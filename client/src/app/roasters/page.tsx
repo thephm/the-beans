@@ -36,13 +36,9 @@ export default function RoastersPage() {
       const response = await fetch(`http://localhost:5000/api/roasters?sort=${sortBy}`)
       if (response.ok) {
         const data = await response.json()
-        console.log('API Response:', data) // Debug log
-        console.log('Roasters array:', data.roasters) // Debug log
-        console.log('Is array?', Array.isArray(data.roasters)) // Debug log
         // The API returns { roasters: [...], pagination: {...} }
         // so we need to extract the roasters array
         const roastersArray = data.roasters || []
-        console.log('Setting roasters to:', roastersArray) // Debug log
         setRoasters(roastersArray)
       } else {
         console.error('Failed to fetch roasters:', response.status, response.statusText)

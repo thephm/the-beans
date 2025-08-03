@@ -262,8 +262,28 @@ router.get('/', [
     const total = await prisma.roaster.count({ where });
     const pages = Math.ceil(total / limit);
 
+    // Add imageUrl field for frontend compatibility
+    const roastersWithImageUrl = filteredRoasters.map((roaster: any) => {
+      const result = {
+        ...roaster,
+        imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
+      };
+      
+      // Round rating to 1 decimal place
+      if (roaster.rating && typeof roaster.rating === 'number') {
+        result.rating = parseFloat(roaster.rating.toFixed(1));
+      }
+      
+      // Round distance to 1 decimal place (only available if location filtering was applied)
+      if (roaster.distance && typeof roaster.distance === 'number') {
+        result.distance = parseFloat(roaster.distance.toFixed(1));
+      }
+      
+      return result;
+    });
+
     res.json({
-      roasters: filteredRoasters,
+      roasters: roastersWithImageUrl,
       pagination: {
         page,
         limit,
@@ -485,3 +505,4 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 export default router;
+// trigger restart
