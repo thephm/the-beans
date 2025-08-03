@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 
+// Updated search routes with image URL support
 const router = Router();
 const prisma = new PrismaClient();
 
@@ -266,14 +267,25 @@ router.get('/roasters', async (req: any, res: any) => {
       }
     });
 
-    // Add mock distance and rating for frontend
-    const roastersWithExtras = roasters.map((roaster: any) => ({
-      ...roaster,
-      distance: Math.random() * parseFloat(distance.toString()), // Mock distance for now
-      rating: 4.5 + Math.random() * 0.5, // Mock rating between 4.5-5.0
-      reviewCount: roaster._count.reviews,
-      priceRange: '$$$', // Mock price range
-    }));
+    // Add mock distance and rating for frontend  
+    const roastersWithExtras = roasters.map((roaster: any) => {
+      // Add imageUrl for frontend compatibility
+      const result = {
+        ...roaster,
+        imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
+        distance: parseFloat((Math.random() * parseFloat(distance.toString())).toFixed(1)), // Mock distance for now
+        priceRange: '$$$', // Mock price range
+      };
+
+      // Round rating to 1 decimal place
+      if (roaster.rating && typeof roaster.rating === 'number') {
+        result.rating = parseFloat(roaster.rating.toFixed(1));
+      } else {
+        result.rating = parseFloat((4.5 + Math.random() * 0.5).toFixed(1)); // Mock rating between 4.5-5.0
+      }
+      
+      return result;
+    });
 
     res.json(roastersWithExtras);
   } catch (error) {
