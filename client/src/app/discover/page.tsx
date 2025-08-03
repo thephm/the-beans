@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { SearchSection } from '@/components/SearchSection'
 
 interface Roaster {
@@ -17,6 +18,7 @@ interface Roaster {
 }
 
 export default function DiscoverPage() {
+  const searchParams = useSearchParams()
   const [roasters, setRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({
@@ -25,6 +27,18 @@ export default function DiscoverPage() {
     specialty: '',
     distance: 25
   })
+
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || ''
+    const urlLocation = searchParams.get('location') || ''
+    
+    setFilters(prev => ({
+      ...prev,
+      search: urlSearch,
+      location: urlLocation
+    }))
+  }, [searchParams])
 
   const searchRoasters = async () => {
     setLoading(true)
@@ -48,16 +62,23 @@ export default function DiscoverPage() {
   }
 
   useEffect(() => {
-    searchRoasters()
-  }, [])
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
+    // Only search when filters have been initialized (including from URL params)
+    if (filters.search || filters.location || filters.specialty) {
       searchRoasters()
-    }, 500) // Debounce search by 500ms
+    } else {
+      // If no filters are set, still do an initial search to show all roasters
+      searchRoasters()
+    }
+  }, [filters.search, filters.location, filters.specialty, filters.distance])
+
+  // Remove the debounced search effect since we're handling it in the main effect
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     searchRoasters()
+  //   }, 500) // Debounce search by 500ms
     
-    return () => clearTimeout(timeoutId)
-  }, [filters])
+  //   return () => clearTimeout(timeoutId)
+  // }, [filters])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
