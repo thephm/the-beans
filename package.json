@@ -1,0 +1,30 @@
+{
+  "name": "the-beans",
+  "version": "1.0.0",
+  "description": "A coffee roaster discovery app for finding fresh espresso beans and cafes",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "setup": "npm run install:all"
+  },
+  "keywords": [
+    "coffee",
+    "roaster",
+    "espresso",
+    "cafe",
+    "discovery",
+    "location",
+    "mobile",
+    "web"
+  ],
+  "author": "thephm",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
