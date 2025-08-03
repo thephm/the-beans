@@ -1,0 +1,39 @@
+{
+  "name": "The Beans",
+  "short_name": "TheBeans",
+  "description": "Discover fresh coffee roasters and cafes near you",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3edff",
+  "theme_color": "#a673ff",
+  "orientation": "portrait-primary",
+  "categories": ["food", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}

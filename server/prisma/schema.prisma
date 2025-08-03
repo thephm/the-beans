@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  avatar    String?
+  bio       String?
+  location  String?
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  roasters     Roaster[]
+  reviews      Review[]
+  favorites    Favorite[]
+  notifications Notification[]
+  comments     Comment[]
+
+  @@map("users")
+}
+
+model Roaster {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  email       String?
+  phone       String?
+  website     String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  country     String   @default("US")
+  latitude    Float?
+  longitude   Float?
+  images      String[]
+  hours       Json?    // Store opening hours as JSON
+  priceRange  String?  // $, $$, $$$, $$$$
+  specialties String[] // Array of specialties like "Espresso", "Single Origin", etc.
+  verified    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  owner    User     @relation(fields: [ownerId], references: [id])
+  ownerId  String
+  cafes    Cafe[]
+  reviews  Review[]
+  favorites Favorite[]
+  beans    Bean[]
+
+  @@map("roasters")
+}
+
+model Cafe {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  country   String   @default("US")
+  latitude  Float?
+  longitude Float?
+  phone     String?
+  website   String?
+  images    String[]
+  hours     Json?    // Store opening hours as JSON
+  amenities String[] // WiFi, Parking, Outdoor Seating, etc.
+  rating    Float    @default(0)
+  reviewCount Int    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  roaster   Roaster @relation(fields: [roasterId], references: [id])
+  roasterId String
+  reviews   Review[]
+
+  @@map("cafes")
+}
+
+model Bean {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  origin      String?  // Country/region of origin
+  process     String?  // Washed, Natural, Honey, etc.
+  roastLevel  String?  // Light, Medium, Dark
+  price       Float?
+  weight      String?  // 12oz, 1lb, etc.
+  tastingNotes String[] // Chocolate, Fruity, Nutty, etc.
+  availability Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  roaster   Roaster @relation(fields: [roasterId], references: [id])
+  roasterId String
+
+  @@map("beans")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // 1-5 stars
+  title     String?
+  content   String?
+  images    String[]
+  helpful   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  roaster   Roaster? @relation(fields: [roasterId], references: [id])
+  roasterId String?
+  cafe      Cafe?    @relation(fields: [cafeId], references: [id])
+  cafeId    String?
+  comments  Comment[]
+
+  @@map("reviews")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  review   Review @relation(fields: [reviewId], references: [id])
+  reviewId String
+
+  @@map("comments")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relationships
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  roaster   Roaster @relation(fields: [roasterId], references: [id])
+  roasterId String
+
+  @@unique([userId, roasterId])
+  @@map("favorites")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // new_roaster, new_review, etc.
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  data      Json?    // Additional data for the notification
+  createdAt DateTime @default(now())
+
+  // Relationships
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@map("notifications")
+}
