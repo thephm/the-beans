@@ -155,15 +155,6 @@ export default function CafesPage() {
               </button>
             </div>
           )}
-
-          {/* Debug info */}
-          <div className="mt-4 text-sm text-gray-500">
-            Cafes state: {JSON.stringify({
-              isArray: Array.isArray(cafes),
-              length: cafes?.length,
-              type: typeof cafes
-            })}
-          </div>
         </div>
       </div>
     </div>

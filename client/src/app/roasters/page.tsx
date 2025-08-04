@@ -62,7 +62,7 @@ export default function RoastersPage() {
               Coffee Roasters
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Explore our complete collection of artisanal coffee roasters. From small-batch specialists to award-winning masters.
+              Explore our collection of artisanal coffee roasters.
             </p>
           </div>
 
