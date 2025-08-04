@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useAuth } from '@/contexts/AuthContext'
+import { UserMenu } from '@/components/UserMenu'
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { isAuthenticated, loading } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +18,26 @@ export function Navbar() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Don't render until auth state is loaded
+  if (loading) {
+    return (
+      <nav className="fixed top-0 left-0 right-0 z-[9999] bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">☕</span>
+              </div>
+              <span className="font-bold text-xl bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent">
+                The Beans
+              </span>
+            </Link>
+          </div>
+        </div>
+      </nav>
+    )
+  }
 
   return (
     <nav
@@ -50,18 +73,26 @@ export function Navbar() {
             <Link href="/about" className="text-gray-700 hover:text-primary-600 transition-colors">
               About
             </Link>
-            <Link 
-              href="/login" 
-              className="text-primary-600 hover:text-primary-700 transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link 
-              href="/signup" 
-              className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
-            >
-              Join Free
-            </Link>
+            
+            {/* Authentication Section */}
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <>
+                <Link 
+                  href="/login" 
+                  className="text-primary-600 hover:text-primary-700 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
+                >
+                  Join Free
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -85,27 +116,40 @@ export function Navbar() {
             className="md:hidden border-t border-lavender-200 mt-2 pt-4 pb-4"
           >
             <div className="flex flex-col space-y-3">
-              <Link href="/discover" className="text-gray-700 hover:text-primary-600 py-2">
+              <Link href="/discover" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 Discover
               </Link>
-              <Link href="/roasters" className="text-gray-700 hover:text-primary-600 py-2">
+              <Link href="/roasters" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 Roasters
               </Link>
-              <Link href="/cafes" className="text-gray-700 hover:text-primary-600 py-2">
+              <Link href="/cafes" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 Cafes
               </Link>
-              <Link href="/about" className="text-gray-700 hover:text-primary-600 py-2">
+              <Link href="/about" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 About
               </Link>
-              <Link href="/login" className="text-primary-600 hover:text-primary-700 py-2">
-                Sign In
-              </Link>
-              <Link 
-                href="/signup" 
-                className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-3 rounded-lg text-center"
-              >
-                Join Free
-              </Link>
+              
+              {/* Mobile Authentication Section */}
+              {isAuthenticated ? (
+                <div className="border-t border-lavender-200 pt-3 mt-3">
+                  <div className="px-2 py-2">
+                    <UserMenu />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Link href="/login" className="text-primary-600 hover:text-primary-700 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                    Sign In
+                  </Link>
+                  <Link 
+                    href="/signup" 
+                    className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-3 rounded-lg text-center"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Join Free
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
