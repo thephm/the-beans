@@ -108,57 +108,6 @@ export default function DiscoverPage() {
             />
           </div>
 
-          {/* Filters */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Refine Your Search</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-                <input
-                  type="text"
-                  value={filters.search}
-                  onChange={(e) => setFilters({...filters, search: e.target.value})}
-                  placeholder="Roaster name or coffee type"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                <input
-                  type="text"
-                  value={filters.location}
-                  onChange={(e) => setFilters({...filters, location: e.target.value})}
-                  placeholder="City or zip code"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Specialty</label>
-                <select
-                  value={filters.specialty}
-                  onChange={(e) => setFilters({...filters, specialty: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="">All Specialties</option>
-                  <option value="espresso">Espresso</option>
-                  <option value="single-origin">Single Origin</option>
-                  <option value="cold-brew">Cold Brew</option>
-                  <option value="fair-trade">Fair Trade</option>
-                  <option value="organic">Organic</option>
-                </select>
-              </div>
-              <div className="flex items-end">
-                <button
-                  onClick={searchRoasters}
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white py-2 px-6 rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50"
-                >
-                  {loading ? 'Searching...' : 'Search'}
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* Results */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? (
@@ -223,3 +172,4 @@ export default function DiscoverPage() {
     </div>
   )
 }
+// force recompile
