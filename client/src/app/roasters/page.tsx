@@ -23,9 +23,28 @@ export default function RoastersPage() {
   const [roasters, setRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState('name')
+  const [favorites, setFavorites] = useState<string[]>([])
+
+  // Load favorites from localStorage
+  useEffect(() => {
+    const savedFavorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
+    setFavorites(savedFavorites)
+  }, [])
 
   // Debug log
   console.log('Roasters state:', roasters, 'Type:', typeof roasters, 'Is array:', Array.isArray(roasters))
+
+  const toggleFavorite = (roasterId: string) => {
+    let updatedFavorites
+    if (favorites.includes(roasterId)) {
+      updatedFavorites = favorites.filter(id => id !== roasterId)
+    } else {
+      updatedFavorites = [...favorites, roasterId]
+    }
+    
+    setFavorites(updatedFavorites)
+    localStorage.setItem('favoriteRoasters', JSON.stringify(updatedFavorites))
+  }
 
   useEffect(() => {
     fetchRoasters()
@@ -171,8 +190,15 @@ export default function RoastersPage() {
                       >
                         View Details 💜
                       </Link>
-                      <button className="px-4 py-2 border border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors">
-                        ❤️
+                      <button 
+                        onClick={() => toggleFavorite(roaster.id)}
+                        className={`px-4 py-2 border rounded-lg transition-all transform hover:scale-105 ${
+                          favorites.includes(roaster.id)
+                            ? 'bg-red-100 border-red-300 text-red-600 hover:bg-red-200'
+                            : 'border-primary-500 text-primary-600 hover:bg-primary-50'
+                        }`}
+                      >
+                        {favorites.includes(roaster.id) ? '❤️' : '🤍'}
                       </button>
                     </div>
                   </div>
