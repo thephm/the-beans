@@ -25,6 +25,25 @@ export default function CafesPage() {
   const [cafes, setCafes] = useState<Cafe[]>([])
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState('name')
+  const [favorites, setFavorites] = useState<string[]>([])
+
+  // Load favorites from localStorage
+  useEffect(() => {
+    const savedFavorites = JSON.parse(localStorage.getItem('favoriteCafes') || '[]')
+    setFavorites(savedFavorites)
+  }, [])
+
+  const toggleFavorite = (cafeId: string) => {
+    let updatedFavorites
+    if (favorites.includes(cafeId)) {
+      updatedFavorites = favorites.filter(id => id !== cafeId)
+    } else {
+      updatedFavorites = [...favorites, cafeId]
+    }
+    
+    setFavorites(updatedFavorites)
+    localStorage.setItem('favoriteCafes', JSON.stringify(updatedFavorites))
+  }
 
   // Add debugging to track state changes
   console.log('Render - cafes state:', {
@@ -134,8 +153,15 @@ export default function CafesPage() {
                       >
                         Visit Cafe 💜
                       </Link>
-                      <button className="px-4 py-2 border border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors">
-                        ❤️
+                      <button 
+                        onClick={() => toggleFavorite(cafe.id)}
+                        className={`px-4 py-2 border rounded-lg transition-all transform hover:scale-105 ${
+                          favorites.includes(cafe.id)
+                            ? 'bg-red-100 border-red-300 text-red-600 hover:bg-red-200'
+                            : 'border-primary-500 text-primary-600 hover:bg-primary-50'
+                        }`}
+                      >
+                        {favorites.includes(cafe.id) ? '❤️' : '🤍'}
                       </button>
                     </div>
                   </div>
