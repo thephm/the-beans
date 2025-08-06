@@ -26,6 +26,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') {
+      setLoading(false)
+      return
+    }
+
     // Check for existing auth data on mount
     const token = localStorage.getItem('token')
     const userData = localStorage.getItem('user')

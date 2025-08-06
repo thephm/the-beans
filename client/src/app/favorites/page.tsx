@@ -1,9 +1,9 @@
 'use client'
 
-import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Roaster {
   id: number
@@ -25,12 +25,19 @@ interface Cafe {
 }
 
 export default function FavoritesPage() {
-  const { isAuthenticated, loading } = useAuth()
   const router = useRouter()
+  const { user, loading } = useAuth()
   const [favoriteRoasters, setFavoriteRoasters] = useState<Roaster[]>([])
   const [favoriteCafes, setFavoriteCafes] = useState<Cafe[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [favorites, setFavorites] = useState<{[key: string]: boolean}>({})
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [user, loading, router])
 
   const toggleFavorite = (id: number, type: 'roaster' | 'cafe') => {
     const key = `${type}-${id}`
@@ -66,15 +73,7 @@ export default function FavoritesPage() {
   }
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login')
-    }
-  }, [isAuthenticated, loading, router])
-
-  useEffect(() => {
     const loadFavorites = async () => {
-      if (!isAuthenticated) return
-
       try {
         // Get favorites from localStorage using the actual keys used by roasters/cafes pages
         const favoriteRoasterIds = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
@@ -117,16 +116,12 @@ export default function FavoritesPage() {
     }
 
     loadFavorites()
-  }, [isAuthenticated])
+  }, [])
 
-  if (loading || isLoading) {
+  if (isLoading) {
     return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center">
       <div className="text-xl">Loading...</div>
     </div>
-  }
-
-  if (!isAuthenticated) {
-    return null
   }
 
   const hasFavorites = favoriteRoasters.length > 0 || favoriteCafes.length > 0
