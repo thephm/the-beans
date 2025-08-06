@@ -209,7 +209,7 @@ export default function RoastersPage() {
             <div className="text-center py-12">
               <div className="text-6xl mb-4">☕</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">No Roasters Found</h3>
-              <p className="text-gray-600 mb-6">We couldn't find any roasters matching your criteria.</p>
+              <p className="text-gray-600 mb-6">We're constantly adding new roasters. Check back soon!</p>
               <button 
                 onClick={() => {
                   setSortBy('name')
@@ -217,23 +217,8 @@ export default function RoastersPage() {
                 }}
                 className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105"
               >
-                View All Roasters
-              </button>
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!loading && roasters.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">☕</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No roasters found</h3>
-              <p className="text-gray-600 mb-6">We're constantly adding new roasters. Check back soon!</p>
-              <Link
-                href="/discover"
-                className="inline-flex items-center bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
-              >
                 Discover Roasters 🔍
-              </Link>
+              </button>
             </div>
           )}
         </div>
