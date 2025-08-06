@@ -9,8 +9,6 @@ export const metadata = {
   title: 'The Beans - Coffee Roaster Discovery',
   description: 'Discover fresh coffee roasters and cafes near you',
   manifest: '/manifest.json',
-  themeColor: '#a673ff',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 }
 
 export default function RootLayout({
@@ -21,8 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" sizes="192x192" />
         <meta name="theme-color" content="#a673ff" />
       </head>
       <body className={`${inter.className} bg-gradient-lavender min-h-screen`}>
