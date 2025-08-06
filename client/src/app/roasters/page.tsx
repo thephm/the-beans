@@ -50,7 +50,7 @@ export default function RoastersPage() {
     fetchRoasters()
   }, [sortBy])
 
-  const fetchRoasters = async () => {
+  const fetchRoasters = async (retryCount = 0) => {
     try {
       const response = await fetch(`http://localhost:5000/api/roasters?sort=${sortBy}`)
       if (response.ok) {
@@ -65,9 +65,20 @@ export default function RoastersPage() {
       }
     } catch (error) {
       console.error('Failed to fetch roasters:', error)
-      setRoasters([]) // Set empty array as fallback
+      // Retry once after 1 second if backend isn't ready yet
+      if (retryCount < 2) {
+        console.log('Retrying fetch roasters in 1 second...')
+        setTimeout(() => fetchRoasters(retryCount + 1), 1000)
+        return
+      }
+      setRoasters([]) // Set empty array as fallback after retries
     } finally {
-      setLoading(false)
+      // Always set loading to false after retries complete or on first successful call
+      if (retryCount === 0) {
+        setTimeout(() => setLoading(false), 100)
+      } else if (retryCount >= 2) {
+        setLoading(false)
+      }
     }
   }
 
