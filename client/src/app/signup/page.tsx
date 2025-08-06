@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -17,7 +16,6 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [passwordStrength, setPasswordStrength] = useState('')
   const router = useRouter()
-  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,8 +45,7 @@ export default function SignupPage() {
 
       if (response.ok) {
         const data = await response.json()
-        login(data.token, data.user)
-        router.push('/discover')
+        router.push('/')
       } else {
         const errorData = await response.json()
         setError(errorData.error || 'Registration failed')
