@@ -3,42 +3,51 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 
-// Mock data - in a real app, this would come from your API
-const featuredRoasters = [
-  {
-    id: 1,
-    name: 'Purple Mountain Coffee',
-    location: 'Seattle, WA',
-    image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=300&fit=crop',
-    rating: 4.8,
-    specialty: 'Single Origin Ethiopian',
-    distance: '2.3 miles',
-    description: 'Award-winning roaster specializing in light roasts and pour-over brewing methods.',
-  },
-  {
-    id: 2,
-    name: 'Lavender Bean Co.',
-    location: 'Portland, OR',
-    image: 'https://images.unsplash.com/photo-1442550528053-c431ecb55509?w=400&h=300&fit=crop',
-    rating: 4.9,
-    specialty: 'Espresso Blends',
-    distance: '4.1 miles',
-    description: 'Family-owned roastery with three cafe locations and online ordering.',
-  },
-  {
-    id: 3,
-    name: 'Violet Coffee Works',
-    location: 'San Francisco, CA',
-    image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop',
-    rating: 4.7,
-    specialty: 'Cold Brew',
-    distance: '1.8 miles',
-    description: 'Modern roastery focusing on sustainable sourcing and innovative brewing techniques.',
-  },
-]
+interface Roaster {
+  id: string
+  name: string
+  city: string
+  state: string
+  rating: number
+  specialties: string[]
+  description: string
+  imageUrl: string
+}
 
 export function FeaturedRoasters() {
+  const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchFeaturedRoasters()
+  }, [])
+
+  const fetchFeaturedRoasters = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/roasters?limit=3')
+      if (response.ok) {
+        const data = await response.json()
+        setFeaturedRoasters(data.roasters || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch featured roasters:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 via-lavender-50 to-orchid-50">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-lg text-gray-600">Loading featured roasters...</div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 via-lavender-50 to-orchid-50">
       <div className="max-w-7xl mx-auto">
@@ -73,7 +82,7 @@ export function FeaturedRoasters() {
             >
               <div className="relative h-48">
                 <Image
-                  src={roaster.image}
+                  src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=300&fit=crop'}
                   alt={roaster.name}
                   fill
                   className="object-cover"
@@ -81,15 +90,12 @@ export function FeaturedRoasters() {
                 <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600">
                   ⭐ {roaster.rating}
                 </div>
-                <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
-                  📍 {roaster.distance}
-                </div>
               </div>
               
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
-                <p className="text-gray-600 mb-2">📍 {roaster.location}</p>
-                <p className="text-primary-600 font-medium mb-3">☕ {roaster.specialty}</p>
+                <p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>
+                <p className="text-primary-600 font-medium mb-3">☕ {roaster.specialties?.[0] || 'Coffee Roasting'}</p>
                 <p className="text-gray-600 text-sm mb-4">{roaster.description}</p>
                 
                 <div className="flex gap-2">
