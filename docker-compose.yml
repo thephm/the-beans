@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Development Only)
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: the_beans_db
+      POSTGRES_USER: beans_user
+      POSTGRES_PASSWORD: 2w3E4r%T
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/prisma/schema.prisma:/docker-entrypoint-initdb.d/schema.prisma
+    networks:
+      - coffee-network
+    restart: unless-stopped
+
+  # Backend API Server
+  server:
+    build: ./server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://beans_user:2w3E4r%T@database:5432/the_beans_db
+    depends_on:
+      - database
+    networks:
+      - coffee-network
+    restart: unless-stopped
+
+  # Frontend Next.js App  
+  client:
+    build: ./client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - server
+    networks:
+      - coffee-network
+    restart: unless-stopped
+
+networks:
+  coffee-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  server_node_modules:
+  client_node_modules:
