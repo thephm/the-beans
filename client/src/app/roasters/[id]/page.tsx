@@ -27,6 +27,26 @@ interface Roaster {
   owner?: string | { id: string; username: string; firstName: string; lastName: string }
 }
 
+// Utility function to format time from 24-hour to 12-hour format with proper spacing
+const formatTime = (timeString: string): string => {
+  // Handle time ranges like "6:30-19:00"
+  if (timeString.includes('-')) {
+    const [startTime, endTime] = timeString.split('-');
+    const formattedStart = format24HourTo12Hour(startTime.trim());
+    const formattedEnd = format24HourTo12Hour(endTime.trim());
+    return `${formattedStart} - ${formattedEnd}`;
+  }
+  
+  return format24HourTo12Hour(timeString);
+};
+
+const format24HourTo12Hour = (time: string): string => {
+  const [hours, minutes] = time.split(':').map(Number);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+};
+
 export default function RoasterDetail() {
   const params = useParams()
   const router = useRouter()
@@ -214,15 +234,19 @@ export default function RoasterDetail() {
                 {roaster.hours && (
                   <div className="mb-8">
                     <h3 className="text-xl font-bold text-gray-900 mb-4">Hours</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {Object.entries(roaster.hours).map(([day, hours]) => (
-                        <div key={day} className="flex justify-between py-1">
-                          <span className="font-medium text-gray-700 capitalize">{day}:</span>
-                          <span className="text-gray-600">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {Object.entries(
+                        typeof roaster.hours === 'string' 
+                          ? JSON.parse(roaster.hours) 
+                          : roaster.hours
+                      ).map(([day, hours]) => (
+                        <div key={day} className="flex items-center py-1">
+                          <span className="font-medium text-gray-700 capitalize w-24">{day}:</span>
+                          <span className="text-gray-600 ml-2">
                             {typeof hours === 'string' 
-                              ? hours
+                              ? formatTime(hours)
                               : typeof hours === 'object' && hours !== null && 'open' in hours && 'close' in hours
-                                ? `${hours.open} - ${hours.close}`
+                                ? formatTime(`${hours.open}-${hours.close}`)
                                 : 'Hours not available'
                             }
                           </span>
