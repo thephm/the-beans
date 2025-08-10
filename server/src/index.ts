@@ -21,10 +21,18 @@ dotenv.config();
 const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
-// Rate limiting
-const limiter = rateLimit({
+// Rate limiting - More reasonable limits for development and normal usage
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // increased from 100 to 1000 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+// Stricter rate limiting for auth endpoints only
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // limit auth attempts
+  message: 'Too many authentication attempts, please try again later.',
 });
 
 // Middleware
@@ -34,7 +42,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(morgan('combined'));
-app.use(limiter);
+app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -89,7 +97,7 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes); // Apply stricter rate limiting to auth endpoints
 app.use('/api/users', userRoutes);
 app.use('/api/roasters', roasterRoutes);
 app.use('/api/cafes', cafeRoutes);
