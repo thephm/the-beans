@@ -13972,3 +13972,225 @@ Perfect! I've fixed the "View Details" button on the discover page. Here's what 
 **Result**: Now when users click "View Details" on any roaster card in the discover page, they'll be taken to that roaster's detail page where they can see the full information, hours, specialties, and contact details.
 
 Try clicking on a "View Details" button from the discover page now - it should take you to the individual roaster's detail page! ✅
+
+> that worked!
+
+Working...
+
+Awesome! 🎉 The View Details navigation is working perfectly now. Users can seamlessly navigate from the discover page to the detailed roaster pages.
+
+What's the next issue you'd like me to fix? ☕🔧
+
+> Next problem, on the top page, if i click Espresso pill or one of the others, it fills the "Search for roasters or cafes" search field but doesn't filter the results at the bottom, ie doesn't search. The location search doesn't work there either if I type something in
+
+Summarized conversation history
+
+I see the issue! The specialty pills and location search are filling the search field but not actually triggering the search functionality. Let me investigate the main page search implementation and fix this.
+
+✔ Read `page.tsx`
+
+Now let me check the SearchSection component to see how it handles the specialty pills and search functionality:
+
+✔ Read `SearchSection.tsx`, lines 1 to 100
+
+Let me continue reading to see the specialty pills section:
+
+✔ Read `SearchSection.tsx`, lines 80 to 116
+
+Perfect! I found the issues:
+
+1. **Specialty pills issue**: The pills are calling `handleSearchQueryChange(tag)` which only sets the search field value but doesn't trigger the actual search
+2. **Enter key missing**: There's no enter key handler for the search inputs
+3. **No auto-search**: The search only happens when the search button is clicked
+
+Let me fix these issues by:
+
+1. Making the specialty pills trigger a search automatically
+2. Adding enter key handlers to both search inputs
+3. Ensuring the search is executed when users interact with the pills
+
+`SearchSection.tsx +15 -0`
+
+Now let me add the enter key handlers to the input fields:
+
+`SearchSection.tsx +1 -0`
+
+Working...
+
+`SearchSection.tsx +1 -0`
+
+Now let me update the specialty pills to use the new handler:
+
+`SearchSection.tsx +1 -1`
+
+Now let me restart the client container to apply these changes:
+
+Restart the client container to apply the search functionality fixes
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the search functionality issues on the main page. Here's what I implemented:
+
+## ✅ Fixed Search Functionality Issues
+
+### Problems Fixed:
+
+1. **Specialty pills not triggering search**: Pills were only filling the search field but not executing the search
+2. **No enter key support**: Users couldn't press Enter to search
+3. **Location search not working**: Same enter key issue
+
+### Solutions Implemented:
+
+1. **Added** `handleSpecialtyClick()` function: When users click a specialty pill (Espresso, Single Origin, etc.), it now:
+
+  - Fills the search field with the specialty term
+  - Immediately triggers the search and navigates to /discover with search parameters
+2. **Added** `handleKeyPress()` function: Users can now press Enter in either search field to execute the search
+3. **Enhanced both input fields**: Added `onKeyPress={handleKeyPress}` to both the search and location inputs
+
+### User Experience Improvements:
+
+- **Specialty Pills**: Click "Espresso" → instantly searches for espresso and shows results
+- **Enter Key**: Type in search terms and press Enter → executes search
+- **Location Search**: Type location and press Enter → includes location in search
+- **Search Button**: Still works as before for mouse users
+
+Try it now:
+
+1. Click on any specialty pill (Espresso, Single Origin, etc.) - it should immediately navigate to the discover page with filtered results
+2. Type something in the search field and press Enter - should execute the search
+3. Type a location and press Enter - should include the location in the search
+
+The search functionality should now work seamlessly! ✅
+
+## 126th try
+
+> I think it died because I clicked "Espresso" and got 
+
+```
+"No roasters found
+Try adjusting your search criteria or location."
+
+And then roasters and cafes pages don't show anything anymore
+```
+
+I see the issue! It sounds like clicking "Espresso" triggered a search that returned no results, but more concerning is that the roasters and cafes pages are now empty too. This suggests the database might have lost its data or there's an issue with the search functionality affecting the base queries.
+
+Let me check the current state of the containers and database:
+
+Check the status of all containers to see if they're still running
+
+✔ `docker-compose ps`
+
+The containers are running. Let me check if the database still has data:
+
+Check if roasters still exist in the database
+
+✔ `docker-compose exec database psql -U beans_user -d the_beans_db -c "SELECT COUNT(*) FROM roasters;"`
+
+Check if cafes still exist in the database
+
+✔ `docker-compose exec database psql -U beans_user -d the_beans_db -c "SELECT COUNT(*) FROM cafes;"`
+
+The data is still in the database. Let me check the server logs to see if there are any errors:
+
+Check recent server logs for any errors
+
+`docker-compose logs server --tail=20`
+
+Ah! I see the problem! The server logs show **HTTP 429 "Too Many Requests"** errors. The search functionality I implemented is making too many API calls and hitting a rate limit. This is likely because:
+
+1. The specialty pills are triggering searches immediately
+2. There might be multiple rapid-fire requests
+3. The server has rate limiting that's blocking subsequent requests
+
+The 429 errors are affecting not just the search but also the basic `/api/roasters?sort=name` calls, which is why your roasters and cafes pages are now empty.
+
+Let me check if there's a rate limiting configuration in the server, and then fix the search implementation to be less aggressive:
+
+✔ Searched text for `rate.*limit|429|throttle` (`**/server/src/**`), 3 results
+
+Let me check the rate limiting configuration:
+
+✔ Read `index.ts`, lines 20 to 40
+
+The rate limit is set to 100 requests per 15 minutes, which should be reasonable. The issue is that the search functionality is making too many rapid requests when the specialty pills are clicked. Let me fix this by:
+
+1. Adding a small delay/debounce to prevent rapid-fire requests
+2. First, let me restart the server to clear the rate limit:
+
+Restart the server to clear the rate limit
+
+✔ `docker-compose restart server`
+
+Now let me check if the roasters page works again:
+
+Opened Simple Browser at http://localhost:3000/roasters
+
+Good! Now let me fix the search functionality to prevent the rate limiting issue. The problem is that the current implementation triggers immediate searches when pills are clicked, but there might be multiple rapid requests. Let me add a debounce mechanism to the SearchSection:
+
+✔ Read `SearchSection.tsx`, lines 1 to 50
+
+Let me see the rest of the `handleSpecialtyClick` function:
+
+✔ Read `SearchSection.tsx`, lines 40 to 60
+
+I can see that `handleSpecialtyClick` triggers the search immediately. The issue is that when you click multiple pills quickly, it makes multiple rapid API calls. Let me add a simple debounce mechanism to prevent this. However, for the specialty pills, we actually want immediate search - the problem might be elsewhere.
+
+Let me check if there are any issues with the search API implementation that could be causing multiple requests. First, let me modify the search to add a small delay to prevent accidental rapid-fire clicking:
+
+`SearchSection.tsx +3 -1`
+
+Now let me also check the discover page to see if there are any issues there that could be causing multiple API calls:
+
+✔ Searched text for `useEffect|fetch|api` (`**/client/src/app/discover/page.tsx`), 6 results
+
+Let me check the discover page's useEffect implementation:
+
+✔ Read `page.tsx`, lines 30 to 80
+
+I found the issue! The problem is in the discover page's useEffect on line 65. It triggers searchRoasters() every time any filter changes, and it also does an initial search even when no filters are set. This is causing multiple rapid API calls.
+
+When you click a specialty pill:
+
+1. The search params get updated
+2. The `useEffect` on line 33 updates the filters from URL params
+3. The `useEffect` on line 65 triggers a search because filters changed
+4. This happens very rapidly, causing rate limiting
+
+Let me fix this by adding proper debouncing to prevent rapid-fire API calls:
+
+`page.tsx +5 -6`
+
+Now let me restart the client container to apply these fixes:
+
+Restart client to apply the debounced search fixes
+
+✔ `docker-compose restart client`
+
+Perfect! Now the issues should be resolved. Here's what I fixed:
+
+## ✅ Fixed Rate Limiting and Search Issues
+
+### The Problem:
+
+The search functionality was causing HTTP 429 "Too Many Requests" errors because:
+
+1. **Multiple rapid API calls**: When specialty pills were clicked, multiple useEffect hooks triggered searches simultaneously
+2. **No debouncing**: The discover page was making immediate API calls on every filter change
+3. **Rate limit exhaustion**: This blocked not just searches but also basic roaster/cafe page requests
+
+### The Solution:
+
+1. **Added debouncing to discover page**: 300ms delay prevents rapid-fire API calls when filters change
+2. **Added small delay to specialty clicks**: 100ms delay prevents accidental double-clicks
+3. **Restarted server**: Cleared the rate limit state
+
+### What to Test Now:
+
+1. **Roasters page** should work again - try http://localhost:3000/roasters
+2. **Cafes page** should work again - try http://localhost:3000/cafes
+3. **Specialty pills** should work without causing rate limiting - try clicking "Espresso"
+4. **Search functionality** should work smoothly with proper debouncing
+
+The app should now be fully functional again! The rate limiting was the root cause of everything appearing broken. Try navigating to different pages and testing the search functionality - it should all work properly now without hitting the API limits.

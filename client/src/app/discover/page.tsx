@@ -63,13 +63,12 @@ export default function DiscoverPage() {
   }
 
   useEffect(() => {
-    // Only search when filters have been initialized (including from URL params)
-    if (filters.search || filters.location || filters.specialty) {
+    // Debounce the search to prevent rapid-fire API calls
+    const timeoutId = setTimeout(() => {
       searchRoasters()
-    } else {
-      // If no filters are set, still do an initial search to show all roasters
-      searchRoasters()
-    }
+    }, 300) // Debounce search by 300ms
+    
+    return () => clearTimeout(timeoutId)
   }, [filters.search, filters.location, filters.specialty, filters.distance])
 
   // Remove the debounced search effect since we're handling it in the main effect

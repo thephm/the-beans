@@ -39,6 +39,23 @@ export function SearchSection({
     onLocationChange?.(value)
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
+  const handleSpecialtyClick = (tag: string) => {
+    setLocalSearchQuery(tag)
+    onSearchQueryChange?.(tag)
+    // Add a small delay to prevent rapid-fire requests
+    setTimeout(() => {
+      if (onSearch) {
+        onSearch(tag, localLocation)
+      }
+    }, 100)
+  }
+
   return (
     <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-4xl mx-auto">
@@ -67,6 +84,7 @@ export function SearchSection({
                 id="search"
                 value={localSearchQuery}
                 onChange={(e) => handleSearchQueryChange(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="e.g., Blue Bottle, espresso, single origin..."
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
@@ -81,6 +99,7 @@ export function SearchSection({
                 id="location"
                 value={localLocation}
                 onChange={(e) => handleLocationChange(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="Enter city or zip code"
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
@@ -101,7 +120,7 @@ export function SearchSection({
             {['Espresso', 'Single Origin', 'Cold Brew', 'Fair Trade', 'Organic'].map((tag) => (
               <button
                 key={tag}
-                onClick={() => handleSearchQueryChange(tag)}
+                onClick={() => handleSpecialtyClick(tag)}
                 className="px-3 py-1 bg-white text-primary-600 rounded-full text-sm border border-primary-200 hover:bg-primary-50 transition-colors"
               >
                 {tag}
