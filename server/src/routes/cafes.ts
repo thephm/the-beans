@@ -209,7 +209,7 @@ router.get('/', [
       hours: JSON.stringify(cafe.hours) || '',
       rating: cafe.rating || 0,
       reviewCount: cafe._count.reviews,
-      imageUrl: cafe.images?.[0] || '/images/default-cafe.jpg',
+      imageUrl: cafe.images?.[0] || '/images/default-cafe.svg',
       roasterName: cafe.roaster?.name || '',
       roasterId: cafe.roaster?.id || '',
       features: cafe.amenities || [],
