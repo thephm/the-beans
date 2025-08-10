@@ -14194,3 +14194,69 @@ The search functionality was causing HTTP 429 "Too Many Requests" errors because
 4. **Search functionality** should work smoothly with proper debouncing
 
 The app should now be fully functional again! The rate limiting was the root cause of everything appearing broken. Try navigating to different pages and testing the search functionality - it should all work properly now without hitting the API limits.
+
+## 127th try
+
+> It's better but still doesn't work. Now if I type Espresso in search, it tries to search but fails. I don't think it's searching whatever attribute those pills are in. Search by location when I type in now works without hitting search.
+
+I see the issue! The specialty pills are now working (no more rate limiting), but when you search for "Espresso", it's not finding any results because the search isn't looking in the right database fields. Let me check what attributes the roasters have and how the search is implemented.
+
+Check what specialties data exists in the roasters table
+
+✔ `docker-compose exec database psql -U beans_user -d the_beans_db -c "SELECT name, specialties FROM roasters;"`
+
+Perfect! I can see the issue. The roasters do have "Espresso" in their specialties (Stumptown has it), but let me check how the search API is implemented to see why it's not finding them:
+
+✔ Read `search.ts`, lines 1 to 50
+
+Let me find the specific roaster search endpoint:
+
+Searched text for `router\.(get|post).*roasters` (`**server/src/routes/search.ts`), 1 result
+
+✔ Read `search.ts`, lines 218 to 280
+
+I found the issue! The search implementation is correct - it does search in the `specialties` field when a `specialty` parameter is provided (line 234: `whereClause.specialties = { has: specialty };`). However, the problem is likely that when you type "Espresso" in the `search` field, it's being sent as the search parameter, not the `specialty` parameter.
+
+The `search` parameter only searches in `name`, `description`, `city`, and `state` fields (lines 226-231), but not in `specialties`. Let me check how the frontend is sending the search request:
+
+✔ Read `page.tsx`, lines 40 to 60
+
+The issue is clear now! When you type "Espresso" in the search field, it gets sent as the `search` parameter, which only searches in name, description, city, and state - not in specialties. But the specialties are stored as an array field that needs to be searched differently.
+
+I need to modify the search API to also search within the specialties array when someone types in the general search field. Let me fix this:
+
+`search.ts +1 -0`
+
+Now I need to restart the server to apply this fix:
+
+Restart server to apply the specialties search fix
+
+✔ `docker-compose restart server`
+
+Perfect! Now the search functionality should work properly. Here's what I fixed:
+
+## ✅ Fixed Specialty Search Issue
+
+### The Problem:
+
+When you typed "Espresso" in the search field, the API was only searching in:
+
+- Roaster name
+- Description
+- City
+- State
+
+But NOT in the `specialties` array where "Espresso" is actually stored.
+
+### The Solution:
+
+I added `{ specialties: { has: search } }` to the search conditions, so now when you search for "Espresso", it will also look in the specialties array.
+
+### What Works Now:
+
+1. **Typing "Espresso"** in the search field should now find "Stumptown Coffee Roasters" (which has "Espresso" in its specialties)
+2. **Clicking the "Espresso" pill** should work the same way
+3. **Location search** already worked as you mentioned
+4. **All other specialty terms** like "Single Origin", "Cold Brew", etc. should also be searchable
+
+Try searching for "Espresso" now - it should find Stumptown Coffee Roasters which has "Espresso" in its specialties array! ✅
