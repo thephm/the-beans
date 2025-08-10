@@ -233,4 +233,91 @@ router.get('/', [
   }
 });
 
+/**
+ * @swagger
+ * /api/cafes/{id}:
+ *   get:
+ *     summary: Get a specific cafe by ID
+ *     tags: [Cafes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The cafe ID
+ *     responses:
+ *       200:
+ *         description: The cafe details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cafe'
+ *       404:
+ *         description: Cafe not found
+ */
+router.get('/:id', [
+  param('id').isLength({ min: 1 }).withMessage('Invalid cafe ID'),
+], optionalAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+
+    const cafe = await prisma.cafe.findUnique({
+      where: { id },
+      include: {
+        roaster: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
+        _count: {
+          select: {
+            reviews: true,
+          }
+        }
+      },
+    });
+
+    if (!cafe) {
+      return res.status(404).json({ error: 'Cafe not found' });
+    }
+
+    // Transform data to match frontend expectations
+    const transformedCafe = {
+      id: cafe.id,
+      name: cafe.name,
+      description: '', // Not in schema, provide default
+      address: cafe.address || '',
+      city: cafe.city || '',
+      state: cafe.state || '',
+      phone: cafe.phone || '',
+      website: cafe.website || '',
+      email: '', // Not in schema, provide default
+      rating: cafe.rating || 0,
+      reviewCount: cafe._count.reviews,
+      priceRange: '$', // Not in schema, provide default
+      amenities: cafe.amenities || [],
+      hours: cafe.hours || {},
+      atmosphere: '', // Not in schema, provide default
+      seatingCapacity: 0, // Not in schema, provide default
+      wifi: cafe.amenities?.includes('WiFi') || false,
+      parking: cafe.amenities?.includes('Parking') || false,
+      imageUrl: cafe.images?.[0] || '/images/default-cafe.svg',
+      roasterName: cafe.roaster?.name || '',
+      roasterId: cafe.roaster?.id || '',
+    };
+
+    res.json(transformedCafe);
+  } catch (error) {
+    console.error('Get cafe by ID error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
