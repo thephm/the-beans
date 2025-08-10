@@ -13267,5 +13267,614 @@ Restarting frontend to clear cache and refresh data
 
 Restarting frontend to clear cache and refresh data
 
-`docker-compose restart client`
+✔ `docker-compose restart client`
 
+Now try refreshing the cafes page at http://localhost:3000/cafes. The images should now show up properly since:
+
+- ✅ The database has the image URLs stored
+- ✅ The API returns the correct SVG fallback path
+- ✅ The frontend container has been restarted to clear any cache
+
+The cafes should now display the Unsplash images instead of "Cafe Photo Coming Soon"!
+
+## 120th try
+
+> Bingo! that worked thanks
+
+Excellent! 🎉 Another issue down! The cafe images are now working properly with the real Unsplash photos instead of the "Cafe Photo Coming Soon" placeholder.
+
+Ready for the next problem whenever you are! What's the next issue you'd like me to tackle? ☕🔧
+
+> In the roaster details page the hours are all messed up, could be some old debug code, here's what it looks like:
+
+```json
+0:
+{
+1:
+"
+2:
+m
+3:
+o
+4:
+n
+5:
+d
+6:
+a
+7:
+y
+8:
+"
+9:
+:
+10:
+11:
+"
+12:
+6
+13:
+:
+14:
+3
+15:
+0
+16:
+-
+17:
+1
+18:
+9
+19:
+:
+20:
+0
+21:
+0
+22:
+"
+23:
+,
+24:
+25:
+"
+26:
+t
+27:
+u
+28:
+e
+29:
+s
+30:
+d
+31:
+a
+32:
+y
+33:
+"
+34:
+:
+35:
+36:
+"
+37:
+6
+38:
+:
+39:
+3
+40:
+0
+41:
+-
+42:
+1
+43:
+9
+44:
+:
+45:
+0
+46:
+0
+47:
+"
+48:
+,
+49:
+50:
+"
+51:
+w
+52:
+e
+53:
+d
+54:
+n
+55:
+e
+56:
+s
+57:
+d
+58:
+a
+59:
+y
+60:
+"
+61:
+:
+62:
+63:
+"
+64:
+6
+65:
+:
+66:
+3
+67:
+0
+68:
+-
+69:
+1
+70:
+9
+71:
+:
+72:
+0
+73:
+0
+74:
+"
+75:
+,
+76:
+77:
+"
+78:
+t
+79:
+h
+80:
+u
+81:
+r
+82:
+s
+83:
+d
+84:
+a
+85:
+y
+86:
+"
+87:
+:
+88:
+89:
+"
+90:
+6
+91:
+:
+92:
+3
+93:
+0
+94:
+-
+95:
+1
+96:
+9
+97:
+:
+98:
+0
+99:
+0
+100:
+"
+101:
+,
+102:
+103:
+"
+104:
+f
+105:
+r
+106:
+i
+107:
+d
+108:
+a
+109:
+y
+110:
+"
+111:
+:
+112:
+113:
+"
+114:
+6
+115:
+:
+116:
+3
+117:
+0
+118:
+-
+119:
+1
+120:
+9
+121:
+:
+122:
+0
+123:
+0
+124:
+"
+125:
+,
+126:
+127:
+"
+128:
+s
+129:
+a
+130:
+t
+131:
+u
+132:
+r
+133:
+d
+134:
+a
+135:
+y
+136:
+"
+137:
+:
+138:
+139:
+"
+140:
+7
+141:
+:
+142:
+0
+143:
+0
+144:
+-
+145:
+1
+146:
+9
+147:
+:
+148:
+0
+149:
+0
+150:
+"
+151:
+,
+152:
+153:
+"
+154:
+s
+155:
+u
+156:
+n
+157:
+d
+158:
+a
+159:
+y
+160:
+"
+161:
+:
+162:
+163:
+"
+164:
+7
+165:
+:
+166:
+0
+167:
+0
+168:
+-
+169:
+1
+170:
+9
+171:
+:
+172:
+0
+173:
+0
+174:
+"
+175:
+}
+```
+
+Ah yes, I can see the issue! The hours are being displayed as if they're iterating over each character in the JSON string instead of parsing it as JSON. This is definitely some debug code or incorrect iteration logic.
+
+Let me find the roaster details page and fix this:
+
+✔ Searched for files matching `**/roasters/[id]/page.tsx`, no matches
+
+✔ Read `page.tsx`, lines 1 to 50
+
+Let me search for where the hours are being displayed:
+
+✔ Searched text for hours (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me search for the debug code pattern that's showing the numbered output:
+
+✔ Searched text for `map|forEach|Object\.entries` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me read more of the file to find where the hours are being rendered:
+
+✔ Read `page.tsx`, lines 150 to 200
+
+✔ Read `page.tsx`, lines 250 to 300
+
+✔ Read `page.tsx`, lines 300 to 363
+
+I notice that I didn't see any hours section in the component. Let me search more specifically for where hours might be displayed:
+
+✔ Searched text for Hours (**/client/src/app/roasters/[id]/page.tsx), no results
+
+Let me search for any JSON parsing or stringified data in the file:
+
+✔ Searched text for JSON (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+The hours section might not be implemented yet, or it could be in a different part of the page. Let me search more broadly for where this debug output might be coming from:
+
+Found it! Let me look at line 218 in the roaster details page:
+
+✔ Read `page.tsx`, lines 210 to 240
+
+Perfect! I found the issue. The problem is that roaster.hours is coming from the API as a JSON string, but the code is trying to do Object.entries(roaster.hours) on the string. When you do Object.entries() on a string, it treats each character as a key-value pair with the index as the key.
+
+Let me check how the hours data is being handled in the API first:
+
+✔ Read `roasters.ts`, lines 70 to 120
+
+Let me find the actual roaster retrieval endpoint:
+
+✔ Read `roasters.ts`, lines 320 to 380
+
+✔ Read `roasters.ts`, lines 380 to 420
+
+I can see that the API is returning the roaster data directly from Prisma, including the hours field. In the database schema, hours is stored as a JSON field, but when it comes back from the API, it might be a string that needs to be parsed.
+
+The fix is to parse the JSON string in the frontend before trying to use Object.entries(). Let me fix the roaster details page:
+
+Working...
+
+`page.tsx +5 -1`
+
+Perfect! I've fixed the issue by adding a check to parse the JSON string if roaster.hours is a string before using Object.entries().
+
+Let me also check and fix the same issue in the cafe details page since I saw it has the same pattern:
+
+✔ Read `page.tsx`, lines 240 to 260
+
+Yes, the cafe page has the same issue. Let me fix it too:
+
+`page.tsx +5 -1`
+
+I need to fix the TypeScript error. Let me update the cafe page to handle the type properly:
+
+`page.tsx +1 -1`
+
+Now the frontend will properly parse the JSON string hours data before trying to iterate over it. The fix will:
+
+1. ✅ Check if `hours` is a string and parse it as JSON
+2. ✅ If it's already an object, use it directly
+3. ✅ Properly iterate over the parsed object instead of individual characters
+
+Try refreshing the roaster details page now - instead of seeing the numbered character breakdown, you should see properly formatted hours like:
+
+```
+Monday: 6:30-19:00
+Tuesday: 6:30-19:00
+Wednesday: 6:30-19:00
+etc.
+```
+
+The same fix has been applied to the cafe details pages as well!
+
+## 121st try
+
+> nothing changed, did you get too excited and forget to restart or did you expect it to pickup the changes automatically? which would be much better of course
+
+You're absolutely right! I got excited about the fix and forgot to restart the client container to pick up the changes. Docker containers don't automatically pick up file changes without a restart (unlike local development with hot reload).
+
+Let me restart the client container now:
+
+Restarting frontend to pick up the hours display fix
+
+✔ `docker-compose restart client`
+
+Now try refreshing the roaster details page - the hours should display properly as:
+
+```
+Monday: 6:30-19:00
+Tuesday: 6:30-19:00
+Wednesday: 6:30-19:00
+etc.
+```
+
+Instead of that crazy numbered character breakdown! The JSON string is now being properly parsed before iteration.
+
+## 122nd try
+
+> that worked! ok, now the next issue if you look at the pasted image the screenshot shows how far away the hours are from the day of the week label e.g. "Monday: " so much so that they butt up against the day of the week on the right side e.g. "Tuesday"
+
+Perfect! I can see the issue from your screenshot. The hours are displaying correctly now, but the layout is problematic - there's too much space between the day labels and their corresponding hours, causing the hours to push up against the next day's label.
+
+Looking at the current CSS grid layout, it's using `justify-between` which pushes the day and hours to opposite ends. Let me fix this spacing issue:
+
+✔ Read `page.tsx`, lines 215 to 230
+
+Working...
+
+I can see the problem! The CSS class `justify-between` is pushing the day label and hours to opposite ends of the container, and with the 2-column grid, this creates the awkward spacing you're seeing.
+
+Let me fix this by changing the layout to use a more compact format:
+
+`page.tsx +4 -4`
+
+Now let me also fix the same issue in the cafe details page:
+
+Read `page.tsx`, lines 240 to 260
+
+`page.tsx +4 -4`
+
+Summarized conversation history
+
+Restart the client container to apply the hours layout fix for cafes
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the hours layout spacing issue for both roaster and cafe detail pages. The changes I made:
+
+1. **Roaster page hours layout** (already done):
+
+  - Changed from `justify-between` to `items-center`
+  - Added fixed width `w-20` for day labels
+  - Added `ml-2` margin for proper spacing
+
+2. **Cafe page hours layout** (just completed):
+
+  - Applied the same fix as the roaster page
+  - Changed from `justify-between` to `items-center`
+  - Added fixed width `w-20` for day labels
+  - Added `ml-2` margin between day and time
+  - Increased gap from `gap-2` to `gap-3` for better visual separation
+
+The client container has been restarted, so the changes should now be live. The hours display should now show properly aligned with consistent spacing, preventing the day labels from butting up against the next day's times.
+
+You can refresh the cafe detail pages to see the improved layout!
+
+## 123rd try
+
+> Much better, but a little agressive on the label and hours as for wednesday they overlap, the others look great
+
+You're right! The fix worked well overall, but Wednesday is overlapping because it's the longest day name. The fixed width of `w-20` (80px) isn't quite enough for "Wednesday:". Let me adjust the width to give a bit more space for the longer day names:
+
+Let me read the current state of the roaster page to see the exact formatting:
+
+✔ Read `page.tsx`, lines 215 to 235
+
+I see the current structure is more complex. Let me update the width from `w-20` to `w-24` to accommodate "Wednesday:":
+
+`page.tsx +1 -1`
+
+Now let me apply the same fix to the cafe details page:
+
+`page.tsx +1 -1`
+
+Restart the client container to apply the wider label width fix
+
+✔ `docker-compose restart client`
+
+## 124th try
+
+> perfect, ok next thing, most people don't know military hours so you should use am and pm and also there's no space between the hours and the dash "-" e.g. "6:30-19:00"
+
+You're absolutely right! Let me fix the hours formatting to be more user-friendly with AM/PM format and proper spacing around the dash.
+
+First, let me check the current hours data format in the seed file to see what we're working with:
+
+Read `seed.ts`, lines 50 to 100
+
+I can see the hours are stored in 24-hour format like "6:30-19:00". Instead of changing all the seed data, I'll create a utility function to convert the times to AM/PM format with proper spacing in the frontend. Let me create this function in the roaster detail page:
+
+✔ Read `page.tsx`, lines 200 to 225
+
+Let me see the complete hours rendering section:
+
+✔ Read `page.tsx`, lines 220 to 240
+
+Now I need to add a utility function to convert 24-hour format to 12-hour AM/PM format with proper spacing. Let me add this function at the top of the component:
+
+✔ Read `page.tsx`, lines 1 to 30
+
+Perfect! I'll add the time formatting function right after the interface definition and before the component:
+
+Working...
+
+`page.tsx +20 -0`
+
+Now I need to update the hours rendering to use this formatting function:
+
+`page.tsx`
+
+Now I need to update the hours rendering to use this formatting function:
+
+`page.tsx +2 -2`
+
+Now let me apply the same fix to the cafe details page. First, let me read the cafe page:
+
+✔ Read `page.tsx`, lines 1 to 30
+
+Let me add the time formatting functions to the cafe page as well:
+
+`page.tsx +20 -0` 
+
+Now let me find the hours section in the cafe page and update it:
+
+Searched text for `hours.*map` (`**/client/src/app/cafes/[id]/page.tsx`), no results
+
+Let me search for the hours rendering in the cafe page:
+
+Searched text for `Object.entries` (`**/client/src/app/cafes/[id]/page.tsx`), no results
+
+Let me read more of the cafe page to find the hours section:
+
+✔ Read `page.tsx`, lines 250 to 300
+
+Perfect! I found the hours section in the cafe page. Now let me update it to use the formatting function:
+
+`page.tsx+1-1`
+
+Now let me restart the client container to apply these changes:
+
+Restart the client container to apply AM/PM time formatting changes
+
+✔ `docker-compose restart client`
