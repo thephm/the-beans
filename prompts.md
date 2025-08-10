@@ -13878,3 +13878,97 @@ Now let me restart the client container to apply these changes:
 Restart the client container to apply AM/PM time formatting changes
 
 ✔ `docker-compose restart client`
+
+Perfect! I've fixed the time formatting issues. Here's what I implemented:
+
+## ✅ Fixed Time Format Issues
+
+Changes Made:
+
+1. **Added utility functions** for time conversion in both roaster and cafe detail pages:
+
+  - `formatTime()` - Handles time ranges and individual times
+  - `format24HourTo12Hour()` - Converts 24-hour to 12-hour format with AM/PM
+
+Fixed spacing and format:
+
+  - **Before**: `6:30-19:00` (no spaces, military time)
+  - **After**: `6:30 AM - 7:00 PM` (proper spacing, civilian time)
+
+3. **Applied to both pages**:
+
+  - Roaster detail pages
+  - Cafe detail pages
+
+Time Format Examples:
+
+The hours will now display as:
+
+- `6:30 AM - 7:00 PM` instead of `6:30-19:00`
+- `7:00 AM - 7:00 PM` instead of `7:00-19:00`
+
+The formatting handles various scenarios:
+
+- **Range times**: "6:30-19:00" → "6:30 AM - 7:00 PM"
+- **Midnight**: "0:00" → "12:00 AM"
+- **Noon**: "12:00" → "12:00 PM"
+
+Try refreshing a roaster or cafe detail page now - the hours should display in a much more user-friendly format with proper AM/PM times and spacing! ✅
+
+## 125th try
+
+> fixed thanks!
+
+Working...
+
+Excellent! 🎉 Glad the AM/PM time formatting is working perfectly now. The hours should be much more user-friendly with proper 12-hour format and spacing.
+
+What's the next issue you'd like me to tackle? ☕🔧
+
+> You're on a roll! Next issue, the View Details from the discover page doesn't go anywhere
+
+Let me investigate the "View Details" button issue on the discover page. I'll check where it's supposed to navigate and see what's broken.
+
+✔ Read `page.tsx`, lines 1 to 50
+
+Let me find where the "View Details" button is defined in the discover page:
+
+Searched text for `View Details` (`**/client/src/app/discover/page.tsx`), 1 result
+
+Let me read around line 156 to see the context of the View Details button:
+
+✔ Read `page.tsx`, lines 140 to 176
+
+ can see the issue! The "View Details" button is missing an onClick handler or a Link component to navigate to the roaster detail page. It's just a static button that doesn't do anything. Let me fix this by adding navigation:
+
+✔ Read `page.tsx`, lines 1 to 10
+
+First, I need to add the Link import and useRouter hook to handle navigation:
+
+`page.tsx +2 -1`
+
+Now I need to fix the View Details button to navigate to the roaster detail page. Let me replace the static button with a Link:
+
+`page.tsx +5 -2`
+
+Now let me restart the client container to apply the changes:
+
+Restart the client container to apply the View Details navigation fix
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the "View Details" button on the discover page. Here's what I did:
+
+## ✅ Fixed View Details Navigation
+
+**The Problem**: The "View Details" button was just a static `<button>` element with no navigation functionality.
+
+**The Fix**:
+
+1. **Added imports**: Added Link from Next.js and useRouter from `next/navigation`
+2. **Converted button to Link**: Changed the static button to a Link component that navigates to `/roasters/${roaster.id}`
+3. **Preserved styling**: Kept all the existing CSS classes and hover effects
+
+**Result**: Now when users click "View Details" on any roaster card in the discover page, they'll be taken to that roaster's detail page where they can see the full information, hours, specialties, and contact details.
+
+Try clicking on a "View Details" button from the discover page now - it should take you to the individual roaster's detail page! ✅
