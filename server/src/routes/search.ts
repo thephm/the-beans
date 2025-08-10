@@ -228,6 +228,7 @@ router.get('/roasters', async (req: any, res: any) => {
         { description: { contains: search, mode: 'insensitive' } },
         { city: { contains: search, mode: 'insensitive' } },
         { state: { contains: search, mode: 'insensitive' } },
+        { specialties: { has: search } }, // Also search in specialties array
       ];
     }
     
