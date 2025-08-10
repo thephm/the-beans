@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { SearchSection } from '@/components/SearchSection'
 
 interface Roaster {
@@ -152,9 +153,12 @@ export default function DiscoverPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">📍 {roaster.distance} miles</span>
-                      <button className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
+                      <Link 
+                        href={`/roasters/${roaster.id}`}
+                        className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
+                      >
                         View Details 💜
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
