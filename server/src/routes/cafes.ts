@@ -212,7 +212,6 @@ router.get('/', [
       imageUrl: cafe.images?.[0] || '/images/default-cafe.svg',
       roasterName: cafe.roaster?.name || '',
       roasterId: cafe.roaster?.id || '',
-      features: cafe.amenities || [],
     }));
 
     const total = await prisma.cafe.count({ where });
@@ -302,12 +301,7 @@ router.get('/:id', [
       rating: cafe.rating || 0,
       reviewCount: cafe._count.reviews,
       priceRange: '$', // Not in schema, provide default
-      amenities: cafe.amenities || [],
       hours: cafe.hours || {},
-      atmosphere: '', // Not in schema, provide default
-      seatingCapacity: 0, // Not in schema, provide default
-      wifi: cafe.amenities?.includes('WiFi') || false,
-      parking: cafe.amenities?.includes('Parking') || false,
       imageUrl: cafe.images?.[0] || '/images/default-cafe.svg',
       roasterName: cafe.roaster?.name || '',
       roasterId: cafe.roaster?.id || '',

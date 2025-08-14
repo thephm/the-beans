@@ -21,7 +21,6 @@ interface Cafe {
   location: string
   rating: number
   imageUrl?: string
-  amenities?: string[]
 }
 
 export default function FavoritesPage() {
@@ -240,15 +239,6 @@ export default function FavoritesPage() {
                             <div>
                               <h3 className="text-xl font-bold text-gray-900 mb-2">{cafe.name}</h3>
                               <p className="text-gray-600 mb-2">{cafe.location}</p>
-                              {cafe.amenities && (
-                                <div className="flex flex-wrap gap-1">
-                                  {cafe.amenities.slice(0, 2).map((amenity, idx) => (
-                                    <span key={idx} className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded">
-                                      {amenity}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
                             </div>
                             <div className="flex items-center space-x-1">
                               <span className="text-yellow-400">★</span>

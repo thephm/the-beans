@@ -57,7 +57,6 @@ export interface Cafe {
   website?: string;
   images: string[];
   hours?: Record<string, any>;
-  amenities: string[];
   rating: number;
   reviewCount: number;
   createdAt: string;
