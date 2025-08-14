@@ -20,6 +20,7 @@ interface Roaster {
 
 export default function DiscoverPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({
@@ -33,11 +34,13 @@ export default function DiscoverPage() {
   useEffect(() => {
     const urlSearch = searchParams.get('search') || ''
     const urlLocation = searchParams.get('location') || ''
+    const urlSpecialty = searchParams.get('specialty') || ''
     
     setFilters(prev => ({
       ...prev,
-      search: urlSearch,
-      location: urlLocation
+      search: urlSearch || urlSpecialty, // If specialty is provided, show it in search field
+      location: urlLocation,
+      specialty: urlSpecialty
     }))
   }, [searchParams])
 
@@ -102,8 +105,22 @@ export default function DiscoverPage() {
               onSearchQueryChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
               onLocationChange={(value) => setFilters(prev => ({ ...prev, location: value }))}
               onSearch={(searchQuery, location) => {
-                setFilters(prev => ({ ...prev, search: searchQuery, location: location }))
-                searchRoasters()
+                // Check if the search query is a specialty (from pill click)
+                const isSpecialtySearch = ['Espresso', 'Single Origin', 'Cold Brew', 'Light Roast', 'Dark Roast', 'Organic'].includes(searchQuery)
+                
+                if (isSpecialtySearch) {
+                  // Update URL with specialty parameter
+                  const newParams = new URLSearchParams()
+                  newParams.set('specialty', searchQuery)
+                  if (location) newParams.set('location', location)
+                  router.push(`/discover?${newParams.toString()}`)
+                } else {
+                  // Regular search
+                  const newParams = new URLSearchParams()
+                  if (searchQuery) newParams.set('search', searchQuery)
+                  if (location) newParams.set('location', location)
+                  router.push(`/discover?${newParams.toString()}`)
+                }
               }}
             />
           </div>
@@ -142,12 +159,13 @@ export default function DiscoverPage() {
                     <p className="text-gray-700 mb-4">{roaster.description}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {roaster.specialties.map((specialty) => (
-                        <span
+                        <button
                           key={specialty}
-                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
+                          onClick={() => router.push(`/discover?specialty=${encodeURIComponent(specialty)}`)}
+                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 cursor-pointer transition-colors"
                         >
                           ☕ {specialty}
-                        </span>
+                        </button>
                       ))}
                     </div>
                     <div className="flex justify-between items-center">
