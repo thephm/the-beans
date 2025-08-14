@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 interface SearchSectionProps {
@@ -20,6 +20,15 @@ export function SearchSection({
 }: SearchSectionProps) {
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
   const [localLocation, setLocalLocation] = useState(location)
+
+  // Sync local state with props when they change
+  useEffect(() => {
+    setLocalSearchQuery(searchQuery)
+  }, [searchQuery])
+
+  useEffect(() => {
+    setLocalLocation(location)
+  }, [location])
 
   const handleSearch = () => {
     if (onSearch) {

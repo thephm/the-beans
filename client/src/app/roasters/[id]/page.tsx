@@ -220,12 +220,13 @@ export default function RoasterDetail() {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Specialties</h3>
                   <div className="flex flex-wrap gap-3">
                     {roaster.specialties.map((specialty) => (
-                      <span
+                      <Link
                         key={specialty}
-                        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium"
+                        href={`/discover?specialty=${encodeURIComponent(specialty)}`}
+                        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                       >
                         ☕ {specialty}
-                      </span>
+                      </Link>
                     ))}
                   </div>
                 </div>

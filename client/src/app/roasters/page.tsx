@@ -156,12 +156,13 @@ export default function RoastersPage() {
                     {/* Specialties */}
                     <div className="flex flex-wrap gap-2 mb-4">
                       {roaster.specialties.slice(0, 3).map((specialty) => (
-                        <span
+                        <Link
                           key={specialty}
-                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
+                          href={`/discover?specialty=${encodeURIComponent(specialty)}`}
+                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 cursor-pointer transition-colors"
                         >
                           ☕ {specialty}
-                        </span>
+                        </Link>
                       ))}
                       {roaster.specialties.length > 3 && (
                         <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
