@@ -169,7 +169,6 @@ async function main() {
         saturday: { open: '08:00', close: '20:00' },
         sunday: { open: '08:00', close: '18:00' }
       },
-      amenities: ['WiFi', 'Outdoor Seating', 'Parking', 'Pet Friendly'],
       rating: 4.8,
       reviewCount: 89,
       roasterId: roaster1.id,

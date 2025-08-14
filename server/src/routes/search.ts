@@ -119,7 +119,6 @@ router.get('/', [
             { name: { contains: q, mode: 'insensitive' } },
             { city: { contains: q, mode: 'insensitive' } },
             { state: { contains: q, mode: 'insensitive' } },
-            { amenities: { has: q } },
           ]
         },
         include: {
