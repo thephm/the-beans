@@ -74,7 +74,12 @@
       "singleOrigin": "Origine unique",
       "coldBrew": "Café froid",
       "decaf": "Décaféiné",
-      "organic": "Biologique"
+      "organic": "Biologique",
+      "artisanal": "Artisanal",
+      "fairTrade": "Commerce équitable",
+      "darkRoast": "Torréfaction foncée",
+      "lightRoast": "Torréfaction claire",
+      "mediumRoast": "Torréfaction moyenne"
     }
   },
   "roasters": {
@@ -181,6 +186,7 @@
     "previous": "Précédent",
     "showMore": "Afficher plus",
     "showLess": "Afficher moins",
+    "more": "plus",
     "selectAll": "Tout sélectionner",
     "none": "Aucun",
     "all": "Tout",

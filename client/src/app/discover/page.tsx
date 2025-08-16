@@ -24,6 +24,24 @@ export default function DiscoverPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
+
+  // Helper function to translate specialty names
+  const translateSpecialty = (specialty: string): string => {
+    const specialtyMap: { [key: string]: string } = {
+      'Cold Brew': 'search.specialties.coldBrew',
+      'Single Origin': 'search.specialties.singleOrigin',
+      'Espresso': 'search.specialties.espresso',
+      'Decaf': 'search.specialties.decaf',
+      'Organic': 'search.specialties.organic',
+      'Artisanal': 'search.specialties.artisanal',
+      'Fair Trade': 'search.specialties.fairTrade',
+      'Dark Roast': 'search.specialties.darkRoast',
+      'Light Roast': 'search.specialties.lightRoast',
+      'Medium Roast': 'search.specialties.mediumRoast'
+    }
+    
+    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
+  }
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({
     search: '',
@@ -152,7 +170,7 @@ export default function DiscoverPage() {
                           onClick={() => router.push(`/discover?specialty=${encodeURIComponent(specialty)}`)}
                           className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                         >
-                          ☕ {specialty}
+                          ☕ {translateSpecialty(specialty)}
                         </button>
                       ))}
                     </div>

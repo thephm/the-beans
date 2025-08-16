@@ -204,7 +204,7 @@ export default function FavoritesPage() {
                               href={`/roasters/${roaster.id}`}
                               className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white py-2 px-4 rounded-lg hover:shadow-lg transition-all text-center"
                             >
-                              View Details
+                              {t('discover.viewDetails')}
                             </Link>
                             <button
                               onClick={() => toggleFavorite(roaster.id, 'roaster')}
@@ -263,7 +263,7 @@ export default function FavoritesPage() {
                               href={`/cafes/${cafe.id}`}
                               className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white py-2 px-4 rounded-lg hover:shadow-lg transition-all text-center"
                             >
-                              View Details
+                              {t('discover.viewDetails')}
                             </Link>
                             <button
                               onClick={() => toggleFavorite(cafe.id, 'cafe')}
