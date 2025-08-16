@@ -60,7 +60,12 @@
       "singleOrigin": "Single Origin",
       "coldBrew": "Cold Brew",
       "decaf": "Decaf",
-      "organic": "Organic"
+      "organic": "Organic",
+      "artisanal": "Artisanal",
+      "fairTrade": "Fair Trade",
+      "darkRoast": "Dark Roast",
+      "lightRoast": "Light Roast",
+      "mediumRoast": "Medium Roast"
     }
   },
   "roasters": {
@@ -181,6 +186,7 @@
     "previous": "Previous",
     "showMore": "Show More",
     "showLess": "Show Less",
+    "more": "more",
     "selectAll": "Select All",
     "none": "None",
     "all": "All",

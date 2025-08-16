@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 interface Roaster {
   id: string
@@ -20,10 +21,29 @@ interface Roaster {
 }
 
 export default function RoastersPage() {
+  const { t } = useTranslation()
   const [roasters, setRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState('name')
   const [favorites, setFavorites] = useState<string[]>([])
+
+  // Helper function to translate specialty names
+  const translateSpecialty = (specialty: string): string => {
+    const specialtyMap: { [key: string]: string } = {
+      'Cold Brew': 'search.specialties.coldBrew',
+      'Single Origin': 'search.specialties.singleOrigin',
+      'Espresso': 'search.specialties.espresso',
+      'Decaf': 'search.specialties.decaf',
+      'Organic': 'search.specialties.organic',
+      'Artisanal': 'search.specialties.artisanal',
+      'Fair Trade': 'search.specialties.fairTrade',
+      'Dark Roast': 'search.specialties.darkRoast',
+      'Light Roast': 'search.specialties.lightRoast',
+      'Medium Roast': 'search.specialties.mediumRoast'
+    }
+    
+    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
+  }
 
   // Load favorites from localStorage
   useEffect(() => {
@@ -161,12 +181,12 @@ export default function RoastersPage() {
                           href={`/discover?specialty=${encodeURIComponent(specialty)}`}
                           className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                         >
-                          ☕ {specialty}
+                          ☕ {translateSpecialty(specialty)}
                         </Link>
                       ))}
                       {roaster.specialties.length > 3 && (
                         <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
-                          +{roaster.specialties.length - 3} more
+                          +{roaster.specialties.length - 3} {t('common.more')}
                         </span>
                       )}
                     </div>

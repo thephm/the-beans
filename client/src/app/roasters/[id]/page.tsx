@@ -57,6 +57,24 @@ export default function RoasterDetail() {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
+  // Helper function to translate specialty names
+  const translateSpecialty = (specialty: string): string => {
+    const specialtyMap: { [key: string]: string } = {
+      'Cold Brew': 'search.specialties.coldBrew',
+      'Single Origin': 'search.specialties.singleOrigin',
+      'Espresso': 'search.specialties.espresso',
+      'Decaf': 'search.specialties.decaf',
+      'Organic': 'search.specialties.organic',
+      'Artisanal': 'search.specialties.artisanal',
+      'Fair Trade': 'search.specialties.fairTrade',
+      'Dark Roast': 'search.specialties.darkRoast',
+      'Light Roast': 'search.specialties.lightRoast',
+      'Medium Roast': 'search.specialties.mediumRoast'
+    }
+    
+    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
+  }
+
   useEffect(() => {
     if (params?.id) {
       fetchRoaster(params.id as string)
@@ -227,7 +245,7 @@ export default function RoasterDetail() {
                         href={`/discover?specialty=${encodeURIComponent(specialty)}`}
                         className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                       >
-                        ☕ {specialty}
+                        ☕ {translateSpecialty(specialty)}
                       </Link>
                     ))}
                   </div>
