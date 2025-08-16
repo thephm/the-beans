@@ -109,31 +109,31 @@ export default function RoastersPage() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              Coffee Roasters
+              {t('roasters.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Explore our collection of artisanal coffee roasters.
+              {t('roasters.subtitle')}
             </p>
           </div>
 
           {/* Filters & Sort */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-              <span className="text-gray-700 font-medium">Sort by:</span>
+              <span className="text-gray-700 font-medium">{t('roasters.sortBy')}</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
-                <option value="name">Name A-Z</option>
-                <option value="-name">Name Z-A</option>
-                <option value="-rating">Highest Rated</option>
-                <option value="-reviewCount">Most Reviewed</option>
-                <option value="city">Location</option>
+                <option value="name">{t('roasters.nameAZ')}</option>
+                <option value="-name">{t('roasters.nameZA')}</option>
+                <option value="-rating">{t('roasters.highestRated')}</option>
+                <option value="-reviewCount">{t('roasters.mostReviewed')}</option>
+                <option value="city">{t('roasters.location')}</option>
               </select>
             </div>
             <div className="text-sm text-gray-600">
-              {roasters.length} roasters found
+              {roasters.length} {t('roasters.resultsFound')}
             </div>
           </div>
 
@@ -193,7 +193,7 @@ export default function RoastersPage() {
 
                     {/* Price Range */}
                     <div className="flex justify-between items-center mb-4">
-                      <span className="text-sm text-gray-600">Price Range: {roaster.priceRange}</span>
+                      <span className="text-sm text-gray-600">{t('roasters.priceRange')} {roaster.priceRange}</span>
                       {roaster.website && (
                         <a 
                           href={roaster.website}
@@ -220,7 +220,7 @@ export default function RoastersPage() {
                         href={`/roasters/${roaster.id}`}
                         className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-2 px-4 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
                       >
-                        View Details 💜
+                        {t('roasters.viewDetails')} 💜
                       </Link>
                       <button 
                         onClick={() => toggleFavorite(roaster.id)}
@@ -240,7 +240,7 @@ export default function RoastersPage() {
           ) : (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">☕</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No Roasters Found</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('roasters.noRoastersFound')}</h3>
               <p className="text-gray-600 mb-6">We're constantly adding new roasters. Check back soon!</p>
               <button 
                 onClick={() => {
