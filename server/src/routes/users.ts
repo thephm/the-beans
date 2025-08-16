@@ -1,6 +1,9 @@
 import { Router } from 'express';
+import { body, validationResult } from 'express-validator';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // In-memory settings storage (in production, this would be a database)
 const userSettings: { [userId: string]: any } = {};
@@ -59,6 +62,35 @@ router.get('/settings', requireAuth, async (req: any, res: any) => {
   } catch (error) {
     console.error('Error fetching user settings:', error);
     res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+// Update user language preference
+router.put('/language', [
+  body('language').isLength({ min: 2, max: 5 }).withMessage('Language code must be 2-5 characters'),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const userId = req.user.id;
+    const { language } = req.body;
+
+    // Update user language in database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { language }
+    });
+
+    res.json({ 
+      message: 'Language preference updated successfully',
+      language 
+    });
+  } catch (error) {
+    console.error('Error updating language preference:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

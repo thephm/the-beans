@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 interface SearchSectionProps {
   onSearch?: (searchQuery: string, location: string) => void
@@ -18,6 +19,7 @@ export function SearchSection({
   onSearchQueryChange,
   onLocationChange 
 }: SearchSectionProps) {
+  const { t } = useTranslation()
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
   const [localLocation, setLocalLocation] = useState(location)
 
@@ -83,10 +85,10 @@ export function SearchSection({
           viewport={{ once: true }}
           className="bg-gradient-to-r from-lavender-50 to-orchid-50 rounded-2xl p-8 shadow-lg opacity-100"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="md:col-span-2">
               <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-                Search for roasters or cafes
+                {t('search.searchLabel')}
               </label>
               <input
                 type="text"
@@ -94,14 +96,14 @@ export function SearchSection({
                 value={localSearchQuery}
                 onChange={(e) => handleSearchQueryChange(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="e.g., Blue Bottle, espresso, single origin..."
+                placeholder={t('search.searchPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
             </div>
             
-            <div className="md:col-span-1">
+            <div className="md:col-span-2">
               <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-                Location
+                {t('search.locationLabel')}
               </label>
               <input
                 type="text"
@@ -109,7 +111,7 @@ export function SearchSection({
                 value={localLocation}
                 onChange={(e) => handleLocationChange(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Enter city or zip code"
+                placeholder={t('search.locationPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
             </div>
@@ -117,15 +119,15 @@ export function SearchSection({
             <div className="md:col-span-1 flex items-end">
               <button
                 onClick={handleSearch}
-                className="w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 whitespace-nowrap"
               >
-                🔍 Search
+                🔍 {t('search.searchButton')}
               </button>
             </div>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <span className="text-sm text-gray-600">Popular searches:</span>
+            <span className="text-sm text-gray-600">{t('search.popularSearches')}:</span>
             {['Espresso', 'Single Origin', 'Cold Brew', 'Fair Trade', 'Organic'].map((tag) => (
               <button
                 key={tag}

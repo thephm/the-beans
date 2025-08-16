@@ -1,6 +1,11 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 export function Footer() {
+  const { t } = useTranslation()
+  
   return (
     <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -14,8 +19,7 @@ export function Footer() {
               <span className="font-bold text-xl">The Beans</span>
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
-              Your ultimate destination for discovering fresh coffee roasters and amazing cafes. 
-              Join our community of coffee lovers and never miss a great cup again.
+              {t('footer.description')}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors">
@@ -41,26 +45,26 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Discover</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('nav.discover')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/roasters" className="text-gray-400 hover:text-white transition-colors">
-                  Coffee Roasters
+                  {t('nav.roasters')}
                 </Link>
               </li>
               <li>
                 <Link href="/cafes" className="text-gray-400 hover:text-white transition-colors">
-                  Cafes & Shops
+                  {t('nav.cafes')}
                 </Link>
               </li>
               <li>
                 <Link href="/map" className="text-gray-400 hover:text-white transition-colors">
-                  Map View
+                  {t('footer.mapView')}
                 </Link>
               </li>
               <li>
                 <Link href="/favorites" className="text-gray-400 hover:text-white transition-colors">
-                  My Favorites
+                  {t('nav.favorites')}
                 </Link>
               </li>
             </ul>
@@ -68,26 +72,26 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.support')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/help" className="text-gray-400 hover:text-white transition-colors">
-                  Help Center
+                  {t('footer.helpCenter')}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
-                  Contact Us
+                  {t('footer.contactUs')}
                 </Link>
               </li>
               <li>
                 <Link href="/api" className="text-gray-400 hover:text-white transition-colors">
-                  API Docs
+                  {t('footer.apiDocs')}
                 </Link>
               </li>
               <li>
                 <Link href="/business" className="text-gray-400 hover:text-white transition-colors">
-                  For Businesses
+                  {t('footer.forBusinesses')}
                 </Link>
               </li>
             </ul>
@@ -96,17 +100,17 @@ export function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2025 The Beans. All rights reserved.
+            {t('footer.copyright')}
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Privacy Policy
+              {t('footer.privacyPolicy')}
             </Link>
             <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Terms of Service
+              {t('footer.termsOfService')}
             </Link>
             <Link href="/cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Cookie Policy
+              {t('footer.cookiePolicy')}
             </Link>
           </div>
         </div>

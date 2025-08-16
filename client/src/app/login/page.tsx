@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from 'react-i18next'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const router = useRouter()
   const { login } = useAuth()
+  const { t } = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,9 +58,9 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome back!</h2>
+          <h2 className="text-3xl font-bold text-gray-900">{t('auth.welcomeBack')}</h2>
           <p className="mt-2 text-gray-600">
-            Sign in to discover amazing coffee
+            {t('auth.signInToDiscover')}
           </p>
         </div>
 
@@ -73,7 +75,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
+                {t('auth.email')}
               </label>
               <input
                 id="email"
@@ -84,13 +86,13 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter your email"
+                placeholder={t('auth.email')}
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                {t('auth.password')}
               </label>
               <input
                 id="password"
@@ -101,7 +103,7 @@ export default function LoginPage() {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter your password"
+                placeholder={t('auth.password')}
               />
             </div>
 
@@ -114,13 +116,13 @@ export default function LoginPage() {
                   className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
+                  {t('auth.rememberMe')}
                 </label>
               </div>
 
               <div className="text-sm">
                 <a href="#" className="text-primary-600 hover:text-primary-500">
-                  Forgot password?
+                  {t('auth.forgotPassword')}
                 </a>
               </div>
             </div>
@@ -130,13 +132,13 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white py-3 px-4 rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? t('auth.signingIn') : t('auth.signIn')}
             </button>
           </form>
 
           {/* Demo Account */}
           <div className="mt-6 p-4 bg-lavender-50 rounded-lg border border-lavender-200">
-            <h3 className="text-sm font-medium text-lavender-800 mb-2">Try the Demo Account:</h3>
+            <h3 className="text-sm font-medium text-lavender-800 mb-2">{t('auth.demo.title')}</h3>
             <p className="text-sm text-lavender-700">
               📧 Email: test@example.com<br />
               🔑 Password: password123
@@ -145,7 +147,7 @@ export default function LoginPage() {
               onClick={() => setFormData({ email: 'test@example.com', password: 'password123' })}
               className="mt-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
-              Fill Demo Credentials
+              {t('auth.demo.fillCredentials')}
             </button>
           </div>
 
@@ -156,7 +158,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500">{t('auth.orContinueWith')}</span>
               </div>
             </div>
 
@@ -184,9 +186,9 @@ export default function LoginPage() {
         {/* Sign up link */}
         <div className="text-center">
           <p className="text-gray-600">
-            Don't have an account?{' '}
+            {t('auth.dontHaveAccount')}{' '}
             <Link href="/signup" className="text-primary-600 hover:text-primary-500 font-medium">
-              Sign up for free
+              {t('auth.signUpForFree')}
             </Link>
           </p>
         </div>

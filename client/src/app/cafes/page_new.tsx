@@ -18,6 +18,7 @@ interface Cafe {
   imageUrl: string
   roasterName: string
   roasterId: string
+  features: string[]
 }
 
 export default function CafesPage() {

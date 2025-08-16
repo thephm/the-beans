@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface Roaster {
   id: string
@@ -17,6 +18,7 @@ interface Roaster {
 }
 
 export function FeaturedRoasters() {
+  const { t } = useTranslation()
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -59,13 +61,13 @@ export function FeaturedRoasters() {
           className="text-center mb-12 opacity-100"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Featured{' '}
+            {t('roasters.featured')}{' '}
             <span className="bg-gradient-to-r from-primary-600 to-orchid-600 bg-clip-text text-transparent">
-              Coffee Roasters
+              {t('roasters.title')}
             </span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover some of the most beloved coffee roasters in your area, handpicked for their quality and community impact
+            {t('roasters.featuredDescription')}
           </p>
         </motion.div>
 
@@ -103,7 +105,7 @@ export function FeaturedRoasters() {
                     href={`/roasters/${roaster.id}`}
                     className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg text-center font-medium hover:shadow-lg transition-all transform hover:scale-105"
                   >
-                    View Details
+                    {t('roasters.viewDetails')}
                   </Link>
                   <button className="px-4 py-2 border-2 border-primary-200 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors">
                     💜
@@ -125,7 +127,7 @@ export function FeaturedRoasters() {
             href="/roasters"
             className="inline-flex items-center px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold border-2 border-primary-200 hover:border-primary-400 hover:bg-primary-50 transition-all"
           >
-            Explore All Roasters
+            {t('roasters.exploreAll')}
             <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

@@ -18,9 +18,14 @@ interface Cafe {
   rating: number
   reviewCount: number
   priceRange: string
+  amenities: string[]
   hours?: {
     [key: string]: string
   }
+  atmosphere?: string
+  seatingCapacity?: number
+  wifi?: boolean
+  parking?: boolean
 }
 
 // Utility function to format time from 24-hour to 12-hour format with proper spacing
@@ -199,7 +204,56 @@ export default function CafeDetail() {
 
                 {/* Description */}
                 <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">About {cafe.name}</h2>
                   <p className="text-gray-700 leading-relaxed">{cafe.description}</p>
+                  {cafe.atmosphere && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Atmosphere</h3>
+                      <p className="text-gray-700 leading-relaxed">{cafe.atmosphere}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Amenities */}
+                {cafe.amenities && cafe.amenities.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Amenities</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {cafe.amenities.map((amenity) => (
+                        <span
+                          key={amenity}
+                          className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium"
+                        >
+                          ✨ {amenity}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Features */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Features</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {cafe.wifi && (
+                      <div className="flex items-center text-gray-700">
+                        <span className="text-green-500 mr-2">📶</span>
+                        Free WiFi
+                      </div>
+                    )}
+                    {cafe.parking && (
+                      <div className="flex items-center text-gray-700">
+                        <span className="text-blue-500 mr-2">🅿️</span>
+                        Parking Available
+                      </div>
+                    )}
+                    {cafe.seatingCapacity && (
+                      <div className="flex items-center text-gray-700">
+                        <span className="text-purple-500 mr-2">🪑</span>
+                        {cafe.seatingCapacity} seats
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Hours */}
