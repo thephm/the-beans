@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 import { SearchSection } from '@/components/SearchSection'
 
 interface Roaster {
@@ -19,6 +20,7 @@ interface Roaster {
 }
 
 export default function DiscoverPage() {
+  const { t } = useTranslation()
   const searchParams = useSearchParams()
   const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
@@ -90,10 +92,10 @@ export default function DiscoverPage() {
           {/* Header */}
           <div className="text-center mb-4">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              Discover Coffee Roasters
+              {t('discover.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Find the perfect coffee roaster near you.
+              {t('discover.subtitle')}
             </p>
           </div>
 
@@ -155,12 +157,12 @@ export default function DiscoverPage() {
                       ))}
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">📍 {roaster.distance} miles</span>
+                      <span className="text-sm text-gray-500">📍 {roaster.distance} {t('discover.miles')}</span>
                       <Link 
                         href={`/roasters/${roaster.id}`}
                         className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
                       >
-                        View Details 💜
+                        {t('discover.viewDetails')} 💜
                       </Link>
                     </div>
                   </div>

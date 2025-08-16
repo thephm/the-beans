@@ -1,6 +1,11 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 export default function AboutPage() {
+  const { t } = useTranslation()
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
       <div className="pt-24 pb-16">
@@ -8,10 +13,10 @@ export default function AboutPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              About The Beans
+              {t('about.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Connecting coffee lovers with exceptional roasters and cafes in their community.
+              {t('about.subtitle')}
             </p>
           </div>
 
@@ -24,9 +29,7 @@ export default function AboutPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
             </div>
             <p className="text-lg text-gray-700 text-center leading-relaxed">
-              We believe that great coffee is more than just a beverage—it's a community experience. 
-              The Beans connects coffee enthusiasts with local artisanal roasters and welcoming cafes, 
-              fostering relationships between passionate coffee makers and the people who appreciate their craft.
+              {t('about.description')}
             </p>
           </div>
 

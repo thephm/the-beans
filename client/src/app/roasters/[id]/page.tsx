@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 interface Roaster {
   id: string
@@ -27,33 +28,34 @@ interface Roaster {
   owner?: string | { id: string; username: string; firstName: string; lastName: string }
 }
 
-// Utility function to format time from 24-hour to 12-hour format with proper spacing
-const formatTime = (timeString: string): string => {
-  // Handle time ranges like "6:30-19:00"
-  if (timeString.includes('-')) {
-    const [startTime, endTime] = timeString.split('-');
-    const formattedStart = format24HourTo12Hour(startTime.trim());
-    const formattedEnd = format24HourTo12Hour(endTime.trim());
-    return `${formattedStart} - ${formattedEnd}`;
-  }
-  
-  return format24HourTo12Hour(timeString);
-};
-
-const format24HourTo12Hour = (time: string): string => {
-  const [hours, minutes] = time.split(':').map(Number);
-  const period = hours >= 12 ? 'PM' : 'AM';
-  const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-  return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-};
-
 export default function RoasterDetail() {
+  const { t } = useTranslation()
   const params = useParams()
   const router = useRouter()
   const [roaster, setRoaster] = useState<Roaster | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isFavorite, setIsFavorite] = useState(false)
+
+  // Utility function to format time from 24-hour to 12-hour format with proper spacing
+  const formatTime = (timeString: string): string => {
+    // Handle time ranges like "6:30-19:00"
+    if (timeString.includes('-')) {
+      const [startTime, endTime] = timeString.split('-');
+      const formattedStart = format24HourTo12Hour(startTime.trim());
+      const formattedEnd = format24HourTo12Hour(endTime.trim());
+      return `${formattedStart} - ${formattedEnd}`;
+    }
+    
+    return format24HourTo12Hour(timeString);
+  };
+
+  const format24HourTo12Hour = (time: string): string => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const period = hours >= 12 ? t('time.pm') : t('time.am');
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
 
   useEffect(() => {
     if (params?.id) {
@@ -196,7 +198,7 @@ export default function RoasterDetail() {
                   <div className="flex items-center mr-6">
                     <span className="text-yellow-400 text-2xl">⭐</span>
                     <span className="text-2xl font-bold ml-2">{roaster.rating}</span>
-                    <span className="text-gray-500 ml-2">({roaster.reviewCount} reviews)</span>
+                    <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
                   </div>
                   <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
                     {roaster.priceRange}
@@ -205,7 +207,7 @@ export default function RoasterDetail() {
 
                 {/* Description */}
                 <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">About {roaster.name}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('roasterDetail.about')}</h2>
                   <p className="text-gray-700 leading-relaxed">{roaster.description}</p>
                   {roaster.story && (
                     <div className="mt-6">
@@ -217,7 +219,7 @@ export default function RoasterDetail() {
 
                 {/* Specialties */}
                 <div className="mb-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Specialties</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.specialties')}</h3>
                   <div className="flex flex-wrap gap-3">
                     {roaster.specialties.map((specialty) => (
                       <Link
@@ -234,7 +236,7 @@ export default function RoasterDetail() {
                 {/* Hours */}
                 {roaster.hours && (
                   <div className="mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Hours</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.hours')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {Object.entries(
                         typeof roaster.hours === 'string' 
@@ -242,7 +244,7 @@ export default function RoasterDetail() {
                           : roaster.hours
                       ).map(([day, hours]) => (
                         <div key={day} className="flex items-center py-1">
-                          <span className="font-medium text-gray-700 capitalize w-24">{day}:</span>
+                          <span className="font-medium text-gray-700 w-24">{t(`time.${day.toLowerCase()}`)}:</span>
                           <span className="text-gray-600 ml-2">
                             {typeof hours === 'string' 
                               ? formatTime(hours)
@@ -261,14 +263,14 @@ export default function RoasterDetail() {
               {/* Sidebar */}
               <div className="lg:col-span-1">
                 <div className="bg-gray-50 rounded-xl p-6 sticky top-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Info</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.contactInfo')}</h3>
                   
                   {/* Address */}
                   <div className="mb-4">
                     <div className="flex items-start">
                       <span className="text-lg mr-2">📍</span>
                       <div>
-                        <p className="font-medium text-gray-900">Address</p>
+                        <p className="font-medium text-gray-900">{t('roasterDetail.address')}</p>
                         <p className="text-gray-600">{roaster.address}</p>
                         <p className="text-gray-600">{roaster.city}, {roaster.state}</p>
                       </div>
@@ -281,7 +283,7 @@ export default function RoasterDetail() {
                       <div className="flex items-center">
                         <span className="text-lg mr-2">📞</span>
                         <div>
-                          <p className="font-medium text-gray-900">Phone</p>
+                          <p className="font-medium text-gray-900">{t('roasterDetail.phone')}</p>
                           <a 
                             href={`tel:${roaster.phone}`}
                             className="text-primary-600 hover:text-primary-700"
@@ -299,14 +301,14 @@ export default function RoasterDetail() {
                       <div className="flex items-center">
                         <span className="text-lg mr-2">🌐</span>
                         <div>
-                          <p className="font-medium text-gray-900">Website</p>
+                          <p className="font-medium text-gray-900">{t('roasterDetail.website')}</p>
                           <a 
                             href={roaster.website}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary-600 hover:text-primary-700"
                           >
-                            Visit Website
+                            {t('roasterDetail.visitWebsite')}
                           </a>
                         </div>
                       </div>
@@ -319,7 +321,7 @@ export default function RoasterDetail() {
                       <div className="flex items-center">
                         <span className="text-lg mr-2">✉️</span>
                         <div>
-                          <p className="font-medium text-gray-900">Email</p>
+                          <p className="font-medium text-gray-900">{t('roasterDetail.email')}</p>
                           <a 
                             href={`mailto:${roaster.email}`}
                             className="text-primary-600 hover:text-primary-700"
@@ -342,7 +344,7 @@ export default function RoasterDetail() {
                   {/* Owner */}
                   {roaster.owner && (
                     <div className="mb-6">
-                      <p className="font-medium text-gray-900">Owner</p>
+                      <p className="font-medium text-gray-900">{t('roasterDetail.owner')}</p>
                       <p className="text-gray-600">
                         {typeof roaster.owner === 'string' 
                           ? roaster.owner
@@ -362,7 +364,7 @@ export default function RoasterDetail() {
                           : 'bg-white border-2 border-red-300 text-red-600 hover:bg-red-50'
                       }`}
                     >
-                      {isFavorite ? '❤️ Remove from Favorites' : '🤍 Add to Favorites'}
+                      {isFavorite ? '❤️ Remove from Favorites' : `🤍 ${t('roasterDetail.addToFavorites')}`}
                     </button>
                     
                     {roaster.website && (
@@ -372,7 +374,7 @@ export default function RoasterDetail() {
                         rel="noopener noreferrer"
                         className="block w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-3 px-4 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105"
                       >
-                        Visit Website 🌐
+                        {t('roasterDetail.visitWebsite')} 🌐
                       </a>
                     )}
                   </div>
