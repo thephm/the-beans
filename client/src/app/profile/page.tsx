@@ -3,8 +3,10 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function ProfilePage() {
+  const { t } = useTranslation()
   const { user, isAuthenticated, loading } = useAuth()
   const router = useRouter()
 
@@ -16,7 +18,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center">
-      <div className="text-xl">Loading...</div>
+      <div className="text-xl">{t('common.loading')}</div>
     </div>
   }
 
@@ -30,10 +32,10 @@ export default function ProfilePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              Your Profile
+              {t('profile.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Manage your account information and preferences
+              {t('profile.description')}
             </p>
           </div>
 
@@ -56,7 +58,7 @@ export default function ProfilePage() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('profile.firstName')}</label>
                 <input 
                   type="text" 
                   defaultValue={user?.firstName || ''}
@@ -65,7 +67,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('profile.lastName')}</label>
                 <input 
                   type="text" 
                   defaultValue={user?.lastName || ''}
@@ -74,7 +76,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.email')}</label>
                 <input 
                   type="email" 
                   defaultValue={user?.email || ''}
@@ -83,7 +85,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.username')}</label>
                 <input 
                   type="text" 
                   defaultValue={user?.username || ''}
@@ -93,7 +95,7 @@ export default function ProfilePage() {
 
               <div className="pt-4">
                 <button className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
-                  Save Changes
+                  {t('profile.saveChanges')}
                 </button>
               </div>
             </div>

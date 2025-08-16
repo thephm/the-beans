@@ -150,6 +150,7 @@ router.post('/register', [
         avatar: true,
         bio: true,
         location: true,
+        language: true,
         createdAt: true,
       }
     });
@@ -302,6 +303,7 @@ router.get('/me', async (req, res) => {
         location: true,
         latitude: true,
         longitude: true,
+        language: true,
         createdAt: true,
       }
     });

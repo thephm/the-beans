@@ -119,6 +119,7 @@ router.get('/', [
             { name: { contains: q, mode: 'insensitive' } },
             { city: { contains: q, mode: 'insensitive' } },
             { state: { contains: q, mode: 'insensitive' } },
+            { amenities: { has: q } },
           ]
         },
         include: {
@@ -221,8 +222,7 @@ router.get('/roasters', async (req: any, res: any) => {
     let whereClause: any = {};
     
     // Build search conditions
-    if (search && !specialty) {
-      // If we have a search term but no specific specialty filter, search across all fields
+    if (search) {
       whereClause.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
@@ -230,48 +230,19 @@ router.get('/roasters', async (req: any, res: any) => {
         { state: { contains: search, mode: 'insensitive' } },
         { specialties: { has: search } }, // Also search in specialties array
       ];
-    } else if (search && specialty && search === specialty) {
-      // If search and specialty are the same (from clicking a pill), just use specialty filter
-      whereClause.specialties = { has: specialty };
-    } else if (search && specialty && search !== specialty) {
-      // If we have both search and specialty with different values, search in non-specialty fields and filter by specialty
-      whereClause.AND = [
-        {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
-            { city: { contains: search, mode: 'insensitive' } },
-            { state: { contains: search, mode: 'insensitive' } },
-          ]
-        },
-        { specialties: { has: specialty } }
-      ];
-    } else if (specialty) {
-      // If we only have specialty filter, use it
+    }
+    
+    if (specialty) {
       whereClause.specialties = { has: specialty };
     }
     
     if (location) {
-      const locationCondition = {
-        OR: [
-          { city: { contains: location, mode: 'insensitive' } },
-          { state: { contains: location, mode: 'insensitive' } },
-          { address: { contains: location, mode: 'insensitive' } }
-        ]
-      };
-      
-      if (whereClause.OR || whereClause.AND) {
-        // If we already have conditions, add location as an additional AND condition
-        whereClause = {
-          AND: [
-            whereClause,
-            locationCondition
-          ]
-        };
-      } else {
-        // If no other conditions, just use location condition
-        whereClause = locationCondition;
-      }
+      whereClause.OR = whereClause.OR || [];
+      whereClause.OR.push(
+        { city: { contains: location, mode: 'insensitive' } },
+        { state: { contains: location, mode: 'insensitive' } },
+        { address: { contains: location, mode: 'insensitive' } }
+      );
     }
 
     const roasters = await prisma.roaster.findMany({

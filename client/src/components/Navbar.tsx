@@ -4,11 +4,15 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from 'react-i18next'
+import { LanguageSelector } from './LanguageSelector'
+import { UserMenu } from './UserMenu'
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { user, logout, loading } = useAuth()
+  const { t } = useTranslation()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,53 +38,46 @@ export function Navbar() {
               <span className="text-white font-bold text-sm">☕</span>
             </div>
             <span className="font-bold text-xl bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent">
-              The Beans
+              {t('app.name')}
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/discover" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Discover
+              {t('nav.discover')}
             </Link>
             <Link href="/roasters" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Roasters
+              {t('nav.roasters')}
             </Link>
             <Link href="/cafes" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Cafes
+              {t('nav.cafes')}
             </Link>
             <Link href="/about" className="text-gray-700 hover:text-primary-600 transition-colors">
-              About
+              {t('nav.about')}
             </Link>
             <Link href="/favorites" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Favorites
+              {t('nav.favorites')}
             </Link>
+            
+            {/* Language Selector */}
+            <LanguageSelector />
             
             {/* Authentication Section */}
             {loading ? (
               <div className="w-8 h-8 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"></div>
             ) : user ? (
-              <div className="flex items-center space-x-4">
-                <Link href="/settings" className="text-gray-700 hover:text-primary-600 transition-colors">
-                  Settings
-                </Link>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
+              <UserMenu />
             ) : (
               <div className="flex items-center space-x-4">
                 <Link href="/login" className="text-gray-700 hover:text-primary-600 transition-colors">
-                  Login
+                  {t('nav.login')}
                 </Link>
                 <Link 
                   href="/signup" 
                   className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Sign Up
+                  {t('nav.signup')}
                 </Link>
               </div>
             )}
@@ -108,20 +105,25 @@ export function Navbar() {
           >
             <div className="flex flex-col space-y-3">
               <Link href="/discover" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                Discover
+                {t('nav.discover')}
               </Link>
               <Link href="/roasters" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                Roasters
+                {t('nav.roasters')}
               </Link>
               <Link href="/cafes" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                Cafes
+                {t('nav.cafes')}
               </Link>
               <Link href="/about" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                About
+                {t('nav.about')}
               </Link>
               <Link href="/favorites" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                Favorites
+                {t('nav.favorites')}
               </Link>
+              
+              {/* Mobile Language Selector */}
+              <div className="py-2">
+                <LanguageSelector />
+              </div>
               
               {/* Mobile Authentication */}
               {loading ? (
@@ -129,7 +131,7 @@ export function Navbar() {
               ) : user ? (
                 <>
                   <Link href="/settings" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    Settings
+                    {t('nav.settings')}
                   </Link>
                   <button
                     onClick={() => {
@@ -138,16 +140,16 @@ export function Navbar() {
                     }}
                     className="text-gray-700 hover:text-primary-600 py-2 text-left"
                   >
-                    Logout
+                    {t('nav.logout')}
                   </button>
                 </>
               ) : (
                 <>
                   <Link href="/login" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    Login
+                    {t('nav.login')}
                   </Link>
                   <Link href="/signup" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    Sign Up
+                    {t('nav.signup')}
                   </Link>
                 </>
               )}

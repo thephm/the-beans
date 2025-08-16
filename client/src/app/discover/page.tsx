@@ -38,7 +38,7 @@ export default function DiscoverPage() {
     
     setFilters(prev => ({
       ...prev,
-      search: urlSearch || urlSpecialty, // If specialty is provided, show it in search field
+      search: urlSpecialty || urlSearch, // Use specialty as search if provided
       location: urlLocation,
       specialty: urlSpecialty
     }))
@@ -105,22 +105,8 @@ export default function DiscoverPage() {
               onSearchQueryChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
               onLocationChange={(value) => setFilters(prev => ({ ...prev, location: value }))}
               onSearch={(searchQuery, location) => {
-                // Check if the search query is a specialty (from pill click)
-                const isSpecialtySearch = ['Espresso', 'Single Origin', 'Cold Brew', 'Light Roast', 'Dark Roast', 'Organic'].includes(searchQuery)
-                
-                if (isSpecialtySearch) {
-                  // Update URL with specialty parameter
-                  const newParams = new URLSearchParams()
-                  newParams.set('specialty', searchQuery)
-                  if (location) newParams.set('location', location)
-                  router.push(`/discover?${newParams.toString()}`)
-                } else {
-                  // Regular search
-                  const newParams = new URLSearchParams()
-                  if (searchQuery) newParams.set('search', searchQuery)
-                  if (location) newParams.set('location', location)
-                  router.push(`/discover?${newParams.toString()}`)
-                }
+                setFilters(prev => ({ ...prev, search: searchQuery, location: location }))
+                searchRoasters()
               }}
             />
           </div>
@@ -162,7 +148,7 @@ export default function DiscoverPage() {
                         <button
                           key={specialty}
                           onClick={() => router.push(`/discover?specialty=${encodeURIComponent(specialty)}`)}
-                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 cursor-pointer transition-colors"
+                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                         >
                           ☕ {specialty}
                         </button>

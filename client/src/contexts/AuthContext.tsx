@@ -9,6 +9,7 @@ interface User {
   firstName?: string
   lastName?: string
   avatar?: string
+  language?: string
 }
 
 interface AuthContextType {

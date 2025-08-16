@@ -23,6 +23,7 @@ model User {
   location  String?
   latitude  Float?
   longitude Float?
+  language  String   @default("en") @db.VarChar(5)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -86,6 +87,7 @@ model Cafe {
   website   String?
   images    String[]
   hours     Json?    // Store opening hours as JSON
+  amenities String[] // WiFi, Parking, Outdoor Seating, etc.
   rating    Float    @default(0)
   reviewCount Int    @default(0)
   createdAt DateTime @default(now())

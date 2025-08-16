@@ -3,8 +3,10 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function SettingsPage() {
+  const { t } = useTranslation()
   const { isAuthenticated, loading, user } = useAuth()
   const router = useRouter()
   const [saving, setSaving] = useState(false)
@@ -95,7 +97,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center">
-      <div className="text-xl">Loading...</div>
+      <div className="text-xl">{t('common.loading')}</div>
     </div>
   }
 
@@ -109,24 +111,24 @@ export default function SettingsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              User Settings
+              {t('settings.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Customize your coffee discovery experience
+              {t('settings.description')}
             </p>
           </div>
 
           <form onSubmit={handleSaveSettings} className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">
             {success && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800">Settings saved successfully!</p>
+                <p className="text-green-800">{t('settings.saveSuccess')}</p>
               </div>
             )}
             
             <div className="space-y-8">
               {/* Notifications */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.notifications')}</h3>
                 <div className="space-y-3">
                   <label className="flex items-center">
                     <input 
@@ -138,7 +140,7 @@ export default function SettingsPage() {
                       }))}
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                     />
-                    <span className="ml-3 text-gray-700">New roasters in your area</span>
+                    <span className="ml-3 text-gray-700">{t('settings.newRoasters')}</span>
                   </label>
                   <label className="flex items-center">
                     <input 
