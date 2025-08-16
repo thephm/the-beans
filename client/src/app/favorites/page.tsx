@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface Roaster {
@@ -25,6 +26,7 @@ interface Cafe {
 }
 
 export default function FavoritesPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { user, loading } = useAuth()
   const [favoriteRoasters, setFavoriteRoasters] = useState<Roaster[]>([])
@@ -132,10 +134,10 @@ export default function FavoritesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              Your Favorites
+              {t('favorites.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Keep track of your favorite roasters and cafes
+              {t('favorites.subtitle')}
             </p>
           </div>
 
@@ -170,7 +172,7 @@ export default function FavoritesPage() {
               {/* Favorite Roasters */}
               {favoriteRoasters.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Favorite Roasters</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('favorites.roasters')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {favoriteRoasters.map((roaster) => (
                       <div key={roaster.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all group">
@@ -221,7 +223,7 @@ export default function FavoritesPage() {
               {/* Favorite Cafes */}
               {favoriteCafes.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Favorite Cafes</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('favorites.cafes')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {favoriteCafes.map((cafe) => (
                       <div key={cafe.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all group">
