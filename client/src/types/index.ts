@@ -37,33 +37,9 @@ export interface Roaster {
   createdAt: string;
   updatedAt: string;
   owner?: User;
-  cafes?: Cafe[];
   beans?: Bean[];
   reviews?: Review[];
   isFavorited?: boolean;
-}
-
-export interface Cafe {
-  id: string;
-  name: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  country: string;
-  latitude?: number;
-  longitude?: number;
-  phone?: string;
-  website?: string;
-  images: string[];
-  hours?: Record<string, any>;
-  amenities: string[];
-  rating: number;
-  reviewCount: number;
-  createdAt: string;
-  updatedAt: string;
-  roaster?: Roaster;
-  reviews?: Review[];
 }
 
 export interface Bean {
@@ -93,7 +69,6 @@ export interface Review {
   updatedAt: string;
   user?: User;
   roaster?: Roaster;
-  cafe?: Cafe;
   comments?: Comment[];
 }
 

@@ -249,14 +249,6 @@ router.get('/', [
             lastName: true,
           }
         },
-        cafes: {
-          select: {
-            id: true,
-            name: true,
-            city: true,
-            state: true,
-          }
-        },
         _count: {
           select: {
             reviews: true,
@@ -361,7 +353,6 @@ router.get('/:id', [
             lastName: true,
           }
         },
-        cafes: true,
         beans: true,
         reviews: {
           include: {

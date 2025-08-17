@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { query, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 
@@ -59,7 +59,7 @@ router.get('/', [
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
   query('radius').optional().isFloat({ min: 1, max: 100 }),
-], async (req: Request, res: Response) => {
+], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -142,7 +142,7 @@ router.get('/roasters', [
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
   query('radius').optional().isFloat({ min: 1, max: 100 }),
-], async (req: Request, res: Response) => {
+], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -249,14 +249,8 @@ router.get('/roasters', [
       });
     }
 
-    // Add imageUrl field for frontend compatibility
-    const roastersWithImageUrl = roasters.map((roaster: any) => ({
-      ...roaster,
-      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
-    }));
-
     res.json({
-      roasters: roastersWithImageUrl,
+      roasters,
       pagination: {
         total: roasters.length,
         page: 1,

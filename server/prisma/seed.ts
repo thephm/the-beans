@@ -47,6 +47,7 @@ async function main() {
       hours: '{"monday": "6:00-18:00", "tuesday": "6:00-18:00", "wednesday": "6:00-18:00", "thursday": "6:00-18:00", "friday": "6:00-18:00", "saturday": "7:00-18:00", "sunday": "7:00-18:00"}',
       priceRange: '$$$',
       specialties: ['Single Origin', 'Pour Over', 'Cold Brew'],
+      images: ['https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop'],
       verified: true,
       featured: true,
       rating: 4.5,
@@ -75,6 +76,7 @@ async function main() {
       hours: '{"monday": "6:30-19:00", "tuesday": "6:30-19:00", "wednesday": "6:30-19:00", "thursday": "6:30-19:00", "friday": "6:30-19:00", "saturday": "7:00-19:00", "sunday": "7:00-19:00"}',
       priceRange: '$$$',
       specialties: ['Direct Trade', 'Espresso', 'Single Origin'],
+      images: ['https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&h=600&fit=crop'],
       verified: true,
       featured: true,
       rating: 4.7,
@@ -103,6 +105,7 @@ async function main() {
       hours: '{"monday": "6:00-20:00", "tuesday": "6:00-20:00", "wednesday": "6:00-20:00", "thursday": "6:00-20:00", "friday": "6:00-20:00", "saturday": "7:00-20:00", "sunday": "7:00-20:00"}',
       priceRange: '$$$',
       specialties: ['Education', 'Cupping', 'Single Origin'],
+      images: ['https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop'],
       verified: true,
       featured: true,
       rating: 4.6,
@@ -112,81 +115,6 @@ async function main() {
   });
 
   console.log('✅ Created roasters:', [roaster1.name, roaster2.name, roaster3.name]);
-
-  // Create test cafes
-  const cafe1 = await prisma.cafe.upsert({
-    where: { id: 'cafe1' },
-    update: {},
-    create: {
-      id: 'cafe1',
-      name: 'Blue Bottle Coffee - Hayes Valley',
-      address: '315 Linden St',
-      city: 'San Francisco',
-      state: 'CA',
-      zipCode: '94102',
-      country: 'US',
-      latitude: 37.7749,
-      longitude: -122.4194,
-      phone: '(510) 653-3394',
-      website: 'https://bluebottlecoffee.com/cafes/hayes-valley',
-      hours: '{"monday": "6:00-19:00", "tuesday": "6:00-19:00", "wednesday": "6:00-19:00", "thursday": "6:00-19:00", "friday": "6:00-19:00", "saturday": "7:00-19:00", "sunday": "7:00-19:00"}',
-      amenities: ['WiFi', 'Outdoor Seating', 'Wheelchair Accessible'],
-      images: ['https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop'],
-      rating: 4.4,
-      reviewCount: 523,
-      roasterId: roaster1.id,
-    },
-  });
-
-  const cafe2 = await prisma.cafe.upsert({
-    where: { id: 'cafe2' },
-    update: {},
-    create: {
-      id: 'cafe2',
-      name: 'Stumptown Coffee - Downtown Portland',
-      address: '128 SW 3rd Ave',
-      city: 'Portland',
-      state: 'OR',
-      zipCode: '97204',
-      country: 'US',
-      latitude: 45.5152,
-      longitude: -122.6784,
-      phone: '(503) 230-7794',
-      website: 'https://stumptowncoffee.com/pages/downtown',
-      hours: '{"monday": "6:30-18:00", "tuesday": "6:30-18:00", "wednesday": "6:30-18:00", "thursday": "6:30-18:00", "friday": "6:30-18:00", "saturday": "7:00-18:00", "sunday": "7:00-18:00"}',
-      amenities: ['WiFi', 'Meeting Rooms', 'Pour Over Bar'],
-      images: ['https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&h=300&fit=crop'],
-      rating: 4.6,
-      reviewCount: 381,
-      roasterId: roaster2.id,
-    },
-  });
-
-  const cafe3 = await prisma.cafe.upsert({
-    where: { id: 'cafe3' },
-    update: {},
-    create: {
-      id: 'cafe3',
-      name: 'Intelligentsia Coffee - Millennium Park',
-      address: '53 E Randolph St',
-      city: 'Chicago',
-      state: 'IL',
-      zipCode: '60601',
-      country: 'US',
-      latitude: 41.8781,
-      longitude: -87.6298,
-      phone: '(312) 253-0594',
-      website: 'https://intelligentsiacoffee.com/pages/millennium-park',
-      hours: '{"monday": "6:00-19:00", "tuesday": "6:00-19:00", "wednesday": "6:00-19:00", "thursday": "6:00-19:00", "friday": "6:00-19:00", "saturday": "7:00-19:00", "sunday": "7:00-19:00"}',
-      amenities: ['WiFi', 'Laptop Friendly', 'Cupping Classes'],
-      images: ['https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop'],
-      rating: 4.5,
-      reviewCount: 627,
-      roasterId: roaster3.id,
-    },
-  });
-
-  console.log('✅ Created cafes:', [cafe1.name, cafe2.name, cafe3.name]);
 
   console.log('🎉 Database seeding completed successfully!');
 }

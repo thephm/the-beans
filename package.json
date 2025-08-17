@@ -1,7 +1,7 @@
 {
   "name": "the-beans",
   "version": "1.0.0",
-  "description": "A coffee roaster discovery app for finding fresh espresso beans and cafes",
+  "description": "A coffee roaster discovery app for finding fresh espresso beans",
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
@@ -16,7 +16,6 @@
     "coffee",
     "roaster",
     "espresso",
-    "cafe",
     "discovery",
     "location",
     "mobile",

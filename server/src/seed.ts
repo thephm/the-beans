@@ -30,7 +30,7 @@ async function main() {
       password: hashedPassword,
       firstName: 'Bean',
       lastName: 'Enthusiast',
-      bio: 'Single origin coffee specialist and cafe owner.',
+      bio: 'Single origin coffee specialist and roaster owner.',
       location: 'Portland, OR',
       latitude: 45.5152,
       longitude: -122.6784,
@@ -77,7 +77,7 @@ async function main() {
   const roaster2 = await prisma.roaster.create({
     data: {
       name: 'Lavender Bean Co.',
-      description: 'Family-owned roastery with three cafe locations and online ordering. We focus on creating the perfect espresso blends.',
+      description: 'Family-owned roastery with multiple locations and online ordering. We focus on creating the perfect espresso blends.',
       email: 'info@lavenderbeancoffe.com',
       phone: '(503) 555-0456',
       website: 'https://lavenderbeanco.com',
@@ -143,36 +143,6 @@ async function main() {
       rating: 4.7,
       reviewCount: 67,
       ownerId: user1.id,
-    },
-  });
-
-  // Create sample cafes
-  await prisma.cafe.create({
-    data: {
-      name: 'Purple Mountain Flagship',
-      address: '1234 Pine Street',
-      city: 'Seattle',
-      state: 'WA',
-      zipCode: '98101',
-      latitude: 47.6097,
-      longitude: -122.3331,
-      phone: '(206) 555-0123',
-      images: [
-        'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop'
-      ],
-      hours: {
-        monday: { open: '07:00', close: '19:00' },
-        tuesday: { open: '07:00', close: '19:00' },
-        wednesday: { open: '07:00', close: '19:00' },
-        thursday: { open: '07:00', close: '19:00' },
-        friday: { open: '07:00', close: '20:00' },
-        saturday: { open: '08:00', close: '20:00' },
-        sunday: { open: '08:00', close: '18:00' }
-      },
-      amenities: ['WiFi', 'Outdoor Seating', 'Parking', 'Pet Friendly'],
-      rating: 4.8,
-      reviewCount: 89,
-      roasterId: roaster1.id,
     },
   });
 

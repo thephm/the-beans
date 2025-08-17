@@ -102,17 +102,6 @@ class ApiClient {
     return this.request(`/search?${searchParams}`);
   }
 
-  // Cafes
-  async getCafes(params?: Record<string, any>) {
-    const searchParams = new URLSearchParams(params).toString();
-    const endpoint = searchParams ? `/cafes?${searchParams}` : '/cafes';
-    return this.request(endpoint);
-  }
-
-  async getCafe(id: string) {
-    return this.request(`/cafes/${id}`);
-  }
-
   // Reviews
   async getReviews(params?: Record<string, any>) {
     const searchParams = new URLSearchParams(params).toString();

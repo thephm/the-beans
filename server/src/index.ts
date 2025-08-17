@@ -11,7 +11,6 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import roasterRoutes from './routes/roasters';
-import cafeRoutes from './routes/cafes';
 import reviewRoutes from './routes/reviews';
 import searchRoutes from './routes/search';
 
@@ -100,7 +99,6 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authLimiter, authRoutes); // Apply stricter rate limiting to auth endpoints
 app.use('/api/users', userRoutes);
 app.use('/api/roasters', roasterRoutes);
-app.use('/api/cafes', cafeRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/search', searchRoutes);
 

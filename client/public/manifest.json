@@ -1,7 +1,7 @@
 {
   "name": "The Beans",
   "short_name": "TheBeans",
-  "description": "Discover fresh coffee roasters and cafes near you",
+  "description": "Discover fresh coffee roasters near you",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f3edff",
