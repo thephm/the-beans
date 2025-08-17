@@ -202,10 +202,10 @@ export default function SettingsPage() {
 
               {/* Preferences */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Coffee Preferences</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.preferences')}</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Preferred roast level</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.roastLevel')}</label>
                     <select 
                       value={settings.preferences.roastLevel}
                       onChange={(e) => setSettings(prev => ({
@@ -214,14 +214,14 @@ export default function SettingsPage() {
                       }))}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     >
-                      <option value="light">Light roast</option>
-                      <option value="medium">Medium roast</option>
-                      <option value="dark">Dark roast</option>
-                      <option value="no-preference">No preference</option>
+                      <option value="light">{t('settings.light')} roast</option>
+                      <option value="medium">{t('settings.medium')} roast</option>
+                      <option value="dark">{t('settings.dark')} roast</option>
+                      <option value="no-preference">{t('settings.noPreference')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Brewing methods</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.brewingMethods')}</label>
                     <div className="grid grid-cols-2 gap-2">
                       <label className="flex items-center">
                         <input 
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                           }))}
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                         />
-                        <span className="ml-2 text-sm text-gray-700">Espresso</span>
+                        <span className="ml-2 text-sm text-gray-700">{t('settings.espresso')}</span>
                       </label>
                       <label className="flex items-center">
                         <input 
@@ -251,7 +251,7 @@ export default function SettingsPage() {
                           }))}
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                         />
-                        <span className="ml-2 text-sm text-gray-700">Pour over</span>
+                        <span className="ml-2 text-sm text-gray-700">{t('settings.pourOver')}</span>
                       </label>
                       <label className="flex items-center">
                         <input 
@@ -266,7 +266,7 @@ export default function SettingsPage() {
                           }))}
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                         />
-                        <span className="ml-2 text-sm text-gray-700">French press</span>
+                        <span className="ml-2 text-sm text-gray-700">{t('settings.frenchPress')}</span>
                       </label>
                       <label className="flex items-center">
                         <input 
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                           }))}
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                         />
-                        <span className="ml-2 text-sm text-gray-700">Cold brew</span>
+                        <span className="ml-2 text-sm text-gray-700">{t('settings.coldBrew')}</span>
                       </label>
                     </div>
                   </div>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
                   }}
                   className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {saving ? 'Saving...' : 'Save Settings'}
+                  {saving ? t('settings.saving') : t('settings.save')}
                 </button>
               </div>
             </div>
