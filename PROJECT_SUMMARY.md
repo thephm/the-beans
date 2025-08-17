@@ -18,17 +18,16 @@ I've successfully created **The Beans** - a comprehensive coffee roaster discove
 
 ### 🌍 **Core Features**
 - **Roaster Discovery**: Find coffee roasters near you with location-based search
-- **Cafe Linking**: Connect roasters to their physical cafe locations
 - **User Accounts**: Sign up, login, and personalized profiles
 - **Search & Filters**: Advanced search by location, specialty, price range
-- **Review System**: Rate and review roasters and cafes
-- **Favorites**: Save your favorite coffee spots
+- **Review System**: Rate and review roasters
+- **Favorites**: Save your favorite coffee roasters
 - **Photo Uploads**: Share beautiful coffee photos (Cloudinary integration ready)
 
 ### 📱 **Cross-Platform Support**
 - Works seamlessly on iOS, Android, and desktop browsers
 - PWA manifest for mobile app-like experience
-- Deep linking support for sharing specific roasters/cafes
+- Deep linking support for sharing specific roasters
 
 ### 🔒 **Secure & Professional**
 - RESTful API with comprehensive Swagger documentation
@@ -39,7 +38,7 @@ I've successfully created **The Beans** - a comprehensive coffee roaster discove
 
 ### 📊 **Database Schema**
 Complete database design with:
-- Users, Roasters, Cafes, Reviews, Comments
+- Users, Roasters, Reviews, Comments
 - Favorites system, Notifications
 - Geolocation support for proximity search
 - Flexible JSON fields for hours and metadata
@@ -97,7 +96,7 @@ Once running, visit `http://localhost:5000/api-docs` for complete API documentat
 - `POST /api/auth/login` - User login
 - `GET /api/roasters` - Get roasters with filters
 - `GET /api/roasters/:id` - Get specific roaster details
-- `GET /api/search` - Search roasters and cafes
+- `GET /api/search` - Search roasters
 - `POST /api/roasters` - Create new roaster (authenticated)
 
 ## 🚀 **Deployment Ready**

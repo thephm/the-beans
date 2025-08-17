@@ -26,10 +26,10 @@ export default function AboutPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white text-2xl">☕</span>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('about.mission.title')}</h2>
             </div>
             <p className="text-lg text-gray-700 text-center leading-relaxed">
-              {t('about.description')}
+              {t('about.mission.description')}
             </p>
           </div>
 
@@ -39,9 +39,9 @@ export default function AboutPage() {
               <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-primary-600 text-xl">🗺️</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Discover Local</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.features.discoverLocal.title')}</h3>
               <p className="text-gray-600">
-                Find amazing coffee roasters and cafes in your neighborhood and beyond.
+                {t('about.features.discoverLocal.description')}
               </p>
             </div>
 
@@ -49,9 +49,9 @@ export default function AboutPage() {
               <div className="w-12 h-12 bg-orchid-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-orchid-600 text-xl">👥</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Build Community</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.features.buildCommunity.title')}</h3>
               <p className="text-gray-600">
-                Connect with fellow coffee lovers and share your favorite discoveries.
+                {t('about.features.buildCommunity.description')}
               </p>
             </div>
 
@@ -59,63 +59,55 @@ export default function AboutPage() {
               <div className="w-12 h-12 bg-lavender-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-lavender-600 text-xl">⭐</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Quality First</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.features.qualityFirst.title')}</h3>
               <p className="text-gray-600">
-                Every roaster and cafe in our platform is carefully curated for excellence.
+                {t('about.features.qualityFirst.description')}
               </p>
             </div>
           </div>
 
           {/* Story Section */}
           <div className="bg-gradient-to-r from-primary-500 to-orchid-500 rounded-2xl p-8 text-white mb-12">
-            <h2 className="text-3xl font-bold mb-6 text-center">Our Story</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center">{t('about.story.title')}</h2>
             <div className="max-w-3xl mx-auto">
               <p className="text-lg leading-relaxed mb-4">
-                The Beans was born from a simple frustration: finding truly exceptional coffee shouldn't be hard. 
-                As coffee enthusiasts ourselves, we noticed that the best roasters and cafes were often hidden gems, 
-                known only to locals or discovered by chance.
+                {t('about.story.paragraph1')}
               </p>
               <p className="text-lg leading-relaxed mb-4">
-                We created The Beans to change that. Our platform brings together passionate coffee roasters, 
-                welcoming cafe owners, and curious coffee lovers in one beautiful, easy-to-use community.
+                {t('about.story.paragraph2')}
               </p>
               <p className="text-lg leading-relaxed">
-                Whether you're searching for that perfect espresso blend, looking for a cozy cafe to work from, 
-                or wanting to discover what's brewing in your neighborhood, The Beans is your guide to coffee excellence.
+                {t('about.story.paragraph3')}
               </p>
             </div>
           </div>
 
           {/* Values Section */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Values</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{t('about.values.title')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-bold text-primary-600 mb-3">🌱 Sustainability</h3>
+                <h3 className="text-xl font-bold text-primary-600 mb-3">{t('about.values.sustainability.title')}</h3>
                 <p className="text-gray-700">
-                  We champion roasters and cafes that prioritize ethical sourcing, fair trade practices, 
-                  and environmental responsibility.
+                  {t('about.values.sustainability.description')}
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-orchid-600 mb-3">🤝 Community</h3>
+                <h3 className="text-xl font-bold text-orchid-600 mb-3">{t('about.values.community.title')}</h3>
                 <p className="text-gray-700">
-                  Coffee brings people together. We foster connections between coffee makers and coffee lovers 
-                  that extend beyond transactions.
+                  {t('about.values.community.description')}
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-lavender-600 mb-3">✨ Quality</h3>
+                <h3 className="text-xl font-bold text-lavender-600 mb-3">{t('about.values.quality.title')}</h3>
                 <p className="text-gray-700">
-                  We believe everyone deserves exceptional coffee. That's why we carefully curate every 
-                  roaster and cafe on our platform.
+                  {t('about.values.quality.description')}
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-primary-600 mb-3">🚀 Innovation</h3>
+                <h3 className="text-xl font-bold text-primary-600 mb-3">{t('about.values.innovation.title')}</h3>
                 <p className="text-gray-700">
-                  We're constantly improving our platform to make discovering and enjoying great coffee 
-                  easier and more delightful.
+                  {t('about.values.innovation.description')}
                 </p>
               </div>
             </div>
@@ -123,38 +115,36 @@ export default function AboutPage() {
 
           {/* Team Section */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Meet the Team</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{t('about.team.title')}</h2>
             <div className="text-center">
               <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white text-4xl">☕</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Coffee Enthusiasts</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('about.team.subtitle')}</h3>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                We're a small but passionate team of coffee lovers, designers, and developers who believe 
-                that great coffee experiences should be accessible to everyone. Our diverse backgrounds 
-                in technology, hospitality, and coffee culture inform everything we build.
+                {t('about.team.description')}
               </p>
             </div>
           </div>
 
           {/* Call to Action */}
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Ready to Discover Amazing Coffee?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">{t('about.cta.title')}</h2>
             <p className="text-xl text-gray-600 mb-8">
-              Join our community and start exploring the best coffee your area has to offer.
+              {t('about.cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/discover"
                 className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105 text-lg"
               >
-                Start Exploring 🔍
+                {t('about.cta.startExploring')}
               </Link>
               <Link
                 href="/signup"
                 className="border-2 border-primary-500 text-primary-600 px-8 py-3 rounded-lg hover:bg-primary-50 transition-colors text-lg"
               >
-                Join the Community 💜
+                {t('about.cta.joinCommunity')}
               </Link>
             </div>
           </div>

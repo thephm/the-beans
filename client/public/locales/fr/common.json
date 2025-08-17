@@ -1,12 +1,11 @@
 {
   "app": {
     "name": "The Beans",
-    "tagline": "Découvrez des torréfacteurs de café frais et des cafés près de vous"
+        "tagline": "Découvrez des torréfacteurs de café frais près de chez vous"
   },
   "nav": {
     "discover": "Découvrir",
     "roasters": "Torréfacteurs",
-    "cafes": "Cafés",
     "about": "À propos",
     "favorites": "Favoris",
     "profile": "Profil",
@@ -116,29 +115,6 @@
     "noResults": "Aucun torréfacteur trouvé",
     "tryAdjusting": "Essayez d'ajuster vos critères de recherche ou votre emplacement."
   },
-  "cafes": {
-    "title": "Cafés",
-    "subtitle": "Explorez notre collection de cafés",
-    "visitCafe": "Visiter le café",
-    "about": "À propos",
-    "hours": "Heures",
-    "contact": "Contact",
-    "notFound": "Café introuvable",
-    "goBack": "← Retour aux cafés",
-    "noResults": "Aucun café trouvé",
-    "noCafesFound": "Aucun café trouvé",
-    "tryAdjusting": "Essayez d'ajuster vos critères de recherche ou votre emplacement.",
-    "tryAdjustingCafe": "Essayez d'ajuster vos critères de recherche ou revenez plus tard.",
-    "sortBy": "Trier par :",
-    "nameAZ": "Nom A-Z",
-    "nameZA": "Nom Z-A",
-    "highestRated": "Mieux notés",
-    "mostReviewed": "Plus commentés", 
-    "location": "Emplacement",
-    "cafesFound": "cafés trouvés",
-    "viewDetails": "Voir les détails",
-    "discoverAmazing": "Découvrir d'incroyables"
-  },
   "discover": {
     "title": "Découvrir les torréfacteurs de café",
     "subtitle": "Trouvez le torréfacteur de café parfait près de chez vous.",
@@ -149,9 +125,8 @@
   },
   "favorites": {
     "title": "Vos favoris",
-    "subtitle": "Suivez vos torréfacteurs et cafés préférés",
+    "subtitle": "Suivez vos torréfacteurs préférés",
     "roasters": "Torréfacteurs favoris",
-    "cafes": "Cafés favoris",
     "noFavorites": "Aucun favori pour le moment",
     "startExploring": "Commencez à explorer pour ajouter vos favoris !",
     "loginRequired": "Veuillez vous connecter pour voir vos favoris"
@@ -244,7 +219,61 @@
   "about": {
     "title": "À propos de The Beans",
     "subtitle": "Votre guide vers un café exceptionnel",
-    "description": "Nous sommes passionnés par la connexion des amateurs de café avec d'incroyables torréfacteurs et cafés. Découvrez votre prochaine boisson préférée avec nous."
+    "description": "Nous sommes passionnés par la connexion des amateurs de café avec d'incroyables torréfacteurs. Découvrez votre prochaine boisson préférée avec nous.",
+    "mission": {
+      "title": "Notre Mission",
+      "description": "Nous sommes passionnés par la connexion des amateurs de café avec d'incroyables torréfacteurs. Découvrez votre prochaine boisson préférée avec nous."
+    },
+    "features": {
+      "discoverLocal": {
+        "title": "Découvrir Local",
+        "description": "Trouvez d'incroyables torréfacteurs de café dans votre quartier et au-delà."
+      },
+      "buildCommunity": {
+        "title": "Construire une Communauté",
+        "description": "Connectez-vous avec d'autres amateurs de café et partagez vos découvertes préférées."
+      },
+      "qualityFirst": {
+        "title": "Qualité d'abord",
+        "description": "Chaque torréfacteur de notre plateforme est soigneusement sélectionné pour l'excellence."
+      }
+    },
+    "story": {
+      "title": "Notre Histoire",
+      "paragraph1": "The Beans est né d'une simple frustration : trouver un café vraiment exceptionnel ne devrait pas être difficile. En tant qu'amateurs de café nous-mêmes, nous avons remarqué que les meilleurs torréfacteurs étaient souvent des joyaux cachés, connus seulement des locaux ou découverts par hasard.",
+      "paragraph2": "Nous avons créé The Beans pour changer cela. Notre plateforme rassemble des torréfacteurs passionnés et des amateurs de café curieux dans une communauté belle et facile à utiliser.",
+      "paragraph3": "Que vous cherchiez ce mélange d'espresso parfait, que vous recherchiez un café confortable pour travailler, ou que vous vouliez découvrir ce qui se prépare dans votre quartier, The Beans est votre guide vers l'excellence du café."
+    },
+    "values": {
+      "title": "Nos Valeurs",
+      "sustainability": {
+        "title": "🌱 Durabilité",
+        "description": "Nous soutenons les torréfacteurs qui privilégient l'approvisionnement éthique, les pratiques de commerce équitable et la responsabilité environnementale."
+      },
+      "community": {
+        "title": "🤝 Communauté",
+        "description": "Le café rassemble les gens. Nous favorisons les connexions entre les créateurs de café et les amateurs de café qui s'étendent au-delà des transactions."
+      },
+      "quality": {
+        "title": "✨ Qualité",
+        "description": "Nous croyons que tout le monde mérite un café exceptionnel. C'est pourquoi nous sélectionnons soigneusement chaque torréfacteur sur notre plateforme."
+      },
+      "innovation": {
+        "title": "🚀 Innovation",
+        "description": "Nous améliorons constamment notre plateforme pour rendre la découverte et la dégustation d'un excellent café plus faciles et plus délicieuses."
+      }
+    },
+    "team": {
+      "title": "Rencontrez l'Équipe",
+      "subtitle": "Passionnés de Café",
+      "description": "Nous sommes une petite équipe passionnée d'amateurs de café, de designers et de développeurs qui croient que les excellentes expériences de café devraient être accessibles à tous. Nos divers antécédents en technologie, hospitalité et culture du café informent tout ce que nous construisons."
+    },
+    "cta": {
+      "title": "Prêt à Découvrir un Café Incroyable ?",
+      "subtitle": "Rejoignez notre communauté et commencez à explorer le meilleur café que votre région a à offrir.",
+      "startExploring": "Commencer l'Exploration 🔍",
+      "joinCommunity": "Rejoindre la Communauté 💜"
+    }
   },
   "roasterDetail": {
     "about": "À propos",

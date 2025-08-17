@@ -1,12 +1,11 @@
 {
   "app": {
     "name": "The Beans",
-    "tagline": "Discover fresh coffee roasters and cafes near you"
+    "tagline": "Discover fresh coffee roasters near you"
   },
   "nav": {
     "discover": "Discover",
     "roasters": "Roasters",
-    "cafes": "Cafes",
     "about": "About",
     "favorites": "Favorites",
     "profile": "Profile",
@@ -49,9 +48,9 @@
     }
   },
   "search": {
-    "searchLabel": "Search for roasters or cafes",
+    "searchLabel": "Search for roasters",
     "locationLabel": "Location",
-    "searchPlaceholder": "Search for roasters or cafes",
+    "searchPlaceholder": "Search for roasters",
     "locationPlaceholder": "Enter location",
     "searchButton": "Search",
     "popularSearches": "Popular searches",
@@ -102,29 +101,6 @@
     "noResults": "No roasters found",
     "tryAdjusting": "Try adjusting your search criteria or location."
   },
-  "cafes": {
-    "title": "Coffee Cafes",
-    "subtitle": "Explore our collection of coffee cafes",
-    "visitCafe": "Visit Cafe",
-    "about": "About",
-    "hours": "Hours",
-    "contact": "Contact",
-    "notFound": "Cafe not found",
-    "goBack": "← Back to Cafes",
-    "noResults": "No cafes found",
-    "noCafesFound": "No cafes found",
-    "tryAdjusting": "Try adjusting your search criteria or location.",
-    "tryAdjustingCafe": "Try adjusting your search criteria or check back later.",
-    "sortBy": "Sort by:",
-    "nameAZ": "Name A-Z",
-    "nameZA": "Name Z-A", 
-    "highestRated": "Highest Rated",
-    "mostReviewed": "Most Reviewed",
-    "location": "Location",
-    "cafesFound": "cafes found",
-    "viewDetails": "View Details",
-    "discoverAmazing": "Discover Amazing"
-  },
   "discover": {
     "title": "Discover Coffee Roasters",
     "subtitle": "Find the perfect coffee roaster near you.",
@@ -135,9 +111,8 @@
   },
   "favorites": {
     "title": "Your Favorites",
-    "subtitle": "Keep track of your favorite roasters and cafes",
+    "subtitle": "Keep track of your favorite roasters",
     "roasters": "Favorite Roasters",
-    "cafes": "Favorite Cafes",
     "noFavorites": "No favorites yet",
     "startExploring": "Start exploring to add your favorites!",
     "loginRequired": "Please log in to view your favorites"
@@ -182,19 +157,19 @@
   },
   "hero": {
     "title": "Discover Amazing Coffee",
-    "subtitle": "Find the best local coffee roasters and cafes in your area. From artisanal espresso to specialty single-origin beans, discover your perfect cup with our beautiful, easy-to-use platform.",
+    "subtitle": "Find the best local coffee roasters in your area. From artisanal espresso to specialty single-origin beans, discover your perfect cup with our beautiful, easy-to-use platform.",
     "findRoasters": "Find Roasters Near Me",
     "joinCommunity": "Join The Community",
     "locationBased": "Location-Based",
-    "locationDescription": "Find roasters and cafes near your location",
+    "locationDescription": "Find roasters near your location",
     "qualityBeans": "Quality Beans",
     "qualityDescription": "Discover fresh, artisanal coffee roasters",
     "community": "Community",
     "communityDescription": "Connect with fellow coffee enthusiasts"
   },
   "footer": {
-    "tagline": "Connecting coffee lovers with exceptional roasters and cafes worldwide.",
-    "description": "Your ultimate destination for discovering fresh coffee roasters and amazing cafes. Join our community of coffee lovers and never miss a great cup again.",
+    "tagline": "Connecting coffee lovers with exceptional roasters worldwide.",
+    "description": "Your ultimate destination for discovering fresh coffee roasters. Join our community of coffee lovers and never miss a great cup again.",
     "mapView": "Map View",
     "support": "Support",
     "helpCenter": "Help Center",
@@ -244,7 +219,61 @@
   "about": {
     "title": "About The Beans",
     "subtitle": "Your guide to exceptional coffee",
-    "description": "We're passionate about connecting coffee lovers with amazing roasters and cafes. Discover your next favorite brew with us."
+    "description": "Nous sommes passionnés de connecter les amateurs de café avec d'incroyables torréfacteurs. Découvrez votre prochaine infusion préférée avec nous.",
+    "mission": {
+      "title": "Our Mission",
+      "description": "We're passionate about connecting coffee lovers with amazing roasters. Discover your next favorite brew with us."
+    },
+    "features": {
+      "discoverLocal": {
+        "title": "Discover Local",
+        "description": "Find amazing coffee roasters and cafes in your neighborhood and beyond."
+      },
+      "buildCommunity": {
+        "title": "Build Community", 
+        "description": "Connect with fellow coffee lovers and share your favorite discoveries."
+      },
+      "qualityFirst": {
+        "title": "Quality First",
+        "description": "Every roaster and cafe in our platform is carefully curated for excellence."
+      }
+    },
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "The Beans was born from a simple frustration: finding truly exceptional coffee shouldn't be hard. As coffee enthusiasts ourselves, we noticed that the best roasters and cafes were often hidden gems, known only to locals or discovered by chance.",
+      "paragraph2": "We created The Beans to change that. Our platform brings together passionate coffee roasters, welcoming cafe owners, and curious coffee lovers in one beautiful, easy-to-use community.",
+      "paragraph3": "Whether you're searching for that perfect espresso blend, looking for a cozy cafe to work from, or wanting to discover what's brewing in your neighborhood, The Beans is your guide to coffee excellence."
+    },
+    "values": {
+      "title": "Our Values",
+      "sustainability": {
+        "title": "🌱 Sustainability",
+        "description": "We champion roasters and cafes that prioritize ethical sourcing, fair trade practices, and environmental responsibility."
+      },
+      "community": {
+        "title": "🤝 Community",
+        "description": "Coffee brings people together. We foster connections between coffee makers and coffee lovers that extend beyond transactions."
+      },
+      "quality": {
+        "title": "✨ Quality",
+        "description": "We believe everyone deserves exceptional coffee. That's why we carefully curate every roaster and cafe on our platform."
+      },
+      "innovation": {
+        "title": "🚀 Innovation",
+        "description": "We're constantly improving our platform to make discovering and enjoying great coffee easier and more delightful."
+      }
+    },
+    "team": {
+      "title": "Meet the Team",
+      "subtitle": "Coffee Enthusiasts",
+      "description": "We're a small but passionate team of coffee lovers, designers, and developers who believe that great coffee experiences should be accessible to everyone. Our diverse backgrounds in technology, hospitality, and coffee culture inform everything we build."
+    },
+    "cta": {
+      "title": "Ready to Discover Amazing Coffee?",
+      "subtitle": "Join our community and start exploring the best coffee your area has to offer.",
+      "startExploring": "Start Exploring 🔍",
+      "joinCommunity": "Join the Community 💜"
+    }
   },
   "roasterDetail": {
     "about": "About",

@@ -65,40 +65,11 @@ model Roaster {
   // Relationships
   owner    User     @relation(fields: [ownerId], references: [id])
   ownerId  String
-  cafes    Cafe[]
   reviews  Review[]
   favorites Favorite[]
   beans    Bean[]
 
   @@map("roasters")
-}
-
-model Cafe {
-  id        String   @id @default(cuid())
-  name      String
-  address   String?
-  city      String?
-  state     String?
-  zipCode   String?
-  country   String   @default("US")
-  latitude  Float?
-  longitude Float?
-  phone     String?
-  website   String?
-  images    String[]
-  hours     Json?    // Store opening hours as JSON
-  amenities String[] // WiFi, Parking, Outdoor Seating, etc.
-  rating    Float    @default(0)
-  reviewCount Int    @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relationships
-  roaster   Roaster @relation(fields: [roasterId], references: [id])
-  roasterId String
-  reviews   Review[]
-
-  @@map("cafes")
 }
 
 model Bean {
@@ -137,8 +108,6 @@ model Review {
   userId    String
   roaster   Roaster? @relation(fields: [roasterId], references: [id])
   roasterId String?
-  cafe      Cafe?    @relation(fields: [cafeId], references: [id])
-  cafeId    String?
   comments  Comment[]
 
   @@map("reviews")

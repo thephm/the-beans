@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import { SearchSection } from '@/components/SearchSection'
 
@@ -80,7 +81,7 @@ export default function DiscoverPage() {
       const response = await fetch(`http://localhost:5000/api/search/roasters?${searchParams}`)
       if (response.ok) {
         const data = await response.json()
-        setRoasters(data)
+        setRoasters(data.roasters || [])
       }
     } catch (error) {
       console.error('Search failed:', error)
@@ -152,9 +153,11 @@ export default function DiscoverPage() {
             ) : roasters.length > 0 ? (
               roasters.map((roaster) => (
                 <div key={roaster.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                  <img
+                  <Image
                     src={roaster.imageUrl}
                     alt={roaster.name}
+                    width={800}
+                    height={600}
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-6">

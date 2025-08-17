@@ -53,11 +53,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/cafes" className="text-gray-400 hover:text-white transition-colors">
-                  {t('nav.cafes')}
-                </Link>
-              </li>
-              <li>
                 <Link href="/map" className="text-gray-400 hover:text-white transition-colors">
                   {t('footer.mapView')}
                 </Link>
