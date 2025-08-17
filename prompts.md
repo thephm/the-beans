@@ -17323,3 +17323,6 @@ Now when you're on a roaster detail page and have the language set to French, th
 The button should now properly display French text when the language is set to French!
 
 ## 157th try
+
+*(worked!)*
+

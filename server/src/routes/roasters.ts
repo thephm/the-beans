@@ -170,6 +170,7 @@ router.get('/', [
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
   query('radius').optional().isFloat({ min: 1, max: 500 }),
+  query('sort').optional().isString(),
 ], optionalAuth, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -181,7 +182,35 @@ router.get('/', [
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
-    const { search, city, state, specialty, latitude, longitude, radius = 50 } = req.query;
+    const { search, city, state, specialty, latitude, longitude, radius = 50, sort } = req.query;
+
+    // Build orderBy clause based on sort parameter
+    let orderBy: any[] = [];
+    
+    switch (sort) {
+      case 'name':
+        orderBy = [{ name: 'asc' }];
+        break;
+      case '-name':
+        orderBy = [{ name: 'desc' }];
+        break;
+      case '-rating':
+        orderBy = [{ rating: 'desc' }];
+        break;
+      case '-reviewCount':
+        orderBy = [{ reviewCount: 'desc' }];
+        break;
+      case 'city':
+        orderBy = [{ city: 'asc' }];
+        break;
+      default:
+        // Default sorting when no sort parameter or invalid value
+        orderBy = [
+          { featured: 'desc' },
+          { rating: 'desc' },
+          { reviewCount: 'desc' },
+        ];
+    }
 
     // Build where clause
     const where: any = {};
@@ -235,11 +264,7 @@ router.get('/', [
           }
         }
       },
-      orderBy: [
-        { featured: 'desc' },
-        { rating: 'desc' },
-        { reviewCount: 'desc' },
-      ]
+      orderBy: orderBy
     });
 
     // If location-based search, filter by distance
