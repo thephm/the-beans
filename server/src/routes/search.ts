@@ -219,21 +219,46 @@ router.get('/roasters', async (req: any, res: any) => {
   try {
     const { search, location, specialty, distance = 25 } = req.query;
     
+    // Translation map for French to English specialty names
+    const frenchToEnglishSpecialties: { [key: string]: string } = {
+      'Café froid': 'Cold Brew',
+      'Origine unique': 'Single Origin',
+      'Décaféiné': 'Decaf',
+      'Biologique': 'Organic',
+      'Artisanal': 'Artisanal',
+      'Commerce équitable': 'Fair Trade',
+      'Torréfaction foncée': 'Dark Roast',
+      'Torréfaction claire': 'Light Roast',
+      'Torréfaction moyenne': 'Medium Roast',
+      'Infusion lente': 'Pour Over'
+    };
+    
+    // Convert French search terms to English for database matching
+    let searchTerm = search;
+    if (search && frenchToEnglishSpecialties[search]) {
+      searchTerm = frenchToEnglishSpecialties[search];
+    }
+    
+    let specialtyTerm = specialty;
+    if (specialty && frenchToEnglishSpecialties[specialty]) {
+      specialtyTerm = frenchToEnglishSpecialties[specialty];
+    }
+    
     let whereClause: any = {};
     
     // Build search conditions
-    if (search) {
+    if (searchTerm) {
       whereClause.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { city: { contains: search, mode: 'insensitive' } },
-        { state: { contains: search, mode: 'insensitive' } },
-        { specialties: { has: search } }, // Also search in specialties array
+        { name: { contains: searchTerm, mode: 'insensitive' } },
+        { description: { contains: searchTerm, mode: 'insensitive' } },
+        { city: { contains: searchTerm, mode: 'insensitive' } },
+        { state: { contains: searchTerm, mode: 'insensitive' } },
+        { specialties: { has: searchTerm } }, // Also search in specialties array
       ];
     }
     
-    if (specialty) {
-      whereClause.specialties = { has: specialty };
+    if (specialtyTerm) {
+      whereClause.specialties = { has: specialtyTerm };
     }
     
     if (location) {

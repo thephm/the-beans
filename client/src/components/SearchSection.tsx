@@ -76,12 +76,13 @@ export function SearchSection({
   }
 
   const handleSpecialtyClick = (tag: string) => {
-    setLocalSearchQuery(tag)
-    onSearchQueryChange?.(tag)
+    const translatedTag = translateSpecialty(tag)
+    setLocalSearchQuery(translatedTag)
+    onSearchQueryChange?.(translatedTag)
     // Add a small delay to prevent rapid-fire requests
     setTimeout(() => {
       if (onSearch) {
-        onSearch(tag, localLocation)
+        onSearch(translatedTag, localLocation)
       }
     }, 100)
   }
