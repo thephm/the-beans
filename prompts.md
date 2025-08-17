@@ -17207,3 +17207,119 @@ Restart client container to ensure translation changes take effect
 Great! I can see that you've been working through the internationalization implementation and have made significant progress. The "Price Range:" translation issue should now be resolved after the container restart, and the roasters page should display "Gamme de prix :" when the language is set to French.
 
 If you encounter any other translation gaps or issues with the multilingual functionality, feel free to let me know and I can help fix them!
+
+2025-08-17
+
+> Under roasters detail view, I am still seeing "Remove from Favorites" on the button when I favorite the roaster even though my language setting is french
+
+I need to check the roaster detail page and fix the "Remove from Favorites" button so it displays the French translation "Retirer des favoris" when the language is set to French.
+
+Let me check the roaster detail page to see how the favorites button is implemented:
+
+✔ Read `page.tsx`, lines 1 to 50
+
+I can see the page has useTranslation imported. Now let me find the favorites button to see how it's currently implemented:
+
+✔ Searched text for `Add to Favorites|Remove from Favorites|isFavorite` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me search more broadly for the favorites functionality:
+
+✔ Searched text for `favorite|Favorite` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me search for the heart icon or button that toggles favorites:
+
+✔ Searched text for `heart|Heart|onClick.*setIsFavorite` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me read more of the file to find the favorites button section:
+
+✔ Read `page.tsx`, lines 150 to 200
+
+Now I can see the favorites button! Let me continue reading to see the full button implementation:
+
+✔ Read `page.tsx`, lines 190 to 220
+
+I can see there's a heart emoji button, but I need to find if there's also a text-based "Add to Favorites" or "Remove from Favorites" button elsewhere. Let me search for the toggleFavorite function:
+
+✔ Searched text for `toggleFavorite` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me search for "Favorites" text in the file:
+
+✔ Searched text for `Favorites` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me read more of the file to find any other buttons or text that might contain "Remove from Favorites":
+
+✔ Read `page.tsx`, lines 250 to 300
+
+Let me continue reading to find any other favorites-related buttons:
+
+✔ Read `page.tsx`, lines 300 to 350
+
+Let me continue reading to find the action buttons:
+
+✔ Read `page.tsx`, lines 350 to 408
+
+Perfect! I found the issue! On line 378, the button shows hardcoded English text "Remove from Favorites" instead of using a translation key. I can see it uses `t('roasterDetail.addToFavorites')` for adding to favorites, but hardcoded text for removing from favorites.
+
+Let me check if the translation key for "Remove from Favorites" exists in the translation files:
+
+✔ Searched text for `removeFromFavorites` (`**/client/public/locales/en/common.json`), no results
+
+The translation key doesn't exist yet. Let me add it to both English and French translation files, then update the component.
+
+First, let me check the current roasterDetail section in the English translation file:
+
+✔ Read `common.json`, lines 180 to 220
+
+Let me find the roasterDetail section:
+
+✔ Searched text for `rosterDetail` (`**/client/public/locales/en/common.json`), 1 result
+
+✔ Read `common.json`, lines 223 to 246
+
+Perfect! I can see the roasterDetail section already has "addToFavorites" but is missing "removeFromFavorites". Let me add it to the English translation file:
+
+`common.json +1 -0`
+
+Now let me add the same key to the French translation file:
+
+✔ Read `common.json`, lines 223 to 246
+
+`common.json +1 -0`
+
+Now let me update the roaster detail component to use the translation key instead of hardcoded English text:
+
+`page.tsx +1 -1`
+
+Now let me restart the client container to apply these translation changes:
+
+Restart client container to apply the removeFromFavorites translation fix
+
+✔ `cd /data/github/the-beans && docker-compose restart client`
+
+Perfect! I've fixed the issue with the "Remove from Favorites" button. Here's what I did:
+
+## ✅ Fixed "Remove from Favorites" Translation
+
+### Changes Made:
+
+1. Added missing translation key to English translation file:
+
+  - `"removeFromFavorites": "Remove from Favorites"`
+
+2. **Added French translation** to French translation file:
+
+  - `"removeFromFavorites": "Retirer des favoris"`
+
+3. **Updated the roaster detail** component to use the translation key:
+
+  - Changed from hardcoded '`❤️ Remove from Favorites`'
+  - To: ❤️ `${t('roasterDetail.removeFromFavorites')}`
+
+Now when you're on a roaster detail page and have the language set to French, the favorites button will display:
+
+- **When not favorited**: "🤍 Ajouter aux favoris" (Add to Favorites)
+- **When favorited**: "❤️ Retirer des favoris" (Remove from Favorites)
+
+The button should now properly display French text when the language is set to French!
+
+## 157th try
