@@ -50,6 +50,25 @@ export function SearchSection({
     onLocationChange?.(value)
   }
 
+  // Helper function to translate specialty names
+  const translateSpecialty = (specialty: string): string => {
+    const specialtyMap: { [key: string]: string } = {
+      'Cold Brew': 'search.specialties.coldBrew',
+      'Single Origin': 'search.specialties.singleOrigin',
+      'Espresso': 'search.specialties.espresso',
+      'Decaf': 'search.specialties.decaf',
+      'Organic': 'search.specialties.organic',
+      'Artisanal': 'search.specialties.artisanal',
+      'Fair Trade': 'search.specialties.fairTrade',
+      'Dark Roast': 'search.specialties.darkRoast',
+      'Light Roast': 'search.specialties.lightRoast',
+      'Medium Roast': 'search.specialties.mediumRoast',
+      'Pour Over': 'search.specialties.pourOver'
+    }
+    
+    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
+  }
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch()
@@ -134,7 +153,7 @@ export function SearchSection({
                 onClick={() => handleSpecialtyClick(tag)}
                 className="px-3 py-1 bg-white text-primary-600 rounded-full text-sm border border-primary-200 hover:bg-primary-50 transition-colors"
               >
-                {tag}
+                {translateSpecialty(tag)}
               </button>
             ))}
           </div>

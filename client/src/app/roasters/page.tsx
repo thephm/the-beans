@@ -39,7 +39,8 @@ export default function RoastersPage() {
       'Fair Trade': 'search.specialties.fairTrade',
       'Dark Roast': 'search.specialties.darkRoast',
       'Light Roast': 'search.specialties.lightRoast',
-      'Medium Roast': 'search.specialties.mediumRoast'
+      'Medium Roast': 'search.specialties.mediumRoast',
+      'Pour Over': 'search.specialties.pourOver'
     }
     
     return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
