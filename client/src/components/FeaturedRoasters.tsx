@@ -22,6 +22,25 @@ export function FeaturedRoasters() {
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
 
+  const translateSpecialty = (specialty: string) => {
+    const specialtyMap: { [key: string]: string } = {
+      'Single Origin': t('specialties.singleOrigin'),
+      'Espresso': t('specialties.espresso'),
+      'Cold Brew': t('specialties.coldBrew'),
+      'Pour Over': t('specialties.pourOver'),
+      'Organic': t('specialties.organic'),
+      'Fair Trade': t('specialties.fairTrade'),
+      'Direct Trade': t('specialties.directTrade'),
+      'Education': t('specialties.education'),
+      'Artisanal': t('specialties.artisanal'),
+      'Dark Roast': t('specialties.darkRoast'),
+      'Light Roast': t('specialties.lightRoast'),
+      'Medium Roast': t('specialties.mediumRoast'),
+      'Decaf': t('specialties.decaf')
+    }
+    return specialtyMap[specialty] || specialty
+  }
+
   useEffect(() => {
     fetchFeaturedRoasters()
   }, [])
@@ -97,7 +116,7 @@ export function FeaturedRoasters() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
                 <p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>
-                <p className="text-primary-600 font-medium mb-3">☕ {roaster.specialties?.[0] || 'Coffee Roasting'}</p>
+                <p className="text-primary-600 font-medium mb-3">☕ {translateSpecialty(roaster.specialties?.[0]) || t('specialties.artisanal')}</p>
                 <p className="text-gray-600 text-sm mb-4">{roaster.description}</p>
                 
                 <div className="flex gap-2">
