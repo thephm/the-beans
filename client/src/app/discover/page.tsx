@@ -59,7 +59,7 @@ export default function DiscoverPage() {
     
     setFilters(prev => ({
       ...prev,
-      search: urlSpecialty || urlSearch, // Use specialty as search if provided
+      search: urlSpecialty ? translateSpecialty(urlSpecialty) : urlSearch, // Use translated specialty as search if provided
       location: urlLocation,
       specialty: urlSpecialty
     }))
