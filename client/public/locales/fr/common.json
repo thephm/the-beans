@@ -117,7 +117,7 @@
   },
   "cafes": {
     "title": "Cafés",
-    "subtitle": "Trouvez le café parfait pour votre prochaine pause café",
+    "subtitle": "Explorez notre collection de cafés",
     "visitCafe": "Visiter le café",
     "about": "À propos",
     "hours": "Heures",
@@ -125,7 +125,18 @@
     "notFound": "Café introuvable",
     "goBack": "← Retour aux cafés",
     "noResults": "Aucun café trouvé",
-    "tryAdjusting": "Essayez d'ajuster vos critères de recherche ou votre emplacement."
+    "noCafesFound": "Aucun café trouvé",
+    "tryAdjusting": "Essayez d'ajuster vos critères de recherche ou votre emplacement.",
+    "tryAdjustingCafe": "Essayez d'ajuster vos critères de recherche ou revenez plus tard.",
+    "sortBy": "Trier par :",
+    "nameAZ": "Nom A-Z",
+    "nameZA": "Nom Z-A",
+    "highestRated": "Mieux notés",
+    "mostReviewed": "Plus commentés", 
+    "location": "Emplacement",
+    "cafesFound": "cafés trouvés",
+    "viewDetails": "Voir les détails",
+    "discoverAmazing": "Découvrir d'incroyables"
   },
   "discover": {
     "title": "Découvrir les torréfacteurs de café",
@@ -161,11 +172,11 @@
     "selectLanguage": "Sélectionner la langue",
     "notifications": "Notifications",
     "newRoasters": "Nouveaux torréfacteurs dans votre région",
-    "promotions": "Promotions et offres",
-    "recommendations": "Recommandations personnalisées",
+    "promotions": "Offres spéciales et promotions",
+    "recommendations": "Recommandations de café hebdomadaires",
     "privacy": "Confidentialité",
-    "showProfile": "Montrer le profil aux autres utilisateurs",
-    "allowLocationTracking": "Autoriser le suivi de localisation",
+    "showProfile": "Montrer mon profil aux autres utilisateurs",
+    "allowLocationTracking": "Autoriser le suivi de localisation pour de meilleures recommandations",
     "preferences": "Préférences de café",
     "roastLevel": "Niveau de torréfaction préféré",
     "noPreference": "Aucune préférence",
@@ -248,6 +259,21 @@
     "website": "Site web",
     "email": "E-mail",
     "owner": "Propriétaire"
+  },
+  "forms": {
+    "firstName": "Prénom",
+    "lastName": "Nom de famille", 
+    "createPassword": "Créer un mot de passe fort",
+    "confirmPassword": "Confirmer votre mot de passe",
+    "passwordStrength": "Force du mot de passe",
+    "weak": "Faible",
+    "medium": "Moyen", 
+    "strong": "Fort",
+    "validation": {
+      "required": "Ce champ est requis",
+      "invalidEmail": "Veuillez entrer une adresse e-mail valide", 
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères"
+    }
   },
   "validation": {
     "required": "Ce champ est obligatoire",

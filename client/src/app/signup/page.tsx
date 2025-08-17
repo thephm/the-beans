@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 
 export default function SignupPage() {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -108,7 +110,7 @@ export default function SignupPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                  First name
+                  {t('forms.firstName')}
                 </label>
                 <input
                   id="firstName"
@@ -123,7 +125,7 @@ export default function SignupPage() {
               </div>
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Last name
+                  {t('forms.lastName')}
                 </label>
                 <input
                   id="lastName"
@@ -167,7 +169,7 @@ export default function SignupPage() {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Create a strong password"
+                placeholder={t('forms.createPassword')}
               />
               {formData.password && (
                 <div className="mt-2">
@@ -182,7 +184,7 @@ export default function SignupPage() {
                         }}
                       ></div>
                     </div>
-                    <span className="text-sm text-gray-600 capitalize">{passwordStrength}</span>
+                    <span className="text-sm text-gray-600 capitalize">{t(`forms.${passwordStrength}`)}</span>
                   </div>
                 </div>
               )}
@@ -190,7 +192,7 @@ export default function SignupPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm password
+                {t('forms.confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
@@ -200,7 +202,7 @@ export default function SignupPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Confirm your password"
+                placeholder={t('forms.confirmPassword')}
               />
             </div>
 
