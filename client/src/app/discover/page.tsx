@@ -171,7 +171,13 @@ export default function DiscoverPage() {
                       {roaster.specialties.map((specialty) => (
                         <button
                           key={specialty}
-                          onClick={() => router.push(`/discover?specialty=${encodeURIComponent(specialty)}`)}
+                          onClick={() => {
+                            setFilters(prev => ({
+                              ...prev,
+                              search: translateSpecialty(specialty),
+                              specialty: specialty
+                            }))
+                          }}
                           className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                         >
                           ☕ {translateSpecialty(specialty)}
