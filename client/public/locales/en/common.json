@@ -66,12 +66,17 @@
       "darkRoast": "Dark Roast",
       "lightRoast": "Light Roast",
       "mediumRoast": "Medium Roast",
-      "pourOver": "Pour Over"
+      "pourOver": "Pour Over",
+      "directTrade": "Direct Trade",
+      "education": "Education"
     }
   },
   "roasters": {
     "title": "Coffee Roasters",
     "subtitle": "Explore our collection of artisanal coffee roasters.",
+    "featured": "Featured",
+    "featuredDescription": "Discover exceptional coffee from our featured roasters",
+    "exploreAll": "Explore All Roasters",
     "featuredTitle": "Featured Coffee Roasters",
     "featuredSubtitle": "Discover exceptional coffee from our featured roasters",
     "viewDetails": "View Details",
@@ -165,7 +170,15 @@
   },
   "hero": {
     "title": "Discover Amazing Coffee",
-    "subtitle": "Find the best local coffee roasters and cafes in your area. From artisanal espresso to specialty single-origin beans, discover your perfect cup with our beautiful, easy-to-use platform."
+    "subtitle": "Find the best local coffee roasters and cafes in your area. From artisanal espresso to specialty single-origin beans, discover your perfect cup with our beautiful, easy-to-use platform.",
+    "findRoasters": "Find Roasters Near Me",
+    "joinCommunity": "Join The Community",
+    "locationBased": "Location-Based",
+    "locationDescription": "Find roasters and cafes near your location",
+    "qualityBeans": "Quality Beans",
+    "qualityDescription": "Discover fresh, artisanal coffee roasters",
+    "community": "Community",
+    "communityDescription": "Connect with fellow coffee enthusiasts"
   },
   "footer": {
     "tagline": "Connecting coffee lovers with exceptional roasters and cafes worldwide.",

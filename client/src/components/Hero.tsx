@@ -35,13 +35,13 @@ export function Hero() {
               href="/discover"
               className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
             >
-              🌍 Find Roasters Near Me
+              🌍 {t('hero.findRoasters')}
             </Link>
             <Link
               href="/signup"
               className="bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-primary-200 hover:border-primary-400 hover:bg-primary-50 transition-all"
             >
-              ☕ Join The Community
+              ☕ {t('hero.joinCommunity')}
             </Link>
           </motion.div>
 
@@ -57,24 +57,24 @@ export function Hero() {
                   <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-violet-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl">📍</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Location-Based</h3>
-                  <p className="text-gray-600">Find roasters and cafes near your location</p>
+                  <h3 className="font-semibold text-gray-900 mb-2">{t('hero.locationBased')}</h3>
+                  <p className="text-gray-600">{t('hero.locationDescription')}</p>
                 </div>
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl">☕</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Quality Beans</h3>
-                  <p className="text-gray-600">Discover fresh, artisanal coffee roasters</p>
+                  <h3 className="font-semibold text-gray-900 mb-2">{t('hero.qualityBeans')}</h3>
+                  <p className="text-gray-600">{t('hero.qualityDescription')}</p>
                 </div>
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-orchid-500 to-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl">💜</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Community</h3>
-                  <p className="text-gray-600">Connect with fellow coffee enthusiasts</p>
+                  <h3 className="font-semibold text-gray-900 mb-2">{t('hero.community')}</h3>
+                  <p className="text-gray-600">{t('hero.communityDescription')}</p>
                 </div>
               </div>
             </div>
