@@ -190,8 +190,8 @@ export default function DiscoverPage() {
             ) : (
               <div className="col-span-full text-center py-12">
                 <div className="text-6xl mb-4">☕</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No roasters found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria or location.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('roasters.noRoastersFound')}</h3>
+                <p className="text-gray-600">{t('discover.tryAdjusting')}</p>
               </div>
             )}
           </div>
