@@ -37,11 +37,18 @@
     "createAccount": "Create your account",
     "joinCommunity": "Join our community of coffee lovers",
     "agreeToTerms": "I agree to the",
+    "and": "and",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "orContinueWith": "Or continue with",
+    "orSignUpWith": "Or sign up with", 
     "google": "Google",
     "twitter": "Twitter",
+    "joinCommunityTitle": "Join our community!",
+    "joinCommunitySubtitle": "Create your free account and start discovering amazing coffee",
+    "emailAddress": "Email address",
+    "creatingAccount": "Creating account...",
+    "passwordsNotMatch": "Passwords do not match",
     "demo": {
       "title": "Try the Demo Account:",
       "fillCredentials": "Fill Demo Credentials"
