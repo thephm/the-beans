@@ -230,7 +230,10 @@ router.get('/roasters', async (req: any, res: any) => {
       'Torréfaction foncée': 'Dark Roast',
       'Torréfaction claire': 'Light Roast',
       'Torréfaction moyenne': 'Medium Roast',
-      'Infusion lente': 'Pour Over'
+      'Infusion lente': 'Pour Over',
+      'Commerce direct': 'Direct Trade',
+      'Éducation': 'Education',
+      'Dégustation': 'Cupping'
     };
     
     // Convert French search terms to English for database matching

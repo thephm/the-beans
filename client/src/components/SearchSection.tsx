@@ -63,7 +63,10 @@ export function SearchSection({
       'Dark Roast': 'search.specialties.darkRoast',
       'Light Roast': 'search.specialties.lightRoast',
       'Medium Roast': 'search.specialties.mediumRoast',
-      'Pour Over': 'search.specialties.pourOver'
+      'Pour Over': 'search.specialties.pourOver',
+      'Direct Trade': 'search.specialties.directTrade',
+      'Education': 'search.specialties.education',
+      'Cupping': 'search.specialties.cupping'
     }
     
     return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty

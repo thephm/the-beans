@@ -18895,3 +18895,98 @@ All hardcoded English text in the Coffee Preferences section is now translated:
 - "Saving..." → "Enregistrement en cours..."
 
 The settings page is now fully translated when in French mode.
+
+## 167th try
+
+*(settings page now all French)*
+
+> See two English specialty labels on discover page check for others: Cupping and Direct Trade
+
+I can see that there are still some English specialty labels showing on the discover page. Let me check for "Cupping" and "Direct Trade" and any other missing specialty translations.
+
+✔ Searched text for `Cupping|Direct Trade` (`**/client/public/locales/en/common.json`), 1 result
+
+✔ Read `common.json`, lines 60 to 80
+
+I can see that "directTrade" exists but "cupping" is missing. Let me check what other specialties might be missing by looking at the discover page to see what specialties are being used:
+
+✔ Searched text for `Cupping|Direct Trade` (`**/client/src/app/discover/page.tsx`), no results
+
+✔ Searched text for `Cupping|Direct Trade` (`**/client/src/components/SearchSection.tsx`), no results
+
+Let me check the `SearchSection` component to see what specialty pills are defined:
+
+✔ Read `SearchSection.tsx`, lines 140 to 166
+
+I can see the SearchSection only uses 5 specialty pills. Let me check if there are dynamic specialty pills elsewhere, perhaps from the roasters data. Let me search for "Cupping" in the codebase:
+
+Perfect! I found that "Cupping" is used in the seed data. Let me also check the translateSpecialty functions to see if they're missing the "Cupping" mapping:
+
+✔ Read `page.tsx`, lines 25 to 50
+
+I can see that the translateSpecialty function is missing both "Direct Trade" and "Cupping" mappings. Let me add the missing translation keys and update all the translateSpecialty functions. First, let me add the missing keys to the English translation file:
+
+`common.json +2 -1`
+
+Now let me add the French translation:
+
+✔ Read `common.json`, lines 60 to 80
+
+✔ Read `common.json`, lines 70 to 90
+
+`common.json +2 -1`
+
+Now I need to update the translateSpecialty function in the discover page:
+
+`page.tsx+4-1`
+
+Now let me update the translateSpecialty function in the roasters page:
+
+✔ Read `page.tsx`, lines 25 to 50
+
+`page.tsx +4 -1`
+
+Now let me update the translateSpecialty function in the roaster detail page:
+
+✔ Read `page.tsx`, lines 70 to 100
+
+`page.tsx +4 -1`
+
+Now let me update the SearchSection component:
+
+✔ Read `SearchSection.tsx`, lines 90 to 120
+
+✔ Read `SearchSection.tsx`, lines 50 to 75
+
+`SearchSection.tsx +4 -1`
+Finally, I need to update the backend search to handle the new French specialty translations:
+
+✔ Read `search.ts`, lines 240 to 270
+
+✔ Read `search.ts`, lines 210 to 240
+
+`search.ts +4 -1`
+
+Now let me restart the client container to apply all the changes:
+
+Restart client container to apply specialty translation fixes
+
+✔ `cd /data/github/the-beans && docker-compose restart client`
+
+## ✅ Fixed Missing Specialty Translations
+
+### Added missing translation keys:
+
+- "Cupping" → "Dégustation" (French)
+- "Direct Trade" already existed but wasn't mapped in translateSpecialty functions
+
+**Updated all translateSpecialty** functions in:
+
+- Discover page
+- Roasters page
+- Roaster detail page
+- SearchSection component
+
+**Updated backend search** to handle French translations for "Commerce direct" and "Dégustation"
+
+Both "Cupping" and "Direct Trade" specialty pills now display in French when language is set to French.
