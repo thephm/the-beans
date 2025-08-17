@@ -136,7 +136,12 @@
     "roasters": "Torréfacteurs favoris",
     "noFavorites": "Aucun favori pour le moment",
     "startExploring": "Commencez à explorer pour ajouter vos favoris !",
-    "loginRequired": "Veuillez vous connecter pour voir vos favoris"
+    "loginRequired": "Veuillez vous connecter pour voir vos favoris",
+    "noFavoritesYet": "Aucun favori pour le moment",
+    "startExploringDescription": "Commencez à explorer et ajoutez vos torréfacteurs préférés pour les garder ici pour un accès facile.",
+    "exploreRoasters": "Explorer les torréfacteurs",
+    "viewDetails": "Voir les détails",
+    "remove": "Retirer"
   },
   "profile": {
     "title": "Votre profil",

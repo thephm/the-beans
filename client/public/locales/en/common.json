@@ -122,7 +122,12 @@
     "roasters": "Favorite Roasters",
     "noFavorites": "No favorites yet",
     "startExploring": "Start exploring to add your favorites!",
-    "loginRequired": "Please log in to view your favorites"
+    "loginRequired": "Please log in to view your favorites",
+    "noFavoritesYet": "No favorites yet",
+    "startExploringDescription": "Start exploring and add your favorite roasters to keep them here for easy access.",
+    "exploreRoasters": "Explore Roasters",
+    "viewDetails": "View Details",
+    "remove": "Remove"
   },
   "profile": {
     "title": "Your Profile",
