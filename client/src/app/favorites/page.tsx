@@ -24,6 +24,12 @@ export default function FavoritesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [favorites, setFavorites] = useState<{[key: string]: boolean}>({})
 
+  // Helper function to translate specialty names
+  const translateSpecialty = (specialty: string) => {
+    // Convert "Direct Trade" to "directTrade", "Single Origin" to "singleOrigin", etc.
+    const specialtyKey = specialty.toLowerCase().replace(/\s+(.)/g, (match, char) => char.toUpperCase())
+    return t(`search.specialties.${specialtyKey}`, { defaultValue: specialty })
+  }
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
@@ -120,16 +126,16 @@ export default function FavoritesPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">No favorites yet</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('favorites.noFavoritesYet')}</h3>
               <p className="text-gray-600 mb-6">
-                Start exploring and add your favorite roasters to keep them here for easy access.
+                {t('favorites.startExploringDescription')}
               </p>
               <div className="flex justify-center">
                 <button 
                   onClick={() => router.push('/roasters')}
                   className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
                 >
-                  Explore Roasters
+                  {t('favorites.exploreRoasters')}
                 </button>
               </div>
             </div>
@@ -156,7 +162,7 @@ export default function FavoritesPage() {
                           <div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
                             <p className="text-gray-600 mb-1">{roaster.location}</p>
-                            <p className="text-sm text-primary-600 font-medium">{roaster.specialties?.[0]}</p>
+                            <p className="text-sm text-primary-600 font-medium">{roaster.specialties?.[0] ? translateSpecialty(roaster.specialties[0]) : ''}</p>
                           </div>
                           <div className="flex items-center space-x-1">
                             <span className="text-yellow-400">★</span>
@@ -173,13 +179,13 @@ export default function FavoritesPage() {
                             href={`/roasters/${roaster.id}`}
                             className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg text-center font-medium hover:shadow-lg transition-all transform hover:scale-105"
                           >
-                            View Details
+                            {t('favorites.viewDetails')}
                           </Link>
                           <button
                             onClick={() => toggleFavorite(roaster.id)}
                             className="px-4 py-2 border-2 border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                           >
-                            💔 Remove
+                            💔 {t('favorites.remove')}
                           </button>
                         </div>
                       </div>
