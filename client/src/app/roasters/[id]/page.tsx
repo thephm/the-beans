@@ -382,7 +382,7 @@ export default function RoasterDetail() {
                           : 'bg-white border-2 border-red-300 text-red-600 hover:bg-red-50'
                       }`}
                     >
-                      {isFavorite ? '❤️ Remove from Favorites' : `🤍 ${t('roasterDetail.addToFavorites')}`}
+                      {isFavorite ? `❤️ ${t('roasterDetail.removeFromFavorites')}` : `🤍 ${t('roasterDetail.addToFavorites')}`}
                     </button>
                     
                     {roaster.website && (
