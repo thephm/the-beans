@@ -152,7 +152,7 @@ export default function SettingsPage() {
                       }))}
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                     />
-                    <span className="ml-3 text-gray-700">Special offers and promotions</span>
+                    <span className="ml-3 text-gray-700">{t('settings.promotions')}</span>
                   </label>
                   <label className="flex items-center">
                     <input 
@@ -164,7 +164,7 @@ export default function SettingsPage() {
                       }))}
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                     />
-                    <span className="ml-3 text-gray-700">Weekly coffee recommendations</span>
+                    <span className="ml-3 text-gray-700">{t('settings.recommendations')}</span>
                   </label>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
                       }))}
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                     />
-                    <span className="ml-3 text-gray-700">Show my profile to other users</span>
+                    <span className="ml-3 text-gray-700">{t('settings.showProfile')}</span>
                   </label>
                   <label className="flex items-center">
                     <input 
@@ -195,7 +195,7 @@ export default function SettingsPage() {
                       }))}
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                     />
-                    <span className="ml-3 text-gray-700">Allow location tracking for better recommendations</span>
+                    <span className="ml-3 text-gray-700">{t('settings.allowLocationTracking')}</span>
                   </label>
                 </div>
               </div>

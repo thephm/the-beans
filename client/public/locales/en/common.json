@@ -103,7 +103,7 @@
   },
   "cafes": {
     "title": "Coffee Cafes",
-    "subtitle": "Find the perfect cafe for your next coffee break",
+    "subtitle": "Explore our collection of coffee cafes",
     "visitCafe": "Visit Cafe",
     "about": "About",
     "hours": "Hours",
@@ -111,7 +111,18 @@
     "notFound": "Cafe not found",
     "goBack": "← Back to Cafes",
     "noResults": "No cafes found",
-    "tryAdjusting": "Try adjusting your search criteria or location."
+    "noCafesFound": "No cafes found",
+    "tryAdjusting": "Try adjusting your search criteria or location.",
+    "tryAdjustingCafe": "Try adjusting your search criteria or check back later.",
+    "sortBy": "Sort by:",
+    "nameAZ": "Name A-Z",
+    "nameZA": "Name Z-A", 
+    "highestRated": "Highest Rated",
+    "mostReviewed": "Most Reviewed",
+    "location": "Location",
+    "cafesFound": "cafes found",
+    "viewDetails": "View Details",
+    "discoverAmazing": "Discover Amazing"
   },
   "discover": {
     "title": "Discover Coffee Roasters",
@@ -147,11 +158,11 @@
     "selectLanguage": "Select Language",
     "notifications": "Notifications",
     "newRoasters": "New roasters in your area",
-    "promotions": "Promotions and deals",
-    "recommendations": "Personalized recommendations",
+    "promotions": "Special offers and promotions",
+    "recommendations": "Weekly coffee recommendations",
     "privacy": "Privacy",
-    "showProfile": "Show profile to other users",
-    "allowLocationTracking": "Allow location tracking",
+    "showProfile": "Show my profile to other users",
+    "allowLocationTracking": "Allow location tracking for better recommendations",
     "preferences": "Coffee Preferences",
     "roastLevel": "Preferred roast level",
     "noPreference": "No preference",
@@ -248,6 +259,21 @@
     "website": "Website",
     "email": "Email",
     "owner": "Owner"
+  },
+  "forms": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "createPassword": "Create a strong password", 
+    "confirmPassword": "Confirm your password",
+    "passwordStrength": "Password strength",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "passwordTooShort": "Password must be at least 8 characters"
+    }
   },
   "validation": {
     "required": "This field is required",

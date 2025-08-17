@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 interface Cafe {
   id: string
@@ -22,6 +23,7 @@ interface Cafe {
 }
 
 export default function CafesPage() {
+  const { t } = useTranslation()
   const [cafes, setCafes] = useState<Cafe[]>([])
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState('name')
@@ -89,10 +91,10 @@ export default function CafesPage() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              Coffee Cafes
+              {t('cafes.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Find the perfect spot to enjoy freshly roasted coffee in a cozy atmosphere
+              {t('cafes.subtitle')}
             </p>
           </div>
 
@@ -103,9 +105,9 @@ export default function CafesPage() {
               onChange={(e) => setSortBy(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
-              <option value="name">Sort by Name</option>
-              <option value="rating">Sort by Rating</option>
-              <option value="reviewCount">Sort by Reviews</option>
+              <option value="name">{t('cafes.nameAZ')}</option>
+              <option value="rating">{t('cafes.highestRated')}</option>
+              <option value="reviewCount">{t('cafes.mostReviewed')}</option>
             </select>
           </div>
 
@@ -148,7 +150,7 @@ export default function CafesPage() {
                         href={`/cafes/${cafe.id}`}
                         className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-2 px-4 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
                       >
-                        Visit Cafe 💜
+                        {t('cafes.visitCafe')} 💜
                       </Link>
                       <button 
                         onClick={() => toggleFavorite(cafe.id)}
@@ -168,8 +170,8 @@ export default function CafesPage() {
           ) : (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">☕</div>
-              <h3 className="text-2xl font-bold text-gray-700 mb-2">No cafes found</h3>
-              <p className="text-gray-500 mb-6">Try adjusting your search criteria or check back later.</p>
+              <h3 className="text-2xl font-bold text-gray-700 mb-2">{t('cafes.noCafesFound')}</h3>
+              <p className="text-gray-500 mb-6">{t('cafes.tryAdjustingCafe')}</p>
               <button 
                 onClick={fetchCafes}
                 className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
