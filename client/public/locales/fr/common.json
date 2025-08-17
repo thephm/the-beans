@@ -79,7 +79,8 @@
       "fairTrade": "Commerce équitable",
       "darkRoast": "Torréfaction foncée",
       "lightRoast": "Torréfaction claire",
-      "mediumRoast": "Torréfaction moyenne"
+      "mediumRoast": "Torréfaction moyenne",
+      "pourOver": "Infusion lente"
     }
   },
   "roasters": {

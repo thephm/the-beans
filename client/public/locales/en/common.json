@@ -65,7 +65,8 @@
       "fairTrade": "Fair Trade",
       "darkRoast": "Dark Roast",
       "lightRoast": "Light Roast",
-      "mediumRoast": "Medium Roast"
+      "mediumRoast": "Medium Roast",
+      "pourOver": "Pour Over"
     }
   },
   "roasters": {
