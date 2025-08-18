@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -69,7 +69,7 @@ export default function DiscoverPage() {
     }))
   }, [searchParams])
 
-  const searchRoasters = async () => {
+  const searchRoasters = useCallback(async () => {
     setLoading(true)
     try {
       const searchParams = new URLSearchParams()
@@ -88,7 +88,7 @@ export default function DiscoverPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters.search, filters.location, filters.specialty, filters.distance])
 
   useEffect(() => {
     // Debounce the search to prevent rapid-fire API calls
@@ -97,7 +97,7 @@ export default function DiscoverPage() {
     }, 300) // Debounce search by 300ms
     
     return () => clearTimeout(timeoutId)
-  }, [filters.search, filters.location, filters.specialty, filters.distance])
+  }, [searchRoasters])
 
   // Remove the debounced search effect since we're handling it in the main effect
   // useEffect(() => {
@@ -127,7 +127,11 @@ export default function DiscoverPage() {
             <SearchSection 
               searchQuery={filters.search}
               location={filters.location}
-              onSearchQueryChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
+              onSearchQueryChange={(value, specialty) => setFilters(prev => ({ 
+                ...prev, 
+                search: value,
+                specialty: specialty || ''
+              }))}
               onLocationChange={(value) => setFilters(prev => ({ ...prev, location: value }))}
               onSearch={(searchQuery, location) => {
                 setFilters(prev => ({ ...prev, search: searchQuery, location: location }))
