@@ -21319,3 +21319,21 @@ These warnings will only disappear when those tools update their own dependencie
 You can safely ignore these warnings for now. They do not affect your production build or runtime. If you want, you can check for beta/next versions of eslint and related packages, but otherwise, you are as up-to-date as possible.
 
 Let me know if you want to check for beta/next versions or need help with anything else!
+
+## https://github.com/thephm/the-beans/issues/25
+
+> The README.md is out of date. It doesn't describe docker, still mentions cafes feature that was removed yesterday 
+
+✔ Read `README.md`, lines 1 to 60
+
+✔ Read `README.md`, lines 61 to 120
+
+Sorry, the response hit the length limit. Please rephrase your prompt.
+
+✔ Read `docker-compose.yml`, lines 1 to 40
+
+✔ Read `docker-compose.yml`, lines 41 to 62
+
+✔ Read `README.md`, lines 120 to 120
+
+The `README.md` has been updated to remove all cafe references, add Docker usage instructions, and reflect the current project structure and features. Let me know if you want further adjustments or a review of any other documentation.

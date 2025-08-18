@@ -1,13 +1,12 @@
 # The Beans - Coffee Roaster Discovery App
 
-A beautiful, modern web application for discovering fresh coffee roasters and cafes near you. Built with Next.js, Node.js, and PostgreSQL.
+A beautiful, modern web application for discovering fresh coffee roasters near you. Built with Next.js, Node.js, and PostgreSQL.
 
 ## Features
 
-- 🌍 **Location-based Discovery**: Find coffee roasters and cafes near you
-- ☕ **Roaster Profiles**: Detailed information about coffee roasters including contact info, hours, and bean prices
-- 🏪 **Cafe Tracking**: Link roasters to their physical cafe locations
-- 👥 **User Accounts**: Sign up for notifications about new locations
+- 🌍 **Location-based Discovery**: Find coffee roasters near you
+- ☕ **Roaster Profiles**: Detailed information about coffee roasters including contact info, hours, and bean offerings
+- 👥 **User Accounts**: Sign up for notifications about new roasters
 - 📱 **Cross-platform**: Works on web, Android, and iOS
 - 🔗 **Deep Linking**: Every page is directly linkable
 - 📸 **Photos & Reviews**: Share photos and comments with moderation
@@ -37,7 +36,28 @@ A beautiful, modern web application for discovering fresh coffee roasters and ca
 - **Railway/Render** - Backend hosting
 - **Cloudflare** - CDN and domain management
 
-## Quick Start
+## Quick Start (with Docker)
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/thephm/the-beans.git
+   cd the-beans
+   ```
+
+2. **Set up environment variables**
+   - Copy `.env.example` to `.env` in both `client` and `server` directories
+   - Fill in your database and API keys as needed
+
+3. **Build and start all services with Docker Compose**
+   ```bash
+   docker-compose up --build -d
+   ```
+
+4. **Open your browser**
+   - Frontend: http://localhost:3000
+   - API Documentation: http://localhost:5000/api-docs
+
+## Local Development (without Docker)
 
 1. **Install dependencies**
    ```bash
@@ -48,14 +68,10 @@ A beautiful, modern web application for discovering fresh coffee roasters and ca
    - Copy `.env.example` to `.env` in both client and server directories
    - Fill in your database and API keys
 
-3. **Run the development server**
+3. **Run the development servers**
    ```bash
    npm run dev
    ```
-
-4. **Open your browser**
-   - Frontend: http://localhost:3000
-   - API Documentation: http://localhost:5000/api-docs
 
 ## Project Structure
 
@@ -65,18 +81,15 @@ the-beans/
 │   ├── src/
 │   │   ├── app/           # App Router pages
 │   │   ├── components/    # Reusable components
-│   │   ├── lib/          # Utilities and configs
-│   │   └── types/        # TypeScript types
-│   └── public/           # Static assets
-├── server/                # Node.js backend
+│   │   ├── lib/           # Utilities and configs
+│   │   └── types/         # TypeScript types
+│   └── public/            # Static assets
+├── server/                 # Node.js backend
 │   ├── src/
-│   │   ├── controllers/  # API controllers
-│   │   ├── middleware/   # Express middleware
-│   │   ├── models/      # Database models
-│   │   ├── routes/      # API routes
-│   │   └── utils/       # Utilities
-│   └── prisma/          # Database schema
-└── docs/                 # Documentation
+│   │   ├── routes/        # API routes
+│   │   ├── lib/           # Utilities
+│   └── prisma/            # Database schema & migrations
+└── docker-compose.yml      # Docker Compose setup
 ```
 
 ## Development
