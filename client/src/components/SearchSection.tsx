@@ -8,7 +8,7 @@ interface SearchSectionProps {
   onSearch?: (searchQuery: string, location: string) => void
   searchQuery?: string
   location?: string
-  onSearchQueryChange?: (value: string) => void
+  onSearchQueryChange?: (value: string, specialty?: string) => void
   onLocationChange?: (value: string) => void
 }
 
@@ -81,13 +81,8 @@ export function SearchSection({
   const handleSpecialtyClick = (tag: string) => {
     const translatedTag = translateSpecialty(tag)
     setLocalSearchQuery(translatedTag)
-    onSearchQueryChange?.(translatedTag)
-    // Add a small delay to prevent rapid-fire requests
-    setTimeout(() => {
-      if (onSearch) {
-        onSearch(translatedTag, localLocation)
-      }
-    }, 100)
+    // Update parent state with both search and specialty to match roaster panel behavior
+    onSearchQueryChange?.(translatedTag, tag)
   }
 
   return (
