@@ -25,4 +25,8 @@
 - As a new user, I want to sign up so I can access personalized features.
 - As a user, I want to log in so I can access my account and favorites.
 - As a user, I want to log out to keep my account secure.
-- As a user, I want to see clear error messages if I enter invalid credentials or try to register with an existing email/username.
+-- As a user, I want to see clear error messages if I enter invalid credentials or try to register with an existing email/username.
+
+---
+
+See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Test Cases](test.md)

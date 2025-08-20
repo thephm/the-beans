@@ -85,4 +85,5 @@ Search for roasters by specialty, location, and other filters.
 
 ---
 
-See also: [Search Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)
+
+See also: [Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)

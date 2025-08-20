@@ -39,9 +39,11 @@ This document describes the API endpoints for managing user settings (notificati
 	"message": "Settings updated successfully",
 	"settings": { ... }
 }
-```
 
 **Notes:**
-- Both endpoints require authentication.
-- Settings are persisted per user.
-- Returns defaults if no settings are saved yet.
+
+```
+
+---
+
+See also: [Settings Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)

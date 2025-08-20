@@ -26,4 +26,5 @@ This document describes the technical design and architecture of the search feat
 ## Extensibility
 - Easily extendable to support more filters, additional entity types, or advanced search (e.g., fuzzy matching).
 
+
 See also: [API](api.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)

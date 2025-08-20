@@ -77,8 +77,17 @@ All profile endpoints require authentication via a Bearer token in the `Authoriz
 **Description:** Placeholder endpoint for user listing (not implemented).
 
 **Response:**
+{
+	"message": "Users endpoint - coming soon!"
+}
+```
+
 ```json
 {
 	"message": "Users endpoint - coming soon!"
 }
 ```
+
+---
+
+See also: [Profile Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)

@@ -18,4 +18,5 @@
 5. Results update when sorting is changed.
 6. UI displays error messages for invalid input or server errors.
 
+
 See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Requirements](requirements.md)

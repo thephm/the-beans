@@ -26,3 +26,7 @@
 - Unit test AuthContext for correct user state management
 - Integration test API endpoints for settings and language update
 - E2E test: login, update profile, verify persistence
+
+---
+
+See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Requirements](requirements.md)

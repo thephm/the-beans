@@ -11,8 +11,7 @@ List of requirements and user stories for settings.
 - As a user, I want to access my settings only when authenticated.
 
 ## Functional Requirements
-- The settings page must display current user settings.
-- The settings page must allow editing and saving of all settings fields.
-- All settings API endpoints must require authentication.
-- Settings changes must be persisted and reflected in the UI.
-- Defaults are returned if no settings are saved yet.
+
+---
+
+See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Test Cases](test.md)

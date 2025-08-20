@@ -17,5 +17,16 @@
 - Profile changes must be persisted in the backend and reflected in the UI.
 
 ## Non-Functional Requirements
-- Profile data must be protected and not accessible to unauthenticated users.
-- The UI must provide feedback for loading, errors, and successful updates.
+
+> Profile is missing "see also" for design.md,  overview.md, requirements.md, test.md
+
+Read design.md
+
+Read overview.md
+
+Read `requirements.md`
+
+Read `test.md`
+
+Working...
+See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Test Cases](test.md)

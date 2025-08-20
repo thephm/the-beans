@@ -22,4 +22,5 @@
 - As a user, I want to see popular searches and use them quickly.
 - As a user, I want to sort results to find the best or closest roasters.
 
+
 See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Test Cases](test.md)

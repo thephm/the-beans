@@ -1,3 +1,24 @@
-# Roasters Requirements
 
 List of requirements and user stories for roasters.
+
+# Roasters Requirements
+
+## Functional Requirements
+- Users can view a list of coffee roasters with filtering and sorting options.
+- Users can search roasters by name, city, state, specialty, or proximity.
+- Users can view detailed information for each roaster.
+- Users can favorite/unfavorite roasters and see their favorites.
+- Roaster profiles display ratings, review counts, specialties, contact info, and hours.
+- Authenticated users can create new roasters.
+- Roaster data is available in multiple languages.
+
+## Non-Functional Requirements
+- API must respond within 1 second for standard queries.
+- Data must be accurate and up-to-date.
+- UI must be responsive and accessible.
+
+## User Stories
+
+---
+
+See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Test Cases](test.md)

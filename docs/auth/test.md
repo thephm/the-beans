@@ -1,6 +1,5 @@
 # Auth Test Cases
 
-
 ## Registration
 
 - Register with valid email, username, and password → Success, receives token
@@ -23,4 +22,9 @@
 - Login and signup forms show error messages for invalid input
 - User is redirected to discover page after login
 - User is redirected to home after signup
+
 - Logout removes token and user info from localStorage
+
+---
+
+See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Requirements](requirements.md)
