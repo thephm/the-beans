@@ -32,6 +32,11 @@ model User {
 }
 ```
 
+
 ## Security
 - All profile endpoints require a valid JWT token.
 - User data is only accessible to the authenticated user.
+
+---
+
+See also: [API](api.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)

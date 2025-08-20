@@ -51,6 +51,11 @@
 **Headers:**
 - Authorization: Bearer `<token>`
 
+
 **Responses:**
 - `200`: `user` object
 - `401`: Unauthorized or invalid token
+
+---
+
+See also: [Auth Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)

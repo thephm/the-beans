@@ -29,3 +29,7 @@ Test cases and scenarios for settings.
 - GET /api/users/settings returns correct settings for authenticated user
 - PUT /api/users/settings updates and persists settings
 - Unauthenticated requests are rejected
+
+---
+
+See also: [API](api.md), [Design](design.md), [Overview](overview.md), [Requirements](requirements.md)

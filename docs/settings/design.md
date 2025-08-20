@@ -39,4 +39,9 @@ Technical design and architecture for settings.
 		}
 	}
 }
+
 ```
+
+---
+
+See also: [API](api.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)

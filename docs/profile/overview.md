@@ -12,3 +12,7 @@ The Profile feature allows users to view and manage their personal information a
 
 ## User Value
 The profile feature empowers users to personalize their experience, control privacy and notification settings, and ensure their information is up to date. This enhances trust, usability, and engagement with the platform.
+
+---
+
+See also: [API](api.md), [Design](design.md), [Requirements](requirements.md), [Test Cases](test.md)

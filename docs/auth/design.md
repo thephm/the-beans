@@ -32,3 +32,7 @@ Authentication is implemented using JWT tokens and secure password hashing. The 
 - JWT secret is environment-protected
 - All sensitive endpoints require valid JWT
 - Input validation and error handling on all auth routes
+
+---
+
+See also: [API](api.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)
