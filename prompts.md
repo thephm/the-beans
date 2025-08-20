@@ -21906,11 +21906,8 @@ The "See also" section has been added to the bottom of api.md for consistency wi
 > All of the files for docs/settings are missing "see also" except for api.md
 
 ✔ Read `design.md`
-
 ✔ Read `overview.md`
-
 ✔ Read `requirements.md`
-
 ✔ Read `test.md`
 
 `design.md +5 -0`
@@ -21919,3 +21916,51 @@ The "See also" section has been added to the bottom of api.md for consistency wi
 `test.md +4 -0`
 
 All files under `settings` now have a "See also" section at the bottom for consistent cross-referencing. Let me know if you need this for any other folders or want further improvements!
+
+## README.md for each feature
+
+should each overview docs page instead be a README.md so when viewed in GitHub it's right there? If yes, let's do that
+
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Read `overview.md`
+✔ Read `overview.md`
+✔ Read `overview.md`
+✔ Read `overview.md`
+✔ Read `overview.md`
+✔ Read `overview.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+✔ Created `README.md`
+
+`README.md +7 -3`
+`README.md +16 -3`
+`README.md +18 -3`
+`README.md +16 -3`
+`README.md +22 -3`
+`README.md +20 -3`
+
+✔ `Remove-Item -Path c:\data\github\the-beans\docs\auth\overview.md`
+
+`overview.md +1 -8`
+`overview.md +1 -16`
+`overview.md +1 -18`
+`overview.md +0 -18`
+`overview.md +1 -22`
+`overview.md +0 -23`
+
+✔ `Remove-Item -Path c:\data\github\the-beans\docs\auth\overview.md`
+✔ `Remove-Item -Path c:\data\github\the-beans\docs\favorites\overview.md`
+✔ `Remove-Item -Path c:\data\github\the-beans\docs\profile\overview.md`
+✔ `Remove-Item -Path c:\data\github\the-beans\docs\roasters\overview.md`
+✔ `Remove-Item -Path c:\data\github\the-beans\docs\search\overview.md`
+✔ `Remove-Item -Path c:\data\github\the-beans\docs\settings\overview.md`
+
+Yes, each overview doc is now migrated to a `README.md` in its respective folder, so it will show up directly in GitHub. The old overview.md files have been cleared and deleted. Your documentation is now more GitHub-friendly!
