@@ -21964,3 +21964,35 @@ should each overview docs page instead be a README.md so when viewed in GitHub i
 ✔ `Remove-Item -Path c:\data\github\the-beans\docs\settings\overview.md`
 
 Yes, each overview doc is now migrated to a `README.md` in its respective folder, so it will show up directly in GitHub. The old overview.md files have been cleared and deleted. Your documentation is now more GitHub-friendly!
+
+> For each docs feature/README.md remove the " Overview" from the heading
+
+✔ Read `README.md`, lines 1 to 10
+✔ Read `README.md`, lines 1 to 10
+✔ Read `README.md`, lines 1 to 10
+✔ Read `README.md`, lines 1 to 10
+✔ Read `README.md`, lines 1 to 10
+✔ Read `README.md`
+
+`README.md +1 -1`
+`README.md +1 -1`
+`README.md +1 -1`
+`README.md +1 -1`
+`README.md +1 -1`
+`README.md +1 -1`
+
+All " Overview" text has been removed from the headings in each README.md file as requested. If you need further changes or want to review the updated files, let me know!
+
+> Now under docs there should also be a `README.md` which includes a top level overview of the product, links to the architecture, glossary, and index. 
+
+✔ Created `README.md`
+
+A new README.md has been created with a top-level product overview and links to the architecture, glossary, and index. Let me know if you want to add or adjust any content!
+
+> when we changed the overview.md files you forgot to update the index.md that links to them
+
+✔ Read `index.md`
+
+`index.md +6 -6`
+
+The index.md has been updated to link to each feature's `README.md` instead of `overview.md`. All links now reflect the new filenames. Let me know if you need anything else!

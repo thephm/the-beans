@@ -1,4 +1,4 @@
-# Search Feature Overview
+# Search Feature
 
 The search feature allows users to find coffee roasters using a variety of filters and keywords. It is accessible from the home page and the Discover page.
 

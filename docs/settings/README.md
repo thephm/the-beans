@@ -1,4 +1,4 @@
-# Settings Feature Overview
+# Settings Feature
 
 The settings feature allows users to customize their experience by managing:
 
