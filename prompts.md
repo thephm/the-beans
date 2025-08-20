@@ -21657,3 +21657,48 @@ Searched text for `settings|preference|language|user settings` (`**/server/src/r
 `test.md+29-1`
 
 All documentation files for the settings feature have been filled in with detailed content, including API endpoints, feature overview, technical design, requirements, and test cases. Let me know if you need further details or edits!
+
+## Docs for search
+
+> please fill in all the docs file for search
+
+✔ Read `api.md`
+✔ Read `design.md`
+✔ Read `overview.md`
+✔ Read `requirements.md`
+✔ Read `test.md`
+
+Searching codebase for "search feature, search API, search implementation, search requirements, search test cases"
+
+✔ Read `search.ts`, lines 1 to 60
+✔ Read `SearchSection.tsx`, lines 1 to 60
+✔ Read `api.ts`, lines 1 to 60
+✔ Read `search_new.ts`, lines 1 to 60
+✔ Read `page.tsx`, lines 1 to 60
+✔ Read `api.md`
+✔ Read `design.md`
+✔ Read `overview.md`
+✔ Read `requirements.md`
+✔ Read `test.md`
+✔ Read `search.ts`, lines 61 to 120
+✔ Read `search_new.ts`, lines 61 to 120
+✔ Read `SearchSection.tsx`, lines 61 to 164
+✔ Read `page.tsx`, lines 61 to 120
+✔ Read `api.ts`, lines 61 to 121
+
+> you seemed stuck
+
+`overview.md +20 -1`
+`design.md +27 -1`
+`requirements.md +23 -1`
+`test.md +19 -1`
+
+All search docs except `api.md` have been filled in successfully. There is a technical issue preventing the update of `api.md` (likely due to file encoding or formatting). The other `files—overview.md`, `design.md`, `requirements.md`, and `test.md` — are now complete and detailed.
+
+Would you like the API documentation content for api.md here so you can copy it manually, or should I try a different method to update the file?
+
+> yes
+
+`api.md +86 -1`
+
+The API documentation for the search feature has been added to api.md. All search documentation files are now complete and detailed. Let me know if you need further improvements or another section documented!
