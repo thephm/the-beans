@@ -21377,3 +21377,118 @@ To fix this, ensure there are no blank lines before services: at the top of your
 `docker-compose.yml +0 -1`
 
 The duplicate and blank lines at the top of your docker-compose.yml have been removed. The file should now be valid and the warning about the obsolete version attribute will no longer appear. You can now use docker-compose commands without YAML errors.
+
+## Specs
+
+> I need to document / keep my requirements like docs as code in this repo. I started a product.md but thinking I should have a folder with docs and specs and subfolder for each major feature underneath. in each major feature I would have one Markdown for each aspect of the feature so I can describe
+
+A "docs as code" approach is a great idea for maintainability and collaboration. Here’s a recommended structure for your documentation:
+
+- Create a top-level `docs/` folder.
+- Inside `docs/`, create subfolders for each major feature (e.g., `auth/`, `search/`, `roasters/`).
+- Within each feature folder, use separate Markdown files for different aspects, such as:
+  - `overview.md` (feature summary)
+  - `requirements.md` (user stories, requirements)
+  - `design.md` (architecture, diagrams)
+  - `api.md` (API contracts, endpoints)
+  - `test.md` (test cases, scenarios)
+- You can also have general docs at the root of `docs/` (e.g., `architecture.md`, `glossary.md`, `index.md`).
+
+Would you like me to scaffold this structure for you? If so, please specify the major features you want to start with, or I can suggest some based on your codebase.
+
+> yes
+
+✔ Created `docs`
+✔ Created `auth`
+✔ Created `search`
+✔ Created `roasters`
+✔ Created `favorites`
+✔ Created `profile`
+✔ Created `settings`
+✔ Created `index.md`
+✔ Created `architecture.md`
+✔ Created `glossary.md`
+✔ Creating `overview.md`
+✔ Created `requirements.md`
+✔ Created `design.md`
+✔ Created `api.md`
+✔ Created `test.md`
+✔ Created `overview.md`
+✔ Created `requirements.md`
+✔ Created `design.md`
+✔ Created `api.md`
+✔ Created `test.md`
+✔ Created `overview.md`
+✔ Created `requirements.md`
+✔ Created `design.md`
+✔ Created `api.md`
+✔ Created `test.md`
+✔ Created `overview.md`
+✔ Created `requirements.md`
+✔ Created `design.md`
+✔ Created `api.md`
+✔ Created `test.md`
+✔ Created `overview.md`
+✔ Created `requirements.md`
+✔ Created `design.md`
+✔ Created `api.md`
+✔ Created `test.md`
+✔ Created `overview.md`
+✔ Created `requirements.md`
+✔ Created `design.md`
+✔ Created `api.md`
+✔ Created `test.md`
+
+The documentation structure is now scaffolded as requested:
+
+- `docs` at the project root, with subfolders for each major feature (`auth`, `search`, `roasters`, `favorites`, `profile`, `settings`)
+- Each feature folder contains Markdown files for `overview`, `requirements`, `design`, `api`, and `test`
+- General docs like `index.md`, `architecture.md`, and `glossary.md` are included at the root of docs
+
+You can now start documenting requirements, specs, and details for each feature in their respective files. Let me know if you want to add more features, sections, or need templates for any of the docs!
+
+## Architecture
+
+> Please fill in the docs/architecture.md for me based on all the code
+
+✔ Read `docker-compose.yml`
+✔ Read `package.json`
+✔ Read `package.json`
+✔ Read `schema.prisma`, lines 1 to 65
+✔ Read `index.ts`, lines 1 to 60
+✔ Read `layout.tsx`
+✔ Read `page.tsx`
+✔ Read `README.md`, lines 1 to 60
+✔ Read `README.md`, lines 61 to 133
+✔ Read `roasters.ts`, lines 1 to 60
+✔ Read `SearchSection.tsx`, lines 1 to 60
+✔ Read `auth.ts`, lines 1 to 60
+✔ Read `search.ts`, lines 1 to 60
+✔ Read `users.ts`, lines 1 to 60
+✔ Read `reviews.ts`
+✔ Read `page.tsx`, lines 1 to 60
+✔ Read `page.tsx`, lines 1 to 60
+✔ Read `page.tsx`, lines 1 to 60
+✔ Read `page.tsx`, lines 1 to 60
+✔ Read `page.tsx`, lines 1 to 60
+✔ Read `page.tsx`, lines 1 to 60
+
+`architecture.md +95 -1`
+
+The architecture.md file is now filled in with a comprehensive overview of your system, including tech stack, high-level design, key flows, security, and deployment details—all based on your actual codebase and project structure.
+
+If you want to add diagrams, more details on any component, or keep this in sync as the project evolves, just let me know!
+
+> Does the README.md link to these docs at all? if not, should it?
+
+The current README.md does not link to the new docs/ directory or its documentation files.
+
+It is a good practice to add a link to your documentation in the README.md, so contributors and users can easily find detailed specs, requirements, and architecture information.
+
+Would you like me to update the README.md to include a "Documentation" section with links to the main docs?
+
+> yes
+
+`README.md +16 -0`
+
+The README.md now includes a "Documentation" section with links to the docs/ directory and all major documentation files. This makes it easy for anyone to find and navigate your project specs and architecture docs. Let me know if you want to adjust the links or add more details!

@@ -73,6 +73,22 @@ A beautiful, modern web application for discovering fresh coffee roasters near y
    npm run dev
    ```
 
+
+## Documentation
+
+Full project documentation, requirements, and specs are kept as code in the [`docs/`](./docs/) directory.
+
+- [Project Index](./docs/index.md)
+- [Architecture Overview](./docs/architecture.md)
+- [Glossary](./docs/glossary.md)
+- [Feature Specs](./docs/)
+   - [Auth](./docs/auth/overview.md)
+   - [Search](./docs/search/overview.md)
+   - [Roasters](./docs/roasters/overview.md)
+   - [Favorites](./docs/favorites/overview.md)
+   - [Profile](./docs/profile/overview.md)
+   - [Settings](./docs/settings/overview.md)
+
 ## Project Structure
 
 ```

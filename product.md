@@ -7,54 +7,38 @@ Here’s how I’d approach this so you give Copilot a clear, structured prompt 
 
 1. Origins
 
-You’ve already got the big three:
+- **Africa** (e.g., Ethiopia, Kenya, Rwanda)
+- **Latin America** (e.g., Colombia, Brazil, Guatemala, Costa Rica, Honduras)
+- **Asia** (e.g., Indonesia, Vietnam, India, Yemen)
+- **Oceania** (Papua New Guinea, Solomon Islands) – rare but notable in specialty coffee.
 
-Africa (e.g., Ethiopia, Kenya, Rwanda)
-Latin America (e.g., Colombia, Brazil, Guatemala, Costa Rica, Honduras)
-Asia (e.g., Indonesia, Vietnam, India, Yemen)
-
-I’d also add:
-
-Oceania (Papua New Guinea, Solomon Islands) – rare but notable in specialty coffee.
-
-Instead of hardcoding only 3–4 origins, make Origin a field that can be expanded later — maybe prefilled with these continents/regions but also allowing country-level precision.
+Instead of hardcoding origins, make Origin a field that can be expanded later — maybe prefilled with these continents/regions. Down the road will add country-level precision.
 
 2. Roast Levels
 
-You’ve got the right 3 for most consumers:
-
-Light
-Medium
-Dark
-
-Optionally:
-
-Medium-Light and Medium-Dark if you want to capture nuance without getting overly technical.
+- Light
+- Medium
+- Medium-Light
+- Medium-Dark
+- Dark
 
 3. Processing Methods
 
-Your three — Washed, Natural, Honey — are spot-on.
-You might also want to include:
-
-Anaerobic (increasingly popular in specialty coffee)
-
-Experimental (catch-all for funky fermentations, like carbonic maceration)
-
-These are trendy but optional — you can keep the core three as defaults.
+- Washed
+- Natural
+- Honey
+- Anaerobic
+- Experimental
 
 4. Flavor Notes
 
-Instead of maintaining a huge flavor wheel, make this:
+A controlled list for analytics later e.g., “Fruit", “Nut”, “Chocolate” but don’t enforce it at the start.
 
-A free-text field where roasters/curators can enter “raisin, peach, chocolate, floral” etc.
-
-Optionally, a controlled list for analytics later (e.g., “fruity”, “nutty”, “chocolatey”) but don’t enforce it at the start.
+A free-text field where roasters/curators can enter more “raisin, peach, chocolate, floral” etc.
 
 5. Media
 
-One or more images per bean type (roast close-up, packaging, latte art, etc.).
-
-Store image URLs in the database, linked to bean record.
+One or more images per bean type (roast close-up, packaging, latte art, etc.). Store images in the database, linked to bean record.
 
 6. Ratings & Comments
 
@@ -64,11 +48,11 @@ Optional comment per rating.
 
 Automated moderation:
 
-Profanity filter (common foul language list + AI model for context)
+Profanity filter: common foul language list from source?
 
-Spam detection (e.g., links, repeated text, rapid posting)
+Spam detection e.g., hyperlinks, repeated text, rapid posting
 
-Option to auto-hide flagged comments until admin review.
+Option to auto-hide flagged comments until admin review. Enabled by default.
 
 7. Deep Linking to Roasters
 
@@ -76,81 +60,50 @@ Each bean record should have a foreign key to the roaster’s profile in your da
 
 Display roaster name & link to their page.
 
-8. Copilot Prompt
-
-Here’s a clean, ready-to-paste prompt for VS Code’s Copilot:
-
 Build a backend and frontend component for a coffee bean catalog feature.
 Each bean record should have:
 
-id (unique identifier)
+`id` (unique identifier)
 
-name (string)
+`name` (string)
 
-origin (string, e.g., Africa, Latin America, Asia, Oceania, or specific country)
+- `origin_continent` (string: Africa, Latin America, Asia, Oceania)
+- `origin_country` (enum: ca, us etc)
+- `roast_level` (enum: light, medium-light, medium, medium-dark, dark)
+- `processing_method` (enum: Washed, Natural, Honey, Anaerobic, Experimental)
+- `flavor_type` (enum: fruity, nutty, chocolate, floral, spicy, berry, citrus, caramel, earthy, etc.).
+- `flavor_notes` (free-text string, comma-separated, e.g., “raisin, peach, chocolate”)
+- `roaster_id` (foreign key to roaster table)
+- `photos` (array of image deeplink URLs which render from the DB)
+- `ratings` (1–5 stars, average + count)
+- `comments` (array with user, text, timestamp, moderated flag)
+- `created_by` user id
+- `created_at` timestamp
+- `updated_at` timestamp
 
-roast_level (enum: light, medium, dark; optionally medium-light, medium-dark)
+`flavor_notes` is an array of flavor IDs from a controlled flavors table
 
-processing_method (enum: Washed, Natural, Honey, Anaerobic, Experimental)
+`flavors` table stores id, name, and status (approved, pending).
 
-flavor_notes (free-text string, comma-separated, e.g., “raisin, peach, chocolate”)
-
-roaster_id (foreign key to roaster table)
-
-photos (array of image URLs)
-
-ratings (1–5 stars, average + count)
-
-comments (array with user, text, timestamp, moderated flag)
-
-created_at, updated_at timestamps
 Requirements:
 
-Ability to view all beans, filter by origin, roast, processing method.
-
-Display roaster name with link to their profile.
-
-Allow users to submit a rating + optional comment.
-
-Automatic moderation: block foul language and spam in comments.
-
-Store all data in a relational database with efficient queries.
-
-API endpoints for listing, creating, updating, deleting beans (admin only), rating, and commenting.
-
-Frontend UI to display bean details, photos, roaster info, ratings, and comments.
-
-Mobile-friendly layout.
-
-> 4. flavor notes prefer controlled list with the ability to suggest new one
-
-Got it — so instead of fully free-text flavor notes, you’d have a controlled vocabulary that:
-
-Is pre-populated with common tasting notes (fruity, nutty, chocolate, floral, spicy, berry, citrus, caramel, earthy, etc.).
-
-Allows multiple selections per bean.
-
-Lets users suggest new flavor notes, but new suggestions go into a pending review state before they become selectable for everyone.
-
-Still stores them in a way that supports filtering/searching later.
-
-Here’s the updated Copilot prompt section for Flavor Notes:
-
-Flavor Notes
-
-flavor_notes is an array of flavor IDs from a controlled flavors table.
-
-flavors table stores id, name, and status (approved, pending).
-
-UI lets the user select from approved flavors.
-
-Users can type a new flavor suggestion — system adds it to flavors table with status pending.
-
-Admin dashboard shows pending flavors for approval or rejection.
-
-Beans can have multiple flavor notes.
-
-Do you want me to update the full Copilot prompt to reflect this controlled-list flavor system so you can paste it straight into VS Code? That way, it’s all in one coherent spec.
+1. Fully multilingual like the rest of the app
+2. Strings for English and French
+3. Ability to view all beans, filter by origin, roast, processing method.
+4. User can select from approved flavors.
+5. Users can type a new flavor suggestion — system adds it to flavors table with status pending
+5. Display roaster name with link to their profile.
+6. Allow users to submit a rating + optional comment.
+7. Allows multiple flavor selections per bean.
+8. Automatic moderation: block foul language and spam in comments.
+9. Store all data in a relational database with efficient queries.
+10. API endpoints for listing, creating, updating, deleting beans (admin only)
+11. API endpoints for rating roaster or beans
+12. API endpoints for commenting roaster or beans
+13. Frontend UI to display bean details, photos, roaster name which is hyperlink to the roaster details page, ratings, and comments.
+14. Mobile-friendly layout.
+15. Admin dashboard shows pending flavors for approval or rejection.
+16. Beans can have multiple flavor notes.
 
 ## Multilingual
 
@@ -423,11 +376,8 @@ ALTER TABLE users ADD COLUMN language VARCHAR(5) DEFAULT 'en';
 ### Benefits with Accounts
 
 - Consistent across devices — they get the same language if they log in from a phone or a new browser.
-
 - No cookie/localStorage drift — one authoritative setting in the DB.
-
 - Easier to send multilingual emails/notifications in the correct language.
-
 - Future analytics: see what percentage of users prefer each language.
 
 ### Small UX Considerations
