@@ -13,26 +13,6 @@ A beautiful, modern web application for discovering fresh coffee roasters near y
 - 🔒 **Secure API**: RESTful API with Swagger documentation
 - 💜 **Beautiful Design**: Purple-themed UI with lavender, violet, and orchid colors
 
-## Tech Stack
-
-### Frontend
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling with custom purple theme
-- **PWA** - Progressive Web App for mobile installation
-- **Framer Motion** - Smooth animations
-
-### Backend
-- **Node.js** - Server runtime
-- **Express.js** - Web framework
-- **PostgreSQL** - Database
-- **Prisma** - Database ORM
-- **JWT** - Authentication
-- **Swagger** - API documentation
-- **Cloudinary** - Image storage
-
-### Deployment
-- **Vercel** - Frontend hosting
 - **Railway/Render** - Backend hosting
 - **Cloudflare** - CDN and domain management
 
