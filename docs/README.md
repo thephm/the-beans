@@ -16,9 +16,9 @@ The Beans is a platform for discovering, reviewing, and managing specialty coffe
 
 The following documentation covers each major feature:
 
-	- [Auth](./auth/README.md)
-	- [Search](./search/README.md)
-	- [Roasters](./roasters/README.md)
-	- [Favorites](./favorites/README.md)
-	- [Profile](./profile/README.md)
-	- [Settings](./settings/README.md)
+- [Auth](./auth/README.md)
+- [Search](./search/README.md)
+- [Roasters](./roasters/README.md)
+- [Favorites](./favorites/README.md)
+- [Profile](./profile/README.md)
+- [Settings](./settings/README.md)
