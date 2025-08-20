@@ -1,4 +1,4 @@
-# Favorites Feature Overview
+# Favorites Feature
 
 The favorites feature allows users to bookmark their favorite coffee roasters for quick access. Favorites are displayed on a dedicated page and can be managed from both the roaster list and detail views.
 

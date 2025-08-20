@@ -1,4 +1,4 @@
-# Roasters Feature Overview
+# Roasters Feature
 
 The Roasters feature enables users to discover, view, and interact with specialty coffee roasters. It provides:
 

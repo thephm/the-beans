@@ -1,4 +1,4 @@
-# Profile Feature Overview
+# Profile Feature
 
 The Profile feature allows users to view and manage their personal information and preferences within the application. It is accessible only to authenticated users.
 
