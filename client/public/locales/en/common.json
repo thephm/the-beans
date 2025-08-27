@@ -167,6 +167,10 @@
     "saved": "Settings saved successfully!",
     "saveSuccess": "Settings saved successfully!"
   },
+  "distanceUnit": "Show distances in",
+  "km": "Kilometers",
+  "mi": "Miles",
+  
   "hero": {
     "title": "Discover Amazing Coffee",
     "subtitle": "Find the best local coffee roasters in your area. From artisanal espresso to specialty single-origin beans, discover your perfect cup with our beautiful, easy-to-use platform.",

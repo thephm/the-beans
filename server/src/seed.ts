@@ -4,9 +4,9 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  // Starting database seed
 
-  // Create sample users
+  // Create users
   const hashedPassword = await bcrypt.hash('password123', 12);
   
   const user1 = await prisma.user.create({
@@ -37,7 +37,7 @@ async function main() {
     },
   });
 
-  // Create sample roasters
+  // Create roasters
   const roaster1 = await prisma.roaster.create({
     data: {
       name: 'Purple Mountain Coffee',
@@ -146,7 +146,7 @@ async function main() {
     },
   });
 
-  // Create sample beans
+  // Create beans
   await prisma.bean.create({
     data: {
       name: 'Ethiopian Yirgacheffe',
@@ -177,9 +177,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Database seeded successfully!');
-  console.log(`📧 Sample user login: coffee@lover.com / password123`);
-  console.log(`☕ Created ${3} roasters with sample data`);
+  // Database seeded successfully
 }
 
 main()

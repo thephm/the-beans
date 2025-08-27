@@ -35,8 +35,6 @@ export function SearchSection({
   const handleSearch = () => {
     if (onSearch) {
       onSearch(localSearchQuery, localLocation)
-    } else {
-      console.log('Searching for:', localSearchQuery, 'in', localLocation)
     }
   }
 

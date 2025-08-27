@@ -59,7 +59,7 @@ router.get('/', [
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
   query('radius').optional().isFloat({ min: 1, max: 100 }),
-], async (req, res) => {
+], async (req: import('express').Request, res: import('express').Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -142,7 +142,7 @@ router.get('/roasters', [
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
   query('radius').optional().isFloat({ min: 1, max: 100 }),
-], async (req, res) => {
+], async (req: import('express').Request, res: import('express').Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
