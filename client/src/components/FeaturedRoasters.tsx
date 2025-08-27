@@ -20,16 +20,16 @@ interface Roaster {
 }
 
 export function FeaturedRoasters() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km')
-  // Load user preference for distance unit from localStorage/settings
+  // Always use the latest value from localStorage on every render
   useEffect(() => {
-    const settings = JSON.parse(localStorage.getItem('settings') || '{}')
-    setDistanceUnit(settings?.preferences?.distanceUnit || 'km')
-  }, [])
+    const settings = JSON.parse(localStorage.getItem('settings') || '{}');
+    setDistanceUnit(settings?.preferences?.distanceUnit || 'km');
+  });
 
   // Get user location
   useEffect(() => {
@@ -51,28 +51,29 @@ export function FeaturedRoasters() {
     return R * c
   }
 
+  // Translate specialty using i18n keys matching backend data
   const translateSpecialty = (specialty: string) => {
-    const specialtyMap: { [key: string]: string } = {
-      'Single Origin': t('specialties.singleOrigin'),
-      'Espresso': t('specialties.espresso'),
-      'Cold Brew': t('specialties.coldBrew'),
-      'Pour Over': t('specialties.pourOver'),
-      'Organic': t('specialties.organic'),
-      'Fair Trade': t('specialties.fairTrade'),
-      'Direct Trade': t('specialties.directTrade'),
-      'Education': t('specialties.education'),
-      'Artisanal': t('specialties.artisanal'),
-      'Dark Roast': t('specialties.darkRoast'),
-      'Light Roast': t('specialties.lightRoast'),
-      'Medium Roast': t('specialties.mediumRoast'),
-      'Decaf': t('specialties.decaf')
+    if (!specialty) return '';
+    let key = specialty;
+    // If specialty already starts with 'specialties.', use as-is
+    if (!key.startsWith('specialties.')) {
+      // Convert to camelCase key
+      key = key.replace(/\s+(.)/g, (_, c) => c.toUpperCase());
+      key = key.charAt(0).toLowerCase() + key.slice(1);
+      key = key.replace(/[^a-zA-Z0-9]/g, '');
+      key = `specialties.${key}`;
     }
-    return specialtyMap[specialty] || specialty
+    const translated = t(key);
+    if (translated === key) {
+      // Fallback: show original specialty string (without 'specialties.' prefix)
+      return specialty.startsWith('specialties.') ? specialty.replace('specialties.', '') : specialty;
+    }
+    return translated;
   }
 
   useEffect(() => {
     fetchFeaturedRoasters()
-  }, [])
+  }, [i18n.language])
 
   const fetchFeaturedRoasters = async () => {
     try {
@@ -149,14 +150,26 @@ export function FeaturedRoasters() {
                     <span>
                       {(() => {
                         const dist = calcDistance(userLocation.lat, userLocation.lng, roaster.latitude, roaster.longitude, distanceUnit)
-                        return `${dist.toFixed(1)} ${distanceUnit === 'mi' ? 'miles' : 'km'}`
+                        return `${dist.toFixed(1)} ${distanceUnit === 'mi' ? t('mi').toLowerCase() : t('km').toLowerCase()}`
                       })()}
                     </span>
                   ) : (
-                    <span>{distanceUnit === 'mi' ? 'miles' : 'km'}</span>
+                    <span>{distanceUnit === 'mi' ? t('mi').toLowerCase() : t('km').toLowerCase()}</span>
                   )}
                 </p>
-                <p className="text-primary-600 font-medium mb-3">☕ {translateSpecialty(roaster.specialties?.[0]) || t('specialties.artisanal')}</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {roaster.specialties && roaster.specialties.length > 0 ? (
+                    roaster.specialties.map((spec) => (
+                      <span key={spec} className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200">
+                        {translateSpecialty(spec)}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200">
+                      {t('specialties.artisanal')}
+                    </span>
+                  )}
+                </div>
                 <p className="text-gray-600 text-sm mb-4">{roaster.description}</p>
                 <div className="flex gap-2">
                   <Link

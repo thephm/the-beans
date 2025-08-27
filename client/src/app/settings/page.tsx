@@ -86,6 +86,8 @@ export default function SettingsPage() {
       if (response.ok) {
         setSuccess(true)
         setTimeout(() => setSuccess(false), 3000)
+        // Save to localStorage so other components see the update immediately
+        localStorage.setItem('settings', JSON.stringify(settings));
       } else {
         console.error('Failed to save settings, status:', response.status)
       }

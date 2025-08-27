@@ -103,13 +103,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const changeLanguage = async (languageCode: string) => {
     try {
       setIsChanging(true)
-      
+
       const language = SUPPORTED_LANGUAGES.find(lang => lang.code === languageCode)
       if (!language) {
         throw new Error(`Unsupported language: ${languageCode}`)
       }
 
       await i18n.changeLanguage(languageCode)
+      await i18n.reloadResources(); // Force reload of translations
       setCurrentLanguage(language)
 
       if (isAuthenticated && user) {
