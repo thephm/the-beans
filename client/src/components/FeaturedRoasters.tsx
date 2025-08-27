@@ -25,11 +25,25 @@ export function FeaturedRoasters() {
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km')
+  const [favorites, setFavorites] = useState<string[]>([])
   // Always use the latest value from localStorage on every render
   useEffect(() => {
     const settings = JSON.parse(localStorage.getItem('settings') || '{}');
     setDistanceUnit(settings?.preferences?.distanceUnit || 'km');
-  });
+    const savedFavorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]');
+    setFavorites(savedFavorites)
+  }, []);
+
+  const toggleFavorite = (roasterId: string) => {
+    let updatedFavorites
+    if (favorites.includes(roasterId)) {
+      updatedFavorites = favorites.filter(id => id !== roasterId)
+    } else {
+      updatedFavorites = [...favorites, roasterId]
+    }
+    setFavorites(updatedFavorites)
+    localStorage.setItem('favoriteRoasters', JSON.stringify(updatedFavorites))
+  }
 
   // Get user location
   useEffect(() => {
@@ -182,8 +196,16 @@ export function FeaturedRoasters() {
                   >
                     {t('roasters.viewDetails')}
                   </Link>
-                  <button className="px-4 py-2 border-2 border-primary-200 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors">
-                    💜
+                  <button
+                    className={`px-4 py-2 border-2 rounded-lg transition-colors ${
+                      favorites.includes(roaster.id)
+                        ? 'border-red-300 text-red-600 bg-red-100 hover:bg-red-200'
+                        : 'border-primary-200 text-primary-600 hover:bg-primary-50'
+                    }`}
+                    onClick={() => toggleFavorite(roaster.id)}
+                    aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
+                  >
+                    {favorites.includes(roaster.id) ? '❤️' : '🤍'}
                   </button>
                 </div>
               </div>
