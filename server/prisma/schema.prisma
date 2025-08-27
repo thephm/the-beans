@@ -26,6 +26,7 @@ model User {
   language  String   @default("en") @db.VarChar(5)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  settings   Json?
 
   // Relationships
   roasters     Roaster[]

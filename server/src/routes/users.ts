@@ -6,7 +6,6 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // In-memory settings storage (in production, this would be a database)
-const userSettings: { [userId: string]: any } = {};
 
 // Required auth middleware (same as in roasters.ts)
 const requireAuth = async (req: any, res: any, next: any) => {
@@ -29,10 +28,12 @@ const requireAuth = async (req: any, res: any, next: any) => {
 router.get('/settings', requireAuth, async (req: any, res: any) => {
   try {
     const userId = req.user.id;
-    
-    // Check if user has saved settings
-    let settings = userSettings[userId];
-    
+    // Fetch settings from database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { settings: true }
+    }) as { settings?: any };
+    let settings = user?.settings;
     // If no saved settings, return defaults
     if (!settings) {
       settings = {
@@ -52,12 +53,11 @@ router.get('/settings', requireAuth, async (req: any, res: any) => {
             pourOver: false,
             frenchPress: false,
             coldBrew: false
-          }
+          },
+          distanceUnit: 'km'
         }
       };
     }
-    
-    console.log(`Returning settings for user ${userId}:`, settings);
     res.json({ settings });
   } catch (error) {
     console.error('Error fetching user settings:', error);
@@ -99,14 +99,11 @@ router.put('/settings', requireAuth, async (req: any, res: any) => {
   try {
     const userId = req.user.id;
     const settings = req.body;
-    
-    console.log(`User ${userId} updating settings:`, settings);
-    
-    // Save settings to in-memory storage
-    userSettings[userId] = settings;
-    
-    console.log(`Settings saved for user ${userId}. Current storage:`, userSettings);
-    
+    // Persist settings to database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { settings } as any
+    });
     res.json({ 
       success: true, 
       message: 'Settings updated successfully',

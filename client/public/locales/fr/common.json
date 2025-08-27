@@ -181,6 +181,9 @@
     "saved": "Paramètres enregistrés avec succès !",
     "saveSuccess": "Paramètres enregistrés avec succès !"
   },
+  "distanceUnit": "Afficher les distances en",
+  "km": "Kilomètres",
+  "mi": "Miles",
   "hero": {
     "title": "Découvrez un café incroyable",
     "subtitle": "Trouvez les meilleurs torréfacteurs de café locaux et cafés de votre région. De l'espresso artisanal aux grains de spécialité d'origine unique, découvrez votre tasse parfaite avec notre plateforme belle et facile à utiliser.",

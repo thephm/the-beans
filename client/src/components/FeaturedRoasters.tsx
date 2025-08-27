@@ -15,12 +15,41 @@ interface Roaster {
   specialties: string[]
   description: string
   imageUrl: string
+  latitude?: number
+  longitude?: number
 }
 
 export function FeaturedRoasters() {
   const { t } = useTranslation()
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km')
+  // Load user preference for distance unit from localStorage/settings
+  useEffect(() => {
+    const settings = JSON.parse(localStorage.getItem('settings') || '{}')
+    setDistanceUnit(settings?.preferences?.distanceUnit || 'km')
+  }, [])
+
+  // Get user location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => setUserLocation(null)
+      )
+    }
+  }, [])
+  // Haversine formula to calculate distance between two lat/lng points
+  function calcDistance(lat1: number, lng1: number, lat2: number, lng2: number, unit: 'km' | 'mi') {
+    const toRad = (v: number) => v * Math.PI / 180
+    const R = unit === 'mi' ? 3958.8 : 6371
+    const dLat = toRad(lat2 - lat1)
+    const dLng = toRad(lng2 - lng1)
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2) * Math.sin(dLng/2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    return R * c
+  }
 
   const translateSpecialty = (specialty: string) => {
     const specialtyMap: { [key: string]: string } = {
@@ -112,13 +141,23 @@ export function FeaturedRoasters() {
                   ⭐ {roaster.rating}
                 </div>
               </div>
-              
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
                 <p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>
+                <p className="text-gray-600 mb-2">
+                  {userLocation && roaster.latitude && roaster.longitude ? (
+                    <span>
+                      {(() => {
+                        const dist = calcDistance(userLocation.lat, userLocation.lng, roaster.latitude, roaster.longitude, distanceUnit)
+                        return `${dist.toFixed(1)} ${distanceUnit === 'mi' ? 'miles' : 'km'}`
+                      })()}
+                    </span>
+                  ) : (
+                    <span>{distanceUnit === 'mi' ? 'miles' : 'km'}</span>
+                  )}
+                </p>
                 <p className="text-primary-600 font-medium mb-3">☕ {translateSpecialty(roaster.specialties?.[0]) || t('specialties.artisanal')}</p>
                 <p className="text-gray-600 text-sm mb-4">{roaster.description}</p>
-                
                 <div className="flex gap-2">
                   <Link
                     href={`/roasters/${roaster.id}`}

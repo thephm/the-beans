@@ -30,7 +30,8 @@ export default function SettingsPage() {
         pourOver: false,
         frenchPress: false,
         coldBrew: false
-      }
+      },
+      distanceUnit: 'km' // 'km' (default) or 'mi'
     }
   })
 
@@ -198,6 +199,22 @@ export default function SettingsPage() {
                     <span className="ml-3 text-gray-700">{t('settings.allowLocationTracking')}</span>
                   </label>
                 </div>
+              </div>
+
+              {/* Distance Unit (moved out of preferences) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('distanceUnit')}</label>
+                <select
+                  value={settings.preferences.distanceUnit}
+                  onChange={e => setSettings(prev => ({
+                    ...prev,
+                    preferences: { ...prev.preferences, distanceUnit: e.target.value }
+                  }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="km">{t('km')}</option>
+                  <option value="mi">{t('mi')}</option>
+                </select>
               </div>
 
               {/* Preferences */}
