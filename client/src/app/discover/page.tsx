@@ -25,6 +25,24 @@ export default function DiscoverPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
+  const [favorites, setFavorites] = useState<string[]>([])
+
+  // Load favorites from localStorage
+  useEffect(() => {
+    const savedFavorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
+    setFavorites(savedFavorites)
+  }, [])
+
+  const toggleFavorite = (roasterId: string) => {
+    let updatedFavorites
+    if (favorites.includes(roasterId)) {
+      updatedFavorites = favorites.filter(id => id !== roasterId)
+    } else {
+      updatedFavorites = [...favorites, roasterId]
+    }
+    setFavorites(updatedFavorites)
+    localStorage.setItem('favoriteRoasters', JSON.stringify(updatedFavorites))
+  }
 
   // Helper function to translate specialty names
   const translateSpecialty = (specialty: string): string => {
@@ -167,6 +185,17 @@ export default function DiscoverPage() {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{roaster.name}</h3>
+                      <button
+                        onClick={() => toggleFavorite(roaster.id)}
+                        className={`px-4 py-2 border rounded-lg transition-all transform hover:scale-105 ${
+                          favorites.includes(roaster.id)
+                            ? 'bg-red-100 border-red-300 text-red-600 hover:bg-red-200'
+                            : 'border-primary-500 text-primary-600 hover:bg-primary-50'
+                        }`}
+                        aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
+                      >
+                        {favorites.includes(roaster.id) ? '❤️' : '🤍'}
+                      </button>
                       <div className="flex items-center">
                         <span className="text-yellow-400">⭐</span>
                         <span className="text-gray-600 ml-1">{roaster.rating}</span>
