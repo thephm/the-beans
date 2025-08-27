@@ -160,9 +160,13 @@ export function FeaturedRoasters() {
                 <div className="flex flex-wrap gap-2 mb-3">
                   {roaster.specialties && roaster.specialties.length > 0 ? (
                     roaster.specialties.map((spec) => (
-                      <span key={spec} className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200">
+                      <Link
+                        key={spec}
+                        href={`/discover?specialty=${encodeURIComponent(spec)}`}
+                        className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200 hover:bg-primary-100 transition-colors"
+                      >
                         {translateSpecialty(spec)}
-                      </span>
+                      </Link>
                     ))
                   ) : (
                     <span className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200">
