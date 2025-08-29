@@ -18,6 +18,24 @@ interface Roaster {
 
 export default function FavoritesPage() {
   const { t } = useTranslation()
+  // Helper function to translate specialty names
+  const translateSpecialty = (specialty: string) => {
+    if (!specialty) return '';
+    let key = specialty;
+    // If specialty already starts with 'specialties.', use as-is
+    if (!key.startsWith('specialties.')) {
+      key = key.replace(/\s+(.)/g, (_, c) => c.toUpperCase());
+      key = key.charAt(0).toLowerCase() + key.slice(1);
+      key = key.replace(/[^a-zA-Z0-9]/g, '');
+      key = `specialties.${key}`;
+    }
+    const translated = t(key);
+    if (translated === key) {
+      // Fallback: show original specialty string (without 'specialties.' prefix)
+      return specialty.startsWith('specialties.') ? specialty.replace('specialties.', '') : specialty;
+    }
+    return translated;
+  }
   const router = useRouter()
   const { user, loading } = useAuth()
   const [favoriteRoasters, setFavoriteRoasters] = useState<Roaster[]>([])
@@ -156,7 +174,7 @@ export default function FavoritesPage() {
                           <div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
                             <p className="text-gray-600 mb-1">{roaster.location}</p>
-                            <p className="text-sm text-primary-600 font-medium">{roaster.specialties?.[0]}</p>
+                            <p className="text-sm text-primary-600 font-medium">{roaster.specialties?.[0] ? translateSpecialty(roaster.specialties[0]) : ''}</p>
                           </div>
                           <div className="flex items-center space-x-1">
                             <span className="text-yellow-400">★</span>

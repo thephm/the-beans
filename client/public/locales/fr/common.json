@@ -74,23 +74,23 @@
     "searchPlaceholder": "Rechercher des torréfacteurs ou des cafés",
     "locationPlaceholder": "Entrer l'emplacement",
     "searchButton": "Rechercher",
-    "popularSearches": "Recherches populaires",
-    "specialties": {
-      "espresso": "Espresso",
-      "singleOrigin": "Origine unique",
-      "coldBrew": "Café froid",
-      "decaf": "Décaféiné",
-      "organic": "Biologique",
-      "artisanal": "Artisanal",
-      "fairTrade": "Commerce équitable",
-      "darkRoast": "Torréfaction foncée",
-      "lightRoast": "Torréfaction claire",
-      "mediumRoast": "Torréfaction moyenne",
-      "pourOver": "Infusion lente",
-      "directTrade": "Commerce direct",
-      "education": "Éducation",
-      "cupping": "Dégustation"
-    }
+    "popularSearches": "Recherches populaires"
+  },
+  "specialties": {
+    "espresso": "Espresso",
+    "singleOrigin": "Origine unique",
+    "coldBrew": "Café froid",
+    "decaf": "Décaféiné",
+    "organic": "Biologique",
+    "artisanal": "Artisanal",
+    "fairTrade": "Commerce équitable",
+    "darkRoast": "Torréfaction foncée",
+    "lightRoast": "Torréfaction claire",
+    "mediumRoast": "Torréfaction moyenne",
+    "pourOver": "Infusion lente",
+    "directTrade": "Commerce direct",
+    "education": "Éducation",
+    "cupping": "Dégustation"
   },
   "roasters": {
     "title": "Torréfacteurs de café",
