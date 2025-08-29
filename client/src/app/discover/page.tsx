@@ -18,6 +18,8 @@ interface Roaster {
   rating: number
   distance: number
   imageUrl: string
+  latitude?: number
+  longitude?: number
 }
 
 export default function DiscoverPage() {
@@ -26,6 +28,16 @@ export default function DiscoverPage() {
   const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
   const [favorites, setFavorites] = useState<string[]>([])
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
+  // Get user location for distance calculation
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => setUserLocation(null)
+      )
+    }
+  }, [])
 
   // Load favorites from localStorage
   useEffect(() => {
@@ -120,7 +132,6 @@ export default function DiscoverPage() {
   //     searchRoasters()
   //   }, 500) // Debounce search by 500ms
     
-  //   return () => clearTimeout(timeoutId)
   // }, [filters])
 
   return (
@@ -207,7 +218,35 @@ export default function DiscoverPage() {
                       ))}
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">📍 {roaster.distance} {t('discover.miles')}</span>
+                      {(() => {
+                        // Try to use backend-provided distance if present and valid
+                        if (typeof roaster.distance === 'number' && isFinite(roaster.distance)) {
+                          // Use user preference for unit if available
+                          const settings = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('settings') || '{}') : {};
+                          const unit = settings?.preferences?.distanceUnit || 'mi';
+                          let dist = roaster.distance;
+                          if (unit === 'km') dist = dist * 1.60934;
+                          return (
+                            <span className="text-sm text-gray-500">📍 {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}</span>
+                          );
+                        }
+                        // If not, try to calculate from userLocation and roaster lat/lng
+                        if (userLocation && roaster.latitude && roaster.longitude) {
+                          const settings = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('settings') || '{}') : {};
+                          const unit = settings?.preferences?.distanceUnit || 'mi';
+                          const toRad = (v: number) => v * Math.PI / 180;
+                          const R = unit === 'mi' ? 3958.8 : 6371;
+                          const dLat = toRad(roaster.latitude - userLocation.lat);
+                          const dLng = toRad(roaster.longitude - userLocation.lng);
+                          const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(userLocation.lat)) * Math.cos(toRad(roaster.latitude)) * Math.sin(dLng/2) * Math.sin(dLng/2);
+                          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                          const dist = R * c;
+                          return (
+                            <span className="text-sm text-gray-500">📍 {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}</span>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                     <div className="flex space-x-3 mt-4">
                       <Link
@@ -242,6 +281,7 @@ export default function DiscoverPage() {
         </div>
       </div>
     </div>
+
   )
 }
-// force recompile
+

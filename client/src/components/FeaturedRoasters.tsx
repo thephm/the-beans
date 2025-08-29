@@ -159,18 +159,17 @@ export function FeaturedRoasters() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
                 <p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>
-                <p className="text-gray-600 mb-2">
-                  {userLocation && roaster.latitude && roaster.longitude ? (
-                    <span>
-                      {(() => {
-                        const dist = calcDistance(userLocation.lat, userLocation.lng, roaster.latitude, roaster.longitude, distanceUnit)
-                        return `${dist.toFixed(1)} ${distanceUnit === 'mi' ? t('mi').toLowerCase() : t('km').toLowerCase()}`
-                      })()}
-                    </span>
-                  ) : (
-                    <span>{distanceUnit === 'mi' ? t('mi').toLowerCase() : t('km').toLowerCase()}</span>
-                  )}
-                </p>
+                {userLocation && roaster.latitude && roaster.longitude ? (() => {
+                  const dist = calcDistance(userLocation.lat, userLocation.lng, roaster.latitude, roaster.longitude, distanceUnit);
+                  if (isFinite(dist) && !isNaN(dist)) {
+                    return (
+                      <p className="text-gray-600 mb-2">
+                        {dist.toFixed(1)} {distanceUnit === 'mi' ? t('mi').toLowerCase() : t('km').toLowerCase()}
+                      </p>
+                    );
+                  }
+                  return null;
+                })() : null}
                 <div className="flex flex-wrap gap-2 mb-3">
                   {roaster.specialties && roaster.specialties.length > 0 ? (
                     roaster.specialties.map((spec) => (
