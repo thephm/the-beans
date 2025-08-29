@@ -23697,3 +23697,52 @@ Restart the client service to apply the removal of the Favorites option from the
 
 ✔ `docker-compose restart client`
 
+## Favorite button in different place on Discover page
+
+https://github.com/thephm/the-beans/issues/30
+
+> On the top page and on the roasters page, the favorite button for a roaster is to the right of the view details button but on the discover page it's beside the rating. I would like to change the discover page to be the same as the other two pages
+
+Used 2 references
+
+Searched codebase for "favorite button discover page", 11 results
+
+`page.tsx+ 14 -1`
+
+Restart the client to apply the Discover page favorite button layout change.
+
+✔ `docker-compose restart client`
+
+## 194th try
+
+> You added a second one in the right place but didn't remove the favorite button to the left of the rating on discover page
+
+`page.tsx +0 -11`
+
+Restart the client to remove the old favorite button from the Discover page.
+
+✔ `docker-compose restart client`
+
+## 195th try
+
+> OK good that worked, please remove the purple heart from the View details buttons on the discover page
+
+`page.tsx +1 -1`
+
+Restart the client to apply the removal of the purple heart from the View Details buttons on the Discover page.
+
+`docker-compose restart client`
+
+The purple heart has been removed from the View Details buttons on the Discover page. The client has been restarted—refresh your browser to see the update.
+
+## 196th try
+
+> That worked, please remove the purple heart on the view details buttons on the roasters page
+
+Searched codebase for "View Details button heart roasters page", 14 results
+
+`page.tsx +1 -1`
+
+Restart the client to remove the old favorite button from the Discover page.
+
+✔ `docker-compose restart client`

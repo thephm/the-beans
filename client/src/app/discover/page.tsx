@@ -182,17 +182,6 @@ export default function DiscoverPage() {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{roaster.name}</h3>
-                      <button
-                        onClick={() => toggleFavorite(roaster.id)}
-                        className={`px-4 py-2 border rounded-lg transition-all transform hover:scale-105 ${
-                          favorites.includes(roaster.id)
-                            ? 'bg-red-100 border-red-300 text-red-600 hover:bg-red-200'
-                            : 'border-primary-500 text-primary-600 hover:bg-primary-50'
-                        }`}
-                        aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
-                      >
-                        {favorites.includes(roaster.id) ? '❤️' : '🤍'}
-                      </button>
                       <div className="flex items-center">
                         <span className="text-yellow-400">⭐</span>
                         <span className="text-gray-600 ml-1">{roaster.rating}</span>
@@ -219,12 +208,25 @@ export default function DiscoverPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">📍 {roaster.distance} {t('discover.miles')}</span>
-                      <Link 
+                    </div>
+                    <div className="flex space-x-3 mt-4">
+                      <Link
                         href={`/roasters/${roaster.id}`}
-                        className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
+                        className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg text-center font-medium hover:shadow-lg transition-all transform hover:scale-105"
                       >
-                        {t('discover.viewDetails')} 💜
+                        {t('discover.viewDetails')}
                       </Link>
+                      <button
+                        onClick={() => toggleFavorite(roaster.id)}
+                        className={`px-4 py-2 border rounded-lg transition-all transform hover:scale-105 ${
+                          favorites.includes(roaster.id)
+                            ? 'bg-red-100 border-red-300 text-red-600 hover:bg-red-200'
+                            : 'border-primary-500 text-primary-600 hover:bg-primary-50'
+                        }`}
+                        aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
+                      >
+                        {favorites.includes(roaster.id) ? '❤️' : '🤍'}
+                      </button>
                     </div>
                   </div>
                 </div>

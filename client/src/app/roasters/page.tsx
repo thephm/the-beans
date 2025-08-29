@@ -223,7 +223,7 @@ export default function RoastersPage() {
                         href={`/roasters/${roaster.id}`}
                         className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-2 px-4 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
                       >
-                        {t('roasters.viewDetails')} 💜
+                        {t('roasters.viewDetails')}
                       </Link>
                       <button 
                         onClick={() => toggleFavorite(roaster.id)}
