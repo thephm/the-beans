@@ -162,7 +162,19 @@ export default function FavoritesPage() {
                           <div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
                             <p className="text-gray-600 mb-1">{roaster.location}</p>
-                            <p className="text-sm text-primary-600 font-medium">{roaster.specialties?.[0] ? translateSpecialty(roaster.specialties[0]) : ''}</p>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              {roaster.specialties && roaster.specialties.length > 0 ? (
+                                roaster.specialties.map((spec) => (
+                                  <Link
+                                    key={spec}
+                                    href={`/discover?specialty=${encodeURIComponent(spec)}`}
+                                    className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200 hover:bg-primary-100 transition-colors"
+                                  >
+                                    {translateSpecialty(spec)}
+                                  </Link>
+                                ))
+                              ) : null}
+                            </div>
                           </div>
                           <div className="flex items-center space-x-1">
                             <span className="text-yellow-400">★</span>
