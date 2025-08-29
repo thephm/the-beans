@@ -60,23 +60,23 @@
     "searchPlaceholder": "Search for roasters",
     "locationPlaceholder": "Enter location",
     "searchButton": "Search",
-    "popularSearches": "Popular searches",
-    "specialties": {
-      "espresso": "Espresso",
-      "singleOrigin": "Single Origin",
-      "coldBrew": "Cold Brew",
-      "decaf": "Decaf",
-      "organic": "Organic",
-      "artisanal": "Artisanal",
-      "fairTrade": "Fair Trade",
-      "darkRoast": "Dark Roast",
-      "lightRoast": "Light Roast",
-      "mediumRoast": "Medium Roast",
-      "pourOver": "Pour Over",
-      "directTrade": "Direct Trade",
-      "education": "Education",
-      "cupping": "Cupping"
-    }
+    "popularSearches": "Popular searches"
+  },
+  "specialties": {
+    "espresso": "Espresso",
+    "singleOrigin": "Single Origin",
+    "coldBrew": "Cold Brew",
+    "decaf": "Decaf",
+    "organic": "Organic",
+    "artisanal": "Artisanal",
+    "fairTrade": "Fair Trade",
+    "darkRoast": "Dark Roast",
+    "lightRoast": "Light Roast",
+    "mediumRoast": "Medium Roast",
+    "pourOver": "Pour Over",
+    "directTrade": "Direct Trade",
+    "education": "Education",
+    "cupping": "Cupping"
   },
   "roasters": {
     "title": "Coffee Roasters",

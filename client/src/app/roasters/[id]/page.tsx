@@ -60,22 +60,21 @@ export default function RoasterDetail() {
   // Helper function to translate specialty names
   const translateSpecialty = (specialty: string): string => {
     const specialtyMap: { [key: string]: string } = {
-      'Cold Brew': 'search.specialties.coldBrew',
-      'Single Origin': 'search.specialties.singleOrigin',
-      'Espresso': 'search.specialties.espresso',
-      'Decaf': 'search.specialties.decaf',
-      'Organic': 'search.specialties.organic',
-      'Artisanal': 'search.specialties.artisanal',
-      'Fair Trade': 'search.specialties.fairTrade',
-      'Dark Roast': 'search.specialties.darkRoast',
-      'Light Roast': 'search.specialties.lightRoast',
-      'Medium Roast': 'search.specialties.mediumRoast',
-      'Pour Over': 'search.specialties.pourOver',
-      'Direct Trade': 'search.specialties.directTrade',
-      'Education': 'search.specialties.education',
-      'Cupping': 'search.specialties.cupping'
+      'Cold Brew': 'specialties.coldBrew',
+      'Single Origin': 'specialties.singleOrigin',
+      'Espresso': 'specialties.espresso',
+      'Decaf': 'specialties.decaf',
+      'Organic': 'specialties.organic',
+      'Artisanal': 'specialties.artisanal',
+      'Fair Trade': 'specialties.fairTrade',
+      'Dark Roast': 'specialties.darkRoast',
+      'Light Roast': 'specialties.lightRoast',
+      'Medium Roast': 'specialties.mediumRoast',
+      'Pour Over': 'specialties.pourOver',
+      'Direct Trade': 'specialties.directTrade',
+      'Education': 'specialties.education',
+      'Cupping': 'specialties.cupping'
     }
-    
     return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
   }
 

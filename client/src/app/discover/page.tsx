@@ -21,7 +21,7 @@ interface Roaster {
 }
 
 export default function DiscoverPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const searchParams = useSearchParams()
   const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
@@ -46,24 +46,21 @@ export default function DiscoverPage() {
 
   // Helper function to translate specialty names
   const translateSpecialty = (specialty: string): string => {
-    const specialtyMap: { [key: string]: string } = {
-      'Cold Brew': 'search.specialties.coldBrew',
-      'Single Origin': 'search.specialties.singleOrigin',
-      'Espresso': 'search.specialties.espresso',
-      'Decaf': 'search.specialties.decaf',
-      'Organic': 'search.specialties.organic',
-      'Artisanal': 'search.specialties.artisanal',
-      'Fair Trade': 'search.specialties.fairTrade',
-      'Dark Roast': 'search.specialties.darkRoast',
-      'Light Roast': 'search.specialties.lightRoast',
-      'Medium Roast': 'search.specialties.mediumRoast',
-      'Pour Over': 'search.specialties.pourOver',
-      'Direct Trade': 'search.specialties.directTrade',
-      'Education': 'search.specialties.education',
-      'Cupping': 'search.specialties.cupping'
+    // Use i18n.language to force re-render on language change
+    void i18n.language;
+    if (!specialty) return '';
+    let key = specialty;
+    if (!key.startsWith('specialties.')) {
+      key = key.replace(/\s+(.)/g, (_, c) => c.toUpperCase());
+      key = key.charAt(0).toLowerCase() + key.slice(1);
+      key = key.replace(/[^a-zA-Z0-9]/g, '');
+      key = `specialties.${key}`;
     }
-    
-    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
+    const translated = t(key);
+    if (translated === key) {
+      return specialty.startsWith('specialties.') ? specialty.replace('specialties.', '') : specialty;
+    }
+    return translated;
   }
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({
