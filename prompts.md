@@ -23678,3 +23678,22 @@ The Discover page pills and search text will now update immediately when you swi
 > works finally!
 
 Great to hear it's working! If you need anything else, just let me know.
+
+## Remove favorites from user menu
+
+https://github.com/thephm/the-beans/issues/29
+
+> Remove favorites from user menu
+
+Searched codebase for "user menu component or favorites in user menu", 6 results
+
+`UserMenu.tsx +1 -10`
+
+The "Favorites" option has been removed from the user menu dropdown, as it is now available in the main navbar. No further action is needed. Let me know if you need anything else!
+
+> shouldn't you restart the client?
+
+Restart the client service to apply the removal of the Favorites option from the user menu.
+
+✔ `docker-compose restart client`
+
