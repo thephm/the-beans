@@ -56,6 +56,9 @@ export function Navbar() {
             <Link href="/favorites" className="text-gray-700 hover:text-primary-600 transition-colors">
               {t('nav.favorites')}
             </Link>
+            {user?.role === 'admin' && (
+              <Link href="/admin/users" className="text-gray-700 hover:text-gray-900 font-semibold">{t('admin', 'Admin')}</Link>
+            )}
             
             {/* Language Selector */}
             <LanguageSelector />
@@ -113,6 +116,9 @@ export function Navbar() {
               <Link href="/favorites" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.favorites')}
               </Link>
+              {user?.role === 'admin' && (
+                <Link href="/admin/users" className="text-gray-700 hover:text-gray-900 font-semibold" onClick={() => setIsMobileMenuOpen(false)}>{t('admin', 'Admin')}</Link>
+              )}
               
               {/* Mobile Language Selector */}
               <div className="py-2">

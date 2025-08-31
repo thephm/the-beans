@@ -10,6 +10,7 @@ interface User {
   lastName?: string
   avatar?: string
   language?: string
+  role?: string // 'admin' | 'user' etc.
 }
 
 interface AuthContextType {

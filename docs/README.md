@@ -11,6 +11,7 @@ The Beans is a platform for discovering, reviewing, and managing specialty coffe
 
 - [Architecture](architecture.md)
 - [Glossary](glossary.md)
+- [Admin](./admin/README.md)
 
 ## Features
 
@@ -22,3 +23,4 @@ The following documentation covers each major feature:
 - [Favorites](./favorites/README.md)
 - [Profile](./profile/README.md)
 - [Settings](./settings/README.md)
+- [Admin](./admin/README.md) — Admin dashboard for user management

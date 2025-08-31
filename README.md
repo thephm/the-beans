@@ -10,8 +10,10 @@ A beautiful, modern web application for discovering fresh coffee roasters near y
 - 📱 **Cross-platform**: Works on web, Android, and iOS
 - 🔗 **Deep Linking**: Every page is directly linkable
 - 📸 **Photos & Reviews**: Share photos and comments with moderation
+
 - 🔒 **Secure API**: RESTful API with Swagger documentation
 - 💜 **Beautiful Design**: Purple-themed UI with lavender, violet, and orchid colors
+- 🔒 **Admin Dashboard**: Manage users, roles, and permissions (admin only)
 
 - **Railway/Render** - Backend hosting
 - **Cloudflare** - CDN and domain management
