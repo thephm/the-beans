@@ -1,51 +1,32 @@
 
-import { Router } from 'express';
+
+import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
+import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
 
 const router = Router();
 const prisma = new PrismaClient();
-
-// Required auth middleware (same as in roasters.ts)
-const requireAuth = async (req: any, res: any, next: any) => {
-  try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
-    }
-
-    const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: string };
-    req.user = { id: decoded.userId };
-    next();
-  } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
-  }
-};
 
 
 // Update user language preference (any authenticated user can update their own language)
 router.put('/language', [
   body('language').isLength({ min: 2, max: 5 }).withMessage('Language code must be 2-5 characters'),
-], requireAuth, async (req: any, res: any) => {
+], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    console.log('PUT /api/users/language called');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const userId = req.user.id;
+    const userId = req.user?.id;
     const { language } = req.body;
-    console.log('Updating language for user:', userId, 'to', language);
 
     // Update user language in database
-    const updated = await prisma.user.update({
+    await prisma.user.update({
       where: { id: userId },
       data: { language }
     });
-    console.log('Language updated in DB:', updated.language);
 
     res.json({ 
       message: 'Language preference updated successfully',
@@ -58,9 +39,9 @@ router.put('/language', [
 });
 
 // Admin: Update a user (role, language, etc.)
-router.put('/:id', requireAuth, async (req: any, res: any) => {
+router.put('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
@@ -78,9 +59,9 @@ router.put('/:id', requireAuth, async (req: any, res: any) => {
 });
 
 // Admin: Delete a user
-router.delete('/:id', requireAuth, async (req: any, res: any) => {
+router.delete('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
@@ -94,9 +75,9 @@ router.delete('/:id', requireAuth, async (req: any, res: any) => {
 });
 
 // Get user settings
-router.get('/settings', requireAuth, async (req: any, res: any) => {
+router.get('/settings', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     // Fetch settings from database
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -164,9 +145,9 @@ router.put('/language', [
 });
 
 // Update user settings
-router.put('/settings', requireAuth, async (req: any, res: any) => {
+router.put('/settings', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     const settings = req.body;
     // Persist settings to database
     await prisma.user.update({
@@ -187,10 +168,10 @@ router.put('/settings', requireAuth, async (req: any, res: any) => {
 // Placeholder routes - these would be implemented similar to roasters.ts
 
 // Admin: Get all users (basic info)
-router.get('/', requireAuth, async (req: any, res: any) => {
+router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     // Fetch requesting user's role
-    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
