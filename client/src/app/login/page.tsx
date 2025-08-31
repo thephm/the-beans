@@ -102,7 +102,7 @@ export default function LoginPage() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                 placeholder={t('auth.password')}
               />
             </div>
@@ -113,7 +113,7 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded text-gray-900"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   {t('auth.rememberMe')}

@@ -26,6 +26,16 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+/* Ensure all input, select, and textarea fields have visible text color */
+input, select, textarea {
+}
+
+@layer base {
+  input, select, textarea {
+    @apply text-gray-900;
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

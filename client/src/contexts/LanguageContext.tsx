@@ -33,11 +33,11 @@ interface LanguageContextType {
   isChanging: boolean
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+export const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const { i18n } = useTranslation()
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, login } = useAuth()
   const [isChanging, setIsChanging] = useState(false)
   const [currentLanguage, setCurrentLanguage] = useState<Language>(
     SUPPORTED_LANGUAGES[0] // Default to English
@@ -116,6 +116,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (isAuthenticated && user) {
         // Update user's language preference in the database
         await updateUserLanguagePreference(languageCode)
+        // Update the user object in AuthContext to reflect the new language
+        const updatedUser = { ...user, language: languageCode }
+        // Use login to update user in context and localStorage (token remains the same)
+        const token = localStorage.getItem('token') || ''
+        login(token, updatedUser)
       } else {
         // Store guest language preference in localStorage
         localStorage.setItem('guestLanguage', languageCode)
