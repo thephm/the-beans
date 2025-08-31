@@ -6,25 +6,35 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seeding...');
 
-  // Create test users
-  const hashedPassword = await bcrypt.hash('password123', 10);
-  
-  const testUser = await prisma.user.upsert({
-    where: { email: 'test@example.com' },
+
+  // Create default admin user from env vars if not exists
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminFirstName = process.env.ADMIN_FIRSTNAME || 'Admin';
+  const adminLastName = process.env.ADMIN_LASTNAME || 'User';
+  const adminLocation = process.env.ADMIN_LOCATION || 'Headquarters';
+  const adminLatitude = process.env.ADMIN_LATITUDE ? parseFloat(process.env.ADMIN_LATITUDE) : undefined;
+  const adminLongitude = process.env.ADMIN_LONGITUDE ? parseFloat(process.env.ADMIN_LONGITUDE) : undefined;
+
+  const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+
+  const adminUser = await prisma.user.upsert({
+    where: { email: adminEmail },
     update: {},
     create: {
-      email: 'test@example.com',
-      username: 'testuser',
-      password: hashedPassword,
-      firstName: 'Test',
-      lastName: 'User',
-      location: 'Seattle, WA',
-      latitude: 47.6062,
-      longitude: -122.3321,
+      email: adminEmail,
+      username: adminUsername,
+      password: hashedAdminPassword,
+      firstName: adminFirstName,
+      lastName: adminLastName,
+      location: adminLocation,
+      latitude: adminLatitude,
+      longitude: adminLongitude,
+      role: 'admin',
     },
   });
-
-  console.log('✅ Created test user:', testUser.email);
+  console.log('✅ Created/ensured admin user:', adminUser.email);
 
   // Create test roasters
   const roaster1 = await prisma.roaster.upsert({

@@ -1,3 +1,11 @@
+@layer base {
+  input, select, textarea {
+    @apply text-gray-900;
+  }
+  table, th, td {
+    @apply text-gray-900;
+  }
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

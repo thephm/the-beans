@@ -6,11 +6,53 @@ const prisma = new PrismaClient();
 async function main() {
   // Starting database seed
 
+  // Create or update default admin user using env vars
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminFirstName = process.env.ADMIN_FIRSTNAME || 'Admin';
+  const adminLastName = process.env.ADMIN_LASTNAME || 'User';
+  const adminLocation = process.env.ADMIN_LOCATION || 'Headquarters';
+  const adminRole = 'admin';
+  const adminHashedPassword = await bcrypt.hash(adminPassword, 12);
+
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      username: adminUsername,
+      password: adminHashedPassword,
+      firstName: adminFirstName,
+      lastName: adminLastName,
+      location: adminLocation,
+      role: adminRole,
+    },
+    create: {
+      email: adminEmail,
+      username: adminUsername,
+      password: adminHashedPassword,
+      firstName: adminFirstName,
+      lastName: adminLastName,
+      location: adminLocation,
+      role: adminRole,
+    },
+  });
+
   // Create users
   const hashedPassword = await bcrypt.hash('password123', 12);
-  
-  const user1 = await prisma.user.create({
-    data: {
+
+  const user1 = await prisma.user.upsert({
+    where: { email: 'coffee@lover.com' },
+    update: {
+      username: 'coffeelover',
+      password: hashedPassword,
+      firstName: 'Coffee',
+      lastName: 'Lover',
+      bio: 'Passionate about discovering the best coffee roasters!',
+      location: 'Seattle, WA',
+      latitude: 47.6062,
+      longitude: -122.3321,
+    },
+    create: {
       email: 'coffee@lover.com',
       username: 'coffeelover',
       password: hashedPassword,
@@ -23,8 +65,19 @@ async function main() {
     },
   });
 
-  const user2 = await prisma.user.create({
-    data: {
+  const user2 = await prisma.user.upsert({
+    where: { email: 'bean@enthusiast.com' },
+    update: {
+      username: 'beanenthusiast',
+      password: hashedPassword,
+      firstName: 'Bean',
+      lastName: 'Enthusiast',
+      bio: 'Single origin coffee specialist and roaster owner.',
+      location: 'Portland, OR',
+      latitude: 45.5152,
+      longitude: -122.6784,
+    },
+    create: {
       email: 'bean@enthusiast.com',
       username: 'beanenthusiast',
       password: hashedPassword,

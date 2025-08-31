@@ -1,3 +1,4 @@
+"use client";
 // Admin Users Page
 // This is a scaffold for the admin user management page.
 // TODO: Connect to backend API and add real data fetching, editing, and deleting logic.
@@ -33,7 +34,10 @@ const AdminUsersPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/users');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const res = await fetch('http://localhost:5000/api/users', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
       if (!res.ok) throw new Error('Failed to fetch users');
       const data = await res.json();
       setUsers(data);
@@ -60,9 +64,13 @@ const AdminUsersPage: React.FC = () => {
 
   const saveEdit = async (user: User) => {
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const res = await fetch(`http://localhost:5000/api/users/${user.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(editData),
       });
       if (!res.ok) throw new Error('Failed to update user');
@@ -90,14 +98,27 @@ const AdminUsersPage: React.FC = () => {
   if (loading) return <div>{t('loading')}</div>;
   if (error) return <div className="text-red-600">{t('error')}: {error}</div>;
 
+  // Debug: Show raw users data if empty
+  if (!users || users.length === 0) {
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-4">{t('admin.users.title', 'User Management')}</h1>
+        <div className="text-red-600 mb-4">No users found or API returned empty. Debug info:</div>
+        <pre>{JSON.stringify(users, null, 2)}</pre>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{t('admin.users.title', 'User Management')}</h1>
+      <div className="mt-20 mb-6">
+        <h1 className="text-4xl font-bold text-gray-900 bg-transparent mb-2">Users</h1>
+      </div>
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr>
-            <th className="py-2 px-4 border-b">{t('admin.users.username', 'Username')}</th>
-            <th className="py-2 px-4 border-b">{t('admin.users.email', 'Email')}</th>
+            <th className="py-2 px-4 border-b text-left">{t('admin.users.username', 'Username')}</th>
+            <th className="py-2 px-4 border-b text-left">{t('admin.users.email', 'Email')}</th>
             <th className="py-2 px-4 border-b">{t('admin.users.role', 'Role')}</th>
             <th className="py-2 px-4 border-b">{t('admin.users.language', 'Language')}</th>
             <th className="py-2 px-4 border-b">{t('admin.users.createdAt', 'Created')}</th>
@@ -108,8 +129,8 @@ const AdminUsersPage: React.FC = () => {
         <tbody>
           {users.map((user) => (
             <tr key={user.id} className="text-center">
-              <td className="py-2 px-4 border-b">{user.username}</td>
-              <td className="py-2 px-4 border-b">{user.email}</td>
+              <td className="py-2 px-4 border-b text-left">{user.username}</td>
+              <td className="py-2 px-4 border-b text-left">{user.email}</td>
               <td className="py-2 px-4 border-b">
                 {editId === user.id ? (
                   <select
