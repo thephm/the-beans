@@ -1,5 +1,5 @@
-// API route for admin user management (scaffold)
-// TODO: Connect to your database and implement real logic with authentication/authorization.
+// Dynamic API route for admin user management
+// In-memory users array (shared for demo only)
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -9,12 +9,13 @@ const users = [
 ];
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  // TODO: Add admin authentication/authorization check
+  const { id } = req.query;
   if (req.method === 'GET') {
-    return res.status(200).json(users);
+    const user = users.find(u => u.id === id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.status(200).json(user);
   }
   if (req.method === 'PUT') {
-    const { id } = req.query;
     const update = req.body;
     const idx = users.findIndex(u => u.id === id);
     if (idx === -1) {
@@ -24,7 +25,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(users[idx]);
   }
   if (req.method === 'DELETE') {
-    const { id } = req.query;
     const idx = users.findIndex(u => u.id === id);
     if (idx === -1) {
       return res.status(404).json({ message: 'User not found' });
