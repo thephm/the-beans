@@ -117,7 +117,7 @@ export function SearchSection({
                 onChange={(e) => handleSearchQueryChange(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={t('search.searchPlaceholder')}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
             </div>
             

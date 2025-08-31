@@ -23,6 +23,40 @@ const requireAuth = async (req: any, res: any, next: any) => {
   }
 };
 
+
+// Update user language preference (any authenticated user can update their own language)
+router.put('/language', [
+  body('language').isLength({ min: 2, max: 5 }).withMessage('Language code must be 2-5 characters'),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    console.log('PUT /api/users/language called');
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const userId = req.user.id;
+    const { language } = req.body;
+    console.log('Updating language for user:', userId, 'to', language);
+
+    // Update user language in database
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { language }
+    });
+    console.log('Language updated in DB:', updated.language);
+
+    res.json({ 
+      message: 'Language preference updated successfully',
+      language 
+    });
+  } catch (error) {
+    console.error('Error updating language preference:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Admin: Update a user (role, language, etc.)
 router.put('/:id', requireAuth, async (req: any, res: any) => {
   try {
@@ -100,7 +134,7 @@ router.get('/settings', requireAuth, async (req: any, res: any) => {
   }
 });
 
-// Update user language preference
+// Update user language preference (any authenticated user can update their own language)
 router.put('/language', [
   body('language').isLength({ min: 2, max: 5 }).withMessage('Language code must be 2-5 characters'),
 ], requireAuth, async (req: any, res: any) => {
