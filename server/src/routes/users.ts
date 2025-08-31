@@ -1,11 +1,10 @@
+
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
 const prisma = new PrismaClient();
-
-// In-memory settings storage (in production, this would be a database)
 
 // Required auth middleware (same as in roasters.ts)
 const requireAuth = async (req: any, res: any, next: any) => {
@@ -23,6 +22,42 @@ const requireAuth = async (req: any, res: any, next: any) => {
     res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+// Admin: Update a user (role, language, etc.)
+router.put('/:id', requireAuth, async (req: any, res: any) => {
+  try {
+    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { role: true } });
+    if (!me || me.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden: Admins only' });
+    }
+    const { id } = req.params;
+    const { role, language, firstName, lastName } = req.body;
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { role, language, firstName, lastName },
+    });
+    res.json({ success: true, user: updated });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// Admin: Delete a user
+router.delete('/:id', requireAuth, async (req: any, res: any) => {
+  try {
+    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { role: true } });
+    if (!me || me.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden: Admins only' });
+    }
+    const { id } = req.params;
+    await prisma.user.delete({ where: { id } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
 
 // Get user settings
 router.get('/settings', requireAuth, async (req: any, res: any) => {
@@ -116,8 +151,33 @@ router.put('/settings', requireAuth, async (req: any, res: any) => {
 });
 
 // Placeholder routes - these would be implemented similar to roasters.ts
-router.get('/', async (req: any, res: any) => {
-  res.json({ message: 'Users endpoint - coming soon!' });
+
+// Admin: Get all users (basic info)
+router.get('/', requireAuth, async (req: any, res: any) => {
+  try {
+    // Fetch requesting user's role
+    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { role: true } });
+    if (!me || me.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden: Admins only' });
+    }
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        language: true,
+        createdAt: true,
+        updatedAt: true,
+        role: true,
+      }
+    });
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
 });
 
 export default router;
