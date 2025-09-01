@@ -71,6 +71,7 @@ model Roaster {
   favorites Favorite[]
   beans    Bean[]
 
+  @@unique([name])
   @@map("roasters")
 }
 
