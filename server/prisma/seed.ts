@@ -4,6 +4,22 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  // Create a test user for roaster ownership
+  const testUser = await prisma.user.upsert({
+    where: { email: 'coffee@lover.com' },
+    update: {},
+    create: {
+      email: 'coffee@lover.com',
+      username: 'coffeelover',
+      password: await bcrypt.hash('password123', 10),
+      firstName: 'Coffee',
+      lastName: 'Lover',
+      location: 'Everywhere',
+      latitude: 0,
+      longitude: 0,
+      role: 'user',
+    },
+  });
   console.log('🌱 Starting database seeding...');
 
 
@@ -38,10 +54,9 @@ async function main() {
 
   // Create test roasters
   const roaster1 = await prisma.roaster.upsert({
-    where: { id: 'roaster1' },
+    where: { name: 'Blue Bottle Coffee' },
     update: {},
     create: {
-      id: 'roaster1',
       name: 'Blue Bottle Coffee',
       description: 'Artisanal coffee roaster focused on freshness and quality.',
       email: 'info@bluebottlecoffee.com',
@@ -67,10 +82,9 @@ async function main() {
   });
 
   const roaster2 = await prisma.roaster.upsert({
-    where: { id: 'roaster2' },
+    where: { name: 'Stumptown Coffee Roasters' },
     update: {},
     create: {
-      id: 'roaster2',
       name: 'Stumptown Coffee Roasters',
       description: 'Portland-based roaster known for direct trade relationships.',
       email: 'hello@stumptowncoffee.com',
@@ -96,10 +110,9 @@ async function main() {
   });
 
   const roaster3 = await prisma.roaster.upsert({
-    where: { id: 'roaster3' },
+    where: { name: 'Intelligentsia Coffee' },
     update: {},
     create: {
-      id: 'roaster3',
       name: 'Intelligentsia Coffee',
       description: 'Chicago-based specialty coffee roaster with a focus on education.',
       email: 'info@intelligentsiacoffee.com',
