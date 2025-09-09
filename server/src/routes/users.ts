@@ -88,9 +88,7 @@ router.get('/settings', requireAuth, async (req: AuthenticatedRequest, res: Resp
     if (!settings) {
       settings = {
         notifications: {
-          newRoasters: true,
-          promotions: true,
-          recommendations: false
+          newRoasters: true
         },
         privacy: {
           showProfile: true,
