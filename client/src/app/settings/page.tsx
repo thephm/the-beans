@@ -18,9 +18,7 @@ export default function SettingsPage() {
   // Form state
   const [settings, setSettings] = useState({
     notifications: {
-      newRoasters: true,
-      promotions: true,
-      recommendations: false
+      newRoasters: true
     },
     privacy: {
       showProfile: true,
@@ -133,19 +131,39 @@ export default function SettingsPage() {
             )}
             
             <div className="space-y-8">
-              {/* Language Preference */}
+              {/* Preferences (Language & Distance Unit) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.language')}</label>
-                <select
-                  value={settings.language}
-                  onChange={e => setSettings(prev => ({ ...prev, language: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  {languageContext?.supportedLanguages.map(lang => (
-                    <option key={lang.code} value={lang.code}>{lang.nativeName}</option>
-                  ))}
-                </select>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.preferences')}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Language Preference */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.language')}</label>
+                    <select
+                      value={settings.language}
+                      onChange={e => setSettings(prev => ({ ...prev, language: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      {languageContext?.supportedLanguages.map(lang => (
+                        <option key={lang.code} value={lang.code}>{lang.nativeName}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Distance Unit */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('distanceUnit')}</label>
+                    <select
+                      value={settings.preferences.distanceUnit}
+                      onChange={e => setSettings(prev => ({
+                        ...prev,
+                        preferences: { ...prev.preferences, distanceUnit: e.target.value }
+                      }))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="km">{t('km')}</option>
+                      <option value="mi">{t('mi')}</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               {/* Notifications */}
               <div>
@@ -162,30 +180,6 @@ export default function SettingsPage() {
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 text-gray-900" 
                     />
                     <span className="ml-3 text-gray-700">{t('settings.newRoasters')}</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      checked={settings.notifications.promotions}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        notifications: { ...prev.notifications, promotions: e.target.checked }
-                      }))}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
-                    />
-                    <span className="ml-3 text-gray-700">{t('settings.promotions')}</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      checked={settings.notifications.recommendations}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        notifications: { ...prev.notifications, recommendations: e.target.checked }
-                      }))}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
-                    />
-                    <span className="ml-3 text-gray-700">{t('settings.recommendations')}</span>
                   </label>
                 </div>
               </div>
@@ -221,25 +215,9 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* Distance Unit (moved out of preferences) */}
+              {/* Coffee Preferences */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('distanceUnit')}</label>
-                <select
-                  value={settings.preferences.distanceUnit}
-                  onChange={e => setSettings(prev => ({
-                    ...prev,
-                    preferences: { ...prev.preferences, distanceUnit: e.target.value }
-                  }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
-                >
-                  <option value="km">{t('km')}</option>
-                  <option value="mi">{t('mi')}</option>
-                </select>
-              </div>
-
-              {/* Preferences */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.preferences')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.coffeePreferences')}</h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.roastLevel')}</label>
