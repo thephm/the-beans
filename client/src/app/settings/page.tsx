@@ -18,7 +18,6 @@ export default function SettingsPage() {
   // Form state
   const [settings, setSettings] = useState({
     notifications: {
-      newRoasters: true
     },
     privacy: {
       showProfile: true,
@@ -165,25 +164,6 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-              {/* Notifications */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.notifications')}</h3>
-                <div className="space-y-3">
-                  <label className="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      checked={settings.notifications.newRoasters}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        notifications: { ...prev.notifications, newRoasters: e.target.checked }
-                      }))}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 text-gray-900" 
-                    />
-                    <span className="ml-3 text-gray-700">{t('settings.newRoasters')}</span>
-                  </label>
-                </div>
-              </div>
-
               {/* Privacy */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Privacy</h3>
