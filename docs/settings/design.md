@@ -21,9 +21,6 @@ Technical design and architecture for settings.
 ```json
 {
 	"notifications": {
-		"newRoasters": true,
-		"promotions": true,
-		"recommendations": false
 	},
 	"privacy": {
 		"showProfile": true,
