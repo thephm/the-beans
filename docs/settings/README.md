@@ -2,10 +2,6 @@
 
 The settings feature allows users to customize their experience by managing:
 
-- **Notifications:**
-	- New roasters
-	- Promotions
-	- Weekly recommendations
 - **Privacy:**
 	- Profile visibility
 	- Location tracking
