@@ -25,10 +25,29 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<{[key: string]: boolean}>({})
 
   // Helper function to translate specialty names
-  const translateSpecialty = (specialty: string) => {
-    // Convert "Direct Trade" to "directTrade", "Single Origin" to "singleOrigin", etc.
-    const specialtyKey = specialty.toLowerCase().replace(/\s+(.)/g, (match, char) => char.toUpperCase())
-    return t(`search.specialties.${specialtyKey}`, { defaultValue: specialty })
+  const translateSpecialty = (specialty: string): string => {
+    const specialtyMap: { [key: string]: string } = {
+      'Cold Brew': 'specialties.coldBrew',
+      'Single Origin': 'specialties.singleOrigin',
+      'Espresso': 'specialties.espresso',
+      'Decaf': 'specialties.decaf',
+      'Organic': 'specialties.organic',
+      'Artisanal': 'specialties.artisanal',
+      'Fair Trade': 'specialties.fairTrade',
+      'Dark Roast': 'specialties.darkRoast',
+      'Light Roast': 'specialties.lightRoast',
+      'Medium Roast': 'specialties.mediumRoast',
+      'Pour Over': 'specialties.pourOver',
+      'Direct Trade': 'specialties.directTrade',
+      'Education': 'specialties.education',
+      'Cupping': 'specialties.cupping',
+      'Blends': 'specialties.blends',
+      'Ethiopian': 'specialties.ethiopian',
+      'Italian Roast': 'specialties.italianRoast',
+      'Nitro Coffee': 'specialties.nitroCoffee',
+      'Sustainable': 'specialties.sustainable'
+    }
+    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
   }
   // Redirect to login if not authenticated
   useEffect(() => {
