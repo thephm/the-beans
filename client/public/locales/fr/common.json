@@ -91,7 +91,12 @@
     "pourOver": "Infusion lente",
     "directTrade": "Commerce direct",
     "education": "Éducation",
-    "cupping": "Dégustation"
+    "cupping": "Dégustation",
+    "blends": "Mélanges",
+    "ethiopian": "Éthiopien",
+    "italianRoast": "Torréfaction italienne",
+    "nitroCoffee": "Café nitro",
+    "sustainable": "Durable"
   },
   "roasters": {
     "title": "Torréfacteurs de café",
