@@ -78,44 +78,53 @@ export default function DiscoverPage() {
   const [filters, setFilters] = useState({
     search: '',
     location: '',
-    specialty: '',
     distance: 25
   })
 
   // Initialize filters from URL parameters
   useEffect(() => {
-    const urlSearch = searchParams.get('search') || ''
-    const urlLocation = searchParams.get('location') || ''
-    const urlSpecialty = searchParams.get('specialty') || ''
+    if (!searchParams) return;
+    const urlSearch = searchParams.get('search') || '';
+    const urlLocation = searchParams.get('location') || '';
+    const urlSpecialty = searchParams.get('specialty') || '';
+    
+    // If specialty is provided, put it in the search field instead of separate filter
+    const searchValue = urlSpecialty || urlSearch;
     
     setFilters(prev => ({
       ...prev,
-      search: urlSpecialty ? translateSpecialty(urlSpecialty) : urlSearch, // Use translated specialty as search if provided
-      location: urlLocation,
-      specialty: urlSpecialty
-    }))
-  }, [searchParams])
+      search: searchValue,
+      location: urlLocation
+    }));
+  }, [searchParams]);
 
   const searchRoasters = useCallback(async () => {
     setLoading(true)
     try {
       const searchParams = new URLSearchParams()
-      if (filters.search) searchParams.append('search', filters.search)
+      if (filters.search) searchParams.append('q', filters.search)
       if (filters.location) searchParams.append('location', filters.location)
-      if (filters.specialty) searchParams.append('specialty', filters.specialty)
       searchParams.append('distance', filters.distance.toString())
 
       const response = await fetch(`http://localhost:5000/api/search/roasters?${searchParams}`)
       if (response.ok) {
         const data = await response.json()
         setRoasters(data.roasters || [])
+        
+        // Trigger popular searches refetch after successful search
+        if (filters.search && filters.search.trim().length > 0) {
+          // Dispatch a custom event that SearchSection can listen to
+          window.dispatchEvent(new CustomEvent('searchCompleted', { 
+            detail: { query: filters.search } 
+          }))
+        }
       }
     } catch (error) {
       console.error('Search failed:', error)
     } finally {
       setLoading(false)
     }
-  }, [filters.search, filters.location, filters.specialty, filters.distance])
+  }, [filters.search, filters.location, filters.distance])
 
   useEffect(() => {
     // Debounce the search to prevent rapid-fire API calls
@@ -153,10 +162,9 @@ export default function DiscoverPage() {
             <SearchSection 
               searchQuery={filters.search}
               location={filters.location}
-              onSearchQueryChange={(value, specialty) => setFilters(prev => ({ 
+              onSearchQueryChange={(value) => setFilters(prev => ({ 
                 ...prev, 
-                search: value,
-                specialty: specialty || ''
+                search: value
               }))}
               onLocationChange={(value) => setFilters(prev => ({ ...prev, location: value }))}
               onSearch={(searchQuery, location) => {
@@ -207,8 +215,7 @@ export default function DiscoverPage() {
                           onClick={() => {
                             setFilters(prev => ({
                               ...prev,
-                              search: translateSpecialty(specialty),
-                              specialty: specialty
+                              search: translateSpecialty(specialty)
                             }))
                           }}
                           className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"

@@ -69,12 +69,13 @@
     }
   },
   "search": {
-    "searchLabel": "Rechercher des torréfacteurs ou des cafés",
-    "locationLabel": "Emplacement",
-    "searchPlaceholder": "Rechercher des torréfacteurs ou des cafés",
-    "locationPlaceholder": "Entrer l'emplacement",
-    "searchButton": "Rechercher",
-    "popularSearches": "Recherches populaires"
+  "searchLabel": "Rechercher des torréfacteurs ou des cafés",
+  "locationLabel": "Emplacement",
+  "searchPlaceholder": "Rechercher des torréfacteurs ou des cafés",
+  "locationPlaceholder": "Entrer l'emplacement",
+  "searchButton": "Rechercher",
+  "popularSearches": "Recherches populaires",
+  "noPopularSearches": "Aucune recherche populaire pour l'instant. Commencez à chercher pour voir les tendances !"
   },
   "specialties": {
     "espresso": "Espresso",

@@ -66,21 +66,34 @@ router.get('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { q, type = 'roasters', latitude, longitude, radius = 25 } = req.query;
-    const searchQuery = q as string;
-    
-    let roasters: any[] = [];
+    const { q, search, type = 'roasters', latitude, longitude, radius = 25 } = req.query;
+    // Accept both ?q= and ?search= for search term
+    const searchQuery = (typeof q === 'string' && q) || (typeof search === 'string' && search) || '';
 
-    // Search roasters
-    roasters = await prisma.roaster.findMany({
+    // Log the search query to the Search table
+    if (searchQuery && searchQuery.trim().length > 0) {
+      const sqLower = searchQuery.trim().toLowerCase();
+      const existing = await prisma.search.findFirst({ where: { query: sqLower } });
+      if (existing) {
+        await prisma.search.update({
+          where: { id: existing.id },
+          data: { count: { increment: 1 } },
+        });
+      } else {
+        await prisma.search.create({
+          data: { query: sqLower, count: 1 },
+        });
+      }
+    }
+
+    // Search roasters in DB
+    let roasters: any[] = await prisma.roaster.findMany({
       where: {
         OR: [
           { name: { contains: searchQuery, mode: 'insensitive' } },
           { description: { contains: searchQuery, mode: 'insensitive' } },
           { city: { contains: searchQuery, mode: 'insensitive' } },
           { state: { contains: searchQuery, mode: 'insensitive' } },
-          { specialties: { has: searchQuery } },
-          { specialties: { hasSome: searchQuery.split(' ') } },
         ],
       },
       include: {
@@ -105,15 +118,24 @@ router.get('/', [
       ],
     });
 
-    // Add distance calculation if coordinates provided
+    // Filter by specialty (case-insensitive) if searchQuery is present
+    if (searchQuery) {
+      const qLower = searchQuery.trim().toLowerCase();
+      roasters = roasters.filter(roaster =>
+        (Array.isArray(roaster.specialties) &&
+          (roaster.specialties as string[]).some((s: string) => s.toLowerCase() === qLower))
+        || roaster.name.toLowerCase().includes(qLower)
+        || (roaster.description && roaster.description.toLowerCase().includes(qLower))
+        || (roaster.city && roaster.city.toLowerCase().includes(qLower))
+        || (roaster.state && roaster.state.toLowerCase().includes(qLower))
+      );
+    }
     if (latitude && longitude) {
       const lat = parseFloat(latitude as string);
       const lng = parseFloat(longitude as string);
       const maxRadius = parseFloat(radius as string);
-
-      roasters = roasters.filter(roaster => {
+      roasters = roasters.filter((roaster: any) => {
         if (!roaster.latitude || !roaster.longitude) return false;
-        
         const distance = calculateDistance(
           lat,
           lng,
@@ -124,9 +146,15 @@ router.get('/', [
       });
     }
 
+    // Add imageUrl field for frontend compatibility
+    const roastersWithImageUrl = roasters.map((roaster: any) => ({
+      ...roaster,
+      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
+    }));
+
     res.json({
-      roasters,
-      total: roasters.length,
+      roasters: roastersWithImageUrl,
+      total: roastersWithImageUrl.length,
     });
   } catch (error) {
     console.error('Search error:', error);
@@ -136,6 +164,7 @@ router.get('/', [
 
 // Specialty search route for roasters
 router.get('/roasters', [
+  query('q').optional().isLength({ min: 1 }),
   query('specialty').optional().isLength({ min: 1 }),
   query('location').optional().isLength({ min: 1 }),
   query('sort').optional().isIn(['name', '-name', '-rating', '-reviewCount', 'city']),
@@ -149,33 +178,28 @@ router.get('/roasters', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { specialty, location, sort, latitude, longitude, radius = 25 } = req.query;
-    
+    const { q, specialty, location, sort, latitude, longitude, radius = 25 } = req.query;
     let whereClause: any = {};
-    
-    if (specialty) {
-      const specialtyQuery = specialty as string;
-      
-      // French to English specialty translation mapping for backend search
-      const frenchToEnglishSpecialties: {[key: string]: string} = {
-        'Espresso': 'Espresso',
-        'Origine unique': 'Single Origin',
-        'Café froid': 'Cold Brew',
-        'Commerce équitable': 'Fair Trade',
-        'Biologique': 'Organic',
-        'Infusion lente': 'Pour Over',
-        'Commerce direct': 'Direct Trade',
-        'Dégustation': 'Cupping'
-      };
-      
-      // Check if the specialty is in French and convert to English for database search
-      const englishSpecialty = frenchToEnglishSpecialties[specialtyQuery] || specialtyQuery;
-      
-      whereClause.specialties = {
-        has: englishSpecialty
-      };
+
+    // Log the search query to the Search table (for popular searches)
+    if (q && typeof q === 'string' && q.trim().length > 0) {
+      const qLower = q.trim().toLowerCase();
+      const existing = await prisma.search.findFirst({ where: { query: qLower } });
+      if (existing) {
+        await prisma.search.update({
+          where: { id: existing.id },
+          data: { count: { increment: 1 } },
+        });
+      } else {
+        await prisma.search.create({
+          data: { query: qLower, count: 1 },
+        });
+      }
     }
-    
+
+    if (q && typeof q === 'string') {
+      // Remove Prisma filtering for search query; filter in JS below
+    }
     if (location) {
       whereClause.OR = [
         { city: { contains: location as string, mode: 'insensitive' } },
@@ -211,7 +235,6 @@ router.get('/roasters', [
     }
 
     let roasters = await prisma.roaster.findMany({
-      where: whereClause,
       include: {
         owner: {
           select: {
@@ -229,6 +252,20 @@ router.get('/roasters', [
       },
       orderBy,
     });
+    // DEBUG: Log specialties for all roasters returned by the DB query
+    console.log('DEBUG specialties:', roasters.map(r => ({ id: r.id, name: r.name, specialties: r.specialties })));
+    // Filter by all fields (including specialties, case-insensitive, partial match) in JS if q is present
+    if (q && typeof q === 'string') {
+      const qLower = q.trim().toLowerCase();
+      roasters = roasters.filter(roaster =>
+        (Array.isArray(roaster.specialties) &&
+          (roaster.specialties as string[]).some((s: string) => s.toLowerCase().includes(qLower)))
+        || (roaster.name && roaster.name.toLowerCase().includes(qLower))
+        || (roaster.description && roaster.description.toLowerCase().includes(qLower))
+        || (roaster.city && roaster.city.toLowerCase().includes(qLower))
+        || (roaster.state && roaster.state.toLowerCase().includes(qLower))
+      );
+    }
 
     // Add distance calculation and filtering if coordinates provided
     if (latitude && longitude) {
@@ -287,5 +324,22 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 function deg2rad(deg: number): number {
   return deg * (Math.PI / 180);
 }
+
+
+// Popular searches endpoint
+router.get('/popular', async (req: Request, res: Response) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 5;
+    const popular = await prisma.search.findMany({
+      orderBy: { count: 'desc' },
+      take: limit,
+      select: { query: true, count: true },
+    });
+    res.json({ popular });
+  } catch (error) {
+    console.error('Popular searches error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 export default router;
