@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import axios from 'axios';
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
@@ -22,6 +23,35 @@ export function SearchSection({
   const { t, i18n } = useTranslation()
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
   const [localLocation, setLocalLocation] = useState(location)
+  const [popularSearches, setPopularSearches] = useState<string[]>([])
+  // Fetch popular searches from backend
+  const fetchPopularSearches = () => {
+    axios.get('http://localhost:5000/api/search/popular?limit=5')
+      .then(res => {
+        if (res.data && Array.isArray(res.data.popular)) {
+          setPopularSearches(res.data.popular.map((item: any) => item.query));
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching popular searches:', error);
+        setPopularSearches([]);
+      });
+  };
+
+  useEffect(() => {
+    fetchPopularSearches();
+
+    // Listen for search completion events from discover page
+    const handleSearchCompleted = () => {
+      setTimeout(fetchPopularSearches, 500);
+    };
+
+    window.addEventListener('searchCompleted', handleSearchCompleted);
+    
+    return () => {
+      window.removeEventListener('searchCompleted', handleSearchCompleted);
+    };
+  }, []);
 
   // Sync local state with props when they change
   useEffect(() => {
@@ -34,7 +64,9 @@ export function SearchSection({
 
   const handleSearch = () => {
     if (onSearch) {
-      onSearch(localSearchQuery, localLocation)
+      onSearch(localSearchQuery, localLocation);
+      // Refetch popular searches after a search
+      setTimeout(fetchPopularSearches, 200);
     }
   }
 
@@ -73,18 +105,14 @@ export function SearchSection({
     }
   }
 
-  const handleSpecialtyClick = (tag: string) => {
-    const specialtyKeyMap: { [key: string]: string } = {
-      'Espresso': 'specialties.espresso',
-      'Single Origin': 'specialties.singleOrigin',
-      'Cold Brew': 'specialties.coldBrew',
-      'Fair Trade': 'specialties.fairTrade',
-      'Organic': 'specialties.organic'
+  const handlePopularSearchClick = (query: string) => {
+    setLocalSearchQuery(query)
+    onSearchQueryChange?.(query)
+    if (onSearch) {
+      onSearch(query, localLocation)
+      // Refetch popular searches after a search via pill
+      setTimeout(fetchPopularSearches, 200);
     }
-    const specialtyKey = specialtyKeyMap[tag] || tag
-    setLocalSearchQuery(specialtyKey)
-    // Update parent state with both search and specialty to match roaster panel behavior
-    onSearchQueryChange?.(specialtyKey, tag)
   }
 
   return (
@@ -148,15 +176,20 @@ export function SearchSection({
 
           <div className="mt-6 flex flex-wrap gap-2">
             <span className="text-sm text-gray-600">{t('search.popularSearches')}:</span>
-            {['Espresso', 'Single Origin', 'Cold Brew', 'Fair Trade', 'Organic'].map((tag) => (
-              <button
-                key={tag}
-                onClick={() => handleSpecialtyClick(tag)}
-                className="px-3 py-1 bg-white text-primary-600 rounded-full text-sm border border-primary-200 hover:bg-primary-50 transition-colors"
-              >
-                {translateSpecialty(tag)}
-              </button>
-            ))}
+            {popularSearches.length === 0 ? (
+              <span className="text-sm text-gray-400 ml-2">{t('search.noPopularSearches') || 'No data yet'}</span>
+            ) : (
+              popularSearches.map((query) => (
+                <button
+                  key={query}
+                  onClick={() => handlePopularSearchClick(query)}
+                  className="px-3 py-1 bg-white text-primary-600 rounded-full text-sm border border-primary-200 hover:bg-primary-50 transition-colors break-words max-w-xs truncate"
+                  title={query}
+                >
+                  {query}
+                </button>
+              ))
+            )}
           </div>
         </motion.div>
       </div>

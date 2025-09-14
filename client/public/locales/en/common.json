@@ -55,12 +55,13 @@
     }
   },
   "search": {
-    "searchLabel": "Search for roasters",
-    "locationLabel": "Location",
-    "searchPlaceholder": "Search for roasters",
-    "locationPlaceholder": "Enter location",
-    "searchButton": "Search",
-    "popularSearches": "Popular searches"
+  "searchLabel": "Search for roasters",
+  "locationLabel": "Location",
+  "searchPlaceholder": "Search for roasters",
+  "locationPlaceholder": "Enter location",
+  "searchButton": "Search",
+  "popularSearches": "Popular searches",
+  "noPopularSearches": "No popular searches yet. Start searching to see trends!"
   },
   "specialties": {
     "espresso": "Espresso",
