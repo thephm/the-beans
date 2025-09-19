@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
@@ -11,8 +11,10 @@ import { UserMenu } from './UserMenu'
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
   const { user, logout, loading } = useAuth()
   const { t } = useTranslation()
+  const adminMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +22,19 @@ export function Navbar() {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
+        setIsAdminMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [])
 
   return (
@@ -54,7 +69,33 @@ export function Navbar() {
               {t('nav.favorites')}
             </Link>
             {user?.role === 'admin' && (
-              <Link href="/admin/users" className="text-gray-700 hover:text-gray-900 font-semibold">{t('admin', 'Admin')}</Link>
+              <div className="relative" ref={adminMenuRef}>
+                <button
+                  onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+                  className="flex items-center text-gray-700 hover:text-gray-900 font-semibold transition-colors"
+                >
+                  {t('admin', 'Admin')}
+                  <svg 
+                    className={`ml-1 w-4 h-4 transition-transform ${isAdminMenuOpen ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isAdminMenuOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <Link 
+                      href="/admin/users" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.users', 'Users')}
+                    </Link>
+                  </div>
+                )}
+              </div>
             )}
             
             {/* Language Selector */}
@@ -111,7 +152,16 @@ export function Navbar() {
                 {t('nav.favorites')}
               </Link>
               {user?.role === 'admin' && (
-                <Link href="/admin/users" className="text-gray-700 hover:text-gray-900 font-semibold" onClick={() => setIsMobileMenuOpen(false)}>{t('admin', 'Admin')}</Link>
+                <div className="py-2">
+                  <div className="text-gray-700 font-semibold mb-2">{t('admin', 'Admin')}</div>
+                  <Link 
+                    href="/admin/users" 
+                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('admin.users', 'Users')}
+                  </Link>
+                </div>
               )}
               
               {/* Mobile Language Selector */}
@@ -154,3 +204,4 @@ export function Navbar() {
     </nav>
   )
 }
+
