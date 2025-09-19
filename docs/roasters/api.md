@@ -57,7 +57,6 @@ Create a new roaster (requires authentication).
 	"zipCode": "...",
 	"latitude": 0,
 	"longitude": 0,
-	"priceRange": "$",
 	"specialties": ["Espresso", ...]
 }
 ```
@@ -72,7 +71,7 @@ Create a new roaster (requires authentication).
 
 ## Roaster Object Fields
 
-- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `priceRange`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `_count`
+- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `_count`
 
 
 See the Swagger (OpenAPI) documentation for full field details.

@@ -28,7 +28,6 @@ export interface Roaster {
   longitude?: number;
   images: string[];
   hours?: Record<string, any>;
-  priceRange?: string;
   specialties: string[];
   verified: boolean;
   featured: boolean;
@@ -124,5 +123,4 @@ export interface SearchFilters {
   latitude?: number;
   longitude?: number;
   radius?: number;
-  priceRange?: string;
 }

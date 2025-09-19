@@ -19,7 +19,7 @@ The roasters feature is built with a full-stack architecture:
 - **Swagger Annotations:** For API documentation.
 
 ## Database Schema
-- **Roaster Model:** Includes fields for name, description, contact info, location, images, hours, price range, specialties, verification, featured status, rating, and review count.
+- **Roaster Model:** Includes fields for name, description, contact info, location, images, hours, specialties, verification, featured status, rating, and review count.
 - **Relations:** Roaster belongs to a User (owner), has many Beans, Reviews, and Favorites.
 
 ## Frontend Integration

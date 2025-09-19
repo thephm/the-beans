@@ -18,7 +18,6 @@ interface Roaster {
   email?: string
   rating: number
   reviewCount: number
-  priceRange: string
   specialties: string[]
   hours?: {
     [key: string]: string | { open: string; close: string }
