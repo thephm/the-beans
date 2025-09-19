@@ -33404,3 +33404,43 @@ Now when users visit the Discover page and no roasters are found (either due to 
 Instead of the raw translation key "roasters.noRoastersFound".
 
 The fix should take effect immediately as the translation files are loaded dynamically by the i18n system.
+
+## 286th try
+
+*(string is there now)*
+
+## Remove "with our beautiful, easy-to-use platform" from top page
+
+https://github.com/thephm/the-beans/issues/49
+
+> Remove "with our beautiful, easy-to-use platform" from top page
+
+I'll help you remove that text from the top page. Let me first locate the main page file and find where that text is located.
+
+Searched codebase for "with our beautiful, easy-to-use platform", 20 results
+
+I found that the text "with our beautiful, easy-to-use platform" appears in the English translations file. Let me check the main page (Hero component) to see the exact structure and then remove this text.
+
+✔ Read `common.json`, lines 154 to 170
+
+Perfect! I found the text in the hero subtitle. Now let me also check the French translation to remove it there as well:
+
+✔ Searched text for `beautiful, easy-to-use platform` (`**/client/public/locales/fr/common.json`), no results
+
+Let me check the French hero section to see if there's a similar phrase:
+
+✔ Read `common.json`, lines 176 to 190
+
+Great! I can see that both the English and French versions have the phrase about "beautiful, easy-to-use platform" in their hero subtitles. Now I'll remove this phrase from both translations:
+
+`common.json +1 -1`
+`common.json +1 -1`
+
+Perfect! I've successfully removed "with our beautiful, easy-to-use platform" from the top page in both English and French translations.
+
+The hero subtitle now reads:
+
+- **English**: "Find the best local coffee roasters in your area. From artisanal espresso to specialty single-origin beans, discover your perfect cup."
+- **French**: "Trouvez les meilleurs torréfacteurs de café locaux et cafés de votre région. De l'espresso artisanal aux grains de spécialité d'origine unique, découvrez votre tasse parfaite."
+
+The phrase has been cleanly removed while maintaining the natural flow of the text. The changes will take effect the next time the app is loaded or refreshed.
