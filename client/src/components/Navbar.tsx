@@ -93,6 +93,13 @@ export function Navbar() {
                     >
                       {t('admin.users', 'Users')}
                     </Link>
+                    <Link 
+                      href="/admin/roasters" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.roasters', 'Roasters')}
+                    </Link>
                   </div>
                 )}
               </div>
@@ -160,6 +167,13 @@ export function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('admin.users', 'Users')}
+                  </Link>
+                  <Link 
+                    href="/admin/roasters" 
+                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('admin.roasters', 'Roasters')}
                   </Link>
                 </div>
               )}

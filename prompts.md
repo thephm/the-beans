@@ -33678,3 +33678,66 @@ The admin dropdown menu should now be visible when you're logged in as an admin 
 You're absolutely right, and thank you for being patient with me! I should have considered the Docker volume mounting issue from the start instead of assuming hot reload would work perfectly. It's a good reminder that container environments can have their own quirks that affect file watching and hot reload functionality.
 
 I appreciate you pointing out when I was wrong - it helps me provide better assistance. The admin dropdown menu should now be working properly after the container restart!
+
+## 291st try
+
+*(admin roasters page is alive!)*
+
+> When I click "Update Roaster" button which should just say "Save", I get "Not found" error and in the developer console it shows the client called http://localhost:5000/api/roasters/cmf03jd0y0005scua29m279q1
+
+I see two issues here:
+
+The button should say "Save" instead of "Update Roaster"
+The API call is failing with "Not found" error
+Let me fix both issues:
+
+`page.tsx +1 -3`
+
+Now let me check what the actual roaster GET endpoint returns to understand the correct API structure:
+
+✔ Read `roasters.ts`, lines 150 to 250
+
+✔ Read `roasters.ts`, lines 250 to 350
+
+I see the issue! The API expects the roaster ID to exist, but it seems like either:
+
+The roaster doesn't exist in the database with that ID
+There might be an issue with the PUT route implementation
+Let me check if there's a GET endpoint by ID and also check the PUT route more carefully:
+
+✔ Read `roasters.ts`, lines 350 to 400
+
+The issue is likely that the PUT endpoint I added isn't properly handling the request. Let me check if there might be a route ordering issue or see what the current error actually is. Let me add some debugging to the PUT route:
+
+`roasters.ts +22 -0`
+
+Now let me restart the server to pick up the debugging logs:
+
+✔ `docker-compose restart server`
+*Auto approved by rule `docker-compose`*
+
+Now try to edit a roaster again and check the server logs to see what's happening. The debugging will show us:
+
+1. If the PUT route is being called
+2. What the roaster ID is
+3. If the roaster exists in the database
+4. What the actual error is
+
+You can check the server logs with:
+
+`docker-compose logs server`
+
+This will help us identify whether:
+
+- The roaster ID is invalid/doesn't exist
+- There's an authentication issue
+- There's a database connection problem
+- There's a route conflict issue
+
+Try editing a roaster now and let me know what happens!
+
+## 292nd try
+
+*(works!)*
+
+> that worked thanks!
