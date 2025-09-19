@@ -25,24 +25,41 @@ export function SearchSection({
   const [localLocation, setLocalLocation] = useState(location)
   const [popularSearches, setPopularSearches] = useState<string[]>([])
   // Fetch popular searches from backend
-  const fetchPopularSearches = () => {
-    axios.get('http://localhost:5000/api/search/popular?limit=5')
-      .then(res => {
-        if (res.data && Array.isArray(res.data.popular)) {
-          setPopularSearches(res.data.popular.map((item: any) => item.query));
+  const fetchPopularSearches = async () => {
+    console.log('🔍 Fetching popular searches...');
+    try {
+      const response = await fetch('http://localhost:5000/api/search/popular?limit=5');
+      console.log('📊 Popular searches HTTP response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📊 Popular searches API response:', data);
+        
+        if (data && Array.isArray(data.popular)) {
+          const queries = data.popular.map((item: any) => item.query);
+          setPopularSearches(queries);
+          console.log('✅ Updated popular searches state:', queries);
+        } else {
+          console.log('❌ Invalid response format:', data);
+          setPopularSearches([]);
         }
-      })
-      .catch((error) => {
-        console.error('Error fetching popular searches:', error);
+      } else {
+        console.log('❌ HTTP error:', response.status, response.statusText);
         setPopularSearches([]);
-      });
+      }
+    } catch (error) {
+      console.error('❌ Error fetching popular searches:', error);
+      setPopularSearches([]);
+    }
   };
 
   useEffect(() => {
+    console.log('🎬 SearchSection mounted, fetching popular searches...');
     fetchPopularSearches();
 
     // Listen for search completion events from discover page
     const handleSearchCompleted = () => {
+      console.log('🎯 Search completed event received, refetching popular searches...');
       setTimeout(fetchPopularSearches, 500);
     };
 

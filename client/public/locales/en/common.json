@@ -77,7 +77,12 @@
     "pourOver": "Pour Over",
     "directTrade": "Direct Trade",
     "education": "Education",
-    "cupping": "Cupping"
+    "cupping": "Cupping",
+    "blends": "Blends",
+    "ethiopian": "Ethiopian",
+    "italianRoast": "Italian Roast",
+    "nitroCoffee": "Nitro Coffee",
+    "sustainable": "Sustainable"
   },
   "roasters": {
     "title": "Coffee Roasters",
