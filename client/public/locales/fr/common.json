@@ -5,7 +5,6 @@
   },
   "nav": {
     "discover": "Découvrir",
-    "roasters": "Torréfacteurs",
     "about": "À propos",
     "favorites": "Favoris",
     "profile": "Profil",
@@ -99,22 +98,11 @@
     "sustainable": "Durable"
   },
   "roasters": {
-    "title": "Torréfacteurs de café",
-    "subtitle": "Explorez notre collection de torréfacteurs artisanaux.",
     "featured": "En vedette",
     "featuredDescription": "Découvrez un café exceptionnel de nos torréfacteurs en vedette",
-    "exploreAll": "Explorer tous les torréfacteurs",
     "featuredTitle": "Torréfacteurs de café en vedette",
     "featuredSubtitle": "Découvrez un café exceptionnel de nos torréfacteurs en vedette",
     "viewDetails": "Voir les détails",
-    "sortBy": "Trier par :",
-    "nameAZ": "Nom A-Z",
-    "nameZA": "Nom Z-A",
-    "highestRated": "Mieux notés",
-    "mostReviewed": "Plus commentés",
-    "location": "Emplacement",
-    "resultsFound": "torréfacteurs trouvés",
-    "noRoastersFound": "Aucun torréfacteur trouvé",
     "priceRange": "Gamme de prix :",
     "about": "À propos",
     "hours": "Heures",
@@ -123,10 +111,7 @@
     "website": "Site web",
     "phone": "Téléphone",
     "address": "Adresse",
-    "notFound": "Torréfacteur introuvable",
-    "goBack": "← Retour aux torréfacteurs",
-    "noResults": "Aucun torréfacteur trouvé",
-    "tryAdjusting": "Essayez d'ajuster vos critères de recherche ou votre emplacement."
+    "notFound": "Torréfacteur introuvable"
   },
   "discover": {
     "title": "Découvrir les torréfacteurs de café",
@@ -145,7 +130,6 @@
     "loginRequired": "Veuillez vous connecter pour voir vos favoris",
     "noFavoritesYet": "Aucun favori pour le moment",
     "startExploringDescription": "Commencez à explorer et ajoutez vos torréfacteurs préférés pour les garder ici pour un accès facile.",
-    "exploreRoasters": "Explorer les torréfacteurs",
     "viewDetails": "Voir les détails",
     "remove": "Retirer"
   },
@@ -191,7 +175,6 @@
   "hero": {
     "title": "Découvrez un café incroyable",
     "subtitle": "Trouvez les meilleurs torréfacteurs de café locaux et cafés de votre région. De l'espresso artisanal aux grains de spécialité d'origine unique, découvrez votre tasse parfaite avec notre plateforme belle et facile à utiliser.",
-    "findRoasters": "Trouvez des torréfacteurs près de moi",
     "joinCommunity": "Rejoignez la communauté",
     "locationBased": "Basé sur la localisation",
     "locationDescription": "Trouvez des torréfacteurs et des cafés près de votre emplacement",

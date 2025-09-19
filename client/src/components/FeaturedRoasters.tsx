@@ -126,7 +126,7 @@ export function FeaturedRoasters() {
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t('roasters.featured')}{' '}
             <span className="bg-gradient-to-r from-primary-600 to-orchid-600 bg-clip-text text-transparent">
-              {t('roasters.title')}
+              Coffee Roasters
             </span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -220,10 +220,10 @@ export function FeaturedRoasters() {
           className="text-center mt-12 opacity-100"
         >
           <Link
-            href="/roasters"
+            href="/discover"
             className="inline-flex items-center px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold border-2 border-primary-200 hover:border-primary-400 hover:bg-primary-50 transition-all"
           >
-            {t('roasters.exploreAll')}
+            {t('discover.title')}
             <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

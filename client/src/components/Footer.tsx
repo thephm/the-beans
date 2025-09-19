@@ -48,8 +48,8 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">{t('nav.discover')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/roasters" className="text-gray-400 hover:text-white transition-colors">
-                  {t('nav.roasters')}
+                <Link href="/discover" className="text-gray-400 hover:text-white transition-colors">
+                  {t('nav.discover')}
                 </Link>
               </li>
               <li>

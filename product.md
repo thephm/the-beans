@@ -431,3 +431,108 @@ Requirements:
 If you want, I can now design the database schema for the multilingual coffee data (origins, processing methods, flavor notes) so when you add that feature, you won’t have to redo anything.
 
 Do you want me to set up that schema now while we’re still in “multilingual mode”?
+
+## Not storing bad words
+
+I am building an app and it has a search function which remembers popular searches. If someone searches using inapropriate language I don't want that stored in the database and shown to other users in the popular search pill buttons. Is there a public API for checking that text in any language is not innapropriate? ie does not include profanity, hate message, etc?
+
+Yes — there are public / third-party APIs and services you can use (or adapt) to check user input for profanity, hate speech, and other toxic / inappropriate content across multiple languages. It’s a common content moderation need. I can list a few, along with pros/cons, and some considerations for using them in production. If you want I can also pull up pricing & suggestions specific to Canada / your stack.
+
+### ✅ Example APIs & services
+
+Here are some services / tools you might consider:
+
+Name | What it does / strengths	| Notes / limitations
+--- | --- | ---
+SightEngine — Text Moderation	| Detects profanity, hateful / sexual / toxic content in any user-generated text: comments, posts, usernames, etc. | Good for filtering / flagging. Need to check how well it handles non-English / local dialects.
+Moderation API	| Automated text moderation (toxicity, profanity, etc.) ‒ good safety features.  moderationapi.com | Depending on plan, might have limits; review response latency and language coverage.
+WebPurify Profanity Filter | Classic profanity filter / blocking + options like replace, checkcount, etc. | Historically more English-centric; check which other languages are supported.
+Profanity Filter API (API Ninjas)	| Detect & censor profanity/bad words; returns censored text etc. | Good for simpler profanity detection; may not catch hate speech or subtle abusive content.
+Bad Words API (apilayer marketplace) | Detects bad/swear words, censoring; works to catch variations. | English only (per current documentation) for many features. Non-English coverage may be weaker.
+Deepgram Profanity Filtering | Part of speech transcription pipelines, with profanity masking, for audio/text in multiple languages. 
+developers.deepgram.com | If your “search input” is text it may be overkill; but good if you also deal with voice or other input.
+
+### ⚠️ Key considerations
+
+When selecting/implementing one, here are things to watch out for / plan for:
+
+- **Language & locale coverage**: Does the API support the languages your users use (including dialects, romanization, slang, code-mixing)? Many services focus mostly on English, Spanish, etc. You might have to augment or train something yourself for less common or mixed languages.
+
+- **False positives / negatives**: Some profanity or “bad” words are context dependent, even in the same language (tone, usage, etc.). Also, some words may be harmless in some cultures but offensive in others.
+
+- **Obfuscation / attempts to bypass filters**: Users often try to mask bad words (e.g. “f#ck”, “f*ck”, foreign scripts, use of spaces or punctuation). You’ll want something robust or allow you to expand/maintain block-lists or use ML models.
+
+- **Latency & cost**: Checking every user search in real time can become expensive / slow depending on scale. Maybe you don’t need a full ML API for every query — perhaps a lightweight filter, or cache of known good/bad terms might help.
+
+- **Privacy / compliance**: You're sending user input to third-party services; ensure their data policies are acceptable (GDPR, etc.). For search terms, may not be super sensitive, but still.
+
+- **Moderation vs blocking vs sanitization**: Decide what you’ll do when you detect inappropriate: reject search, sanitize, not store for popular terms, etc. Also store the reason or category (profanity, hate speech, etc.) so you can analyse / tune.
+
+- **Updating / adaptability**: Slang, new insult terms show up all the time — ensure whatever system you use is maintainable, allows you to add new terms or retrain or tweak thresholds.
+
+### 🤔 Possible custom / open-source alternatives
+
+If none of the third-party ones meet your language / performance / cost requirements, you could build or integrate:
+
+- A small ML model (e.g. using transformer or a fine-tuned open-source model) for “toxicity detection” / “hate speech detection” in multiple languages.
+
+- Maintain your own blocklist / allowlist; maybe combined with ML.
+
+- Use open datasets (or multilingual ones) + open-source tools like some of the models in the literature for multilingual hate speech detection. (Some academic work shows good results across multiple languages for hate/offensive detection). 
+
+If you like, I can compare a few of these in more detail (cost, language support, integration effort) and pick ones that might work well for your app (given your region, expected user base). Do you want me to pull those together for you?
+
+> Maybe a simpler way is to rate limit somene who is continually searching in an attempt to save the same bad words
+
+Yes — that’s often the simpler and cheaper approach compared to running every search through a moderation API.
+
+Instead of fully classifying the text, you can:
+
+1. **Maintain a blocklist (swear words, slurs, etc.)**
+
+- Store a small dictionary of known offensive terms (expandable over time).
+- If a search matches, don’t save it to “popular searches.”
+- Optionally increment a “bad search counter” for that user.
+
+2. **Rate limit based on abuse attempts**
+
+- If a user repeatedly tries to search with blocked terms, slow them down or temporarily suspend search.
+- Example:
+  - 1st time → ignore silently (just don’t save to popular searches).
+  - 2nd/3rd time in a short window → add a cooldown (e.g. 30s before next search).
+  - Repeated abuse → block search for X minutes or flag the account.
+
+3. **Edge: avoid false positives**
+
+- Keep the blocklist minimal to start (obvious slurs/profanity).
+- For words with multiple meanings, consider context or allow them unless clearly used abusively.
+- This reduces the risk of “innocent” searches being blocked.
+
+4. **Hybrid model**
+
+- Lightweight blocklist filter for the majority of cases.
+- Optionally, run suspicious or borderline terms through a moderation API (to catch creative bypasses, multi-language issues, etc.).
+
+🔧 Implementation idea (pseudo-flow):
+
+```python
+if search_term in blocked_terms:
+    increment bad_search_counter(user)
+    if bad_search_counter > threshold:
+        apply_rate_limit(user)
+    do_not_save_to_popular()
+else:
+    reset bad_search_counter(user)
+    save_to_popular()
+```
+
+This way you:
+
+- **Don’t pay** for API calls on every query.
+- **Still protect** “popular searches” UI.
+- **Discourage trolls** by slowing them down.
+
+Do you want me to sketch a Python snippet for a basic blocklist + rate limit system (so you can drop it into your app)?
+
+## The Roasters tab is mostly a duplicate of Discover so let's delete it
+

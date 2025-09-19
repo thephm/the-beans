@@ -47,9 +47,6 @@ export function Navbar() {
             <Link href="/discover" className="text-gray-700 hover:text-primary-600 transition-colors">
               {t('nav.discover')}
             </Link>
-            <Link href="/roasters" className="text-gray-700 hover:text-primary-600 transition-colors">
-              {t('nav.roasters')}
-            </Link>
             <Link href="/about" className="text-gray-700 hover:text-primary-600 transition-colors">
               {t('nav.about')}
             </Link>
@@ -106,9 +103,6 @@ export function Navbar() {
             <div className="flex flex-col space-y-3">
               <Link href="/discover" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.discover')}
-              </Link>
-              <Link href="/roasters" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('nav.roasters')}
               </Link>
               <Link href="/about" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.about')}

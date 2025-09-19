@@ -5,7 +5,6 @@
   },
   "nav": {
     "discover": "Discover",
-    "roasters": "Roasters",
     "about": "About",
     "favorites": "Favorites",
     "profile": "Profile",
@@ -85,22 +84,11 @@
     "sustainable": "Sustainable"
   },
   "roasters": {
-    "title": "Coffee Roasters",
-    "subtitle": "Explore our collection of artisanal coffee roasters.",
     "featured": "Featured",
     "featuredDescription": "Discover exceptional coffee from our featured roasters",
-    "exploreAll": "Explore All Roasters",
     "featuredTitle": "Featured Coffee Roasters",
     "featuredSubtitle": "Discover exceptional coffee from our featured roasters",
     "viewDetails": "View Details",
-    "sortBy": "Sort by:",
-    "nameAZ": "Name A-Z",
-    "nameZA": "Name Z-A",
-    "highestRated": "Highest Rated",
-    "mostReviewed": "Most Reviewed",
-    "location": "Location",
-    "resultsFound": "roasters found",
-    "noRoastersFound": "No Roasters Found",
     "priceRange": "Price Range:",
     "about": "About",
     "hours": "Hours",
@@ -109,10 +97,7 @@
     "website": "Website",
     "phone": "Phone",
     "address": "Address",
-    "notFound": "Roaster not found",
-    "goBack": "← Back to Roasters",
-    "noResults": "No roasters found",
-    "tryAdjusting": "Try adjusting your search criteria or location."
+    "notFound": "Roaster not found"
   },
   "discover": {
     "title": "Discover Coffee Roasters",
@@ -131,7 +116,6 @@
     "loginRequired": "Please log in to view your favorites",
     "noFavoritesYet": "No favorites yet",
     "startExploringDescription": "Start exploring and add your favorite roasters to keep them here for easy access.",
-    "exploreRoasters": "Explore Roasters",
     "viewDetails": "View Details",
     "remove": "Remove"
   },
@@ -178,7 +162,6 @@
   "hero": {
     "title": "Discover Amazing Coffee",
     "subtitle": "Find the best local coffee roasters in your area. From artisanal espresso to specialty single-origin beans, discover your perfect cup with our beautiful, easy-to-use platform.",
-    "findRoasters": "Find Roasters Near Me",
     "joinCommunity": "Join The Community",
     "locationBased": "Location-Based",
     "locationDescription": "Find roasters near your location",
