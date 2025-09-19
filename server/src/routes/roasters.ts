@@ -507,6 +507,204 @@ router.post('/', [
   }
 });
 
+/**
+ * @swagger
+ * /api/roasters/{id}:
+ *   put:
+ *     summary: Update a roaster (admin only)
+ *     tags: [Roasters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               website:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               zipCode:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               latitude:
+ *                 type: number
+ *               longitude:
+ *                 type: number
+ *               priceRange:
+ *                 type: string
+ *               specialties:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               verified:
+ *                 type: boolean
+ *               featured:
+ *                 type: boolean
+ *               rating:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Roaster updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Admin access required
+ *       404:
+ *         description: Roaster not found
+ */
+router.put('/:id', [
+  param('id').isString(),
+  body('name').optional().isLength({ min: 1, max: 100 }),
+  body('description').optional().isLength({ max: 1000 }),
+  body('email').optional().isEmail(),
+  body('phone').optional().isLength({ max: 20 }),
+  body('website').optional().isURL(),
+  body('address').optional().isLength({ max: 200 }),
+  body('city').optional().isLength({ max: 100 }),
+  body('state').optional().isLength({ max: 50 }),
+  body('zipCode').optional().isLength({ max: 20 }),
+  body('country').optional().isLength({ max: 100 }),
+  body('latitude').optional().isFloat({ min: -90, max: 90 }),
+  body('longitude').optional().isFloat({ min: -180, max: 180 }),
+  body('priceRange').optional().isIn(['$', '$$', '$$$', '$$$$']),
+  body('specialties').optional().isArray(),
+  body('verified').optional().isBoolean(),
+  body('featured').optional().isBoolean(),
+  body('rating').optional().isFloat({ min: 0, max: 5 }),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { id } = req.params;
+    const updateData = { ...req.body };
+
+    // Remove undefined values
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+
+    const roaster = await prisma.roaster.update({
+      where: { id },
+      data: updateData,
+      include: {
+        owner: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+          }
+        }
+      }
+    });
+
+    res.json({
+      message: 'Roaster updated successfully',
+      roaster,
+    });
+  } catch (error: any) {
+    console.error('Update roaster error:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/roasters/{id}:
+ *   delete:
+ *     summary: Delete a roaster (admin only)
+ *     tags: [Roasters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Roaster deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Admin access required
+ *       404:
+ *         description: Roaster not found
+ */
+router.delete('/:id', [
+  param('id').isString(),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { id } = req.params;
+
+    await prisma.roaster.delete({
+      where: { id }
+    });
+
+    res.json({
+      message: 'Roaster deleted successfully',
+    });
+  } catch (error: any) {
+    console.error('Delete roaster error:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Helper function to calculate distance between two points
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 3959; // Earth's radius in miles
