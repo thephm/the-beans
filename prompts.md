@@ -33197,4 +33197,66 @@ Great! I'm glad the $$$ price range is now removed from the roaster details view
 
 The change was simple but effective - removing that green badge with the $$$ display makes the roaster details page cleaner and focuses attention on the rating and reviews instead.
 
-## 
+## Can't see the number of stars in roaster details 
+
+https://github.com/thephm/the-beans/issues/47
+
+> Can't see the number of stars in roaster details Because it's white on white text
+
+I'll help you fix the visibility issue with the star rating in the roaster details. Let me first explore the codebase to understand how the star rating is currently implemented and identify the styling issue.
+
+Now let me search for the roaster details page specifically to see where the star rating display issue is occurring:
+
+✔ Searched for files matching `**/roasters/[id]/**`, no matches
+
+✔ Searched for files matching `**/roasters/**`, 7 matches
+
+Perfect! Let me examine the roaster details page where the star rating issue is likely occurring:
+
+✔ Read `page.tsx`, lines 1 to 50
+
+✔ Read `page.tsx`, lines 51 to 150
+
+✔ Read `page.tsx`, lines 151 to 250
+
+✔ Read `page.tsx`, lines 251 to 408
+
+Now I found the issue! Looking at the roaster details page, I can see the star rating display on line 210-214:
+
+```html
+<div className="flex items-center mr-6">
+  <span className="text-yellow-400 text-2xl">⭐</span>
+  <span className="text-2xl font-bold ml-2">{roaster.rating}</span>
+  <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
+</div>
+```
+
+The issue is that the rating number ({roaster.rating}) has a class of `text-2xl font-bold ml-2` but no color class, which means it's inheriting the default text color. On a white background, if the default text color is white or very light, the rating number would be invisible.
+
+Let me fix this by adding an appropriate text color class:
+
+`page.tsx +1 -1`
+
+Perfect! I've fixed the issue by adding `text-gray-900` (dark gray/black) to the rating number span. This ensures the star rating number will be clearly visible against the white background.
+
+The change I made:
+
+- Before: `<span className="text-2xl font-bold ml-2">{roaster.rating}</span>`
+- After: `<span className="text-2xl font-bold text-gray-900 ml-2">{roaster.rating}</span>`
+
+Now the star rating number will display in dark gray (`text-gray-900`), making it clearly visible against the white background instead of being invisible due to white-on-white text. The star emoji remains yellow (`text-yellow-400`) and the review count remains in lighter gray (`text-gray-500`) for good visual hierarchy.
+
+## 284th try
+
+> did you forget to restart the docker client?
+
+You're absolutely right! I fixed the styling issue but didn't restart the client to apply the changes. Let me restart the Docker client container so you can see the fix in action.
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The client container has been restarted. The star rating number in the roaster details page should now be visible with dark gray text (`text-gray-900`) instead of being invisible white-on-white text.
+
+You can now navigate to any roaster's details page and the star rating number should be clearly visible next to the yellow star emoji.
+
+## 285th try

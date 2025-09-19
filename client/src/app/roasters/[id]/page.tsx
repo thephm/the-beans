@@ -218,7 +218,7 @@ export default function RoasterDetail() {
                 <div className="flex items-center mb-6">
                   <div className="flex items-center mr-6">
                     <span className="text-yellow-400 text-2xl">⭐</span>
-                    <span className="text-2xl font-bold ml-2">{roaster.rating}</span>
+                    <span className="text-2xl font-bold text-gray-900 ml-2">{roaster.rating}</span>
                     <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
                   </div>
                 </div>
