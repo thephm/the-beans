@@ -97,7 +97,8 @@
     "website": "Website",
     "phone": "Phone",
     "address": "Address",
-    "notFound": "Roaster not found"
+    "notFound": "Roaster not found",
+    "noRoastersFound": "No roasters found"
   },
   "discover": {
     "title": "Discover Coffee Roasters",
