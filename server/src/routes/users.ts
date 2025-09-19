@@ -38,6 +38,27 @@ router.put('/language', [
   }
 });
 
+// Update user settings
+router.put('/settings', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const settings = req.body;
+    // Persist settings to database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { settings } as any
+    });
+    res.json({ 
+      success: true, 
+      message: 'Settings updated successfully',
+      settings 
+    });
+  } catch (error) {
+    console.error('Error updating user settings:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
 // Admin: Update a user (role, language, etc.)
 router.put('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -109,56 +130,6 @@ router.get('/settings', requireAuth, async (req: AuthenticatedRequest, res: Resp
   } catch (error) {
     console.error('Error fetching user settings:', error);
     res.status(500).json({ error: 'Failed to fetch settings' });
-  }
-});
-
-// Update user language preference (any authenticated user can update their own language)
-router.put('/language', [
-  body('language').isLength({ min: 2, max: 5 }).withMessage('Language code must be 2-5 characters'),
-], requireAuth, async (req: any, res: any) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const userId = req.user.id;
-    const { language } = req.body;
-
-    // Update user language in database
-    await prisma.user.update({
-      where: { id: userId },
-      data: { language }
-    });
-
-    res.json({ 
-      message: 'Language preference updated successfully',
-      language 
-    });
-  } catch (error) {
-    console.error('Error updating language preference:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Update user settings
-router.put('/settings', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const settings = req.body;
-    // Persist settings to database
-    await prisma.user.update({
-      where: { id: userId },
-      data: { settings } as any
-    });
-    res.json({ 
-      success: true, 
-      message: 'Settings updated successfully',
-      settings 
-    });
-  } catch (error) {
-    console.error('Error updating user settings:', error);
-    res.status(500).json({ error: 'Failed to update settings' });
   }
 });
 

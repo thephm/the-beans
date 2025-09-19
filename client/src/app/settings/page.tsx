@@ -287,9 +287,6 @@ export default function SettingsPage() {
                 <button 
                   type="submit"
                   disabled={saving}
-                  onClick={(e) => {
-                    console.log('🎯 BUTTON CLICKED DIRECTLY! Event type:', e.type)
-                  }}
                   className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? t('settings.saving') : t('settings.save')}
