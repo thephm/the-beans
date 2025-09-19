@@ -155,10 +155,10 @@ export default function RoasterDetail() {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Roaster Not Found</h2>
             <p className="text-gray-600 mb-6">{error || 'The roaster you\'re looking for doesn\'t exist.'}</p>
             <Link
-              href="/roasters"
+              href="/discover"
               className="inline-flex items-center bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
             >
-              ← Back to Roasters
+              ← Back to Discover
             </Link>
           </div>
         </div>
@@ -172,10 +172,10 @@ export default function RoasterDetail() {
         {/* Breadcrumb */}
         <nav className="mb-6">
           <Link 
-            href="/roasters" 
+            href="/discover" 
             className="text-primary-600 hover:text-primary-700 font-medium"
           >
-            ← All Roasters
+            ← Discover Roasters
           </Link>
         </nav>
 

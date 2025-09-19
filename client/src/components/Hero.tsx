@@ -35,7 +35,7 @@ export function Hero() {
               href="/discover"
               className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
             >
-              🌍 {t('hero.findRoasters')}
+              🌍 {t('nav.discover')}
             </Link>
             <Link
               href="/signup"

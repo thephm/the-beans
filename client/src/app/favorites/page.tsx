@@ -151,10 +151,10 @@ export default function FavoritesPage() {
               </p>
               <div className="flex justify-center">
                 <button 
-                  onClick={() => router.push('/roasters')}
+                  onClick={() => router.push('/discover')}
                   className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
                 >
-                  {t('favorites.exploreRoasters')}
+                  {t('nav.discover')}
                 </button>
               </div>
             </div>
