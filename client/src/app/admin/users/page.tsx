@@ -101,20 +101,25 @@ const AdminUsersPage: React.FC = () => {
   // Debug: Show raw users data if empty
   if (!users || users.length === 0) {
     return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">{t('admin.users.title', 'User Management')}</h1>
-        <div className="text-red-600 mb-4">No users found or API returned empty. Debug info:</div>
-        <pre>{JSON.stringify(users, null, 2)}</pre>
+      <div className="container mx-auto p-4 pt-28 pl-8 pr-8">
+        <div className="mb-6 ml-4 mr-4">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
+        </div>
+        <div className="ml-4 mr-4">
+          <div className="text-red-600 mb-4">No users found or API returned empty. Debug info:</div>
+          <pre>{JSON.stringify(users, null, 2)}</pre>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mt-20 mb-6">
-        <h1 className="text-4xl font-bold text-gray-900 bg-transparent mb-2">Users</h1>
+    <div className="container mx-auto p-4 pt-28 pl-8 pr-8">
+      <div className="mb-6 ml-4 mr-4">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
       </div>
-      <table className="min-w-full bg-white border border-gray-200">
+      <div className="ml-4 mr-4">
+        <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr>
             <th className="py-2 px-4 border-b text-left">{t('admin.users.username', 'Username')}</th>
@@ -183,6 +188,7 @@ const AdminUsersPage: React.FC = () => {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

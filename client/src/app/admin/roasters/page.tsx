@@ -89,18 +89,21 @@ const AdminRoastersPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t('admin.roasters.title', 'Roaster Management')}</h1>
-        <button
-          onClick={handleAdd}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          {t('admin.roasters.addNew', 'Add New Roaster')}
-        </button>
+    <div className="p-4 pt-28 pl-8 pr-8">
+      <div className="mb-6 ml-4 mr-4">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Roasters</h1>
       </div>
+      <div className="ml-4 mr-4">
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={handleAdd}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ml-auto"
+          >
+            {t('admin.roasters.addNew', 'Add Roaster')}
+          </button>
+        </div>
 
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full table-auto">
           <thead className="bg-gray-50">
             <tr>
@@ -194,6 +197,7 @@ const AdminRoastersPage: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
