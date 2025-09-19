@@ -221,9 +221,6 @@ export default function RoasterDetail() {
                     <span className="text-2xl font-bold ml-2">{roaster.rating}</span>
                     <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
                   </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                    {roaster.priceRange}
-                  </span>
                 </div>
 
                 {/* Description */}

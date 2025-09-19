@@ -33133,3 +33133,68 @@ If you're still seeing the old link, this is likely a browser cache issue. Try:
 The Next.js hot reload has processed the change (as shown in the logs), so a hard refresh should show the updated link pointing to the Swagger documentation at `http://localhost:5000/api-docs`.
 
 Would you like me to verify anything else about the implementation?
+
+2025-09-19
+
+## Remove $$$
+
+https://github.com/thephm/the-beans/issues/46
+
+I'll help you remove the $$$ from the view roaster details. Let me first search for where this appears in the codebase.
+
+✔ Searched text for `\$\$\$`, 16 results
+
+Now let me search for where the roaster details are displayed in the client-side code to see where the $$$ is shown in the UI:
+
+✔ Searching text for `priceRange` (`**/client/**`)
+
+Perfect! I found where the price range is displayed. It looks like it's in the roaster details page at page.tsx on line 225. Let me examine this file to see the context and remove the price range display:
+
+✔ Read `page.tsx`, lines 215 to 235
+
+Now I can see the exact context. I need to remove the price range display span element (lines 223-225). Let me remove it:
+
+`page.tsx +0 -3`
+
+Perfect! I've successfully removed the price range ($$$ display) from the roaster details view. The change removes the green badge that was showing the price range next to the rating and reviews section.
+
+The modification:
+
+- Removed the `<span>` element that displayed `{roaster.priceRange}`
+- This was the green badge with `bg-green-100 text-green-700` styling
+- The rating and reviews display remains intact
+
+The $$$ price range will no longer be visible on the roaster details page. The UI will now show just the rating and review count without the price range indicator.
+
+## 282nd try
+
+> I still see it, do you need to restart docker client maybe?
+
+You're right! Since this is a Next.js application running in Docker, the changes need to be rebuilt. Let me check if the development server is running and restart the client container to pick up the changes.
+
+✔ `docker-compose ps`
+*Auto approved by rule `docker-compose`*
+
+I can see the containers are running. Let me restart the client container to pick up the code changes:
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The client container has been restarted. The changes should now be visible when you refresh the browser or navigate to a roaster details page. The $$$ price range indicator should no longer appear next to the rating and reviews section.
+
+If you're still seeing the old version, you may also want to:
+
+Clear your browser cache or do a hard refresh (Ctrl+F5)
+Wait a moment for the Next.js development server to fully start up after the restart
+
+The price range should now be completely removed from the roaster details view.
+
+## 283rd try
+
+> confirmed $$$ is gone, thanks!
+
+Great! I'm glad the $$$ price range is now removed from the roaster details view. The Docker container restart successfully picked up the code changes, and the UI is now displaying without the price range indicator.
+
+The change was simple but effective - removing that green badge with the $$$ display makes the roaster details page cleaner and focuses attention on the rating and reviews instead.
+
+## 
