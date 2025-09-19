@@ -78,8 +78,6 @@ const requireAuth = async (req: any, res: any, next: any) => {
  *             type: string
  *         hours:
  *           type: object
- *         priceRange:
- *           type: string
  *         specialties:
  *           type: array
  *           items:
@@ -445,8 +443,6 @@ router.get('/:id', [
  *                 type: number
  *               longitude:
  *                 type: number
- *               priceRange:
- *                 type: string
  *               specialties:
  *                 type: array
  *                 items:
@@ -469,7 +465,6 @@ router.post('/', [
   body('zipCode').optional().isLength({ max: 20 }),
   body('latitude').optional().isFloat({ min: -90, max: 90 }),
   body('longitude').optional().isFloat({ min: -180, max: 180 }),
-  body('priceRange').optional().isIn(['$', '$$', '$$$', '$$$$']),
   body('specialties').optional().isArray(),
 ], requireAuth, async (req: any, res: any) => {
   try {
@@ -550,8 +545,6 @@ router.post('/', [
  *                 type: number
  *               longitude:
  *                 type: number
- *               priceRange:
- *                 type: string
  *               specialties:
  *                 type: array
  *                 items:
@@ -586,7 +579,6 @@ router.put('/:id', [
   body('country').optional().isLength({ max: 100 }),
   body('latitude').optional().isFloat({ min: -90, max: 90 }),
   body('longitude').optional().isFloat({ min: -180, max: 180 }),
-  body('priceRange').optional().isIn(['$', '$$', '$$$', '$$$$']),
   body('specialties').optional().isArray(),
   body('verified').optional().isBoolean(),
   body('featured').optional().isBoolean(),

@@ -19,7 +19,7 @@ I've successfully created **The Beans** - a comprehensive coffee roaster discove
 ### 🌍 **Core Features**
 - **Roaster Discovery**: Find coffee roasters near you with location-based search
 - **User Accounts**: Sign up, login, and personalized profiles
-- **Search & Filters**: Advanced search by location, specialty, price range
+- **Search & Filters**: Advanced search by location, specialty
 - **Review System**: Rate and review roasters
 - **Favorites**: Save your favorite coffee roasters
 - **Photo Uploads**: Share beautiful coffee photos (Cloudinary integration ready)
