@@ -179,21 +179,30 @@ router.get('/roasters', [
     }
 
     const { q, specialty, location, sort, latitude, longitude, radius = 25 } = req.query;
+    console.log(`Search roasters endpoint called with params:`, { q, specialty, location, sort });
     let whereClause: any = {};
 
     // Log the search query to the Search table (for popular searches)
     if (q && typeof q === 'string' && q.trim().length > 0) {
-      const qLower = q.trim().toLowerCase();
-      const existing = await prisma.search.findFirst({ where: { query: qLower } });
-      if (existing) {
-        await prisma.search.update({
-          where: { id: existing.id },
-          data: { count: { increment: 1 } },
-        });
-      } else {
-        await prisma.search.create({
-          data: { query: qLower, count: 1 },
-        });
+      try {
+        const qLower = q.trim().toLowerCase();
+        console.log(`Tracking search query: "${qLower}"`);
+        const existing = await prisma.search.findFirst({ where: { query: qLower } });
+        if (existing) {
+          console.log(`Updating existing search: ${existing.query} (count: ${existing.count} -> ${existing.count + 1})`);
+          await prisma.search.update({
+            where: { id: existing.id },
+            data: { count: { increment: 1 } },
+          });
+        } else {
+          console.log(`Creating new search entry: "${qLower}"`);
+          await prisma.search.create({
+            data: { query: qLower, count: 1 },
+          });
+        }
+        console.log(`Search tracking completed for: "${qLower}"`);
+      } catch (error) {
+        console.error('Error tracking search query:', error);
       }
     }
 
