@@ -80,9 +80,9 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/api" className="text-gray-400 hover:text-white transition-colors">
+                <a href="http://localhost:5000/api-docs" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                   {t('footer.apiDocs')}
-                </Link>
+                </a>
               </li>
               <li>
                 <Link href="/business" className="text-gray-400 hover:text-white transition-colors">
