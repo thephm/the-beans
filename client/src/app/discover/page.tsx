@@ -106,7 +106,16 @@ export default function DiscoverPage() {
       if (filters.location) searchParams.append('location', filters.location)
       searchParams.append('distance', filters.distance.toString())
 
-      const response = await fetch(`http://localhost:5000/api/search/roasters?${searchParams}`)
+      // Include authorization header if user is logged in
+      const token = localStorage.getItem('token')
+      const headers: HeadersInit = {}
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
+
+      const response = await fetch(`http://localhost:5000/api/search/roasters?${searchParams}`, {
+        headers
+      })
       if (response.ok) {
         const data = await response.json()
         setRoasters(data.roasters || [])

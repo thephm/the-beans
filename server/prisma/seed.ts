@@ -18,6 +18,23 @@ async function main() {
       latitude: 0,
       longitude: 0,
       role: 'user',
+      settings: {
+        preferences: {
+          showOnlyVerified: true,
+          distanceUnit: 'km',
+          roastLevel: 'no-preference',
+          brewingMethods: {
+            espresso: false,
+            pourOver: false,
+            frenchPress: false,
+            coldBrew: false
+          }
+        },
+        privacy: {
+          showProfile: true,
+          allowLocationTracking: false
+        }
+      }
     },
   });
   console.log('🌱 Starting database seeding...');
@@ -48,6 +65,23 @@ async function main() {
       latitude: adminLatitude,
       longitude: adminLongitude,
       role: 'admin',
+      settings: {
+        preferences: {
+          showOnlyVerified: true,
+          distanceUnit: 'km',
+          roastLevel: 'no-preference',
+          brewingMethods: {
+            espresso: false,
+            pourOver: false,
+            frenchPress: false,
+            coldBrew: false
+          }
+        },
+        privacy: {
+          showProfile: true,
+          allowLocationTracking: false
+        }
+      }
     },
   });
   console.log('✅ Created/ensured admin user:', adminUser.email);
