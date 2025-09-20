@@ -34750,3 +34750,82 @@ The form should now provide much better feedback when validation fails, making i
 
 *(save with just a name works)*
 
+## A roaster with no address shows "📍 ," in it's pane
+
+I'll help you fix the issue where roasters with no address show "📍 ," in their pane. Let me first locate where this address display is being rendered to understand the current implementation.
+
+✔ Searched text for `📍 ,`, 20 results
+
+I can see from the search results that there are roaster cards showing address information with the 📍 emoji. Let me search specifically in the actual component files to find where this is being rendered:
+
+Now I can see several places where the address/location is displayed with the 📍 emoji. Let me look specifically at the discover page since that's likely where roaster cards with empty addresses would appear:
+
+✔ Read `page.tsx`, lines 195 to 220
+
+I found the issue! In the discover page, line 210 shows: `<p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>`
+
+When `roaster.city` and `roaster.state` are empty or null, this results in "📍 ," being displayed. Let me also check the FeaturedRoasters component:
+
+✔ Read `FeaturedRoasters.tsx`, lines 155 to 165
+
+Same issue here at line 161: `<p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>`
+
+Let me also check the roaster detail page:
+
+✔ Read `page.tsx`, lines 185 to 200
+
+Same issue at line 197: `<p className="text-xl">📍 {roaster.city}, {roaster.state}</p>`
+
+Now I need to fix these three locations to handle cases where city and/or state are empty. I'll create a helper function to properly format the location text and only show the location when there's actual data to display.
+
+Let me start by fixing the discover page:
+
+`page.tsx +3 -1`
+
+Now let me fix the FeaturedRoasters component:
+
+`FeaturedRoasters.tsx +3 -1`
+
+Now let me fix the roaster detail page:
+
+`page.tsx +3 -1`
+
+Now I need to restart the client container for the changes to take effect:
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the issue where roasters with no address were showing "📍 ," in their pane. Here's what I changed:
+
+✅ Fixed Empty Address Display Issue
+Problem: Roasters with empty city and state fields were displaying "📍 ," instead of hiding the location information entirely.
+
+Solution: Updated three key components to conditionally display location information only when there's actual data:
+
+1. **Discover Page** (`/discover`)
+
+- **Before**: 📍 {roaster.city}, {roaster.state} (always showed, even if empty)
+- **After**: Only shows location if city OR state exists, and properly joins non-empty values
+
+2. **Featured Roasters Component** (homepage)
+
+- **Before**: `📍 {roaster.city}, {roaster.state}` (always showed)
+- **After**: Only shows location if city OR state exists
+
+3. **Roaster Detail Page** (`/roasters/[id]`)
+
+- **Before**: `📍 {roaster.city}, {roaster.state}` (always showed in hero section)
+- **After**: Only shows location if city OR state exists
+
+**Key Improvements:**
+
+- **Conditional rendering**: `{(roaster.city || roaster.state) && (...)}` - only shows when there's location data
+- **Smart joining**: `[roaster.city, roaster.state].filter(Boolean).join(', ')` - removes empty values and joins properly
+- **Clean display**: No more "📍 ," for roasters without location information
+
+Result: Roasters without address information now show just their name and other details without the confusing "📍 ," display.
+
+## 305th try
+
+*(now the "📍 ," doesn't show)*
+
