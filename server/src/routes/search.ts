@@ -6,6 +6,25 @@ import { PrismaClient } from '@prisma/client';
 const router = Router();
 const prisma = new PrismaClient();
 
+// Middleware to extract user from token (optional for public routes)
+const optionalAuth = async (req: any, res: any, next: any) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (token) {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: string };
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: { id: true, settings: true }
+      });
+      req.user = user;
+    }
+    next();
+  } catch (error) {
+    next(); // Continue without user authentication
+  }
+};
+
 /**
  * @swagger
  * /api/search:
@@ -54,6 +73,7 @@ const prisma = new PrismaClient();
  *                   type: number
  */
 router.get('/', [
+  optionalAuth,
   query('q').isLength({ min: 1 }).withMessage('Search query is required'),
   query('type').optional().isIn(['roasters']),
   query('latitude').optional().isFloat(),
@@ -86,16 +106,28 @@ router.get('/', [
       }
     }
 
+    // Check user settings for verified-only filter
+    const user = (req as any).user;
+    const showOnlyVerified = user?.settings?.preferences?.showOnlyVerified;
+
+    // Build where clause for search
+    let whereClause: any = {
+      OR: [
+        { name: { contains: searchQuery, mode: 'insensitive' } },
+        { description: { contains: searchQuery, mode: 'insensitive' } },
+        { city: { contains: searchQuery, mode: 'insensitive' } },
+        { state: { contains: searchQuery, mode: 'insensitive' } },
+      ],
+    };
+
+    // Add verified filter if user has preference set
+    if (showOnlyVerified) {
+      whereClause.verified = true;
+    }
+
     // Search roasters in DB
     let roasters: any[] = await prisma.roaster.findMany({
-      where: {
-        OR: [
-          { name: { contains: searchQuery, mode: 'insensitive' } },
-          { description: { contains: searchQuery, mode: 'insensitive' } },
-          { city: { contains: searchQuery, mode: 'insensitive' } },
-          { state: { contains: searchQuery, mode: 'insensitive' } },
-        ],
-      },
+      where: whereClause,
       include: {
         owner: {
           select: {
@@ -164,6 +196,7 @@ router.get('/', [
 
 // Specialty search route for roasters
 router.get('/roasters', [
+  optionalAuth,
   query('q').optional().isLength({ min: 1 }),
   query('specialty').optional().isLength({ min: 1 }),
   query('location').optional().isLength({ min: 1 }),
@@ -243,7 +276,17 @@ router.get('/roasters', [
       orderBy = [{ featured: 'desc' }, { rating: 'desc' }, { reviewCount: 'desc' }];
     }
 
+    // Check user settings for verified-only filter
+    const user = (req as any).user;
+    const showOnlyVerified = user?.settings?.preferences?.showOnlyVerified;
+    
+    // Add verified filter if user has preference set
+    if (showOnlyVerified) {
+      whereClause.verified = true;
+    }
+
     let roasters = await prisma.roaster.findMany({
+      where: whereClause,
       include: {
         owner: {
           select: {

@@ -91,7 +91,16 @@ export function FeaturedRoasters() {
 
   const fetchFeaturedRoasters = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/roasters?limit=3')
+      // Include authorization header if user is logged in
+      const token = localStorage.getItem('token')
+      const headers: HeadersInit = {}
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
+
+      const response = await fetch('http://localhost:5000/api/roasters?limit=3', {
+        headers
+      })
       if (response.ok) {
         const data = await response.json()
         setFeaturedRoasters(data.roasters || [])

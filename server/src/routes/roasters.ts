@@ -213,6 +213,12 @@ router.get('/', [
     // Build where clause
     const where: any = {};
     
+    // Check user settings for verified-only filter
+    const showOnlyVerified = req.user?.settings?.preferences?.showOnlyVerified;
+    if (showOnlyVerified) {
+      where.verified = true;
+    }
+    
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
