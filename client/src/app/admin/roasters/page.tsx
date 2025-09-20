@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 import { Roaster } from '@/types';
 
 const AdminRoastersPage: React.FC = () => {
@@ -119,12 +120,14 @@ const AdminRoastersPage: React.FC = () => {
             {Array.isArray(roasters) && roasters.map((roaster) => (
               <tr key={roaster.id} className="hover:bg-gray-50">
                 <td className="py-3 px-4">
-                  <button
-                    onClick={() => handleEdit(roaster.id)}
+                  <Link
+                    href={`/roasters/${roaster.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
                     {roaster.name}
-                  </button>
+                  </Link>
                 </td>
                 <td className="py-3 px-4 text-gray-600">
                   {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
