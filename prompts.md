@@ -34413,7 +34413,7 @@ You're absolutely right! For proper symmetrical layout, I should add the same am
 
 Now let me restart the client to apply these symmetrical spacing changes:
 
-`docker-compose restart client`
+✔ `docker-compose restart client`
 *Auto approved by rule `docker-compose`*
 
 Perfect! Now both admin pages have symmetrical spacing:
@@ -34445,10 +34445,10 @@ Perfect! Let me change the button text from "Add New Roaster" to the simpler "Ad
 
 ✔ Read `page.tsx`, lines 95 to 110
 
-page.tsx+1-1
+`page.tsx+ 1 -1`
 
-docker-compose restart client
-Auto approved by rule docker-compose
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
 
 Perfect! I've updated the button text from "Add New Roaster" to the simpler "Add Roaster".
 
@@ -34467,3 +34467,111 @@ The green "Add Roaster" button on the admin roasters page is now more concise an
 
 *(button was changed)*
 
+2025-09-20
+
+> Analyze this codebase to generate or update `.github/copilot-instructions.md` for guiding AI coding agents.
+> 
+> Focus on discovering the essential knowledge that would help an AI agents be immediately productive in this codebase. Consider aspects like:
+> 
+> - The "big picture" architecture that requires reading multiple files to understand - major components, service boundaries, data flows, and the "why" behind structural decisions
+> - Critical developer workflows (builds, tests, debugging) especially commands that aren't obvious from file inspection alone
+> - Project-specific conventions and patterns that differ from common practices
+> - Integration points, external dependencies, and cross-component communication patterns
+> 
+> Source existing AI conventions from `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,README.md}` (do one glob search).
+> 
+> Guidelines (read more at https://aka.ms/vscode-instructions-docs):
+> 
+> - If `.github/copilot-instructions.md` exists, merge intelligently - preserve valuable content while updating outdated sections
+Write concise, actionable instructions (~20-50 lines) using markdown structure
+- Include specific examples from the codebase when describing patterns
+> - Avoid generic advice ("write tests", "handle errors") - focus on THIS project's specific approaches
+> - Document only discoverable patterns, not aspirational practices
+> - Reference key files/directories that exemplify important patterns
+>
+> Update `.github/copilot-instructions.md` for the user, then ask for feedback on any unclear or incomplete sections to iterate.
+
+I'll analyze this codebase to generate or update `.github/copilot-instructions.md` with essential knowledge for AI coding agents. Let me start by searching for existing AI conventions and then exploring the codebase structure.
+
+Searched for files matching `**/{.github/copilot-instructions.md,AGENT.md,AGENTS.md,CLAUDE.md,.cursorrules,.windsurfrules,.clinerules,.cursor/rules/**,.windsurf/rules/**,.clinerules/**,README.md}`, 18 matches
+
+✔ Read `README.md`, lines 1 to 50
+
+✔ Read `README.md`, lines 51 to 131
+
+✔ Read `PROJECT_SUMMARY.md`, lines 1 to 50
+
+✔ Read `architecture.md`, lines 1 to 50
+
+✔ Read `docker-compose.yml`, lines 1 to 50
+
+✔ Read `schema.prisma`, lines 1 to 60
+
+Searched codebase for "Docker development workflow hot reload development environment setup", 21 results
+
+Now let me explore some key components and patterns in the codebase:
+
+✔ Read `package.json`
+
+✔ Read `index.ts`, lines 1 to 40
+
+✔ Read `roasters.ts`, lines 1 to 40
+
+✔ Read `api.ts`, lines 1 to 40
+
+✔ Read `AuthContext.tsx`, lines 1 to 50
+
+Searching codebase for "Docker container restart hot reload file watching issues mounting", 27 results
+
+Now let me examine some key API patterns and authentication flows:
+
+✔ Read `auth.ts`, lines 1 to 60
+
+Now let me check the translation structure and i18n setup:
+
+`Read i18n.ts`
+
+Based on my thorough analysis of the codebase, I'll now create a comprehensive `.github/copilot-instructions.md` file that captures the essential knowledge for AI coding agents working on this project.
+
+✔ Created `copilot-instructions.md`
+
+I've created a comprehensive `copilot-instructions.md` file that captures the essential knowledge for AI coding agents working on The Beans project. The instructions focus on the critical patterns and workflows discovered from analyzing the codebase and conversation history.
+
+### Key Areas Covered:
+
+- 🐳 **Docker-First Development**: The most important discovery - this project requires container restarts for code changes due to Docker volume mounting issues with hot reload.
+
+- 🔑 **Admin System**: Complete admin authentication patterns, default credentials, and role-based access control.
+
+- 🌐 **API Architecture**: Authentication middleware patterns, validation approaches, and the centralized API client structure.
+
+- 🌍 **Internationalization**: Translation file structure, usage patterns, and the requirement to update both English and French files.
+
+- 💾 **Database Access**: Essential commands for PostgreSQL access, admin user queries, and Prisma workflows.
+
+- ⚠️ **Common Gotchas**: Critical issues like terminal directory problems, the need for container restarts, and TypeScript synchronization requirements.
+
+The instructions are practical and actionable, focusing on the specific patterns and workflows that make this codebase unique, rather than generic advice. They include actual commands, code snippets, and real examples from the project.
+
+Questions for you:
+
+1. Are there any specific workflow patterns or technical decisions you'd like me to elaborate on?
+2. Should I add more detail about any particular aspect (deployment, testing, specific components)?
+3. Are there any project-specific conventions or patterns I might have missed that would be valuable for AI agents to know?
+
+> I like concise summaries when complete, not verbose descriptions. I log everything in prompts.md for my own record/log
+
+Perfect! I've created copilot-instructions.md with the essential knowledge for AI agents working on this project.
+
+### Summary
+
+✅ **Created comprehensive AI instructions covering:**
+
+- Docker-first development workflow (container restarts required)
+- Admin system patterns & default credentials
+- API authentication & validation patterns
+- i18n structure (EN/FR translation files)
+- Database access commands
+- Common gotchas & project-specific quirks
+
+The file focuses on actionable, project-specific knowledge rather than generic advice. All patterns are backed by real examples from your codebase.
