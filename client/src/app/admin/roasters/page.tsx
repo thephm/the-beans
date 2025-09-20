@@ -290,14 +290,16 @@ const RoasterForm: React.FC<{
   };
 
   return (
-    <div className="p-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">
+    <div className="p-4 pt-28 pl-8 pr-8">
+      <div className="mb-6 ml-4 mr-4">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {roaster 
             ? t('admin.roasters.editTitle', 'Edit Roaster') 
-            : t('admin.roasters.addTitle', 'Add New Roaster')
+            : t('admin.roasters.addTitle', 'Add Roaster')
           }
         </h1>
+      </div>
+      <div className="ml-4 mr-4">
 
         {error && (
           <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
