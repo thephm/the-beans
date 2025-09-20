@@ -158,7 +158,9 @@ export function FeaturedRoasters() {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
-                <p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>
+                {(roaster.city || roaster.state) && (
+                  <p className="text-gray-600 mb-2">📍 {[roaster.city, roaster.state].filter(Boolean).join(', ')}</p>
+                )}
                 {userLocation && roaster.latitude && roaster.longitude ? (() => {
                   const dist = calcDistance(userLocation.lat, userLocation.lng, roaster.latitude, roaster.longitude, distanceUnit);
                   if (isFinite(dist) && !isNaN(dist)) {

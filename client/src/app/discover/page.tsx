@@ -206,7 +206,9 @@ export default function DiscoverPage() {
                         <span className="text-gray-600 ml-1">{roaster.rating}</span>
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-2">📍 {roaster.city}, {roaster.state}</p>
+                    {(roaster.city || roaster.state) && (
+                      <p className="text-gray-600 mb-2">📍 {[roaster.city, roaster.state].filter(Boolean).join(', ')}</p>
+                    )}
                     <p className="text-gray-700 mb-4">{roaster.description}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {roaster.specialties.map((specialty) => (
