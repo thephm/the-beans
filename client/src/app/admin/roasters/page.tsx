@@ -270,7 +270,12 @@ const RoasterForm: React.FC<{
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to save roaster');
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          // Handle validation errors
+          const errorMessages = errorData.errors.map((err: any) => err.msg).join(', ');
+          throw new Error(errorMessages);
+        }
+        throw new Error(errorData.error || errorData.message || 'Failed to save roaster');
       }
 
       onSuccess();
