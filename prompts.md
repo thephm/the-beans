@@ -34829,3 +34829,97 @@ Result: Roasters without address information now show just their name and other 
 
 *(now the "📍 ," doesn't show)*
 
+## Change the roaster hyperlink in admin roasters to go to Roaster details page #56
+
+https://github.com/thephm/the-beans/issues/56
+
+Used 1 reference
+
+I'll help you change the roaster hyperlink in the admin roasters page to go to the roaster details page instead of wherever it's currently pointing. Let me first examine the admin roasters page to see how the roaster links are currently implemented.
+
+✔ Read `page.tsx`, lines 1 to 50
+
+Let me continue reading to find where the roaster links are rendered:
+
+✔ Searched text for `href.*roaster` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+✔ Searched text for `Link.*roasters|href|<` (`**/client/src/app/admin/roasters/page.tsx`), 20 results
+
+Let me continue reading to find where the roaster links are rendered:
+
+✔ Searched text for `href.*roaster` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+Let me search more specifically for where the roaster names are rendered as links in the table:
+
+✔ Read `page.tsx`, lines 130 to 180
+
+I need to find where the roaster name is rendered. Let me look for the table body structure:
+
+✔ Read `page.tsx`, lines 110 to 130
+
+Perfect! I found the roaster hyperlink. Currently, it's a button that calls `handleEdit(roaster.id)` to edit the roaster. I need to change this to be a link that goes to the roaster details page instead. Based on the project structure, the roaster details page should be at `/roasters/[id]`.
+
+Let me check if there's a Link component imported and then make the change:
+
+✔ Read `page.tsx`, lines 1 to 10
+
+I need to import the Next.js Link component and then change the button to a Link that goes to the roaster details page. Let me make these changes:
+
+`page.tsx +1 -0`
+
+Now let me change the button to a Link that goes to the roaster details page:
+
+`page.tsx +3 -3`
+
+Now I need to restart the client container for the changes to take effect:
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully changed the roaster hyperlink in the admin roasters page to go to the roaster details page instead of opening the edit form.
+
+## ✅ Updated Roaster Hyperlink in Admin
+
+**Changes Made**:
+
+1. Added Next.js Link import to the admin roasters page
+2. Changed roaster name from button to Link:
+
+- **Before**: Button that called `handleEdit(roaster.id)` to open edit form
+- **After**: Link that navigates to `/roasters/${roaster.id}` (roaster details page)
+
+**Result**:
+
+- Clicking on a roaster name in the admin roasters table now takes you to the roaster details page
+- The styling remains the same (blue text with hover effects)
+- Users can still edit roasters using the dedicated "Edit" button in the Actions column
+- Better UX separation: viewing details vs. editing functionality
+
+The roaster hyperlinks in the admin roasters page now properly navigate to the individual roaster details pages!
+
+## 306th try
+
+> that worked but it should open the page in a new browser tab not the same one
+
+I'll fix that by adding the `target="_blank"` attribute to the Link component so it opens the roaster details page in a new browser tab.
+
+`page.tsx +2 -0`
+
+✔ `docker-compose restart client`
+Auto approved by rule `docker-compose`
+
+Perfect! I've updated the roaster hyperlink to open in a new browser tab.
+
+### ✅ Updated Link to Open in New Tab
+
+**Changes Made:**
+
+- **Added** `target="_blank"` to open the roaster details page in a new tab
+- **Added** `rel="noopener noreferrer"` for security best practices when using` target="_blank"`
+Result:
+
+Now when you click on a roaster name in the admin roasters table, it will open the roaster details page in a new browser tab, allowing you to keep the admin page open for continued management while viewing the roaster details.
+
+## 307th try
+
+*(that worked)*
