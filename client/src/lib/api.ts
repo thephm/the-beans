@@ -96,6 +96,19 @@ class ApiClient {
     });
   }
 
+  // Admin roaster methods
+  async getUnverifiedRoasters(params?: Record<string, any>) {
+    const searchParams = new URLSearchParams(params).toString();
+    const endpoint = searchParams ? `/roasters/admin/unverified?${searchParams}` : '/roasters/admin/unverified';
+    return this.request(endpoint);
+  }
+
+  async verifyRoaster(id: string) {
+    return this.request(`/roasters/${id}/verify`, {
+      method: 'PATCH',
+    });
+  }
+
   // Search
   async search(params: Record<string, any>) {
     const searchParams = new URLSearchParams(params).toString();

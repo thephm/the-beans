@@ -106,9 +106,18 @@ router.get('/', [
       }
     }
 
-    // Check user settings for verified-only filter
+    // Check user role for verification filtering
     const user = (req as any).user;
-    const showOnlyVerified = user?.settings?.preferences?.showOnlyVerified;
+    let userRole = 'user';
+    if (user) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { role: true }
+      });
+      if (currentUser) {
+        userRole = currentUser.role;
+      }
+    }
 
     // Build where clause for search
     let whereClause: any = {
@@ -120,8 +129,8 @@ router.get('/', [
       ],
     };
 
-    // Add verified filter if user has preference set
-    if (showOnlyVerified) {
+    // Only show verified roasters to non-admin users
+    if (userRole !== 'admin') {
       whereClause.verified = true;
     }
 
@@ -276,12 +285,21 @@ router.get('/roasters', [
       orderBy = [{ featured: 'desc' }, { rating: 'desc' }, { reviewCount: 'desc' }];
     }
 
-    // Check user settings for verified-only filter
+    // Check user role for verification filtering
     const user = (req as any).user;
-    const showOnlyVerified = user?.settings?.preferences?.showOnlyVerified;
+    let userRole = 'user';
+    if (user) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { role: true }
+      });
+      if (currentUser) {
+        userRole = currentUser.role;
+      }
+    }
     
-    // Add verified filter if user has preference set
-    if (showOnlyVerified) {
+    // Only show verified roasters to non-admin users
+    if (userRole !== 'admin') {
       whereClause.verified = true;
     }
 

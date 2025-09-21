@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '@/contexts/AuthContext'
 import { SearchSection } from '@/components/SearchSection'
 
 interface Roaster {
@@ -20,10 +21,12 @@ interface Roaster {
   imageUrl: string
   latitude?: number
   longitude?: number
+  verified: boolean
 }
 
 export default function DiscoverPage() {
   const { t, i18n } = useTranslation()
+  const { user } = useAuth()
   const searchParams = useSearchParams()
   const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
@@ -199,7 +202,9 @@ export default function DiscoverPage() {
               ))
             ) : roasters.length > 0 ? (
               roasters.map((roaster) => (
-                <div key={roaster.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div key={roaster.id} className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow ${
+                  user?.role === 'admin' && !roaster.verified ? 'border-4 border-red-500' : ''
+                }`}>
                   <Image
                     src={roaster.imageUrl}
                     alt={roaster.name}

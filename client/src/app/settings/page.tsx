@@ -31,8 +31,7 @@ export default function SettingsPage() {
         frenchPress: false,
         coldBrew: false
       },
-      distanceUnit: 'km', // 'km' (default) or 'mi'
-      showOnlyVerified: true // Show only verified roasters (default enabled)
+      distanceUnit: 'km' // 'km' (default) or 'mi'
     },
     language: user?.language || 'en',
   })
@@ -163,21 +162,6 @@ export default function SettingsPage() {
                       <option value="mi">{t('mi')}</option>
                     </select>
                   </div>
-                </div>
-                {/* Show Only Verified Roasters */}
-                <div className="mt-4">
-                  <label className="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      checked={settings.preferences.showOnlyVerified}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        preferences: { ...prev.preferences, showOnlyVerified: e.target.checked }
-                      }))}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
-                    />
-                    <span className="ml-3 text-sm text-gray-700">{t('settings.showOnlyVerified', 'Show only verified roasters')}</span>
-                  </label>
                 </div>
               </div>
               {/* Privacy */}
