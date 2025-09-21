@@ -13,6 +13,8 @@ const AdminRoastersPage: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showUnverifiedOnly, setShowUnverifiedOnly] = useState(false);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   const fetchRoasters = async () => {
     setLoading(true);
@@ -64,6 +66,23 @@ const AdminRoastersPage: React.FC = () => {
     }
   };
 
+  const handleVerify = async (roasterId: string) => {
+    setVerifyingId(roasterId);
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const res = await fetch(`http://localhost:5000/api/roasters/${roasterId}/verify`, {
+        method: 'PATCH',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('Failed to verify roaster');
+      fetchRoasters();
+    } catch (err: any) {
+      setError(err.message || 'Unknown error');
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
   const onFormSuccess = () => {
     setEditingId(null);
     setShowAddForm(false);
@@ -96,12 +115,24 @@ const AdminRoastersPage: React.FC = () => {
       </div>
       <div className="ml-4 mr-4">
         <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={handleAdd}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ml-auto"
-          >
-            {t('admin.roasters.addNew', 'Add Roaster')}
-          </button>
+          <div></div>
+          <div className="flex items-center gap-8">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={showUnverifiedOnly}
+                onChange={(e) => setShowUnverifiedOnly(e.target.checked)}
+                className="mr-2 accent-blue-600"
+              />
+              <span className="text-gray-700">Show unverified only</span>
+            </label>
+            <button
+              onClick={handleAdd}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              {t('adminSection.roasters.addNew', 'Add Roaster')}
+            </button>
+          </div>
         </div>
 
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -113,11 +144,13 @@ const AdminRoastersPage: React.FC = () => {
               <th className="py-3 px-4 text-center font-medium text-gray-900">{t('admin.roasters.rating', 'Rating')}</th>
               <th className="py-3 px-4 text-center font-medium text-gray-900">{t('admin.roasters.verified', 'Verified')}</th>
               <th className="py-3 px-4 text-center font-medium text-gray-900">{t('admin.roasters.featured', 'Featured')}</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('admin.roasters.actions', 'Actions')}</th>
+              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminSection.roasters.actions', 'Actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {Array.isArray(roasters) && roasters.map((roaster) => (
+            {Array.isArray(roasters) && roasters
+              .filter(roaster => showUnverifiedOnly ? !roaster.verified : true)
+              .map((roaster) => (
               <tr key={roaster.id} className="hover:bg-gray-50">
                 <td className="py-3 px-4">
                   <Link
@@ -151,20 +184,29 @@ const AdminRoastersPage: React.FC = () => {
                     {roaster.featured ? t('admin.roasters.yes', 'Yes') : t('admin.roasters.no', 'No')}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-center">
-                  <div className="flex justify-center space-x-2">
+                <td className="py-3 px-4 text-left">
+                  <div className="flex space-x-2">
                     <button
                       onClick={() => handleEdit(roaster.id)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
                     >
-                      {t('admin.roasters.edit', 'Edit')}
+                      {t('adminSection.roasters.edit', 'Edit')}
                     </button>
                     <button
                       onClick={() => confirmDelete(roaster.id)}
-                      className="text-red-600 hover:text-red-800"
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
                     >
-                      {t('admin.roasters.delete', 'Delete')}
+                      {t('adminSection.roasters.delete', 'Delete')}
                     </button>
+                    {!roaster.verified && (
+                      <button
+                        onClick={() => handleVerify(roaster.id)}
+                        disabled={verifyingId === roaster.id}
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
+                      >
+                        {verifyingId === roaster.id ? 'Verifying...' : 'Verify'}
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

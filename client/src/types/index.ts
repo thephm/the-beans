@@ -27,6 +27,7 @@ export interface Roaster {
   latitude?: number;
   longitude?: number;
   images: string[];
+  imageUrl?: string; // Added for API compatibility
   hours?: Record<string, any>;
   specialties: string[];
   verified: boolean;

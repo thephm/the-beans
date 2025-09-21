@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Roaster {
   id: string
@@ -29,6 +30,7 @@ interface Roaster {
 
 export default function RoasterDetail() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const params = useParams()
   const router = useRouter()
   const [roaster, setRoaster] = useState<Roaster | null>(null)
@@ -86,7 +88,15 @@ export default function RoasterDetail() {
   const fetchRoaster = async (id: string) => {
     try {
       setLoading(true)
-      const response = await fetch(`http://localhost:5000/api/roasters/${id}`)
+      const token = localStorage.getItem('token')
+      const headers: HeadersInit = {}
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
+      
+      const response = await fetch(`http://localhost:5000/api/roasters/${id}`, {
+        headers
+      })
       
       if (!response.ok) {
         throw new Error('Roaster not found')

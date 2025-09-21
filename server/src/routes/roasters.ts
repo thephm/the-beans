@@ -213,9 +213,20 @@ router.get('/', [
     // Build where clause
     const where: any = {};
     
-    // Check user settings for verified-only filter
-    const showOnlyVerified = req.user?.settings?.preferences?.showOnlyVerified;
-    if (showOnlyVerified) {
+    // Get current user's role to determine if they can see unverified roasters
+    let userRole = 'user'; // Default to regular user
+    if (req.userId) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: req.userId },
+        select: { role: true, settings: true }
+      });
+      if (currentUser) {
+        userRole = currentUser.role;
+      }
+    }
+    
+    // Only show verified roasters to non-admin users
+    if (userRole !== 'admin') {
       where.verified = true;
     }
     
@@ -383,6 +394,23 @@ router.get('/:id', [
     });
 
     if (!roaster) {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+
+    // Check if current user is admin or if roaster is verified
+    let userRole = 'user';
+    if (req.userId) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: req.userId },
+        select: { role: true }
+      });
+      if (currentUser) {
+        userRole = currentUser.role;
+      }
+    }
+    
+    // Non-admin users can only see verified roasters
+    if (userRole !== 'admin' && !roaster.verified) {
       return res.status(404).json({ error: 'Roaster not found' });
     }
 
@@ -696,6 +724,174 @@ router.delete('/:id', [
     });
   } catch (error: any) {
     console.error('Delete roaster error:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/roasters/admin/unverified:
+ *   get:
+ *     summary: Get all unverified roasters (admin only)
+ *     tags: [Roasters]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *     responses:
+ *       200:
+ *         description: List of unverified roasters
+ *       403:
+ *         description: Admin access required
+ */
+router.get('/admin/unverified', [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 100 }),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Get unverified roasters
+    const roasters = await prisma.roaster.findMany({
+      where: { verified: false },
+      skip,
+      take: limit,
+      include: {
+        owner: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+          }
+        },
+        _count: {
+          select: {
+            reviews: true,
+            favorites: true,
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const total = await prisma.roaster.count({ where: { verified: false } });
+    const pages = Math.ceil(total / limit);
+
+    // Add imageUrl field for frontend compatibility
+    const roastersWithImageUrl = roasters.map((roaster: any) => ({
+      ...roaster,
+      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
+    }));
+
+    res.json({
+      roasters: roastersWithImageUrl,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages,
+      }
+    });
+  } catch (error) {
+    console.error('Get unverified roasters error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/roasters/{id}/verify:
+ *   patch:
+ *     summary: Verify a roaster (admin only)
+ *     tags: [Roasters]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Roaster verified successfully
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Roaster not found
+ */
+router.patch('/:id/verify', [
+  param('id').isString(),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { id } = req.params;
+
+    const roaster = await prisma.roaster.update({
+      where: { id },
+      data: { verified: true },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+          }
+        }
+      }
+    });
+
+    res.json({
+      message: 'Roaster verified successfully',
+      roaster,
+    });
+  } catch (error: any) {
+    console.error('Verify roaster error:', error);
     if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Roaster not found' });
     }
