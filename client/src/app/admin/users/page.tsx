@@ -35,7 +35,8 @@ const AdminUsersPage: React.FC = () => {
     setError(null);
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const res = await fetch('http://localhost:5000/api/users', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const res = await fetch(`${apiUrl}/api/users`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
       if (!res.ok) throw new Error('Failed to fetch users');
@@ -65,7 +66,8 @@ const AdminUsersPage: React.FC = () => {
   const saveEdit = async (user: User) => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

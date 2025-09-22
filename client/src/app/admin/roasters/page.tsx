@@ -24,10 +24,16 @@ const AdminRoastersPage: React.FC = () => {
     setError(null);
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch('http://localhost:5000/api/roasters', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/roasters`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
-      if (!res.ok) throw new Error('Failed to fetch roasters');
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Failed to fetch roasters: ${res.status} ${errorText}`);
+      }
+      
       const data = await res.json();
       // Handle different response formats
       const roastersArray = Array.isArray(data) ? data : (data.data || data.roasters || []);
@@ -67,7 +73,8 @@ const AdminRoastersPage: React.FC = () => {
   const doDelete = async (id: string) => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch(`http://localhost:5000/api/roasters/${id}`, { 
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/roasters/${id}`, { 
         method: 'DELETE',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
@@ -83,7 +90,8 @@ const AdminRoastersPage: React.FC = () => {
     setVerifyingId(roasterId);
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch(`http://localhost:5000/api/roasters/${roasterId}/verify`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/roasters/${roasterId}/verify`, {
         method: 'PATCH',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
@@ -329,9 +337,10 @@ const RoasterForm: React.FC<{
         specialties: formData.specialties.split(',').map(s => s.trim()).filter(Boolean),
       };
 
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       const url = roaster 
-        ? `http://localhost:5000/api/roasters/${roaster.id}`
-        : 'http://localhost:5000/api/roasters';
+        ? `${apiUrl}/api/roasters/${roaster.id}`
+        : `${apiUrl}/api/roasters`;
       
       const method = roaster ? 'PUT' : 'POST';
 

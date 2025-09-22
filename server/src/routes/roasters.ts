@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { body, validationResult, param, query } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
+import { upload, deleteImage } from '../lib/cloudinary';
+import { canEditRoaster } from '../middleware/roasterAuth';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -911,6 +913,429 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
+
+/**
+ * @swagger
+ * /api/roasters/{id}/images:
+ *   get:
+ *     summary: Get all images for a roaster
+ *     tags: [Roasters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of roaster images
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 images:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       url:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       isPrimary:
+ *                         type: boolean
+ *                       uploadedAt:
+ *                         type: string
+ *       404:
+ *         description: Roaster not found
+ */
+router.get('/:id/images', [
+  param('id').isString(),
+], async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+
+    const roaster = await prisma.roaster.findUnique({
+      where: { id },
+      include: {
+        roasterImages: {
+          orderBy: [
+            { isPrimary: 'desc' },
+            { uploadedAt: 'asc' }
+          ],
+          select: {
+            id: true,
+            url: true,
+            description: true,
+            isPrimary: true,
+            uploadedAt: true,
+            filename: true
+          }
+        }
+      }
+    });
+
+    if (!roaster) {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+
+    res.json({
+      images: roaster.roasterImages,
+    });
+  } catch (error) {
+    console.error('Get roaster images error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/roasters/{id}/images:
+ *   post:
+ *     summary: Upload images to a roaster (owner or admin only)
+ *     tags: [Roasters]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               descriptions:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Optional descriptions for each image
+ *               setPrimary:
+ *                 type: integer
+ *                 description: Index of image to set as primary (0-based)
+ *     responses:
+ *       201:
+ *         description: Images uploaded successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Only owner or admin can upload images
+ *       404:
+ *         description: Roaster not found
+ */
+router.post('/:id/images', [
+  param('id').isString(),
+], requireAuth, canEditRoaster, upload.array('images', 10), async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id: roasterId } = req.params;
+    const { descriptions = [], setPrimary } = req.body;
+    const files = req.files as Express.Multer.File[];
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: 'No images provided' });
+    }
+
+    // Parse descriptions if it's a string (from form data)
+    let imageDescriptions: string[] = [];
+    if (typeof descriptions === 'string') {
+      try {
+        imageDescriptions = JSON.parse(descriptions);
+      } catch {
+        imageDescriptions = [descriptions];
+      }
+    } else if (Array.isArray(descriptions)) {
+      imageDescriptions = descriptions;
+    }
+
+    // Create image records in database
+    const imagePromises = files.map(async (file, index) => {
+      const isPrimary = setPrimary ? parseInt(setPrimary) === index : false;
+      
+      return prisma.roasterImage.create({
+        data: {
+          url: file.path,
+          publicId: (file as any).filename, // Cloudinary public ID
+          filename: file.originalname,
+          description: imageDescriptions[index] || null,
+          isPrimary,
+          roasterId,
+          uploadedById: req.userId,
+        },
+      });
+    });
+
+    const createdImages = await Promise.all(imagePromises);
+
+    // If setting a new primary image, unset previous primary
+    if (setPrimary !== undefined) {
+      const primaryIndex = parseInt(setPrimary);
+      if (primaryIndex >= 0 && primaryIndex < createdImages.length) {
+        await prisma.roasterImage.updateMany({
+          where: {
+            roasterId,
+            id: { not: createdImages[primaryIndex].id }
+          },
+          data: { isPrimary: false }
+        });
+      }
+    }
+
+    // Update the roaster's images array for backward compatibility
+    const allImages = await prisma.roasterImage.findMany({
+      where: { roasterId },
+      orderBy: [{ isPrimary: 'desc' }, { uploadedAt: 'asc' }],
+      select: { url: true }
+    });
+
+    await prisma.roaster.update({
+      where: { id: roasterId },
+      data: {
+        images: allImages.map(img => img.url)
+      }
+    });
+
+    res.status(201).json({
+      message: 'Images uploaded successfully',
+      images: createdImages.map(img => ({
+        id: img.id,
+        url: img.url,
+        description: img.description,
+        isPrimary: img.isPrimary,
+        uploadedAt: img.uploadedAt,
+        filename: img.filename
+      })),
+    });
+  } catch (error) {
+    console.error('Upload roaster images error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/roasters/{id}/images/{imageId}:
+ *   put:
+ *     summary: Update image details (owner or admin only)
+ *     tags: [Roasters]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: imageId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               description:
+ *                 type: string
+ *               isPrimary:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Image updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Only owner or admin can update images
+ *       404:
+ *         description: Roaster or image not found
+ */
+router.put('/:id/images/:imageId', [
+  param('id').isString(),
+  param('imageId').isString(),
+  body('description').optional().isString(),
+  body('isPrimary').optional().isBoolean(),
+], requireAuth, canEditRoaster, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id: roasterId, imageId } = req.params;
+    const { description, isPrimary } = req.body;
+
+    // Check if image belongs to this roaster
+    const existingImage = await prisma.roasterImage.findFirst({
+      where: {
+        id: imageId,
+        roasterId
+      }
+    });
+
+    if (!existingImage) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // If setting as primary, unset other primary images
+    if (isPrimary) {
+      await prisma.roasterImage.updateMany({
+        where: {
+          roasterId,
+          id: { not: imageId }
+        },
+        data: { isPrimary: false }
+      });
+    }
+
+    const updatedImage = await prisma.roasterImage.update({
+      where: { id: imageId },
+      data: {
+        description: description !== undefined ? description : undefined,
+        isPrimary: isPrimary !== undefined ? isPrimary : undefined,
+      },
+    });
+
+    // Update the roaster's images array for backward compatibility
+    const allImages = await prisma.roasterImage.findMany({
+      where: { roasterId },
+      orderBy: [{ isPrimary: 'desc' }, { uploadedAt: 'asc' }],
+      select: { url: true }
+    });
+
+    await prisma.roaster.update({
+      where: { id: roasterId },
+      data: {
+        images: allImages.map(img => img.url)
+      }
+    });
+
+    res.json({
+      message: 'Image updated successfully',
+      image: {
+        id: updatedImage.id,
+        url: updatedImage.url,
+        description: updatedImage.description,
+        isPrimary: updatedImage.isPrimary,
+        uploadedAt: updatedImage.uploadedAt,
+        filename: updatedImage.filename
+      },
+    });
+  } catch (error) {
+    console.error('Update roaster image error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/roasters/{id}/images/{imageId}:
+ *   delete:
+ *     summary: Delete a roaster image (owner or admin only)
+ *     tags: [Roasters]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: imageId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Image deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - Only owner or admin can delete images
+ *       404:
+ *         description: Roaster or image not found
+ */
+router.delete('/:id/images/:imageId', [
+  param('id').isString(),
+  param('imageId').isString(),
+], requireAuth, canEditRoaster, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id: roasterId, imageId } = req.params;
+
+    // Get image details before deletion
+    const image = await prisma.roasterImage.findFirst({
+      where: {
+        id: imageId,
+        roasterId
+      }
+    });
+
+    if (!image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // Delete from Cloudinary
+    const cloudinaryDeleted = await deleteImage(image.publicId);
+    if (!cloudinaryDeleted) {
+      console.warn(`Failed to delete image from Cloudinary: ${image.publicId}`);
+    }
+
+    // Delete from database
+    await prisma.roasterImage.delete({
+      where: { id: imageId }
+    });
+
+    // Update the roaster's images array for backward compatibility
+    const allImages = await prisma.roasterImage.findMany({
+      where: { roasterId },
+      orderBy: [{ isPrimary: 'desc' }, { uploadedAt: 'asc' }],
+      select: { url: true }
+    });
+
+    await prisma.roaster.update({
+      where: { id: roasterId },
+      data: {
+        images: allImages.map(img => img.url)
+      }
+    });
+
+    res.json({
+      message: 'Image deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete roaster image error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 export default router;
 // trigger restart

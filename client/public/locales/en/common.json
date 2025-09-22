@@ -99,6 +99,32 @@
     "notFound": "Roaster not found",
     "noRoastersFound": "No roasters found"
   },
+  "roaster": {
+    "images": {
+      "title": "Roaster Images",
+      "addImages": "Add Images",
+      "uploading": "Uploading...",
+      "dropImages": "Drop images here or click to select",
+      "supportedFormats": "Supports JPG, PNG, WebP (max 5MB each)",
+      "primary": "Primary",
+      "description": "Image description...",
+      "setPrimary": "Set Primary",
+      "delete": "Delete",
+      "noImages": "No images uploaded yet",
+      "guidelines": "Image Guidelines",
+      "guideline1": "Upload high-quality images that showcase your roaster",
+      "guideline2": "Supported formats: JPG, PNG, WebP (max 5MB each)",
+      "guideline3": "Set one image as primary for main display",
+      "guideline4": "Add descriptions for accessibility"
+    },
+    "edit": {
+      "manageImages": "Manage Images",
+      "error": "Error Loading Roaster",
+      "unauthorized": "Access Denied",
+      "unauthorizedMessage": "You do not have permission to edit this roaster.",
+      "editDetails": "Edit Details"
+    }
+  },
   "discover": {
     "title": "Discover Coffee Roasters",
     "subtitle": "Find the perfect coffee roaster near you.",
@@ -196,6 +222,7 @@
     "edit": "Edit",
     "view": "View",
     "back": "Back",
+    "goBack": "Go Back",
     "next": "Next",
     "previous": "Previous",
     "showMore": "Show More",
@@ -292,7 +319,8 @@
     "phone": "Phone", 
     "website": "Website",
     "email": "Email",
-    "owner": "Owner"
+    "owner": "Owner",
+    "manageImages": "Manage Images"
   },
   "forms": {
     "firstName": "First name",

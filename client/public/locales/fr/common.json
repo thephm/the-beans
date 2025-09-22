@@ -113,6 +113,32 @@
     "notFound": "Torréfacteur introuvable",
     "noRoastersFound": "Aucun torréfacteur trouvé"
   },
+  "roaster": {
+    "images": {
+      "title": "Images du torréfacteur",
+      "addImages": "Ajouter des images",
+      "uploading": "Téléchargement...",
+      "dropImages": "Déposez les images ici ou cliquez pour sélectionner",
+      "supportedFormats": "Supporte JPG, PNG, WebP (max 5 Mo chacun)",
+      "primary": "Principale",
+      "description": "Description de l'image...",
+      "setPrimary": "Définir comme principale",
+      "delete": "Supprimer",
+      "noImages": "Aucune image téléchargée",
+      "guidelines": "Directives pour les images",
+      "guideline1": "Téléchargez des images de haute qualité qui mettent en valeur votre torréfacteur",
+      "guideline2": "Formats supportés : JPG, PNG, WebP (max 5 Mo chacun)",
+      "guideline3": "Définissez une image comme principale pour l'affichage principal",
+      "guideline4": "Ajoutez des descriptions pour l'accessibilité"
+    },
+    "edit": {
+      "manageImages": "Gérer les images",
+      "error": "Erreur lors du chargement du torréfacteur",
+      "unauthorized": "Accès refusé",
+      "unauthorizedMessage": "Vous n'avez pas la permission de modifier ce torréfacteur.",
+      "editDetails": "Modifier les détails"
+    }
+  },
   "discover": {
     "title": "Découvrir les torréfacteurs de café",
     "subtitle": "Trouvez le torréfacteur de café parfait près de chez vous.",
@@ -195,6 +221,7 @@
     "edit": "Modifier",
     "view": "Voir",
     "back": "Retour",
+    "goBack": "Retourner",
     "next": "Suivant",
     "previous": "Précédent",
     "showMore": "Afficher plus",
@@ -291,7 +318,8 @@
     "phone": "Téléphone",
     "website": "Site web",
     "email": "E-mail",
-    "owner": "Propriétaire"
+    "owner": "Propriétaire",
+    "manageImages": "Gérer les images"
   },
   "forms": {
     "firstName": "Prénom",

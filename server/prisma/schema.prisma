@@ -42,6 +42,7 @@ model User {
   favorites    Favorite[]
   notifications Notification[]
   comments     Comment[]
+  uploadedImages RoasterImage[]
 
   @@map("users")
 }
@@ -76,9 +77,29 @@ model Roaster {
   reviews  Review[]
   favorites Favorite[]
   beans    Bean[]
+  roasterImages RoasterImage[]
 
   @@unique([name])
   @@map("roasters")
+}
+
+model RoasterImage {
+  id          String   @id @default(cuid())
+  url         String   // Cloudinary URL
+  publicId    String   // Cloudinary public ID for deletion
+  filename    String?  // Original filename
+  description String?  // Alt text/description
+  isPrimary   Boolean  @default(false) // Mark one image as primary for display
+  uploadedAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  roaster     Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+  roasterId   String
+  uploadedBy  User     @relation(fields: [uploadedById], references: [id])
+  uploadedById String
+
+  @@map("roaster_images")
 }
 
 model Bean {
