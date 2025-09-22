@@ -205,6 +205,14 @@ export default function FavoritesPage() {
                           >
                             View Details
                           </Link>
+                          {user?.role === 'admin' && (
+                            <Link
+                              href={`/admin/roasters?edit=${roaster.id}&returnTo=/favorites`}
+                              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                            >
+                              Edit
+                            </Link>
+                          )}
                           <button
                             onClick={() => toggleFavorite(roaster.id)}
                             className="px-4 py-2 border-2 border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"

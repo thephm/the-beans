@@ -278,6 +278,14 @@ export default function DiscoverPage() {
                       >
                         {t('discover.viewDetails')}
                       </Link>
+                      {user?.role === 'admin' && (
+                        <Link
+                          href={`/admin/roasters?edit=${roaster.id}&returnTo=/discover`}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                        >
+                          Edit
+                        </Link>
+                      )}
                       <button
                         onClick={() => toggleFavorite(roaster.id)}
                         className={`px-4 py-2 border rounded-lg transition-all transform hover:scale-105 ${

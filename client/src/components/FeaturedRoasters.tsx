@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Roaster {
   id: string
@@ -21,6 +22,7 @@ interface Roaster {
 
 export function FeaturedRoasters() {
   const { t, i18n } = useTranslation()
+  const { user } = useAuth()
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
@@ -206,6 +208,14 @@ export function FeaturedRoasters() {
                   >
                     {t('roasters.viewDetails')}
                   </Link>
+                  {user?.role === 'admin' && (
+                    <Link
+                      href={`/admin/roasters?edit=${roaster.id}&returnTo=/`}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                    >
+                      Edit
+                    </Link>
+                  )}
                   <button
                     className={`px-4 py-2 border-2 rounded-lg transition-colors ${
                       favorites.includes(roaster.id)
