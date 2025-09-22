@@ -2,11 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Roaster } from '@/types';
 
 const AdminRoastersPage: React.FC = () => {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [roasters, setRoasters] = useState<Roaster[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +42,16 @@ const AdminRoastersPage: React.FC = () => {
   useEffect(() => {
     fetchRoasters();
   }, []);
+
+  // Handle URL parameters for direct editing
+  useEffect(() => {
+    if (searchParams) {
+      const editId = searchParams.get('edit');
+      if (editId) {
+        setEditingId(editId);
+      }
+    }
+  }, [searchParams]);
 
   const handleEdit = (id: string) => {
     setEditingId(id);
@@ -87,11 +100,29 @@ const AdminRoastersPage: React.FC = () => {
     setEditingId(null);
     setShowAddForm(false);
     fetchRoasters();
+    
+    // Check if there's a returnTo parameter to navigate back
+    if (searchParams) {
+      const returnTo = searchParams.get('returnTo');
+      if (returnTo) {
+        router.push(returnTo);
+        return;
+      }
+    }
   };
 
   const onFormCancel = () => {
     setEditingId(null);
     setShowAddForm(false);
+    
+    // Check if there's a returnTo parameter to navigate back
+    if (searchParams) {
+      const returnTo = searchParams.get('returnTo');
+      if (returnTo) {
+        router.push(returnTo);
+        return;
+      }
+    }
   };
 
   if (loading) return <div className="p-4">{t('loading', 'Loading...')}</div>;
