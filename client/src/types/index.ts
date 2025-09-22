@@ -10,6 +10,19 @@ export interface User {
   latitude?: number;
   longitude?: number;
   createdAt: string;
+  role?: string;
+}
+
+export interface RoasterImage {
+  id: string;
+  url: string;
+  publicId: string;
+  filename?: string;
+  description?: string;
+  isPrimary: boolean;
+  uploadedAt: string;
+  updatedAt: string;
+  uploadedBy?: User;
 }
 
 export interface Roaster {
@@ -39,6 +52,7 @@ export interface Roaster {
   owner?: User;
   beans?: Bean[];
   reviews?: Review[];
+  roasterImages?: RoasterImage[];
   isFavorited?: boolean;
 }
 

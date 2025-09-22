@@ -385,6 +385,19 @@ export default function RoasterDetail() {
 
                   {/* Action Buttons */}
                   <div className="space-y-3">
+                    {/* Manage Images Button for admins and owners */}
+                    {user && (user.role === 'admin' || 
+                      (typeof roaster.owner === 'object' && roaster.owner?.id === user.id) ||
+                      (roaster.owner && typeof roaster.owner === 'string' && roaster.owner === user.id)
+                    ) && (
+                      <Link
+                        href={`/roasters/${roaster.id}/images`}
+                        className="block w-full bg-blue-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all"
+                      >
+                        📸 {t('roasterDetail.manageImages', 'Manage Images')}
+                      </Link>
+                    )}
+                    
                     <button
                       onClick={toggleFavorite}
                       className={`w-full py-3 px-4 rounded-lg font-medium transition-all transform hover:scale-105 ${
