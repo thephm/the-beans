@@ -18,7 +18,9 @@ A beautiful, modern web application for discovering fresh coffee roasters near y
 - **Railway/Render** - Backend hosting
 - **Cloudflare** - CDN and domain management
 
-## Quick Start (with Docker)
+## Quick Start (Docker - Recommended)
+
+**⚠️ Important**: This project requires Docker for development. Hot reload is unreliable, so container restarts are needed after code changes.
 
 1. **Clone the repository**
    ```bash
@@ -26,18 +28,36 @@ A beautiful, modern web application for discovering fresh coffee roasters near y
    cd the-beans
    ```
 
-2. **Set up environment variables**
-   - Copy `.env.example` to `.env` in both `client` and `server` directories
-   - Fill in your database and API keys as needed
-
-3. **Build and start all services with Docker Compose**
+2. **Start all services with Docker Compose**
    ```bash
-   docker-compose up --build -d
+   docker-compose up --build
    ```
 
-4. **Open your browser**
+3. **Open your browser**
    - Frontend: http://localhost:3000
    - API Documentation: http://localhost:5000/api-docs
+
+4. **After making changes, restart containers**
+   ```bash
+   # Frontend changes
+   docker-compose restart client
+   
+   # Backend changes  
+   docker-compose restart server
+   ```
+
+### Default Admin Account
+- **Email**: admin@example.com
+- **Password**: admin123
+
+### Database Access
+```bash
+# Connect to PostgreSQL shell
+docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db
+
+# Check admin users
+docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT email, username, role FROM users WHERE role = 'admin';"
+```
 
 ## Local Development (without Docker)
 

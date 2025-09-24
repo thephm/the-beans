@@ -37,11 +37,24 @@ docker exec the-beans-server-1 npx prisma migrate dev
 
 ## Development Workflow
 
-**File watching is now automatic!** When you edit files in VSCode:
-- Frontend changes auto-reload via Next.js hot reload
-- Backend changes auto-restart via nodemon
-- Database persists data between restarts
-- No more manual server restarts needed
+**Important: Container restarts are required for most code changes!** When you edit files in VSCode:
+
+- **Frontend changes**: Require `docker-compose restart client`
+- **Backend changes**: Require `docker-compose restart server`  
+- **Database changes**: Persist between restarts
+- **Hot reload is unreliable** due to Docker volume mounting issues
+
+### After Making Changes:
+```bash
+# After frontend changes
+docker-compose restart client
+
+# After backend changes  
+docker-compose restart server
+
+# Restart everything
+docker-compose restart
+```
 
 ## Useful Commands
 

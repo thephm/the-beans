@@ -16,9 +16,11 @@ The Admin Dashboard allows privileged users to manage the application's users, r
 
 ## API Endpoints
 
-- `GET /api/admin/users` — List all users (admin only)
-- `PUT /api/admin/users/:id` — Update user role/language (admin only)
-- `DELETE /api/admin/users/:id` — Delete a user (admin only)
+- `GET /api/users` — List all users (admin only)
+- `PUT /api/users/:id` — Update user role/language (admin only)
+- `DELETE /api/users/:id` — Delete a user (admin only)
+- `PUT /api/users/settings` — Update user settings (requires auth)
+- `GET /api/users/settings` — Get user settings (requires auth)
 
 ## UI
 
