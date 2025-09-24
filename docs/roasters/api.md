@@ -69,6 +69,30 @@ Create a new roaster (requires authentication).
 }
 ```
 
+### `PUT /api/roasters/{id}`
+Update an existing roaster (requires authentication and ownership).
+
+### `DELETE /api/roasters/{id}`
+Delete a roaster (requires authentication and ownership).
+
+### `GET /api/roasters/admin/unverified`
+Get all unverified roasters (admin only).
+
+### `PATCH /api/roasters/{id}/verify`
+Verify a roaster (admin only).
+
+### `GET /api/roasters/{id}/images`
+Get all images for a roaster.
+
+### `POST /api/roasters/{id}/images`
+Upload a new image for a roaster (requires authentication and ownership).
+
+### `PUT /api/roasters/{id}/images/{imageId}`
+Update image details (requires authentication and ownership).
+
+### `DELETE /api/roasters/{id}/images/{imageId}`
+Delete an image (requires authentication and ownership).
+
 ## Roaster Object Fields
 
 - `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `_count`

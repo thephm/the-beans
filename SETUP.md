@@ -4,45 +4,67 @@ Welcome to The Beans coffee roaster discovery app! This guide will help you get 
 
 ## Prerequisites
 
-- Node.js 18+ 
-- PostgreSQL database
+- Docker and Docker Compose
 - Git
 
-## Quick Setup
+## Recommended Setup (Docker)
 
-1. **Install root dependencies**
+**⚠️ Important**: Docker is the recommended development environment. Container restarts are required for code changes.
+
+1. **Clone and start**
    ```bash
-   npm install
+   git clone https://github.com/thephm/the-beans.git
+   cd the-beans
+   docker-compose up --build
    ```
 
-2. **Install all project dependencies**
+2. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend: http://localhost:5000
+   - API Docs: http://localhost:5000/api-docs
+
+3. **Development workflow**
+   ```bash
+   # After frontend changes
+   docker-compose restart client
+   
+   # After backend changes
+   docker-compose restart server
+   
+   # Database access
+   docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db
+   ```
+
+## Alternative Setup (Local Development)
+
+Only use this if you cannot use Docker:
+
+1. **Prerequisites**
+   - Node.js 18+ 
+   - PostgreSQL database locally installed
+
+2. **Install dependencies**
    ```bash
    npm run setup
    ```
 
-3. **Set up your database**
-   - Create a PostgreSQL database named `the_beans_db`
-   - Update the `DATABASE_URL` in `server/.env`
-
-4. **Configure environment variables**
+3. **Set up environment variables**
    - Copy `server/.env.example` to `server/.env`
    - Copy `client/.env.example` to `client/.env.local`
-   - Fill in your actual values (database URL, API keys, etc.)
+   - Configure your local PostgreSQL connection in `server/.env`
 
-5. **Initialize the database**
+4. **Initialize database**
    ```bash
    cd server
    npm run db:generate
    npm run db:push
    ```
 
-6. **Start the development servers**
+5. **Start development servers**
    ```bash
-   # From the root directory
+   # From root directory
    npm run dev
    ```
-
-This will start both the frontend (port 3000) and backend (port 5000) servers.
 
 ## Environment Variables Guide
 

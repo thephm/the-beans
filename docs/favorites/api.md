@@ -4,41 +4,46 @@ This document describes the API endpoints and contracts for the favorites featur
 
 ## Implementation
 
-Favorites are managed on the client side using `localStorage` and on the backend via the `/api/roasters` endpoints (for authenticated users).
+Favorites are currently managed **client-side only** using `localStorage`. There are no dedicated backend favorites endpoints.
 
-### LocalStorage (Client)
-- Key: `favoriteRoasters`
-- Value: Array of roaster IDs (as strings)
-- Used for quick access and offline support.
+### LocalStorage (Client-Side Only)
+- **Key**: `favoriteRoasters`
+- **Value**: Array of roaster IDs (as strings) `["1", "2", "3"]`
+- **Used for**: All favorite functionality, persistence, and cross-page state
 
-### Backend (Authenticated Users)
-- Favorites are stored in the database and associated with the user.
-- Endpoints:
+### Current API Integration
 
 #### `GET /api/roasters/:id`
-- Returns roaster details, including `isFavorited` (if authenticated).
+- Returns roaster details with basic information
+- **Note**: Does NOT include `isFavorited` field - this is calculated client-side
 - Example response:
 ```json
 {
   "id": 1,
   "name": "Roaster Name",
-  ...,
-  "isFavorited": true
+  "description": "...",
+  "address": "...",
+  "specialties": ["Direct Trade", "Light Roast"]
 }
 ```
 
-#### `POST /api/roasters/:id/favorite`
-- Adds the roaster to the user's favorites.
-- Requires authentication (Bearer token).
-- Response: `{ success: true }`
+#### Favorites Logic (Client-Side)
+- **Add/Remove**: Updates localStorage array and React state
+- **Persistence**: Survives page reloads via localStorage
+- **Cross-Page Sync**: All pages read from same localStorage key
+- **No Authentication Required**: Works for all users
 
-#### `DELETE /api/roasters/:id/favorite`
-- Removes the roaster from the user's favorites.
-- Requires authentication.
-- Response: `{ success: true }`
+### Missing Backend Features
+The following endpoints are documented but **do not exist**:
+- ❌ `POST /api/roasters/:id/favorite` 
+- ❌ `DELETE /api/roasters/:id/favorite`
+- ❌ `GET /api/roasters?favorites=true`
 
-#### `GET /api/roasters?favorites=true`
-- Returns all roasters favorited by the authenticated user.
+### Future Backend Implementation
+When backend favorites are added, they should:
+- Sync with localStorage on login/logout
+- Provide user-specific favorite persistence
+- Include `isFavorited` field in roaster responses
 
 ---
 
