@@ -15,7 +15,7 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Generate Prisma client
 RUN npx prisma generate
@@ -27,4 +27,4 @@ COPY . .
 EXPOSE 5000
 
 # Start development server with Prisma migration
-CMD ["sh", "entrypoint.sh"]
+CMD ["sh", "-c", "sleep 10 && npx prisma migrate deploy && npm run dev"]

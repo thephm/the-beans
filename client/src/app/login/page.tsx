@@ -140,11 +140,11 @@ export default function LoginPage() {
           <div className="mt-6 p-4 bg-lavender-50 rounded-lg border border-lavender-200">
             <h3 className="text-sm font-medium text-lavender-800 mb-2">{t('auth.demo.title')}</h3>
             <p className="text-sm text-lavender-700">
-              📧 Email: test@example.com<br />
+              📧 Email: coffee@lover.com<br />
               🔑 Password: password123
             </p>
             <button
-              onClick={() => setFormData({ email: 'test@example.com', password: 'password123' })}
+              onClick={() => setFormData({ email: 'coffee@lover.com', password: 'password123' })}
               className="mt-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
               {t('auth.demo.fillCredentials')}
