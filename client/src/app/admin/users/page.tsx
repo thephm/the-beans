@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
 interface User {
   id: string;
@@ -136,8 +137,24 @@ const AdminUsersPage: React.FC = () => {
         <tbody>
           {users.map((user) => (
             <tr key={user.id} className="text-center">
-              <td className="py-2 px-4 border-b text-left">{user.username}</td>
-              <td className="py-2 px-4 border-b text-left">{user.email}</td>
+              <td className="py-2 px-4 border-b text-left">
+                <Link
+                  href={`/profile?userId=${user.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  {user.username}
+                </Link>
+              </td>
+              <td className="py-2 px-4 border-b text-left">
+                <a
+                  href={`mailto:${user.email}`}
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  {user.email}
+                </a>
+              </td>
               <td className="py-2 px-4 border-b">
                 {editId === user.id ? (
                   <select
@@ -168,21 +185,53 @@ const AdminUsersPage: React.FC = () => {
               <td className="py-2 px-4 border-b">{user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : ''}</td>
               <td className="py-2 px-4 border-b">
                 {editId === user.id ? (
-                  <>
-                    <button className="text-green-600 hover:underline mr-2" onClick={() => saveEdit(user)}>{t('save', 'Save')}</button>
-                    <button className="text-gray-600 hover:underline" onClick={cancelEdit}>{t('cancel', 'Cancel')}</button>
-                  </>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => saveEdit(user)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                    >
+                      {t('save', 'Save')}
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                    >
+                      {t('cancel', 'Cancel')}
+                    </button>
+                  </div>
                 ) : (
-                  <>
-                    <button className="text-blue-600 hover:underline mr-2" onClick={() => startEdit(user)}>{t('edit', 'Edit')}</button>
-                    <button className="text-red-600 hover:underline" onClick={() => confirmDelete(user.id)}>{t('delete', 'Delete')}</button>
-                  </>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => startEdit(user)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                    >
+                      {t('edit', 'Edit')}
+                    </button>
+                    <button
+                      onClick={() => confirmDelete(user.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                    >
+                      {t('delete', 'Delete')}
+                    </button>
+                  </div>
                 )}
                 {deletingId === user.id && (
                   <div className="mt-2 bg-white border p-2 rounded shadow text-left">
-                    <div>{t('admin.users.confirmDelete', 'Are you sure you want to delete this user?')}</div>
-                    <button className="text-red-600 hover:underline mr-2" onClick={() => doDelete(user.id)}>{t('delete', 'Delete')}</button>
-                    <button className="text-gray-600 hover:underline" onClick={cancelDelete}>{t('cancel', 'Cancel')}</button>
+                    <div className="mb-3">{t('admin.users.confirmDelete', 'Are you sure you want to delete this user?')}</div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => doDelete(user.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                      >
+                        {t('delete', 'Delete')}
+                      </button>
+                      <button
+                        onClick={cancelDelete}
+                        className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                      >
+                        {t('cancel', 'Cancel')}
+                      </button>
+                    </div>
                   </div>
                 )}
               </td>
