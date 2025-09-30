@@ -43054,3 +43054,81 @@ The primary badge now appears as a blue pill overlay in the top-left corner of p
 > be concise in your responses please. that fixed the problem thanks
 
 Great! Glad the primary badge overlay is now working correctly on both the manage images page and the edit roaster page. The fix was simply adding relative positioning to the image container in `SimpleImageUpload.tsx`.
+
+> be concise with your responses. When click "set primary" button in admin roaster, goes back to roasters list
+
+I'll help you fix the issue where clicking the "set primary" button in admin roaster redirects back to the roasters list instead of staying on the current page.
+
+Let me first examine the admin roaster functionality to understand the current implementation.
+
+✔ Searching codebase for `"admin roaster set primary button"`
+
+Now let me look at the SimpleImageUpload component more closely to understand the setPrimaryImage function and see where the navigation happens:
+
+✔ Read `SimpleImageUpload.tsx`, lines 108 to 140
+
+The issue isn't in the SimpleImageUpload component itself - the setPrimaryImage function looks correct. Let me check if there's something in the parent component (the admin roaster form) that might be causing a navigation after the image update:
+
+✔ Read `page.tsx`, lines 280 to 320
+
+Let me find where the onImagesUpdated callback is being passed to SimpleImageUpload:
+
+✔ Read `page.tsx`, lines 650 to 680
+
+The issue is clear now! In the RoasterForm component, the onImagesUpdated callback just calls `setImages(updatedImages)`, which should only update the local state. However, let me check if there's any effect or other logic that might trigger a navigation when images are updated.
+
+Let me look at the useEffect hooks in the RoasterForm:
+
+✔ Read `page.tsx`, lines 340 to 360
+
+Let me find the fetchImages function:
+
+✔ Searched text for `fetchImages` (`**/client/src/app/admin/roasters/page.tsx`), 2 results
+
+✔ Read `page.tsx`, lines 322 to 340
+
+Now I need to understand what exactly is causing the navigation back to the roasters list. Let me check the `onFormSuccess` callback:
+
+✔ Read `page.tsx`, lines 99 to 130
+
+Found it! The issue is that in the RoasterForm, when you submit the form (line 399), it calls `onSuccess()`, which is mapped to `onFormSuccess()`, which sets `setEditingId(null)` and navigates back to the roasters list.
+
+Let me check where the form submission happens in the RoasterForm:
+
+✔ Read `page.tsx`, lines 390 to 410
+
+I need to see the form submission logic. The problem is likely that some action in the SimpleImageUpload component is triggering a form submission. Let me examine the SimpleImageUpload component more thoroughly to see if there's something that could cause the form to submit:
+
+✔ Read `SimpleImageUpload.tsx`, lines 200 to 229
+
+I found the issue! The buttons in the SimpleImageUpload component don't have `type="button"` specified. In HTML, buttons inside a form have a default `type="submit"`, so when you click the "Set Primary" button, it's actually submitting the parent form, which triggers the `onSuccess` callback and navigates back to the roasters list.
+
+Let me fix this by adding `type="button"` to both buttons:
+
+`SimpleImageUpload.tsx +2 -0`
+
+Now let me also check if there are any other buttons in the SimpleImageUpload component that might need the same fix:
+
+✔ Searched text for `<button>` (`**/client/src/components/SimpleImageUpload.tsx`), 6 results
+
+Let me check the upload button at line 156:
+
+✔ Read `SimpleImageUpload.tsx`, lines 150 to 170
+
+Good! The upload button already has type="button". Now let me restart the client container so the changes take effect:
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the issue. The problem was that the "Set Primary" and "Delete" buttons in the `SimpleImageUpload` component didn't have `type="button"` specified. In HTML forms, buttons default to `type="submit"`, so clicking these buttons was submitting the parent form, which triggered the `onSuccess` callback and navigated back to the roasters list.
+
+**Changes made**:
+
+- Added `type="button"` to both the "Set Primary" and "Delete" buttons in `SimpleImageUpload.tsx`
+- Restarted the client container for changes to take effect
+
+Now when you click "Set Primary" on an image in the admin roaster edit page, it will only update the image's primary status without triggering a form submission and navigation back to the roasters list.
+
+## 362nd try
+
+*(fixed!)*
+
