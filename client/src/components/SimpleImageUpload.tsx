@@ -115,6 +115,32 @@ export default function SimpleImageUpload({
     }
   };
 
+  const setPrimaryImage = async (imageId: string) => {
+    if (!canEdit) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/roasters/${roasterId}/images/${imageId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isPrimary: true }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to set primary image');
+      }
+
+      await fetchImages();
+    } catch (error) {
+      console.error('Error setting primary image:', error);
+      setError(error instanceof Error ? error.message : 'Failed to set primary image');
+    }
+  };
+
   return (
     <div className="space-y-4">
       {canEdit && (
@@ -147,7 +173,7 @@ export default function SimpleImageUpload({
       {existingImages.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {existingImages.map((image) => (
-            <div key={image.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div key={image.id} className="relative bg-white rounded-lg shadow-md overflow-hidden">
               <RoasterImageComponent
                 src={image.url}
                 alt={image.description || 'Roaster image'}
@@ -158,7 +184,7 @@ export default function SimpleImageUpload({
               
               {image.isPrimary && (
                 <div className="absolute top-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">
-                  Primary
+                  {t('roaster.images.primary', 'Primary')}
                 </div>
               )}
 
@@ -173,11 +199,19 @@ export default function SimpleImageUpload({
                 
                 {canEdit && (
                   <div className="mt-2 flex space-x-2">
+                    {!image.isPrimary && (
+                      <button
+                        onClick={() => setPrimaryImage(image.id)}
+                        className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200"
+                      >
+                        {t('roaster.images.setPrimary', 'Set Primary')}
+                      </button>
+                    )}
                     <button
                       onClick={() => deleteImage(image.id)}
                       className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200"
                     >
-                      Delete
+                      {t('roaster.images.delete', 'Delete')}
                     </button>
                   </div>
                 )}
