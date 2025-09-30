@@ -54,7 +54,7 @@ export const canEditRoaster = async (req: any, res: any, next: any) => {
     }
 
     if (!roaster.email || roaster.email !== userWithEmail.email) {
-      return res.status(403).json({ error: 'You can only edit roasters with your email address' });
+      return res.status(403).json({ error: 'You can only edit roasters associated with your email address' });
     }
 
     req.userRole = 'owner';
