@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Roaster } from '@/types';
+import { Roaster, RoasterImage } from '@/types';
+import SimpleImageUpload from '@/components/SimpleImageUpload';
 
 const AdminRoastersPage: React.FC = () => {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ const AdminRoastersPage: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showUnverifiedOnly, setShowUnverifiedOnly] = useState(false);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [images, setImages] = useState<RoasterImage[]>([]);
 
   const fetchRoasters = async () => {
     setLoading(true);
@@ -53,7 +55,7 @@ const AdminRoastersPage: React.FC = () => {
   useEffect(() => {
     if (searchParams) {
       const editId = searchParams.get('edit');
-      if (editId) {
+      if (editId && editId.trim() !== '') {
         setEditingId(editId);
       }
     }
@@ -295,6 +297,8 @@ const RoasterForm: React.FC<{
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [images, setImages] = useState<RoasterImage[]>([]);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const [formData, setFormData] = useState({
     name: roaster?.name || '',
     description: roaster?.description || '',
@@ -313,6 +317,35 @@ const RoasterForm: React.FC<{
     featured: roaster?.featured || false,
     rating: roaster?.rating || 0,
   });
+
+  // Fetch images when editing existing roaster
+  const fetchImages = async () => {
+    if (!roaster?.id) return;
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/roasters/${roaster.id}/images`);
+      if (response.ok) {
+        const data = await response.json();
+        setImages(data.images || []);
+        setImagesLoaded(true);
+      }
+    } catch (error) {
+      console.error('Error fetching images:', error);
+      setImagesLoaded(true);
+    }
+  };
+
+  // Load images when component mounts with existing roaster (delayed to prevent auto-trigger)
+  React.useEffect(() => {
+    if (roaster?.id && !imagesLoaded) {
+      const timer = setTimeout(() => {
+        fetchImages();
+      }, 1000); // Delay to prevent auto-trigger
+      
+      return () => clearTimeout(timer);
+    }
+  }, [roaster?.id, imagesLoaded]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -625,6 +658,21 @@ const RoasterForm: React.FC<{
               </div>
             </div>
           </div>
+
+          {/* Images Section - Only show when editing existing roaster and images are loaded */}
+          {roaster && roaster.id && imagesLoaded && (
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {t('adminSection.roasters.images', 'Images')}
+              </h3>
+              <SimpleImageUpload
+                roasterId={roaster.id}
+                existingImages={images}
+                onImagesUpdated={(updatedImages) => setImages(updatedImages)}
+                canEdit={true}
+              />
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="mt-8 flex justify-end space-x-4 pt-4 border-t">

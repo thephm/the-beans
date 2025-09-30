@@ -375,7 +375,8 @@
     "roasters.editTitle": "Modifier Torréfacteur",
     "roasters.addTitle": "Ajouter Torréfacteur",
     "roasters.basicInfo": "Informations de Base",
-    "roasters.description": "Description"
+    "roasters.description": "Description",
+    "roasters.images": "Images"
   },
   "pagination": {
     "previous": "Précédent",

@@ -1,0 +1,195 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { RoasterImage } from '@/types';
+import RoasterImageComponent from './RoasterImage';
+
+interface SimpleImageUploadProps {
+  roasterId: string;
+  existingImages?: RoasterImage[];
+  onImagesUpdated: (images: RoasterImage[]) => void;
+  canEdit?: boolean;
+}
+
+export default function SimpleImageUpload({ 
+  roasterId, 
+  existingImages = [], 
+  onImagesUpdated, 
+  canEdit = false 
+}: SimpleImageUploadProps) {
+  const { t } = useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!canEdit || uploading) return;
+    
+    // Extra safety check
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const files = e.target.files;
+    if (!files || !canEdit) return;
+
+    setUploading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach((file) => {
+        formData.append('images', file);
+      });
+
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/roasters/${roasterId}/images`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload images');
+      }
+
+      // Fetch updated images
+      await fetchImages();
+      
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      setError(error instanceof Error ? error.message : 'Failed to upload images');
+    } finally {
+      setUploading(false);
+      // Clear the input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const fetchImages = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/roasters/${roasterId}/images`);
+      if (response.ok) {
+        const data = await response.json();
+        onImagesUpdated(data.images);
+      }
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    }
+  };
+
+  const deleteImage = async (imageId: string) => {
+    if (!canEdit) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/roasters/${roasterId}/images/${imageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete image');
+      }
+
+      await fetchImages();
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      setError('Failed to delete image');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {canEdit && (
+        <div className="flex items-center justify-end mb-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+          <button
+            type="button"
+            onClick={handleButtonClick}
+            disabled={uploading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {uploading ? 'Uploading...' : 'Add Images'}
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <div className="p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {existingImages.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {existingImages.map((image) => (
+            <div key={image.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <RoasterImageComponent
+                src={image.url}
+                alt={image.description || 'Roaster image'}
+                className="w-full h-48 object-cover"
+                width={300}
+                height={192}
+              />
+              
+              {image.isPrimary && (
+                <div className="absolute top-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">
+                  Primary
+                </div>
+              )}
+
+              <div className="p-3">
+                <input
+                  type="text"
+                  placeholder="Description..."
+                  defaultValue={image.description || ''}
+                  disabled={!canEdit}
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                />
+                
+                {canEdit && (
+                  <div className="mt-2 flex space-x-2">
+                    <button
+                      onClick={() => deleteImage(image.id)}
+                      className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8 text-gray-500">
+          <p>No images uploaded yet</p>
+        </div>
+      )}
+    </div>
+  );
+}
