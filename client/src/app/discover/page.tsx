@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { SearchSection } from '@/components/SearchSection'
+import RoasterImage from '@/components/RoasterImage'
 
 interface Roaster {
   id: string
@@ -205,11 +205,11 @@ export default function DiscoverPage() {
                 <div key={roaster.id} className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow ${
                   user?.role === 'admin' && !roaster.verified ? 'border-4 border-red-500' : ''
                 }`}>
-                  <Image
-                    src={roaster.imageUrl}
+                  <RoasterImage
+                    src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop'}
                     alt={roaster.name}
                     width={800}
-                    height={600}
+                    height={192}
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-6">
