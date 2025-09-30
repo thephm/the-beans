@@ -385,10 +385,9 @@ export default function RoasterDetail() {
 
                   {/* Action Buttons */}
                   <div className="space-y-3">
-                    {/* Manage Images Button for admins and owners */}
+                    {/* Manage Images Button for admins and email match */}
                     {user && (user.role === 'admin' || 
-                      (typeof roaster.owner === 'object' && roaster.owner?.id === user.id) ||
-                      (roaster.owner && typeof roaster.owner === 'string' && roaster.owner === user.id)
+                      (roaster.email && user.email && roaster.email === user.email)
                     ) && (
                       <Link
                         href={`/roasters/${roaster.id}/images`}

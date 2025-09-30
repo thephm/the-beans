@@ -33,18 +33,28 @@ export const canEditRoaster = async (req: any, res: any, next: any) => {
       return next();
     }
 
-    // Check if user owns the roaster
+    // Get user email
+    const userWithEmail = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true }
+    });
+
+    if (!userWithEmail) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // Check if user email matches roaster email
     const roaster = await prisma.roaster.findUnique({
       where: { id: roasterId },
-      select: { ownerId: true }
+      select: { email: true }
     });
 
     if (!roaster) {
       return res.status(404).json({ error: 'Roaster not found' });
     }
 
-    if (roaster.ownerId !== userId) {
-      return res.status(403).json({ error: 'You can only edit your own roasters' });
+    if (!roaster.email || roaster.email !== userWithEmail.email) {
+      return res.status(403).json({ error: 'You can only edit roasters with your email address' });
     }
 
     req.userRole = 'owner';
@@ -84,18 +94,28 @@ export const canViewRoasterManagement = async (req: any, res: any, next: any) =>
       return next();
     }
 
-    // Check if user owns the roaster
+    // Get user email
+    const userWithEmail = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true }
+    });
+
+    if (!userWithEmail) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // Check if user email matches roaster email
     const roaster = await prisma.roaster.findUnique({
       where: { id: roasterId },
-      select: { ownerId: true }
+      select: { email: true }
     });
 
     if (!roaster) {
       return res.status(404).json({ error: 'Roaster not found' });
     }
 
-    if (roaster.ownerId !== userId) {
-      return res.status(403).json({ error: 'You can only manage your own roasters' });
+    if (!roaster.email || roaster.email !== userWithEmail.email) {
+      return res.status(403).json({ error: 'You can only manage roasters with your email address' });
     }
 
     req.userRole = 'owner';
