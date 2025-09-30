@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RoasterImage } from '@/types';
+import RoasterImageComponent from '@/components/RoasterImage';
 
 interface ImageUploadProps {
   roasterId: string;
@@ -254,7 +255,7 @@ export default function ImageUpload({
           {existingImages.map((image) => (
             <div key={image.id} className="group relative bg-white rounded-lg shadow-md overflow-hidden">
               <div className="aspect-w-16 aspect-h-9">
-                <img
+                <RoasterImageComponent
                   src={image.url}
                   alt={image.description || 'Roaster image'}
                   className="w-full h-48 object-cover"

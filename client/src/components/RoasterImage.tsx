@@ -18,6 +18,18 @@ const RoasterImage: React.FC<RoasterImageProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   
+  // Handle undefined/null src values
+  if (!src) {
+    return (
+      <div 
+        className={`flex items-center justify-center bg-gray-200 text-gray-500 ${className}`}
+        style={{ width, height }}
+      >
+        <span>No Image</span>
+      </div>
+    );
+  }
+  
   // If src is just a filename, construct the full backend URL
   const imageUrl = src.includes('http') 
     ? src 
