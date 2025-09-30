@@ -48,10 +48,10 @@ export default function EditRoasterImages() {
       const data = await response.json();
       setRoaster(data);
       
-      // Check if user can edit (admin or owner)
+      // Check if user can edit (admin or email match)
       const isAdmin = user?.role === 'admin';
-      const isOwner = data.ownerId === user?.id || data.owner?.id === user?.id;
-      setCanEdit(isAdmin || isOwner);
+      const emailMatch = data.email && user?.email && data.email === user.email;
+      setCanEdit(isAdmin || emailMatch);
       
     } catch (error) {
       console.error('Error fetching roaster:', error);
