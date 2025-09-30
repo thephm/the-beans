@@ -201,6 +201,7 @@ export default function SimpleImageUpload({
                   <div className="mt-2 flex space-x-2">
                     {!image.isPrimary && (
                       <button
+                        type="button"
                         onClick={() => setPrimaryImage(image.id)}
                         className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200"
                       >
@@ -208,6 +209,7 @@ export default function SimpleImageUpload({
                       </button>
                     )}
                     <button
+                      type="button"
                       onClick={() => deleteImage(image.id)}
                       className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200"
                     >
