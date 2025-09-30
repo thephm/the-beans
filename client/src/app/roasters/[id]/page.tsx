@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
+import RoasterImage from '@/components/RoasterImage'
 
 interface Roaster {
   id: string
@@ -192,14 +193,12 @@ export default function RoasterDetail() {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Hero Image */}
           <div className="relative h-96">
-            <img
-              src={roaster.imageUrl || '/images/placeholder-roaster.jpg'}
+            <RoasterImage
+              src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=400&fit=crop&auto=format'}
               alt={roaster.name}
               className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=400&fit=crop&auto=format';
-              }}
+              width={800}
+              height={400}
             />
             <div className="absolute inset-0 bg-black bg-opacity-20"></div>
             <div className="absolute bottom-6 left-6 text-white">

@@ -266,6 +266,12 @@ router.get('/', [
             lastName: true,
           }
         },
+        roasterImages: {
+          orderBy: [
+            { isPrimary: 'desc' },
+            { uploadedAt: 'asc' }
+          ]
+        },
         _count: {
           select: {
             reviews: true,
@@ -298,9 +304,19 @@ router.get('/', [
 
     // Add imageUrl field for frontend compatibility
     const roastersWithImageUrl = filteredRoasters.map((roaster: any) => {
+      // Use the primary image from roasterImages if available, fall back to old images array
+      let imageUrl = null;
+      if (roaster.roasterImages && roaster.roasterImages.length > 0) {
+        // Find primary image first, or use the first image (they're ordered by isPrimary desc)
+        imageUrl = roaster.roasterImages[0].url;
+      } else if (roaster.images && roaster.images.length > 0) {
+        // Fall back to old images array
+        imageUrl = roaster.images[0];
+      }
+
       const result = {
         ...roaster,
-        imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : null,
+        imageUrl,
       };
       
       // Round rating to 1 decimal place
@@ -371,6 +387,12 @@ router.get('/:id', [
           }
         },
         beans: true,
+        roasterImages: {
+          orderBy: [
+            { isPrimary: 'desc' },
+            { uploadedAt: 'asc' }
+          ]
+        },
         reviews: {
           include: {
             user: {
@@ -431,9 +453,19 @@ router.get('/:id', [
     }
 
     // Add imageUrl field for frontend compatibility (filename only)
+    // Use the primary image from roasterImages if available, fall back to old images array
+    let imageUrl = null;
+    if (roaster.roasterImages && roaster.roasterImages.length > 0) {
+      // Find primary image first, or use the first image (they're ordered by isPrimary desc)
+      imageUrl = roaster.roasterImages[0].url;
+    } else if (roaster.images && roaster.images.length > 0) {
+      // Fall back to old images array
+      imageUrl = roaster.images[0];
+    }
+
     const roasterWithImageUrl = {
       ...roaster,
-      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : null,
+      imageUrl,
       isFavorited,
     };
 
@@ -800,6 +832,12 @@ router.get('/admin/unverified', [
             lastName: true,
           }
         },
+        roasterImages: {
+          orderBy: [
+            { isPrimary: 'desc' },
+            { uploadedAt: 'asc' }
+          ]
+        },
         _count: {
           select: {
             reviews: true,
@@ -814,10 +852,22 @@ router.get('/admin/unverified', [
     const pages = Math.ceil(total / limit);
 
     // Add imageUrl field for frontend compatibility (filename only)
-    const roastersWithImageUrl = roasters.map((roaster: any) => ({
-      ...roaster,
-      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : null,
-    }));
+    const roastersWithImageUrl = roasters.map((roaster: any) => {
+      // Use the primary image from roasterImages if available, fall back to old images array
+      let imageUrl = null;
+      if (roaster.roasterImages && roaster.roasterImages.length > 0) {
+        // Find primary image first, or use the first image (they're ordered by isPrimary desc)
+        imageUrl = roaster.roasterImages[0].url;
+      } else if (roaster.images && roaster.images.length > 0) {
+        // Fall back to old images array
+        imageUrl = roaster.images[0];
+      }
+
+      return {
+        ...roaster,
+        imageUrl,
+      };
+    });
 
     res.json({
       roasters: roastersWithImageUrl,
