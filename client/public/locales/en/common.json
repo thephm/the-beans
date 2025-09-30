@@ -376,7 +376,8 @@
     "roasters.editTitle": "Edit Roaster",
     "roasters.addTitle": "Add Roaster",
     "roasters.basicInfo": "Basic Information",
-    "roasters.description": "Description"
+    "roasters.description": "Description",
+    "roasters.images": "Images"
   },
   "pagination": {
     "previous": "Previous",
