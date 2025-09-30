@@ -1,11 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
+import RoasterImage from './RoasterImage'
 
 interface Roaster {
   id: string
@@ -157,11 +157,12 @@ export function FeaturedRoasters() {
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all opacity-100"
             >
               <div className="relative h-48">
-                <Image
+                <RoasterImage
                   src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=300&fit=crop'}
                   alt={roaster.name}
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
+                  width={400}
+                  height={300}
                 />
                 <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600">
                   ⭐ {roaster.rating}

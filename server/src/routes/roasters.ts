@@ -300,7 +300,7 @@ router.get('/', [
     const roastersWithImageUrl = filteredRoasters.map((roaster: any) => {
       const result = {
         ...roaster,
-        imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
+        imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : null,
       };
       
       // Round rating to 1 decimal place
@@ -430,10 +430,14 @@ router.get('/:id', [
       isFavorited = !!favorite;
     }
 
-    res.json({
+    // Add imageUrl field for frontend compatibility (filename only)
+    const roasterWithImageUrl = {
       ...roaster,
+      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : null,
       isFavorited,
-    });
+    };
+
+    res.json(roasterWithImageUrl);
   } catch (error) {
     console.error('Get roaster error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -809,10 +813,10 @@ router.get('/admin/unverified', [
     const total = await prisma.roaster.count({ where: { verified: false } });
     const pages = Math.ceil(total / limit);
 
-    // Add imageUrl field for frontend compatibility
+    // Add imageUrl field for frontend compatibility (filename only)
     const roastersWithImageUrl = roasters.map((roaster: any) => ({
       ...roaster,
-      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
+      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : null,
     }));
 
     res.json({
