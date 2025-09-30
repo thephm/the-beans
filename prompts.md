@@ -43132,3 +43132,276 @@ Now when you click "Set Primary" on an image in the admin roaster edit page, it 
 
 *(fixed!)*
 
+## The primary image is not show in Favorites page #70
+
+https://github.com/thephm/the-beans/issues/70
+
+I'll help you fix the issue where the primary image is not showing on the Favorites page. Let me investigate the current implementation to understand what's causing this problem.
+
+✔ Created 3 todos
+
+✔ Starting (1/3) Examine Favorites page implementation
+
+Searched for files matching `**/favorites/page.tsx`, 2 matches
+
+✔ Read `page.tsx`, lines 1 to 50
+
+✔ Read `page.tsx`, lines 100 to 150
+
+✔ Read `page.tsx`, lines 180 to 234
+
+I can see the issue! The favorites page is missing the image display entirely. It shows the roaster cards with name, location, rating, and description, but there's no image component. Let me find where the image should be displayed and compare it with other working pages.
+
+✔ Searched text for `roaster.imageUrl` (`**/favorites/page.tsx`), 1 result
+
+Let me check around line 171 to see the current image implementation:
+
+✔ Read `page.tsx`, lines 160 to 180
+
+Perfect! I found the issue. The favorites page is using a regular <img> tag with roaster.imageUrl directly (line 171), but based on the previous fixes in the project, this should be using the RoasterImage component instead. The imageUrl field contains just the filename, not the full URL path.
+
+✔ Starting (2/3) Check Favorites API response
+
+Let me check what the RoasterImage component looks like to understand the proper implementation:
+
+✔ Searched for files matching `**/RoasterImage.tsx`, 2 matches
+
+✔ Read `RoasterImage.tsx`, lines 1 to 30
+
+✔ Read `RoasterImage.tsx`, lines 30 to 62
+
+Perfect! Now I can see that the `RoasterImage` component properly handles the URL construction by checking if the src includes 'http' and if not, it constructs the full backend URL by prepending the API URL and `/uploads/` path.
+
+✔ Starting (3/3) Fix image display issue
+
+Now I need to fix the favorites page by importing and using the RoasterImage component instead of the regular img tag. First, let me add the import:
+
+`page.tsx +1 -0`
+
+Now let me replace the regular img tag with the RoasterImage component:
+
+`page.tsx +2 -5`
+
+Now let me restart the client container to apply the changes:
+
+✔ `docker-compose restart client`
+
+✔ Completed (3/3) Fix image display issue
+
+### Perfect! ✅ Fixed the primary image issue on the Favorites page
+
+**Problem**: The Favorites page was using a regular `<img>` tag with roaster.`imageUrl` directly, but imageUrl contains just the filename (e.g., `"roaster-1759195571384-coffee2.jpg"`), not the full URL path.
+
+**Solution**:
+
+1. **Imported RoasterImage component** - Added the proper image component that handles URL construction
+2. **Replaced img tag **- Changed from `<img src={roaster.imageUrl}>` to `<RoasterImage src={roaster.imageUrl}>`
+3. **Proper URL handling** - The RoasterImage component automatically constructs the full URL: filename → `http://localhost:5000/uploads/filename`
+
+**Changes made**:
+
+- Added `import RoasterImage from '@/components/RoasterImage'` to the imports
+- Replaced the img element with `<RoasterImage>` component that properly handles the URL construction
+- Kept the same fallback image and styling
+
+The Favorites page now displays primary images correctly, consistent with other pages in the application!
+
+## 363rd try
+
+*(worked)*
+
+> Please make margins wider on the edit roaster page thanks!
+
+I'll help you make the margins wider on the edit roaster page. First, let me find the edit roaster page component to see the current layout.
+
+✔ Searched for files matching `**/roasters/*/edit/**`, no matches
+
+✔ Searched for files matching `**/edit**/page.tsx`, no matches
+
+Let me search for edit-related files in the roasters directory:
+
+✔ Searched text for `edit.*roaster|roaster.*edit` (`**/client/src/**`), 16 results
+
+Based on the search results, it looks like the edit roaster functionality is in the admin roasters page. Let me examine that file:
+
+✔ Read `page.tsx`, lines 1 to 50
+
+Let me continue reading to find the container and layout structure:
+
+✔ Searched text for `container|mx-|max-w|margin` (`**/client/src/app/admin/roasters/page.tsx`), 2 results
+
+Let me read more of the file to find the main container structure:
+
+✔ Read `page.tsx`, lines 380 to 450
+
+I found the main container! Let me read the return statement to see the complete layout structure:
+
+✔ Read `page.tsx`, lines 405 to 415
+
+Perfect! I can see the current structure. The edit roaster form appears when you're editing a roaster (when editingId is set). Let me also check the main page container to understand the current margins:
+
+✔ Read `page.tsx`, lines 150 to 200
+
+Now I understand the structure. The current margins are set with:
+
+- Main container: `p-4 pt-28 pl-8 pr-8` (4px padding all around, 28px top, 8px left/right)
+- Inner containers: `ml-4 mr-4` (4px margin left/right)
+
+This gives a total of 12px (8px + 4px) margin on each side. Let me increase these margins to make them wider. I'll update the main container classes to use larger margins:
+
+`page.tsx +3 -3`
+
+Now I need to update the edit form container as well. Let me find that section:
+
+`page.tsx +3 -3`
+
+Now let me restart the client container to apply the changes, as mentioned in the project instructions:
+
+✔ `docker-compose restart client`
+
+Perfect! I've successfully made the margins wider on the edit roaster page. Here's what I changed:
+
+**Changes Made:**
+
+1. **Main container margins**: Changed from `pl-8 pr-8` to `pl-16 pr-16` (doubled the left/right padding from 32px to 64px)
+
+2. **Inner container margins**: Changed from `ml-4 mr-4` to `ml-8 mr-8` (doubled the left/right margins from 16px to 32px)
+
+**Total margin increase:**
+
+- **Before**: 32px + 16px = 48px total margin on each side
+- **After**: 64px + 32px = 96px total margin on each side
+
+This gives you significantly wider margins (doubled) on both the roaster list view and the edit roaster form. The changes affect both the main roasters admin page and the edit roaster form that appears when you click "Edit" on a roaster.
+
+The client container has been restarted, so the changes should now be visible when you navigate to the admin roasters page and edit a roaster.
+
+## 364th try
+
+> still not wide enough margins on left and right
+
+I'll make the margins even wider on the edit roaster page. Let me increase them further:
+
+`page.tsx +3 -3`
+
+`page.ts x+3 -3`
+
+Now let me restart the client container to apply the wider margins:
+
+✔ `docker-compose restart client`
+
+Perfect! I've made the margins significantly wider. Here's the updated margin configuration:
+
+**New Margin Settings:**
+
+- **Main container**: `pl-32 pr-32` (128px left/right padding)
+- **Inner containers**: `ml-16 mr-16` (64px left/right margins)
+
+**Total margins now:**
+
+- **Previous**: 96px total margin on each side
+- **Current**: 128px + 64px = **192px total margin on each side**
+
+This gives you much more spacious margins - the content will now be centered with substantial white space on both sides. The changes affect both the roaster list view and the edit roaster form.
+
+The client container has been restarted, so you should now see the much wider margins when you visit the admin roasters page and edit a roaster.
+
+## 365th try
+
+*(edit roaster page has better margins)*
+
+> in the admin edit roaster page the panes for each roaster should be the same as what is shown to users in the UI and what is show in the manage images pane, they should all use the same settings for size
+
+I can see from the image that you're referring to the image management interface where the roaster images are displayed in a consistent grid layout with uniform sizing. Let me examine the current admin edit roaster page and the manage images page to understand how they differ and make them consistent.
+
+First, let me look at the manage images page to see how it displays images:
+
+✔ Read `page.tsx,` lines 1 to 50
+
+Let me search for the image display section in the manage images page:
+
+✔ Searched text for `grid|w-|h-|aspect` (`**/client/src/app/roasters/[id]/images/page.tsx`), no results
+
+Let me read more of the manage images page to find the image display section:
+
+✔ Read `page.tsx`, lines 150 to 212
+
+I can see that the manage images page uses the `ImageUpload` component. Let me examine that component to see how it displays images:
+
+✔ Read `ImageUpload.tsx`, lines 1 to 50
+
+Let me search for the image grid display in the ImageUpload component:
+
+✔ Searched text for `grid|w-|h-|aspect` (`**/client/src/components/ImageUpload.tsx`), 17 results
+
+Perfect! I can see the image display structure. Let me read that section:
+
+✔ Read `ImageUpload.tsx`, lines 250 to 280
+
+Now let me check how images are displayed in the admin roasters page. Let me search for the images section in the admin page:
+
+Let me examine the Images Section in the admin page:
+
+✔ Read `page.tsx`, lines 660 to 680
+
+Now let me examine the SimpleImageUpload component to see how it differs from the regular ImageUpload:
+
+✔ Read `SimpleImageUpload.tsx`, lines 1 to 50
+
+Let me search for the image display grid in SimpleImageUpload:
+
+✔ Searched text for `grid|w-|h-|aspect` (`**/client/src/components/SimpleImageUpload.tsx`), 18 results
+
+Let me read the image display section in SimpleImageUpload:
+
+✔ Read `SimpleImageUpload.tsx`, lines 170 to 210
+
+Now I can see the differences! Let me also check how roasters are displayed to users in the main UI. Let me search for roaster card components:
+
+✔ Searched for files matching `**/*RoasterCard*`, no matches
+
+✔ Searched text for `roaster.*card|card.*roaster` (`**/client/src/**`), no results
+
+Let me check the FeaturedRoasters component to see how roasters are displayed to users:
+
+✔ Read `FeaturedRoasters.tsx`, lines 50 to 100
+
+Let me search for the roaster display grid/cards in FeaturedRoasters:
+
+✔ Searched text for `grid|w-|h-|aspect` (`**/client/src/components/FeaturedRoasters.tsx`), 16 results
+
+Perfect! Let me read the roaster card display section:
+
+✔ Read `FeaturedRoasters.tsx`, lines 145 to 180
+
+Now I can see the patterns! Here's what I found:
+
+Current Image Display Patterns:
+
+1. **Regular ImageUpload** (Manage Images):
+
+  - Grid: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`
+  - Container: `group relative bg-white rounded-lg shadow-md overflow-hidden`
+  - Image: `w-full h-48 object-cover with aspect-w-16 aspect-h-9`
+
+2. **SimpleImageUpload** (Admin Edit):
+
+  - Grid: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`
+  - Container: `relative bg-white rounded-lg shadow-md overflow-hidden`
+  - Image: `w-full h-48 object-cover`
+
+3. **FeaturedRoasters** (User UI):
+
+  - Grid: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8`
+  - Container: `bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all`
+  - Image: `w-full h-full object-cover with container relative h-48`
+
+I need to make them all consistent. The user interface (FeaturedRoasters) appears to be the reference with the nicest styling. Let me update the SimpleImageUpload component to match the user interface and manage images styling:
+
+`SimpleImageUpload.tsx +5 -3`
+
+Now let me also update the input styling to match the regular ImageUpload component:
+
+`SimpleImageUpload.tsx +4 -2`
+
+Now let me restart the client container to apply these changes:
