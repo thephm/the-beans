@@ -150,11 +150,11 @@ const AdminRoastersPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 pt-28 pl-8 pr-8">
-      <div className="mb-6 ml-4 mr-4">
+    <div className="p-4 pt-28 pl-32 pr-32">
+      <div className="mb-6 ml-16 mr-16">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Roasters</h1>
       </div>
-      <div className="ml-4 mr-4">
+      <div className="ml-16 mr-16">
         <div className="flex justify-between items-center mb-6">
           <div></div>
           <div className="flex items-center gap-8">
@@ -405,8 +405,8 @@ const RoasterForm: React.FC<{
   };
 
   return (
-    <div className="p-4 pt-28 pl-8 pr-8">
-      <div className="mb-6 ml-4 mr-4">
+    <div className="p-4 pt-28 pl-32 pr-32">
+      <div className="mb-6 ml-16 mr-16">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {roaster 
             ? t('admin.roasters.editTitle', 'Edit Roaster') 
@@ -414,7 +414,7 @@ const RoasterForm: React.FC<{
           }
         </h1>
       </div>
-      <div className="ml-4 mr-4">
+      <div className="ml-16 mr-16">
 
         {error && (
           <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">

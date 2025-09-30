@@ -171,16 +171,18 @@ export default function SimpleImageUpload({
       )}
 
       {existingImages.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {existingImages.map((image) => (
-            <div key={image.id} className="relative bg-white rounded-lg shadow-md overflow-hidden">
-              <RoasterImageComponent
-                src={image.url}
-                alt={image.description || 'Roaster image'}
-                className="w-full h-48 object-cover"
-                width={300}
-                height={192}
-              />
+            <div key={image.id} className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all">
+              <div className="aspect-w-16 aspect-h-9">
+                <RoasterImageComponent
+                  src={image.url}
+                  alt={image.description || 'Roaster image'}
+                  className="w-full h-48 object-cover"
+                  width={300}
+                  height={192}
+                />
+              </div>
               
               {image.isPrimary && (
                 <div className="absolute top-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">
@@ -188,14 +190,16 @@ export default function SimpleImageUpload({
                 </div>
               )}
 
-              <div className="p-3">
-                <input
-                  type="text"
-                  placeholder="Description..."
-                  defaultValue={image.description || ''}
-                  disabled={!canEdit}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                />
+              <div className="p-4 space-y-3">
+                <div>
+                  <input
+                    type="text"
+                    placeholder={t('roaster.images.description', 'Image description...')}
+                    defaultValue={image.description || ''}
+                    disabled={!canEdit}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  />
+                </div>
                 
                 {canEdit && (
                   <div className="mt-2 flex space-x-2">

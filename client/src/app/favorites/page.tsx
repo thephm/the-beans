@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
+import RoasterImage from '@/components/RoasterImage'
 
 interface Roaster {
   id: number
@@ -167,13 +168,10 @@ export default function FavoritesPage() {
                   {favoriteRoasters.map((roaster) => (
                     <div key={roaster.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all group">
                       <div className="relative h-48">
-                        <img 
-                          src={roaster.imageUrl || '/placeholder-coffee.jpg'} 
+                        <RoasterImage
+                          src={roaster.imageUrl || 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=300&fit=crop'}
                           alt={roaster.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=300&fit=crop'
-                          }}
                         />
                       </div>
                       <div className="p-6">
