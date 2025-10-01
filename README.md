@@ -94,40 +94,7 @@ docker-compose exec server npx prisma generate
 docker-compose exec server npx prisma migrate reset
 ```
 
-## 💻 Alternative: Local Development (Not Recommended)
-
-⚠️ **Note**: Local development without Docker is not recommended due to environment complexity. Use only if Docker is unavailable.
-
-### Prerequisites
-- Node.js 18+
-- PostgreSQL installed locally
-- npm or yarn
-
-### Setup Steps
-1. **Install dependencies**
-   ```bash
-   npm run setup
-   ```
-
-2. **Set up environment variables**
-   - Copy `.env.example` to `.env` in both `client/` and `server/` directories
-   - Configure database connection and API keys
-
-3. **Start development servers**
-   ```bash
-   npm run dev
-   ```
-
-4. **Manual database setup**
-   ```bash
-   cd server
-   npx prisma migrate dev
-   npx prisma generate
-   npx prisma db seed
-   ```
-
-
-## 📚 Documentation
+##  Documentation
 
 Comprehensive documentation is maintained in the [`docs/`](./docs/) directory following docs-as-code principles.
 

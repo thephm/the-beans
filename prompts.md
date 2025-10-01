@@ -45838,11 +45838,11 @@ Perfect! ✅ I have successfully cleaned up all debug code and dead code from Th
 
 🔍 **Verification**
 
-**Testing Complete**d:
+**Testing Completed**:
 
 - ✅ All Docker containers restart successfully
-- ✅ Frontend loads correctly (http://localhost:3000)
-- ✅ Discover page functions properly (http://localhost:3000/discover)
+- ✅ Frontend loads correctly (`http://localhost:3000`)
+- ✅ Discover page functions properly (`http://localhost:3000/discover`)
 - ✅ No build errors or missing dependencies
 - ✅ Application performance maintained
 
@@ -46010,3 +46010,69 @@ Perfect! I've successfully updated all the key README and documentation files fo
 5. 🚀 **Production Ready**: Complete deployment and scaling instructions
 
 The documentation now accurately reflects the current state of The Beans project and provides a comprehensive guide for both new contributors and ongoing development work!
+
+> remove the
+
+```
+Alternative: Local Development (Not Recommended)
+⚠️ Note: Local development without Docker is not recommended due to environment complexity. Use only if Docker is unavailable.
+
+Prerequisites
+Node.js 18+
+PostgreSQL installed locally
+npm or yarn
+Setup Steps
+Install dependencies
+
+npm run setup
+Set up environment variables
+
+Copy .env.example to .env in both client/ and server/ directories
+Configure database connection and API keys
+Start development servers
+
+npm run dev
+Manual database setup
+
+cd server
+npx prisma migrate dev
+npx prisma generate
+npx prisma db seed
+```
+
+I'll help you remove that "Alternative: Local Development (Not Recommended)" section. First, let me check the current content of the file to locate the exact text.
+
+Read `prompts.md`, lines 1 to 50
+
+I need to see more of the file to locate the `"Alternative: Local Development"` section. Let me search for it:
+
+Searched text for `Alternative: Local Development` (`**/prompts.md`), no results
+
+Let me check if this might be in the `README.md` or SETUP.md files instead:
+
+Found it! The section is in the `README.md` file. Let me read the content around that section to see exactly what needs to be removed:
+
+Read `README.md`, lines 95 to 130
+
+Now I can see the complete section that needs to be removed. Let me remove it:
+
+`README.md +1 -34`
+
+Perfect! I've successfully removed the "Alternative: Local Development (Not Recommended)" section from the README.md file. The section included:
+
+- The header with warning note
+- Prerequisites (Node.js 18+, PostgreSQL, npm/yarn)
+- Setup steps for local development
+- Manual database setup instructions
+
+The `README.md` now flows directly from the Docker setup section to the Documentation section, maintaining the project's focus on Docker-based development as recommended in the copilot instructions.
+
+> remove the "Alternative: Local Development (Not Recommended)" section from the readme.md
+
+I can see from the previous context that the `"Alternative: Local Development (Not Recommended)"` section has already been removed from the README.md file. Let me verify the current state of the file to confirm:
+
+Searched text for `Alternative: Local Development` (`**/README.md)`, no results
+
+Perfect! The "Alternative: Local Development (Not Recommended)" section has already been successfully removed from the README.md file. The section that included the warning note, prerequisites, setup steps, and manual database setup instructions is no longer present in the file.
+
+The `README.md` now maintains focus on the Docker-based development workflow as recommended in the project's architecture guidelines
