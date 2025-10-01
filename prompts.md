@@ -45366,3 +45366,159 @@ Now let me test the admin roaster page to verify the changes work correctly:
 - **Backward Compatible**: Existing roasters continue to work normally
 
 The feature is now fully functional and ready for use! When administrators edit roasters, they can simply check "Online Only" and the hours section will disappear while automatically setting appropriate closed hours in the database. 🎉
+
+## Remove brewing methods from preferences/settings #76
+
+https://github.com/thephm/the-beans/issues/76
+
+> Remove brewing methods from settings. That was old feature for cafes which was removed: Brewing methods, Espresso, Pour Over, French Press, Cold Brew
+
+I'll help you remove the brewing methods section from the settings page. Based on the attachment that shows the brewing methods checkboxes (Espresso, Pour Over, French Press, Cold Brew) highlighted in the settings interface, I need to find and remove this section.
+
+✔ Created 4 todos
+
+✔ Starting (1/4) Find settings page with brewing methods
+
+Let me first locate the settings page with the brewing methods:
+
+✔ Searched for files matching `**/settings/**/page.tsx`, 2 matches
+
+✔ Searched text for `Brewing methods|Espresso|Pour Over|French Press|Cold Brew` (`**/settings/**`), 10 results
+
+Perfect! I found the settings page. Let me examine the current structure of the settings page:
+
+✔ Read `page.tsx`, lines 200 to 270
+
+Let me see the complete brewing methods section:
+
+✔ Read page.tsx, lines 250 to 280
+
+Let me also check the state initialization to understand the complete structure:
+
+✔ Read `page.tsx`, lines 20 to 40
+
+Now let me check where the brewing methods section ends in the JSX:
+
+✔ Read `page.tsx`, lines 275 to 285
+
+✔ Starting (2/4) Remove brewing methods section from UI
+
+Perfect! Now I'll remove the brewing methods section. First, I need to remove the brewingMethods object from the state initialization:
+
+`page.tsx+0-6`
+
+Now I need to remove the entire brewing methods section from the UI. Let me identify the exact section to remove:
+
+Let me read the exact text again to get the precise formatting:
+
+✔ Read `page.tsx`, lines 215 to 285
+
+I need to see where the brewing methods section starts to remove the complete section. Let me find the label and div that starts it:
+
+✔ Read `page.tsx`, lines 205 to 220
+
+Now I can see the exact structure. Let me remove the complete brewing methods section:
+
+`page.tsx +0 -65`
+
+✔ Starting (3/4) Remove brewing methods translations
+
+Now let me clean up the translation keys. First, let me check what brewing methods translations exist in the English locale file:
+
+✔ Searched text for `brewingMethods|espresso|pourOver|frenchPress|coldBrew` (`**/locales/en/common.json`), 12 results
+
+Let me examine the settings section in the English translation file:
+
+✔ Read `common.json`, lines 165 to 185
+
+Perfect! I found the brewing methods translations. Now let me remove them:
+
+`common.json +1 -5`
+
+Now let me check and remove the French translations:
+
+✔ Searched text for `brewingMethods|espresso|pourOver|frenchPress|coldBrew` (`**/locales/fr/common.json`), 12 results
+
+Let me examine the French settings section:
+
+✔ Read `common.json`, lines 180 to 200
+
+Now let me remove the French brewing methods translations:
+
+`common.json +1 -5`
+
+Now let me check if there are any other brewing methods references in the docs that need updating:
+
+✔ Read `README.md`, lines 5 to 15
+
+Let me update the documentation to remove the brewing methods reference:
+
+`README.md +0 -1`
+
+Let me also check the design.md file for any brewing methods references:
+
+✔ Read `design.md`, lines 25 to 40
+
+Let me update the design documentation to remove the brewing methods:
+
+`design.md +1 -7`
+
+Continue to iterate?
+
+Copilot has been working on this problem for a while. It can continue to iterate, or you can send a new message to refine your prompt. Configure max requests.
+
+✔ Starting (4/4) Test and restart containers
+
+Now let me restart the client container to test the changes:
+
+✔ `docker-compose restart client`
+
+Perfect! Now let me test the settings page to verify the brewing methods section has been removed:
+
+✔ Opened Simple Browser at `http://localhost:3000/settings`
+
+### ✅ Perfect! Successfully removed all brewing methods from settings!
+
+🎯 **Complete Removal Summary**
+
+✅ **Removed from Settings Page UI**:
+
+- **Brewing methods** section label
+- **Espresso** checkbox and label
+- **Pour Over** checkbox and label
+- **French Press** checkbox and label
+- **Cold Brew** checkbox and label
+- **Complete brewing methods state object** from component state
+
+✅ **Cleaned Up Translation Keys**:
+
+- **English** (`common.json`): Removed `brewingMethods`, `espresso`, `pourOver`, `frenchPress`, `coldBrew`
+- **French** (`common.json`): Removed `brewingMethods`, `espresso`, `pourOver`, `frenchPress`, `coldBrew`
+✅ **Updated Documentation**:
+
+- Settings **README** (`README.md`): Removed brewing methods from feature list
+- **Design specs** (`design.md`): Removed brewing methods object from data structure example
+
+🔍 **What Was Removed**
+
+**Before**: Settings page had "Coffee Preferences" section with:
+
+- Roast level dropdown ✅ (Kept)
+- Brewing methods section with 4 checkboxes ❌ (Removed)
+  - Espresso
+  - Pour Over
+  - French Press
+  - Cold Brew
+
+**After**: Settings page now has clean "Coffee Preferences" section with:
+
+- Roast level dropdown only ✅
+
+🎉 **User Experience Impact**
+
+- **Cleaner interface** - No more obsolete brewing method preferences
+- **Faster setup** - Users focus only on relevant preferences (roast level)
+- **No confusion** - Removed deprecated cafe-related features
+- **Consistent** - Both English and French translations cleaned up
+
+The brewing methods feature has been completely removed as requested, since it was part of the old cafe functionality that's no longer used in the current roaster-focused app! 🎯

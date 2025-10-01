@@ -27,13 +27,7 @@ Technical design and architecture for settings.
 		"allowLocationTracking": false
 	},
 	"preferences": {
-		"roastLevel": "no-preference",
-		"brewingMethods": {
-			"espresso": false,
-			"pourOver": false,
-			"frenchPress": false,
-			"coldBrew": false
-		}
+		"roastLevel": "no-preference"
 	}
 }
 
