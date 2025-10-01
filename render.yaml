@@ -14,7 +14,6 @@ services:
   - type: web
     name: the-beans-api
     runtime: node
-    nodeVersion: 18
     region: oregon # Choose region closest to your users
     plan: starter # Can upgrade to standard/pro for production
     rootDir: server
@@ -46,7 +45,6 @@ services:
   - type: web
     name: the-beans-frontend
     runtime: node
-    nodeVersion: 18
     region: oregon # Same region as backend for better performance
     plan: starter # Can upgrade for production
     rootDir: client
@@ -65,10 +63,14 @@ services:
         destination: /index.html
     headers:
       - path: /*
-        headers:
-          X-Frame-Options: DENY
-          X-Content-Type-Options: nosniff
-          Referrer-Policy: origin-when-cross-origin
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: origin-when-cross-origin
     autoDeploy: true
 
 
