@@ -25,12 +25,6 @@ export default function SettingsPage() {
     },
     preferences: {
       roastLevel: 'no-preference',
-      brewingMethods: {
-        espresso: false,
-        pourOver: false,
-        frenchPress: false,
-        coldBrew: false
-      },
       distanceUnit: 'km' // 'km' (default) or 'mi'
     },
     language: user?.language || 'en',
@@ -214,71 +208,6 @@ export default function SettingsPage() {
                       <option value="dark">{t('settings.dark')} roast</option>
                       <option value="no-preference">{t('settings.noPreference')}</option>
                     </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.brewingMethods')}</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <label className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          checked={settings.preferences.brewingMethods.espresso}
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev,
-                            preferences: { 
-                              ...prev.preferences, 
-                              brewingMethods: { ...prev.preferences.brewingMethods, espresso: e.target.checked }
-                            }
-                          }))}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{t('settings.espresso')}</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          checked={settings.preferences.brewingMethods.pourOver}
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev,
-                            preferences: { 
-                              ...prev.preferences, 
-                              brewingMethods: { ...prev.preferences.brewingMethods, pourOver: e.target.checked }
-                            }
-                          }))}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{t('settings.pourOver')}</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          checked={settings.preferences.brewingMethods.frenchPress}
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev,
-                            preferences: { 
-                              ...prev.preferences, 
-                              brewingMethods: { ...prev.preferences.brewingMethods, frenchPress: e.target.checked }
-                            }
-                          }))}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{t('settings.frenchPress')}</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          checked={settings.preferences.brewingMethods.coldBrew}
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev,
-                            preferences: { 
-                              ...prev.preferences, 
-                              brewingMethods: { ...prev.preferences.brewingMethods, coldBrew: e.target.checked }
-                            }
-                          }))}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{t('settings.coldBrew')}</span>
-                      </label>
-                    </div>
                   </div>
                 </div>
               </div>

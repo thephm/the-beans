@@ -171,11 +171,7 @@
     "light": "Light",
     "medium": "Medium",
     "dark": "Dark",
-  "brewingMethods": "Brewing methods",
-    "espresso": "Espresso",
-    "pourOver": "Pour Over",
-    "frenchPress": "French Press",
-    "coldBrew": "Cold Brew",
+
     "showOnlyVerified": "Show only verified roasters",
     "save": "Save Settings",
     "saving": "Saving...",
