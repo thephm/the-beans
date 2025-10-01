@@ -26,10 +26,8 @@ export function SearchSection({
   const [popularSearches, setPopularSearches] = useState<string[]>([])
   // Fetch popular searches from backend
   const fetchPopularSearches = async () => {
-    console.log('🔍 Fetching popular searches...');
     try {
       const response = await fetch('http://localhost:5000/api/search/popular?limit=5');
-      console.log('📊 Popular searches HTTP response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
