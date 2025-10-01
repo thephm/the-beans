@@ -35,6 +35,35 @@ export default function SimpleImageUpload({
     }
   };
 
+  const validateImageDimensions = (file: File): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        // Minimum dimensions for good quality display (16:9 aspect ratio minimum)
+        const minWidth = 800;
+        const minHeight = 450;
+        
+        if (img.width < minWidth || img.height < minHeight) {
+          setError(`Images must be at least ${minWidth}x${minHeight} pixels for best quality`);
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      };
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        setError('Invalid image file');
+        resolve(false);
+      };
+      
+      img.src = objectUrl;
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -46,8 +75,39 @@ export default function SimpleImageUpload({
     setError(null);
 
     try {
+      // Validate files before upload
+      const validFiles: File[] = [];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        if (!file.type.startsWith('image/')) {
+          setError('Only image files are allowed');
+          continue;
+        }
+
+        if (file.size > maxSize) {
+          setError('File size must be less than 5MB');
+          continue;
+        }
+
+        // Validate dimensions
+        const isDimensionsValid = await validateImageDimensions(file);
+        if (!isDimensionsValid) {
+          continue;
+        }
+
+        validFiles.push(file);
+      }
+
+      if (validFiles.length === 0) {
+        setUploading(false);
+        return;
+      }
+
       const formData = new FormData();
-      Array.from(files).forEach((file) => {
+      validFiles.forEach((file) => {
         formData.append('images', file);
       });
 
@@ -144,23 +204,28 @@ export default function SimpleImageUpload({
   return (
     <div className="space-y-4">
       {canEdit && (
-        <div className="flex items-center justify-end mb-4">
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
-          <button
-            type="button"
-            onClick={handleButtonClick}
-            disabled={uploading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {uploading ? 'Uploading...' : 'Add Images'}
-          </button>
+        <div className="mb-4">
+          <div className="flex items-center justify-end">
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            <button
+              type="button"
+              onClick={handleButtonClick}
+              disabled={uploading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {uploading ? 'Uploading...' : 'Add Images'}
+            </button>
+          </div>
+          <p className="text-base text-gray-600 mt-2 text-right font-medium">
+            Recommended: 800×450px minimum • JPG, PNG, WebP • Max 5MB each
+          </p>
         </div>
       )}
 
