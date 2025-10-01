@@ -74,7 +74,7 @@ export function Navbar() {
                   onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
                   className="flex items-center text-gray-700 hover:text-gray-900 font-semibold transition-colors"
                 >
-                  {t('admin', 'Admin')}
+                  {t('admin.title', 'Admin')}
                   <svg 
                     className={`ml-1 w-4 h-4 transition-transform ${isAdminMenuOpen ? 'rotate-180' : ''}`}
                     fill="none" 
@@ -160,7 +160,7 @@ export function Navbar() {
               </Link>
               {user?.role === 'admin' && (
                 <div className="py-2">
-                  <div className="text-gray-700 font-semibold mb-2">{t('admin', 'Admin')}</div>
+                  <div className="text-gray-700 font-semibold mb-2">{t('admin.title', 'Admin')}</div>
                   <Link 
                     href="/admin/users" 
                     className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 

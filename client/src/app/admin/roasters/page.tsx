@@ -165,7 +165,7 @@ const AdminRoastersPage: React.FC = () => {
                 onChange={(e) => setShowUnverifiedOnly(e.target.checked)}
                 className="mr-2 accent-blue-600"
               />
-              <span className="text-gray-700">Show unverified only</span>
+              <span className="text-gray-700">{t('adminSection.roasters.showUnverifiedOnly', 'Show unverified only')}</span>
             </label>
             <button
               onClick={handleAdd}
@@ -510,7 +510,7 @@ const RoasterForm: React.FC<{
       <div className="mb-6 ml-16 mr-16">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {roaster 
-            ? t('admin.roasters.editTitle', 'Edit Roaster') 
+            ? t('adminForms.roasters.editRoaster', 'Edit Roaster') 
             : t('admin.roasters.addTitle', 'Add Roaster')
           }
         </h1>
@@ -528,12 +528,12 @@ const RoasterForm: React.FC<{
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
-                {t('admin.roasters.basicInfo', 'Basic Information')}
+                {t('adminForms.roasters.basicInformation', 'Basic Information')}
               </h3>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.name', 'Name')} *
+                  {t('adminForms.roasters.name', 'Name')} *
                 </label>
                 <input
                   type="text"
@@ -547,7 +547,7 @@ const RoasterForm: React.FC<{
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.description', 'Description')}
+                  {t('adminForms.roasters.description', 'Description')}
                 </label>
                 <textarea
                   name="description"
@@ -560,7 +560,7 @@ const RoasterForm: React.FC<{
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.email', 'Email')}
+                  {t('adminForms.roasters.email', 'Email')}
                 </label>
                 <input
                   type="email"
@@ -573,7 +573,7 @@ const RoasterForm: React.FC<{
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.phone', 'Phone')}
+                  {t('adminForms.roasters.phone', 'Phone')}
                 </label>
                 <input
                   type="tel"
@@ -586,7 +586,7 @@ const RoasterForm: React.FC<{
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.website', 'Website')}
+                  {t('adminForms.roasters.website', 'Website')}
                 </label>
                 <input
                   type="url"
@@ -601,12 +601,12 @@ const RoasterForm: React.FC<{
             {/* Location & Details */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
-                {t('admin.roasters.locationDetails', 'Location & Details')}
+                {t('adminForms.roasters.locationDetails', 'Location & Details')}
               </h3>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.address', 'Address')}
+                  {t('adminForms.roasters.address', 'Address')}
                 </label>
                 <input
                   type="text"
@@ -620,7 +620,7 @@ const RoasterForm: React.FC<{
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.roasters.city', 'City')}
+                    {t('adminForms.roasters.city', 'City')}
                   </label>
                   <input
                     type="text"
@@ -632,7 +632,7 @@ const RoasterForm: React.FC<{
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.roasters.state', 'State')}
+                    {t('adminForms.roasters.state', 'State')}
                   </label>
                   <input
                     type="text"
@@ -702,8 +702,8 @@ const RoasterForm: React.FC<{
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.specialties', 'Specialties')} 
-                  <span className="text-sm text-gray-500 ml-1">(comma separated)</span>
+                  {t('adminForms.roasters.specialties', 'Specialties')} 
+                  <span className="text-sm text-gray-500 ml-1">({t('adminForms.roasters.specialtiesHint', 'comma separated')})</span>
                 </label>
                 <input
                   type="text"
@@ -772,7 +772,7 @@ const RoasterForm: React.FC<{
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.roasters.rating', 'Rating')}
+                  {t('adminForms.roasters.rating', 'Rating')}
                 </label>
                 <input
                   type="number"
@@ -796,7 +796,7 @@ const RoasterForm: React.FC<{
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label className="ml-2 block text-sm text-gray-700">
-                    {t('admin.roasters.verified', 'Verified')}
+                    {t('adminForms.roasters.verified', 'Verified')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -808,7 +808,7 @@ const RoasterForm: React.FC<{
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label className="ml-2 block text-sm text-gray-700">
-                    {t('admin.roasters.featured', 'Featured')}
+                    {t('adminForms.roasters.featured', 'Featured')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -831,7 +831,7 @@ const RoasterForm: React.FC<{
           {roaster && roaster.id && imagesLoaded && (
             <div className="mt-8 pt-6 border-t border-gray-200">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {t('adminSection.roasters.images', 'Images')}
+                {t('adminForms.roasters.images', 'Images')}
               </h3>
               <SimpleImageUpload
                 roasterId={roaster.id}
@@ -849,7 +849,7 @@ const RoasterForm: React.FC<{
               onClick={onCancel}
               className="px-6 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
-              {t('admin.roasters.cancel', 'Cancel')}
+              {t('adminForms.roasters.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -857,8 +857,8 @@ const RoasterForm: React.FC<{
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading 
-                ? t('admin.roasters.saving', 'Saving...') 
-                : t('admin.roasters.save', 'Save')
+                ? t('adminForms.roasters.saving', 'Saving...') 
+                : t('adminForms.roasters.save', 'Save')
               }
             </button>
           </div>

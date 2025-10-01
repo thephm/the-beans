@@ -119,7 +119,7 @@ const AdminUsersPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4 pt-28 pl-8 pr-8">
       <div className="mb-6 ml-4 mr-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('admin.users.title', 'Users')}</h1>
       </div>
       <div className="ml-4 mr-4">
         <table className="min-w-full bg-white border border-gray-200">
@@ -190,13 +190,13 @@ const AdminUsersPage: React.FC = () => {
                       onClick={() => saveEdit(user)}
                       className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
                     >
-                      {t('save', 'Save')}
+                      {t('admin.users.save', 'Save')}
                     </button>
                     <button
                       onClick={cancelEdit}
                       className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
                     >
-                      {t('cancel', 'Cancel')}
+                      {t('admin.users.cancel', 'Cancel')}
                     </button>
                   </div>
                 ) : (
@@ -205,13 +205,13 @@ const AdminUsersPage: React.FC = () => {
                       onClick={() => startEdit(user)}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
                     >
-                      {t('edit', 'Edit')}
+                      {t('admin.users.edit', 'Edit')}
                     </button>
                     <button
                       onClick={() => confirmDelete(user.id)}
                       className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
                     >
-                      {t('delete', 'Delete')}
+                      {t('admin.users.delete', 'Delete')}
                     </button>
                   </div>
                 )}
@@ -223,13 +223,13 @@ const AdminUsersPage: React.FC = () => {
                         onClick={() => doDelete(user.id)}
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
                       >
-                        {t('delete', 'Delete')}
+                        {t('admin.users.deleteConfirm', 'Delete')}
                       </button>
                       <button
                         onClick={cancelDelete}
                         className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
                       >
-                        {t('cancel', 'Cancel')}
+                        {t('admin.users.deleteCancel', 'Cancel')}
                       </button>
                     </div>
                   </div>
