@@ -180,11 +180,11 @@ const AdminRoastersPage: React.FC = () => {
         <table className="min-w-full table-auto">
           <thead className="bg-gray-50">
             <tr>
-              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('admin.roasters.name', 'Name')}</th>
-              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('admin.roasters.location', 'Location')}</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('admin.roasters.rating', 'Rating')}</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('admin.roasters.verified', 'Verified')}</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('admin.roasters.featured', 'Featured')}</th>
+              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.name', 'Name')}</th>
+              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.location', 'Location')}</th>
+              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.rating', 'Rating')}</th>
+              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.verified', 'Verified')}</th>
+              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.featured', 'Featured')}</th>
               <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminSection.roasters.actions', 'Actions')}</th>
             </tr>
           </thead>
@@ -299,6 +299,45 @@ const RoasterForm: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+
+  // Helper function to convert old hours format to new format
+  const convertHoursFormat = (hours: any) => {
+    if (!hours) {
+      return {
+        monday: { open: '08:00', close: '18:00', closed: false },
+        tuesday: { open: '08:00', close: '18:00', closed: false },
+        wednesday: { open: '08:00', close: '18:00', closed: false },
+        thursday: { open: '08:00', close: '18:00', closed: false },
+        friday: { open: '08:00', close: '18:00', closed: false },
+        saturday: { open: '08:00', close: '18:00', closed: false },
+        sunday: { open: '08:00', close: '18:00', closed: false },
+      };
+    }
+
+    // If already in new format, return as-is
+    if (hours.monday && typeof hours.monday === 'object' && 'open' in hours.monday) {
+      return hours;
+    }
+
+    // Convert old format "6:00-20:00" to new format
+    const convertedHours: any = {};
+    const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    
+    dayNames.forEach(day => {
+      const dayHours = hours[day];
+      if (!dayHours || dayHours === 'closed') {
+        convertedHours[day] = { open: '', close: '', closed: true };
+      } else if (typeof dayHours === 'string' && dayHours.includes('-')) {
+        const [open, close] = dayHours.split('-');
+        convertedHours[day] = { open: open || '', close: close || '', closed: false };
+      } else {
+        convertedHours[day] = { open: '08:00', close: '18:00', closed: false };
+      }
+    });
+
+    return convertedHours;
+  };
+
   const [formData, setFormData] = useState({
     name: roaster?.name || '',
     description: roaster?.description || '',
@@ -316,6 +355,7 @@ const RoasterForm: React.FC<{
     verified: roaster?.verified || false,
     featured: roaster?.featured || false,
     rating: roaster?.rating || 0,
+    hours: convertHoursFormat(roaster?.hours),
   });
 
   // Fetch images when editing existing roaster
@@ -355,6 +395,52 @@ const RoasterForm: React.FC<{
     }));
   };
 
+  const handleHoursChange = (day: string, field: string, value: string | boolean) => {
+    setFormData(prev => {
+      const currentDay = (prev.hours as any)[day];
+      let newValue = value;
+      
+      // Time validation logic
+      if (field === 'open' && typeof value === 'string') {
+        const closeTime = currentDay?.close;
+        if (closeTime && value >= closeTime) {
+          // If opening time is after closing time, adjust closing time
+          const [hours, minutes] = value.split(':');
+          const newCloseHour = Math.min(23, parseInt(hours) + 1);
+          newValue = value;
+          return {
+            ...prev,
+            hours: {
+              ...prev.hours,
+              [day]: {
+                ...currentDay,
+                open: newValue,
+                close: `${newCloseHour.toString().padStart(2, '0')}:${minutes}`
+              }
+            }
+          };
+        }
+      } else if (field === 'close' && typeof value === 'string') {
+        const openTime = currentDay?.open;
+        if (openTime && value <= openTime) {
+          // If closing time is before opening time, don't allow it
+          return prev;
+        }
+      }
+      
+      return {
+        ...prev,
+        hours: {
+          ...prev.hours,
+          [day]: {
+            ...currentDay,
+            [field]: newValue
+          }
+        }
+      };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -362,8 +448,22 @@ const RoasterForm: React.FC<{
 
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      
+      // Convert hours back to backend format
+      const convertedHours: any = {};
+      Object.entries(formData.hours as any).forEach(([day, dayData]: [string, any]) => {
+        if (dayData.closed) {
+          convertedHours[day] = 'closed';
+        } else if (dayData.open && dayData.close) {
+          convertedHours[day] = `${dayData.open}-${dayData.close}`;
+        } else {
+          convertedHours[day] = '';
+        }
+      });
+
       const payload = {
         ...formData,
+        hours: convertedHours,
         latitude: formData.latitude ? parseFloat(String(formData.latitude)) : undefined,
         longitude: formData.longitude ? parseFloat(String(formData.longitude)) : undefined,
         rating: parseFloat(String(formData.rating)) || 0,
@@ -612,6 +712,61 @@ const RoasterForm: React.FC<{
                   placeholder="espresso, pour over, cold brew"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
+              </div>
+
+              {/* Hours Section */}
+              <div>
+                <h4 className="text-md font-medium text-gray-900 mb-3">
+                  {t('adminForms.roasters.hours.title', 'Opening Hours')}
+                </h4>
+                <div className="space-y-3">
+                  {Object.entries(formData.hours as Record<string, any>).map(([day, dayHours]: [string, any]) => (
+                    <div key={day} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-md">
+                      <div className="w-24">
+                        <label className="text-sm font-medium text-gray-700 capitalize">
+                          {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={dayHours?.closed || false}
+                          onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-gray-600">
+                          {t('adminForms.roasters.hours.closed', 'Closed')}
+                        </span>
+                      </div>
+                      {!dayHours?.closed && (
+                        <>
+                          <div className="flex items-center space-x-2">
+                            <label className="text-sm text-gray-600">
+                              {t('adminForms.roasters.hours.open', 'Open')}:
+                            </label>
+                            <input
+                              type="time"
+                              value={dayHours?.open || '08:00'}
+                              onChange={(e) => handleHoursChange(day, 'open', e.target.value)}
+                              className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <label className="text-sm text-gray-600">
+                              {t('adminForms.roasters.hours.close', 'Close')}:
+                            </label>
+                            <input
+                              type="time"
+                              value={dayHours?.close || '18:00'}
+                              onChange={(e) => handleHoursChange(day, 'close', e.target.value)}
+                              className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div>

@@ -41,6 +41,11 @@ export default function RoasterDetail() {
 
   // Utility function to format time from 24-hour to 12-hour format with proper spacing
   const formatTime = (timeString: string): string => {
+    // Handle closed status
+    if (timeString === 'closed' || timeString.toLowerCase() === 'closed') {
+      return t('time.closed', 'Closed');
+    }
+    
     // Handle time ranges like "6:30-19:00"
     if (timeString.includes('-')) {
       const [startTime, endTime] = timeString.split('-');
@@ -53,7 +58,19 @@ export default function RoasterDetail() {
   };
 
   const format24HourTo12Hour = (time: string): string => {
-    const [hours, minutes] = time.split(':').map(Number);
+    if (!time || !time.includes(':')) {
+      return 'Invalid time';
+    }
+    
+    const [hoursStr, minutesStr] = time.split(':');
+    const hours = parseInt(hoursStr, 10);
+    const minutes = parseInt(minutesStr, 10);
+    
+    // Validate that we got valid numbers
+    if (isNaN(hours) || isNaN(minutes)) {
+      return 'Invalid time';
+    }
+    
     const period = hours >= 12 ? t('time.pm') : t('time.am');
     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;

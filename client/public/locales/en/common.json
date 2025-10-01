@@ -104,7 +104,7 @@
       "title": "Roaster Images",
       "addImages": "Add Images",
       "uploading": "Uploading...",
-      "dropImages": "Drop images here or click to select",
+      "dropImages": "Drop images here",
       "supportedFormats": "Supports JPG, PNG, WebP (max 5MB each)",
       "primary": "Primary",
       "description": "Image description...",
@@ -346,6 +346,43 @@
     "nameRequired": "Name is required"
   },
   "admin": "Admin",
+  "adminForms": {
+    "roasters": {
+      "name": "Name",
+      "description": "Description", 
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "zipCode": "Zip Code",
+      "country": "Country",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "specialties": "Specialties",
+      "rating": "Rating",
+      "verified": "Verified",
+      "featured": "Featured",
+      "locationDetails": "Location & Details",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "hours": {
+        "title": "Opening Hours",
+        "monday": "Monday",
+        "tuesday": "Tuesday", 
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday",
+        "closed": "Closed",
+        "open": "Open",
+        "close": "Close"
+      }
+    }
+  },
   "adminSection": {
     "users": "Users",
     "roasters": "Roasters",

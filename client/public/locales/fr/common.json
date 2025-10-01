@@ -118,7 +118,7 @@
       "title": "Images du torréfacteur",
       "addImages": "Ajouter des images",
       "uploading": "Téléchargement...",
-      "dropImages": "Déposez les images ici ou cliquez pour sélectionner",
+      "dropImages": "Déposez les images ici",
       "supportedFormats": "Supporte JPG, PNG, WebP (max 5 Mo chacun)",
       "primary": "Principale",
       "description": "Description de l'image...",
@@ -345,6 +345,43 @@
     "nameRequired": "Le nom est requis"
   },
   "admin": "Admin",
+  "adminForms": {
+    "roasters": {
+      "name": "Nom",
+      "description": "Description",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "website": "Site web",
+      "address": "Adresse",
+      "city": "Ville",
+      "state": "État/Province",
+      "zipCode": "Code postal",
+      "country": "Pays",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "specialties": "Spécialités",
+      "rating": "Note",
+      "verified": "Vérifié",
+      "featured": "En vedette",
+      "locationDetails": "Détails de localisation",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "hours": {
+        "title": "Heures d'ouverture",
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi",
+        "saturday": "Samedi",
+        "sunday": "Dimanche",
+        "closed": "Fermé",
+        "open": "Ouvert",
+        "close": "Fermer"
+      }
+    }
+  },
   "adminSection": {
     "users": "Utilisateurs",
     "roasters": "Torréfacteurs",
