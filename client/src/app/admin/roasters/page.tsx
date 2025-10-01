@@ -355,6 +355,7 @@ const RoasterForm: React.FC<{
     verified: roaster?.verified || false,
     featured: roaster?.featured || false,
     rating: roaster?.rating || 0,
+    onlineOnly: roaster?.onlineOnly || false,
     hours: convertHoursFormat(roaster?.hours),
   });
 
@@ -808,6 +809,18 @@ const RoasterForm: React.FC<{
                   />
                   <label className="ml-2 block text-sm text-gray-700">
                     {t('admin.roasters.featured', 'Featured')}
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="onlineOnly"
+                    checked={formData.onlineOnly}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 block text-sm text-gray-700">
+                    {t('adminForms.roasters.onlineOnly', 'Online Only')}
                   </label>
                 </div>
               </div>

@@ -278,10 +278,20 @@ export default function RoasterDetail() {
                   </div>
                 </div>
 
-                {/* Hours */}
-                {roaster.hours && (
-                  <div className="mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.hours')}</h3>
+                {/* Hours / Online Only */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.hours')}</h3>
+                  {roaster.onlineOnly ? (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center">
+                        <span className="text-blue-600 text-lg mr-2">🌐</span>
+                        <span className="text-blue-800 font-medium">{t('roasterDetail.onlineOnly', 'Online Only')}</span>
+                      </div>
+                      <p className="text-blue-700 text-sm mt-2">
+                        {t('roasterDetail.onlineOnlyDesc', 'This roaster operates exclusively online with no physical retail location.')}
+                      </p>
+                    </div>
+                  ) : roaster.hours ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {Object.entries(
                         typeof roaster.hours === 'string' 
@@ -301,8 +311,10 @@ export default function RoasterDetail() {
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-gray-500">{t('roasterDetail.hoursNotAvailable', 'Hours information not available')}</p>
+                  )}
+                </div>
               </div>
 
               {/* Sidebar */}
