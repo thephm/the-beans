@@ -46902,6 +46902,39 @@ Now when you try to add the blueprint to Render, it should work properly since b
 
 Port 3000 is the default port for Next.js development and production builds. Looking at the client's `package.json`, the start script uses `next start` which defaults to port 3000.
 
-Read `package.json`, lines 8 to 12
+✔ Read `package.json`, lines 8 to 12
 
 The `next start` command defaults to port 3000. In the render.yaml, I specified `PORT: 3000` to be explicit about which port the service listens on, though it would default to 3000 anyway.
+
+## 334th try
+
+> The render New -> Blueprint is asking for payment. Edit render.yaml to use only free instance types (free tier). Remove or downgrade services that require paid plans.
+
+I'll help you update the `render.yaml` file to use only free tier instance types. Let me first examine the current configuration to see what needs to be downgraded.
+
+✔ Read `render.yaml`, lines 1 to 50
+
+✔ Read `render.yaml`, lines 50 to 88
+
+Perfect! I can see the current configuration uses `starter` plans for all services, but Render requires the free tier plan name. Let me update the configuration to use only free tier resources:
+
+`render.yaml +1 -1`
+`render.yaml +1 -1`
+`render.yaml +1 -1`
+
+Perfect! ✅ I've updated the `render.yaml` file to use only free tier resources:
+
+**Changes Made**:
+
+- **Database**: plan: starter → plan: free
+- **Backend API**: plan: starter → plan: free
+- **Frontend**: plan: starter → plan: free
+
+**Free Tier Limitations**:
+
+- Database: 1GB storage, limited connections
+- Web services: 512MB RAM, goes to sleep after 15min inactivity
+- 750 build hours/month across all services
+
+The configuration now uses only free resources and should deploy without requiring payment.
+
