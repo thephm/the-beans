@@ -46672,3 +46672,60 @@ git push origin main  # Triggers automatic Render deployment
 ```
 
 So yes, you're absolutely right - Render.com deployment using render.yaml is **native Node.js deployment**, not Docker-based. This is actually the recommended approach for Render as it provides better performance and simpler configuration than containerized deployments.
+
+## 3 issues in render.yaml from Render site #79
+
+https://github.com/thephm/the-beans/issues/79
+
+```
+line 17: nodeVersion: 18 field nodeVersion not found in type file. Service
+line 49: nodeVersion: 18 field nodeVersion not found in type file. Service
+line 68: headers: field headers not found in type file.Header
+```
+
+I'll help you fix the issues in the `render.yaml` file. Let me first examine the current file to understand the structure and then fix the identified problems.
+
+✔ Read `render.yaml`, lines 1 to 80
+
+Now let me see the rest of the file to understand the complete structure:
+
+✔ Read `render.yaml`, lines 81 to 97
+
+I can see the issues in the render.yaml file. Let me check the current Render.com documentation format to understand the correct structure. Based on the errors, I need to:
+
+1. Remove or fix the `nodeVersion` fields on lines 17 and 49
+2. Fix the `headers` field structure on line 68
+
+Let me fix these issues:
+
+`render.yaml +0 -1`
+`render.yaml +0 -1`
+
+Now I need to fix the headers section. The issue is that the headers field structure is incorrect. Let me fix this:
+
+`render.yaml +8 -4`
+
+Perfect! I've fixed all three issues in the render.yaml file:
+
+### Issues Fixed:
+
+1. **Lines 17 & 49**: Removed the `nodeVersion: 18` fields that are not supported in the current Render.com service configuration format. Render automatically uses Node.js 18+ by default when runtime: node is specified.
+
+2. **Line 68**: Fixed the `headers` field structure. Instead of nested `headers` objects, each header should be specified as a separate array item with `path`, `name`, and `value` fields.
+
+### Changes Made:
+
+Backend Service (Line 17):
+- Removed `nodeVersion: 18` field
+- Service will use Render's default Node.js version (18+)
+
+Frontend Service (Line 49):
+- Removed `nodeVersion: 18` field
+- Service will use Render's default Node.js version (18+)
+
+Headers Configuration (Line 68):
+- Changed from nested object structure to array format
+- Each security header now properly specified with `path`, `name`, and `value` fields
+- Maintains the same security headers: `X-Frame-Options, X-Content-Type-Options, and Referrer-Policy
+`
+The `render.yaml` file should now be compatible with Render.com's current configuration schema and deploy without validation errors.
