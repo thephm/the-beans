@@ -390,10 +390,29 @@ const RoasterForm: React.FC<{
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
+    const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    
+    setFormData(prev => {
+      const updatedData = {
+        ...prev,
+        [name]: newValue
+      };
+      
+      // If onlineOnly is being checked, set all hours to closed
+      if (name === 'onlineOnly' && newValue === true) {
+        updatedData.hours = {
+          monday: { closed: true, open: '', close: '' },
+          tuesday: { closed: true, open: '', close: '' },
+          wednesday: { closed: true, open: '', close: '' },
+          thursday: { closed: true, open: '', close: '' },
+          friday: { closed: true, open: '', close: '' },
+          saturday: { closed: true, open: '', close: '' },
+          sunday: { closed: true, open: '', close: '' }
+        };
+      }
+      
+      return updatedData;
+    });
   };
 
   const handleHoursChange = (day: string, field: string, value: string | boolean) => {
@@ -715,60 +734,76 @@ const RoasterForm: React.FC<{
                 />
               </div>
 
-              {/* Hours Section */}
-              <div>
-                <h4 className="text-md font-medium text-gray-900 mb-3">
-                  {t('adminForms.roasters.hours.title', 'Opening Hours')}
-                </h4>
-                <div className="space-y-3">
-                  {Object.entries(formData.hours as Record<string, any>).map(([day, dayHours]: [string, any]) => (
-                    <div key={day} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-md">
-                      <div className="w-24">
-                        <label className="text-sm font-medium text-gray-700 capitalize">
-                          {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={dayHours?.closed || false}
-                          onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <span className="text-sm text-gray-600">
-                          {t('adminForms.roasters.hours.closed', 'Closed')}
-                        </span>
-                      </div>
-                      {!dayHours?.closed && (
-                        <>
-                          <div className="flex items-center space-x-2">
-                            <label className="text-sm text-gray-600">
-                              {t('adminForms.roasters.hours.open', 'Open')}:
-                            </label>
-                            <input
-                              type="time"
-                              value={dayHours?.open || '08:00'}
-                              onChange={(e) => handleHoursChange(day, 'open', e.target.value)}
-                              className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <label className="text-sm text-gray-600">
-                              {t('adminForms.roasters.hours.close', 'Close')}:
-                            </label>
-                            <input
-                              type="time"
-                              value={dayHours?.close || '18:00'}
-                              onChange={(e) => handleHoursChange(day, 'close', e.target.value)}
-                              className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
+              {/* Online Only Section */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="onlineOnly"
+                  checked={formData.onlineOnly}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label className="ml-2 block text-sm text-gray-700">
+                  {t('adminForms.roasters.onlineOnly', 'Online Only')}
+                </label>
               </div>
+
+              {/* Hours Section - Only show if not online only */}
+              {!formData.onlineOnly && (
+                <div>
+                  <h4 className="text-md font-medium text-gray-900 mb-3">
+                    {t('adminForms.roasters.hours.title', 'Opening Hours')}
+                  </h4>
+                  <div className="space-y-3">
+                    {Object.entries(formData.hours as Record<string, any>).map(([day, dayHours]: [string, any]) => (
+                      <div key={day} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-md">
+                        <div className="w-24">
+                          <label className="text-sm font-medium text-gray-700 capitalize">
+                            {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={dayHours?.closed || false}
+                            onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <span className="text-sm text-gray-600">
+                            {t('adminForms.roasters.hours.closed', 'Closed')}
+                          </span>
+                        </div>
+                        {!dayHours?.closed && (
+                          <>
+                            <div className="flex items-center space-x-2">
+                              <label className="text-sm text-gray-600">
+                                {t('adminForms.roasters.hours.open', 'Open')}:
+                              </label>
+                              <input
+                                type="time"
+                                value={dayHours?.open || '08:00'}
+                                onChange={(e) => handleHoursChange(day, 'open', e.target.value)}
+                                className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <label className="text-sm text-gray-600">
+                                {t('adminForms.roasters.hours.close', 'Close')}:
+                              </label>
+                              <input
+                                type="time"
+                                value={dayHours?.close || '18:00'}
+                                onChange={(e) => handleHoursChange(day, 'close', e.target.value)}
+                                className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -809,18 +844,6 @@ const RoasterForm: React.FC<{
                   />
                   <label className="ml-2 block text-sm text-gray-700">
                     {t('adminForms.roasters.featured', 'Featured')}
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="onlineOnly"
-                    checked={formData.onlineOnly}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label className="ml-2 block text-sm text-gray-700">
-                    {t('adminForms.roasters.onlineOnly', 'Online Only')}
                   </label>
                 </div>
               </div>
