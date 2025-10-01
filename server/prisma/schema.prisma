@@ -63,6 +63,7 @@ model Roaster {
   longitude   Float?
   images      String[]
   hours       Json?    // Store opening hours as JSON
+  onlineOnly  Boolean  @default(false) // True if roaster operates online only (no physical location)
   specialties String[] // Array of specialties like "Espresso", "Single Origin", etc.
   verified    Boolean  @default(false)
   featured    Boolean  @default(false)

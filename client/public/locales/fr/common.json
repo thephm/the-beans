@@ -319,7 +319,10 @@
     "website": "Site web",
     "email": "E-mail",
     "owner": "Propriétaire",
-    "manageImages": "Gérer les images"
+    "manageImages": "Gérer les images",
+    "onlineOnly": "En ligne seulement",
+    "onlineOnlyDesc": "Ce torréfacteur fonctionne exclusivement en ligne sans magasin de détail physique.",
+    "hoursNotAvailable": "Informations sur les heures non disponibles"
   },
   "forms": {
     "firstName": "Prénom",
@@ -363,6 +366,7 @@
       "rating": "Note",
       "verified": "Vérifié",
       "featured": "En vedette",
+      "onlineOnly": "En ligne seulement",
       "locationDetails": "Détails de localisation",
       "cancel": "Annuler",
       "save": "Enregistrer",

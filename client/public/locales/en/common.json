@@ -320,7 +320,10 @@
     "website": "Website",
     "email": "Email",
     "owner": "Owner",
-    "manageImages": "Manage Images"
+    "manageImages": "Manage Images",
+    "onlineOnly": "Online Only",
+    "onlineOnlyDesc": "This roaster operates exclusively online with no physical retail location.",
+    "hoursNotAvailable": "Hours information not available"
   },
   "forms": {
     "firstName": "First name",
@@ -364,6 +367,7 @@
       "rating": "Rating",
       "verified": "Verified",
       "featured": "Featured",
+      "onlineOnly": "Online Only",
       "locationDetails": "Location & Details",
       "cancel": "Cancel",
       "save": "Save",
