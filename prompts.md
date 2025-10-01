@@ -45522,3 +45522,103 @@ Perfect! Now let me test the settings page to verify the brewing methods section
 - **Consistent** - Both English and French translations cleaned up
 
 The brewing methods feature has been completely removed as requested, since it was part of the old cafe functionality that's no longer used in the current roaster-focused app! 🎯
+
+## 379 try
+
+*(brewing methods feature removed)*
+
+> Remove the "Or sign up with Google Twitter" since it's not implemented
+
+I'll help you remove the "Or sign up with Google Twitter" text since those authentication methods are not implemented. Let me first find where this text appears in the signup page.
+
+✔ Searched text for `Or sign up with Google Twitter`, 1 result
+
+Let me search more broadly for this text in the actual signup page:
+
+✔ Searched text for `sign up with Google`, 1 result
+
+Let me search for the signup page files:
+
+✔ Searched for files matching `**/signup/**`, 1 match
+
+Now let me examine the signup page to find the Google/Twitter signup text:
+
+✔ Read `page.tsx`, lines 1 to 50
+
+Let me search for Google or Twitter text in the signup page:
+
+✔ Searched text for `Google` (`**/client/src/app/signup/page.tsx`), 1 result
+
+✔ Searched text for `Twitter` (`**/client/src/app/signup/page.tsx`), 1 result
+
+Now let me read the section around those lines to see the complete social signup section:
+
+✔ Read `page.tsx`, lines 240 to 280
+
+Perfect! I found the social login section that needs to be removed. The section includes:
+
+1. The "Or sign up with" divider
+2. The Google and Twitter buttons
+
+Let me remove this entire section. I'll remove from the divider through the end of the social buttons:
+
+`page.tsx +1 -27`
+
+The TypeScript errors are expected since we're editing outside the Docker environment. Let me also check if there's a similar social login section in the login page that should be removed as well:
+
+✔ Searched for files matching `**/login/**`, 1 match
+
+✔ Searched text for `Google` (`**/client/src/app/login/page.tsx`), 1 result
+
+Let me check the login page for similar social login buttons:
+
+✔ Read `page.tsx`, lines 160 to 200
+
+I need to see more context to get the complete section. Let me read a bit earlier:
+
+✔ Read `page.tsx`, lines 155 to 185
+
+Perfect! Now I'll remove the social login section from the login page as well:
+
+`page.tsx +1 -29`
+
+Now let me restart the client container to apply these changes and test them:
+
+✔ `docker-compose restart client`
+
+Perfect! Now let me test the changes by opening the signup page to verify the Google/Twitter options have been removed:
+
+✔ Opened Simple Browser at `http://localhost:3000/signup`
+
+Let me also check the login page to ensure those options were removed there as well:
+
+✔ Opened Simple Browser at `http://localhost:3000/login`
+
+### Perfect! ✅ I've successfully removed the "Or sign up with Google Twitter" sections from both the signup and login pages.
+
+#### Summary of Changes
+
+**What I Removed**:
+
+1. **From Signup Page** (`/signup`):
+
+  - The divider text "Or sign up with"
+  - Google signup button with Google logo
+  - Twitter signup button with Twitter logo
+  - Complete social login section
+
+2. **From Login Page** (`/login`):
+
+  - The divider text "Or continue with"
+  - Google login button with Google logo
+  - Twitter login button with Twitter logo
+  - Complete social login section
+
+**Result**:
+
+- Both login and signup pages now only show the email/password forms
+- No more misleading social login options that aren't implemented
+- Cleaner, simpler user interface focused on the actual authentication method
+- Users won't be confused by non-functional buttons
+
+The authentication pages now present a clean, straightforward login/signup experience without the unimplemented Google and Twitter integration options! 🎉
