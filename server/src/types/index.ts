@@ -1,8 +1,10 @@
-import { Request } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 export interface AuthenticatedRequest extends Request {
   user?: { id: string };
 }
+
+export type AuthMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => void;
 
 export interface User {
   id: string;
