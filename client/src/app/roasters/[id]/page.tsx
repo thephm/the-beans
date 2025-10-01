@@ -24,6 +24,7 @@ interface Roaster {
   hours?: {
     [key: string]: string | { open: string; close: string }
   }
+  onlineOnly?: boolean
   story?: string
   founded?: string
   owner?: string | { id: string; username: string; firstName: string; lastName: string }
