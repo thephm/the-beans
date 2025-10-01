@@ -536,3 +536,38 @@ Do you want me to sketch a Python snippet for a basic blocklist + rate limit sys
 
 ## The Roasters tab is mostly a duplicate of Discover so let's delete it
 
+## does google local have an API to retrieve store info like hours of operation, address, reviews, etc?
+
+ChatGPT
+
+Yes — Google (via its Maps/Places platform) provides APIs that let you retrieve business / “place” information (address, hours, reviews, etc.). The main one is the Places API (both the “legacy” and newer forms). 
+
+[Places Oveview](https://developers.google.com/maps/documentation/places/web-service/overview) [About the Places API](https://developers.google.com/maps/documentation/places/web-service/op-overview)
+
+Here are the details, capabilities, and caveats you should know:
+
+✅** What Google’s Places / Maps APIs offer**
+
+- The Place Details endpoint lets you fetch detailed info about a place (given its place ID): e.g. full address, phone number, user ratings, reviews, opening hours, etc. [About the Places API (New)](https://developers.google.com/maps/documentation/places/web-service/op-overview?utm_source=chatgpt.com)
+
+- You can also use Nearby Search, Text Search, or Autocomplete to find places and then fetch details. 
+
+- The APIs support fields for “opening_hours,” “current_opening_hours” (including special / holiday hours), and secondary opening hours (e.g. drive-through times) 
+[Help users discover more with new Places API updates](https://mapsplatform.google.com/resources/blog/help-users-discover-more-new-places-api-updates/?utm_source=chatgpt.com)
+
+- You can get user reviews (often up to ~5 reviews in the result) and ratings via the “reviews” field (if you request those fields) 
+[Working with Google Maps Reviews API](https://elfsight.com/blog/working-with-google-maps-reviews-api)
+
+- Some newer place attributes are supported (e.g. whether a place is wheelchair-accessible, whether it supports takeout/delivery, etc.) 
+
+⚠️ **Caveats, limits, and policy considerations**
+
+- You must enable billing and usage will consume quota / incur costs beyond free tiers.
+
+- You must explicitly request which fields you want — don’t request more than needed.
+
+- Not all data is guaranteed: some places may lack certain attributes (e.g. no reviews, missing hours, etc.).
+
+- There are usage, attribution, and terms of service constraints (you have to follow Google’s branding / usage policies).
+
+- Some data (e.g. “popular times,” real-time live occupancy) is not (or not officially) exposed in the standard APIs. (Third-party scrapers sometimes try to extract those, but that violates terms.)
