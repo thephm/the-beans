@@ -220,11 +220,11 @@ export default function SimpleImageUpload({
               disabled={uploading}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {uploading ? 'Uploading...' : 'Add Images'}
+              {uploading ? t('adminForms.roasters.saving', 'Uploading...') : t('adminForms.roasters.addImages', 'Add Images')}
             </button>
           </div>
           <p className="text-base text-gray-600 mt-2 text-right font-medium">
-            Recommended: 800×450px minimum • JPG, PNG, WebP • Max 5MB each
+            {t('adminForms.roasters.imageGuidelines', 'Recommended: 800×450px minimum • JPG, PNG, WebP • Max 5MB each')}
           </p>
         </div>
       )}
