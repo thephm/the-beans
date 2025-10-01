@@ -1,15 +1,25 @@
 # Render.com deployment configuration for The Beans
 # This file defines the complete infrastructure for the coffee roaster discovery app
 
+# Database Service (PostgreSQL) - Must be created first
+databases:
+  - name: the-beans-db
+    databaseName: the_beans_production
+    region: oregon # Same region as services
+    plan: starter # Free tier available, upgrade for production
+    postgresMajorVersion: 15
+
 services:
   # Backend API Service (Express.js + Prisma)
   - type: web
     name: the-beans-api
     runtime: node
+    nodeVersion: 18
     region: oregon # Choose region closest to your users
     plan: starter # Can upgrade to standard/pro for production
-    buildCommand: cd server && npm install && npx prisma generate && npm run build
-    startCommand: cd server && npm run start
+    rootDir: server
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy && npm run build
+    startCommand: npm run start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -36,10 +46,12 @@ services:
   - type: web
     name: the-beans-frontend
     runtime: node
+    nodeVersion: 18
     region: oregon # Same region as backend for better performance
     plan: starter # Can upgrade for production
-    buildCommand: cd client && npm install && npm run build
-    startCommand: cd client && npm start
+    rootDir: client
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -50,7 +62,7 @@ services:
     routes:
       - type: rewrite
         source: /*
-        destination: /
+        destination: /index.html
     headers:
       - path: /*
         headers:
@@ -59,13 +71,7 @@ services:
           Referrer-Policy: origin-when-cross-origin
     autoDeploy: true
 
-# Database Service (PostgreSQL)
-databases:
-  - name: the-beans-db
-    databaseName: the_beans_production
-    region: oregon # Same region as services
-    plan: starter # Free tier available, upgrade for production
-    postgresMajorVersion: 15
+
     
 # Background Jobs (Optional - for future features)
 # workers:
