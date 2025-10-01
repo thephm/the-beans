@@ -190,9 +190,9 @@ export default function RoasterDetail() {
         </nav>
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-6xl mx-auto">
           {/* Hero Image */}
-          <div className="relative h-96">
+          <div className="relative h-64 sm:h-80 lg:h-96">
             <RoasterImage
               src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=400&fit=crop&auto=format'}
               alt={roaster.name}

@@ -202,6 +202,7 @@ export default function EditRoasterImages() {
           <ul className="text-sm text-blue-700 space-y-1">
             <li>• {t('roaster.images.guideline1', 'Upload high-quality images that showcase your roaster')}</li>
             <li>• {t('roaster.images.guideline2', 'Supported formats: JPG, PNG, WebP (max 5MB each)')}</li>
+            <li>• <span className="font-medium">{t('roaster.images.recommendedSize', 'Recommended: 800×450px minimum for best quality')}</span></li>
             <li>• {t('roaster.images.guideline3', 'Set one image as primary for main display')}</li>
             <li>• {t('roaster.images.guideline4', 'Add descriptions for accessibility')}</li>
           </ul>

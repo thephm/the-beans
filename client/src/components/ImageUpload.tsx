@@ -151,7 +151,36 @@ export default function ImageUpload({
     }
   };
 
-  const handleFileSelect = (files: FileList | null) => {
+  const validateImageDimensions = (file: File): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        // Minimum dimensions for good quality display (16:9 aspect ratio minimum)
+        const minWidth = 800;
+        const minHeight = 450;
+        
+        if (img.width < minWidth || img.height < minHeight) {
+          setError(`Images must be at least ${minWidth}x${minHeight} pixels for best quality`);
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      };
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        setError('Invalid image file');
+        resolve(false);
+      };
+      
+      img.src = objectUrl;
+    });
+  };
+
+  const handleFileSelect = async (files: FileList | null) => {
     if (!files || !canEdit) return;
 
     const validFiles: File[] = [];
@@ -167,6 +196,12 @@ export default function ImageUpload({
 
       if (file.size > maxSize) {
         setError('File size must be less than 5MB');
+        continue;
+      }
+
+      // Validate dimensions
+      const isDimensionsValid = await validateImageDimensions(file);
+      if (!isDimensionsValid) {
         continue;
       }
 
@@ -244,6 +279,7 @@ export default function ImageUpload({
               <div className="text-gray-600">
                 <p className="text-lg">{t('roaster.images.dropImages', 'Drop images here or click to select')}</p>
                 <p className="text-sm text-gray-500">{t('roaster.images.supportedFormats', 'Supports JPG, PNG, WebP (max 5MB each)')}</p>
+                <p className="text-base text-gray-600 font-medium">{t('roaster.images.recommendedSize', 'Recommended: 800×450px minimum for best quality')}</p>
               </div>
             </div>
           </div>
