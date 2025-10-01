@@ -234,14 +234,33 @@ DATABASE_URL="postgresql://beans_user:secure_password_here@localhost:5432/the_be
 
 ## 🚀 Production Deployment
 
-### 🐳 Docker-Based Deployment
-The application is designed for containerized deployment using Docker Compose. Configure your production environment variables and deploy using the included `docker-compose.yml`.
+### 🌟 Render.com Deployment (Recommended)
 
-### 🔧 Backend (Railway/Render)
-1. **Connect** your GitHub repository to [Railway](https://railway.app) or [Render](https://render.com)
-2. **Set environment variables** in platform dashboard
-3. **Add PostgreSQL service** through platform
-4. **Deploy** automatically on push to main branch
+#### One-Click Deployment with Blueprint
+1. **Fork/Clone** the repository to your GitHub account
+2. **Sign up** at [Render.com](https://render.com) and connect your GitHub
+3. **Create New** > **Blueprint** and select your repository
+4. **Review Services** - Render will detect `render.yaml` and show:
+   - `the-beans-api` (Backend API)
+   - `the-beans-frontend` (Next.js Frontend) 
+   - `the-beans-db` (PostgreSQL Database)
+5. **Configure Environment Variables**:
+   ```
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_secret
+   ```
+6. **Deploy** - All services will be created and deployed automatically
+
+#### Manual Service Configuration
+If you prefer manual setup:
+1. **Create PostgreSQL Database** service
+2. **Create Web Service** for backend (Express.js)
+3. **Create Web Service** for frontend (Next.js)
+4. **Configure environment variables** for each service
+
+### 🐳 Docker-Based Deployment
+Alternative deployment using Docker containers with `docker-compose.yml`.
 
 ### 🗃️ Production Database
 ```bash

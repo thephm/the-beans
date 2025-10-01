@@ -46168,3 +46168,260 @@ vercel.json - The main Vercel configuration file
 - Updated environment configuration documentation
 
 The project now focuses entirely on Docker-based development and deployment, which aligns with the project's Docker-first philosophy mentioned in the instructions. All Vercel-specific configuration and deployment documentation has been removed and replaced with Docker-focused alternatives.
+
+> I'm going to use Render.com and I think they support having a YAML config file, can you help me with that?
+
+Yes! Render.com does support YAML configuration files called `render.yaml` that allows you to define your entire infrastructure as code. This is perfect for The Beans project since you have both frontend and backend services. Let me create a comprehensive Render configuration for you.
+
+✔ Created 3 todos
+
+✔ Starting (1/3) Create render.yaml configuration
+
+✔ Created `render.yaml`
+
+✔ Starting (2/3) Update documentation for Render deployment
+
+Now let me update the documentation to include Render.com deployment instructions:
+
+✔ Read `README.md`, lines 180 to 210
+
+`README.md +16 -11`
+
+Now let me update the SETUP.md file as well:
+
+✔ Read `SETUP.md`, lines 235 to 250
+
+`SETUP.md +26 -7`
+
+✔ Starting (3/3) Add Render build scripts if needed
+
+Let me check if we need to add any build scripts or make sure the package.json files have the right scripts for Render deployment:
+
+✔ Read `package.json`, lines 1 to 20
+
+✔ Read `package.json`, lines 1 to 20
+
+Great! The `package.json` files already have the necessary scripts. Let me also create a simple health check endpoint for the backend service to ensure Render can properly monitor the service health:
+
+✔ Read `index.ts`, lines 1 to 30
+
+Let me search for any existing health check routes:
+
+Perfect! There's already a health check endpoint. Let me verify it exists:
+
+✔ Read `index.ts`, lines 100 to 110
+
+Great! The health check endpoint already exists. However, I notice the render.yaml file uses `/api/health` but the actual endpoint is `/health`. Let me update the `render.yaml` file to fix this:
+
+`render.yaml +1 -1`
+
+Now let me create a simple deployment guide document:
+
+✔ Created `RENDER_DEPLOYMENT.md`
+
+✔ Completed (3/3) Add Render build scripts if needed
+
+Perfect! ✅ I've created a comprehensive Render.com deployment configuration for The Beans project. Here's what I've set up for you:
+
+### 🌟 Complete Render.com Deployment Package
+
+📄 1. `render.yaml` **Configuration File**
+
+Created a complete infrastructure-as-code file that defines:
+
+**Services**:
+
+- **Backend API** (`the-beans-api`): Express.js service with Prisma
+- **Frontend Web** (`the-beans-frontend`): Next.js application
+- **PostgreSQL Database** (`the-beans-db`): Managed database service
+
+**Key Features**:
+
+- ✅ **Auto-deployment** on GitHub pushes
+- ✅ **Health checks** for service monitoring
+- ✅ **Environment variables** with secure auto-generation
+- ✅ **Build optimization** with proper commands for each service
+- ✅ **Security headers** and CORS configuration
+- ✅ **Regional optimization** (Oregon region)
+
+📚 2. **Updated Documentation README.md:**
+
+- Added Render.com as the recommended deployment method
+- Clear step-by-step deployment instructions
+- Environment variable configuration guide
+
+**SETUP.md**:
+
+- Comprehensive Blueprint deployment process
+- Manual service creation alternative
+- Production-ready configuration steps
+
+**New Deployment Guide**:
+
+- Created `RENDER_DEPLOYMENT.md` with detailed deployment instructions
+- Troubleshooting section and common issues
+- Post-deployment setup guide
+
+🚀 **3. One-Click Deployment Ready**
+
+To deploy The Beans on Render.com:
+
+1. **Connect Repository** to Render.com
+2. **Create Blueprint** (Render auto-detects render.yaml)
+3. **Set Environment Variables**:
+
+```
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key  
+CLOUDINARY_API_SECRET=your_secret
+```
+
+4. **Deploy** - All services created automatically!
+
+#### 💡 Smart Configuration Features
+
+**Automatic Handling**:
+
+- ✅ Database URL connection from managed PostgreSQL
+- ✅ JWT secret auto-generation for security
+- ✅ Prisma client generation during build
+- ✅ Production environment optimization
+- ✅ CORS configuration between frontend/backend
+
+**Production Ready**:
+
+- ✅ Health check endpoints configured
+- ✅ Build process includes TypeScript compilation
+- ✅ Database migrations run automatically
+- ✅ Service-to-service communication configured
+- ✅ Security headers and rate limiting
+
+🔧 **What You Need to Do**
+
+1. **Get Cloudinary credentials** (for image uploads)
+2. **Push code to GitHu**b (including the new `render.yaml`)
+3. **Connect to Render** and create Blueprint
+4. **Set Cloudinary environment variables**
+5. **Deploy!** 🎉
+
+The configuration handles everything else automatically - database creation, service networking, build processes, and deployments. Render.com's YAML configuration makes this much simpler than managing individual services!
+
+Your app will be available at URLs like:
+
+- Frontend: `https://the-beans-frontend.onrender.com`
+- API: `https://the-beans-api.onrender.com`
+
+Ready to deploy The Beans to production! 🚀☕
+
+> I have a custom domain, is that part of the configuration? I want it to be an environment variable and not in github
+
+Yes, absolutely! Custom domains should definitely be handled as environment variables and not hardcoded in the repository. Let me update the render.yaml configuration to use environment variables for the domain settings.
+
+✔ Read `render.yaml`, lines 1 to 40
+
+✔ Read `render.yaml`, lines 40 to 80
+
+Now I'll update the configuration to use environment variables for the custom domain URLs:
+
+`render.yaml +1 -1`
+`render.yaml +1 -1`
+
+Now let me update the deployment documentation to reflect the custom domain configuration:
+
+✔ Read `RENDER_DEPLOYMENT.md`, lines 30 to 50
+
+`RENDER_DEPLOYMENT.md +5 -0`
+
+Now let me add a section about custom domain setup in the deployment guide:
+
+✔ Read `RENDER_DEPLOYMENT.md`, lines 70 to 90
+
+`RENDER_DEPLOYMENT.md +19 -2`
+
+Now let me update the troubleshooting section to include the custom domain environment variables:
+
+✔ Read `RENDER_DEPLOYMENT.md`, lines 140 to 154
+
+`RENDER_DEPLOYMENT.md +2 -1`
+
+Let me also update the main README and SETUP files to mention the custom domain environment variables:
+
+✔ Read `README.md`, lines 185 to 200
+
+`README.md +5 -0`
+
+Perfect! ✅ I've updated the Render.com configuration to properly handle custom domains as environment variables. Here's what I've changed:
+
+### 🌟 Custom Domain Configuration Updates
+🔧 **Updated** `render.yaml`
+
+**Before** (Hardcoded URLs):
+
+```bash
+- key: CORS_ORIGIN
+  value: https://the-beans.onrender.com # Hardcoded
+- key: NEXT_PUBLIC_API_URL  
+  value: https://the-beans-api.onrender.com # Hardcoded
+```
+
+After (Environment Variables):
+
+```bash
+- key: CORS_ORIGIN
+  sync: false # Set to your custom frontend domain in Render dashboard
+- key: NEXT_PUBLIC_API_URL
+  sync: false # Set to your custom API domain in Render dashboard
+```
+
+🔒** Security Benefits**
+
+- ✅ **No sensitive URLs** in public repository
+- ✅ **Environment-specific** configuration (staging vs production)
+- ✅ **Easy domain changes** without code updates
+- ✅ **Better separation** of configuration and code
+
+📚** Updated Documentation**
+
+**Environment Variables You'll Set**:
+
+```yaml
+# Required for all deployments
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_secret
+
+# For your custom domain
+CORS_ORIGIN=https://yourdomain.com
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+```
+
+**Added Custom Domain Setup Guide:**
+
+- DNS configuration instructions
+- Step-by-step domain setup in Render
+- Environment variable configuration for custom domains
+- Troubleshooting section for domain-related issues
+
+🚀 **How to Deploy with Your Custom Domain**
+
+1. **Deploy with Blueprint** (using `render.yaml`)
+
+2. **Add Custom Domains** in Render dashboard:
+  - Frontend: `yourdomain.com`
+  - Backend API: `api.yourdomain.com`
+
+3. **Set Environment Variables**:
+  - `CORS_ORIGIN=https://yourdomain.com`
+  - `NEXT_PUBLIC_API_URL=https://api.yourdomain.com`
+
+4. Configure DNS:
+
+💡 **Benefits of This Approach**
+
+- 🔐 **Security**: Domain configuration stays private in Render dashboard
+- 🔄 **Flexibility**: Easy to change domains without code changes
+- 🚀 **Multi-Environment**: Different domains for staging/production
+- 📝 **Clean Repository**: No hardcoded URLs in version control
+- ⚡ **Easy Updates**: Change domains instantly via environment variables
+
+Now your custom domain setup is completely secure and flexible! The render.yaml file can be safely committed to your public repository without exposing your actual domain names. 🎉

@@ -1,0 +1,91 @@
+# Render.com deployment configuration for The Beans
+# This file defines the complete infrastructure for the coffee roaster discovery app
+
+services:
+  # Backend API Service (Express.js + Prisma)
+  - type: web
+    name: the-beans-api
+    runtime: node
+    region: oregon # Choose region closest to your users
+    plan: starter # Can upgrade to standard/pro for production
+    buildCommand: cd server && npm install && npx prisma generate && npm run build
+    startCommand: cd server && npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: the-beans-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true # Render will generate a secure random value
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false # Set manually in Render dashboard
+      - key: CLOUDINARY_API_KEY
+        sync: false # Set manually in Render dashboard
+      - key: CLOUDINARY_API_SECRET
+        sync: false # Set manually in Render dashboard
+      - key: PORT
+        value: 5000
+      - key: CORS_ORIGIN
+        sync: false # Set to your custom frontend domain in Render dashboard
+    autoDeploy: true
+    
+  # Frontend Web Service (Next.js)
+  - type: web
+    name: the-beans-frontend
+    runtime: node
+    region: oregon # Same region as backend for better performance
+    plan: starter # Can upgrade for production
+    buildCommand: cd client && npm install && npm run build
+    startCommand: cd client && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        sync: false # Set to your custom API domain in Render dashboard
+      - key: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+        sync: false # Set manually in Render dashboard
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /
+    headers:
+      - path: /*
+        headers:
+          X-Frame-Options: DENY
+          X-Content-Type-Options: nosniff
+          Referrer-Policy: origin-when-cross-origin
+    autoDeploy: true
+
+# Database Service (PostgreSQL)
+databases:
+  - name: the-beans-db
+    databaseName: the_beans_production
+    region: oregon # Same region as services
+    plan: starter # Free tier available, upgrade for production
+    postgresMajorVersion: 15
+    
+# Background Jobs (Optional - for future features)
+# workers:
+#   - name: the-beans-worker
+#     runtime: node
+#     buildCommand: cd server && npm install
+#     startCommand: cd server && npm run worker
+#     envVars:
+#       - key: NODE_ENV
+#         value: production
+#       - key: DATABASE_URL
+#         fromDatabase:
+#           name: the-beans-db
+#           property: connectionString
+
+# Environment Groups (Optional - for shared env vars)
+# envVarGroups:
+#   - name: the-beans-shared
+#     envVars:
+#       - key: LOG_LEVEL
+#         value: info
+#       - key: RATE_LIMIT_WINDOW
+#         value: 15

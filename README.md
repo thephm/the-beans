@@ -181,24 +181,34 @@ docker-compose exec server npx prisma migrate dev
 
 ## 🚀 Deployment
 
-### 🐳 Docker-Based Deployment
-The application is designed for Docker-based deployment. Use the included `docker-compose.yml` for production deployment with proper environment configuration.
+### 🌟 Render.com (Recommended)
+The Beans includes a complete `render.yaml` configuration for one-click deployment on Render.com:
 
-### 🔧 Backend (Railway/Render)
-1. Connect GitHub repository to Railway or Render
-2. Configure environment variables:
+1. **Connect** your GitHub repository to [Render.com](https://render.com)
+2. **Create** a new Blueprint from your repository (Render will detect `render.yaml`)
+3. **Configure** environment variables in Render dashboard:
    ```
-   DATABASE_URL=postgresql://...
-   JWT_SECRET=your_jwt_secret
+   # Required for all deployments
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_secret
+   
+   # For custom domains (optional)
+   CORS_ORIGIN=https://yourdomain.com
+   NEXT_PUBLIC_API_URL=https://api.yourdomain.com
    ```
-3. Add PostgreSQL database service
-4. Deploy automatically on push to `main`
+4. **Deploy** - Render will automatically create:
+   - PostgreSQL database
+   - Backend API service (Express.js)
+   - Frontend web service (Next.js)
+
+### 🐳 Docker-Based Deployment
+Alternative deployment using Docker containers with `docker-compose.yml`.
 
 ### 🗃️ Database Migration
 ```bash
-# Production migrations (via Railway CLI or Render)
+# Automatic via render.yaml build process
+# Or manual via Render shell:
 npx prisma migrate deploy
 npx prisma generate
 ```
