@@ -1,26 +1,41 @@
 # The Beans - Coffee Roaster Discovery App
 
-A beautiful, modern web application for discovering fresh coffee roasters near you. Built with Next.js, Node.js, and PostgreSQL.
+A beautiful, modern full-stack web application for discovering and exploring specialty coffee roasters. Built with Next.js 14, Express.js, and PostgreSQL in a Docker-first development environment.
 
-## Features
+## 🚀 Features
 
+### Core Features
 - 🌍 **Location-based Discovery**: Find coffee roasters near you
-- ☕ **Roaster Profiles**: Detailed information about coffee roasters including contact info, hours, and bean offerings
-- 👥 **User Accounts**: Sign up for notifications about new roasters
-- 📱 **Cross-platform**: Works on web, Android, and iOS
-- 🔗 **Deep Linking**: Every page is directly linkable
-- 📸 **Photos & Reviews**: Share photos and comments with moderation
+- ☕ **Roaster Profiles**: Detailed information including contact info, hours, and bean offerings
+- 👥 **User Authentication**: Secure sign up and login system
+- ⭐ **Reviews & Favorites**: Rate roasters and save your favorites
+- � **Image Uploads**: Upload and share roaster photos
+- � **Notifications**: Stay updated on new roasters and activity
 
-- 🔒 **Secure API**: RESTful API with Swagger documentation
+### Technical Features
+- 🔒 **Secure API**: RESTful API with comprehensive Swagger documentation
+- 🌐 **Internationalization**: Full i18n support (English/French)
 - 💜 **Beautiful Design**: Purple-themed UI with lavender, violet, and orchid colors
-- 🔒 **Admin Dashboard**: Manage users, roles, and permissions (admin only)
+- 🔒 **Admin Dashboard**: Complete user and role management (admin only)
+- 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- 🐳 **Docker-First**: Containerized development and deployment
 
-- **Railway/Render** - Backend hosting
-- **Cloudflare** - CDN and domain management
+### Architecture
+- **Frontend**: Next.js 14 (App Router) with TypeScript
+- **Backend**: Express.js API with Prisma ORM
+- **Database**: PostgreSQL
+- **Deployment**: Vercel (frontend) + Railway/Render (backend)
+- **CDN**: Cloudflare for assets and domain management
 
-## Quick Start (Docker - Recommended)
+## 🐳 Quick Start (Docker - Recommended)
 
-**⚠️ Important**: This project requires Docker for development. Hot reload is unreliable, so container restarts are needed after code changes.
+**⚠️ Critical**: This project requires Docker container restarts for code changes to take effect. Hot reload is unreliable due to Docker volume mounting.
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [Git](https://git-scm.com/)
+
+### Setup Steps
 
 1. **Clone the repository**
    ```bash
@@ -28,123 +43,253 @@ A beautiful, modern web application for discovering fresh coffee roasters near y
    cd the-beans
    ```
 
-2. **Start all services with Docker Compose**
+2. **Start all services**
    ```bash
    docker-compose up --build
    ```
 
-3. **Open your browser**
-   - Frontend: http://localhost:3000
-   - API Documentation: http://localhost:5000/api-docs
+3. **Access the applications**
+   - 🌐 **Frontend**: [http://localhost:3000](http://localhost:3000)
+   - 🔧 **Backend API**: [http://localhost:5000](http://localhost:5000)
+   - 📚 **API Documentation**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
 
-4. **After making changes, restart containers**
-   ```bash
-   # Frontend changes
-   docker-compose restart client
-   
-   # Backend changes  
-   docker-compose restart server
-   ```
+### 🔄 Development Workflow
 
-### Default Admin Account
-- **Email**: admin@example.com
-- **Password**: admin123
+**Essential**: Always restart containers after code changes:
 
-### Database Access
+```bash
+# After making frontend changes
+docker-compose restart client
+
+# After making backend changes  
+docker-compose restart server
+
+# Rebuild everything if needed
+docker-compose up --build
+
+# Stop all services
+docker-compose down
+```
+
+### 👤 Default Admin Account
+- **Email**: `admin@example.com`
+- **Password**: `admin123`
+
+### 🗃️ Database Management
+
 ```bash
 # Connect to PostgreSQL shell
 docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db
 
 # Check admin users
 docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT email, username, role FROM users WHERE role = 'admin';"
+
+# Run database migrations
+docker-compose exec server npx prisma migrate dev
+
+# Generate Prisma client after schema changes
+docker-compose exec server npx prisma generate
+
+# Reset database (careful!)
+docker-compose exec server npx prisma migrate reset
 ```
 
-## Local Development (without Docker)
+## 💻 Alternative: Local Development (Not Recommended)
 
+⚠️ **Note**: Local development without Docker is not recommended due to environment complexity. Use only if Docker is unavailable.
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL installed locally
+- npm or yarn
+
+### Setup Steps
 1. **Install dependencies**
    ```bash
    npm run setup
    ```
 
 2. **Set up environment variables**
-   - Copy `.env.example` to `.env` in both client and server directories
-   - Fill in your database and API keys
+   - Copy `.env.example` to `.env` in both `client/` and `server/` directories
+   - Configure database connection and API keys
 
-3. **Run the development servers**
+3. **Start development servers**
    ```bash
    npm run dev
    ```
 
+4. **Manual database setup**
+   ```bash
+   cd server
+   npx prisma migrate dev
+   npx prisma generate
+   npx prisma db seed
+   ```
 
-## Documentation
 
-Full project documentation, requirements, and specs are kept as code in the [`docs/`](./docs/) directory.
+## 📚 Documentation
 
-- [Project Index](./docs/index.md)
-- [Architecture Overview](./docs/architecture.md)
-- [Glossary](./docs/glossary.md)
-- [Feature Specs](./docs/)
-   - [Auth](./docs/auth/overview.md)
-   - [Search](./docs/search/overview.md)
-   - [Roasters](./docs/roasters/overview.md)
-   - [Favorites](./docs/favorites/overview.md)
-   - [Profile](./docs/profile/overview.md)
-   - [Settings](./docs/settings/overview.md)
+Comprehensive documentation is maintained in the [`docs/`](./docs/) directory following docs-as-code principles.
 
-## Project Structure
+### Core Documentation
+- 🏗️ [Architecture Overview](./docs/architecture.md)
+- 📖 [Documentation Index](./docs/README.md)
+- 📝 [Glossary](./docs/glossary.md)
+- ⚙️ [Setup Guide](./SETUP.md)
+
+### Feature Documentation
+- 🔐 [Authentication System](./docs/auth/README.md)
+- 🔍 [Search & Discovery](./docs/search/README.md)
+- ☕ [Roaster Management](./docs/roasters/README.md)
+- ⭐ [Favorites & Reviews](./docs/favorites/README.md)
+- 👤 [User Profiles](./docs/profile/README.md)
+- ⚙️ [Settings & Preferences](./docs/settings/README.md)
+- 🛡️ [Admin Dashboard](./docs/admin/README.md)
+
+## 🏗️ Project Structure
 
 ```
 the-beans/
-├── client/                 # Next.js frontend
+├── 🌐 client/                    # Next.js 14 Frontend
 │   ├── src/
-│   │   ├── app/           # App Router pages
-│   │   ├── components/    # Reusable components
-│   │   ├── lib/           # Utilities and configs
-│   │   └── types/         # TypeScript types
-│   └── public/            # Static assets
-├── server/                 # Node.js backend
+│   │   ├── app/                 # App Router pages & layouts
+│   │   ├── components/          # Reusable React components
+│   │   ├── contexts/            # React Context providers
+│   │   ├── lib/                # Utilities & configurations
+│   │   └── types/              # TypeScript type definitions
+│   ├── public/
+│   │   ├── locales/            # i18n translation files
+│   │   └── images/             # Static images & icons
+│   └── Dockerfile              # Frontend container config
+├── 🔧 server/                   # Express.js Backend
 │   ├── src/
-│   │   ├── routes/        # API routes
-│   │   ├── lib/           # Utilities
-│   └── prisma/            # Database schema & migrations
-└── docker-compose.yml      # Docker Compose setup
+│   │   ├── routes/             # RESTful API endpoints
+│   │   ├── middleware/         # Auth & validation middleware
+│   │   └── lib/               # Server utilities
+│   ├── prisma/
+│   │   ├── schema.prisma      # Database schema
+│   │   ├── migrations/        # Database migrations
+│   │   └── seed.ts           # Database seeding
+│   ├── uploads/               # File upload storage
+│   └── Dockerfile            # Backend container config
+├── 📚 docs/                    # Documentation (docs-as-code)
+├── 🐳 docker-compose.yml       # Multi-service orchestration
+└── 📋 Various config files     # Setup, CI/CD, etc.
 ```
 
-## Development
+## 🛠️ Development
 
-### Adding New Features
-1. Backend: Add routes in `server/src/routes/`
-2. Frontend: Create components in `client/src/components/`
-3. Database: Update schema in `server/prisma/schema.prisma`
+### 🎯 Key Development Patterns
 
-### Testing
-- Frontend: Jest + Testing Library
-- Backend: Jest + Supertest
-- E2E: Playwright
+#### API Routes (`server/src/routes/`)
+- **Authentication**: `optionalAuth` (public), `requireAuth` (protected)
+- **Admin Routes**: Check `user.role === 'admin'` 
+- **Validation**: express-validator for input sanitization
+- **Error Handling**: Consistent JSON error responses
 
-## Deployment
+#### Frontend API Client (`client/src/lib/api.ts`)
+- Centralized API client with JWT token management
+- Base URL: `http://localhost:5000` (configurable)
+- Automatic token injection and refresh
 
-### Frontend (Vercel)
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main
+#### Database (Prisma)
+```bash
+# After schema changes
+docker-compose exec server npx prisma generate
+docker-compose exec server npx prisma migrate dev
+```
 
-### Backend (Railway)
-1. Connect your GitHub repository to Railway
-2. Set environment variables in Railway dashboard
+### 🔧 Adding New Features
+1. **Backend**: Add routes in `server/src/routes/` with proper middleware
+2. **Frontend**: Create components in `client/src/components/`
+3. **Database**: Update `server/prisma/schema.prisma` + generate + migrate
+4. **i18n**: Add translations to `client/public/locales/{en,fr}/common.json`
+5. **Restart**: Always restart containers after changes
+
+### 🧪 Testing Strategy
+- **Frontend**: Jest + React Testing Library
+- **Backend**: Jest + Supertest for API testing
+- **E2E**: Playwright for integration tests
+- **Manual**: Admin dashboard at `/admin` (requires admin login)
+
+## 🚀 Deployment
+
+### 🌐 Frontend (Vercel)
+1. Connect GitHub repository to Vercel
+2. Configure environment variables:
+   ```
+   NEXT_PUBLIC_API_URL=https://your-backend.railway.app
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+   ```
+3. Deploy automatically on push to `main`
+
+### 🔧 Backend (Railway/Render)
+1. Connect GitHub repository to Railway or Render
+2. Configure environment variables:
+   ```
+   DATABASE_URL=postgresql://...
+   JWT_SECRET=your_jwt_secret
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_secret
+   ```
 3. Add PostgreSQL database service
+4. Deploy automatically on push to `main`
 
-## Contributing
+### 🗃️ Database Migration
+```bash
+# Production migrations (via Railway CLI or Render)
+npx prisma migrate deploy
+npx prisma generate
+```
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+## 🤝 Contributing
 
-## License
+### Development Process
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+3. **Develop** using Docker: `docker-compose up --build`
+4. **Restart** containers after changes: `docker-compose restart client server`
+5. **Test** your changes thoroughly
+6. **Commit** your changes: `git commit -m 'Add amazing feature'`
+7. **Push** to branch: `git push origin feature/amazing-feature`
+8. **Submit** a pull request
+
+### Code Standards
+- **TypeScript**: Strict typing required
+- **ESLint**: Follow configured rules
+- **Prettier**: Auto-formatting enabled
+- **i18n**: All user-facing text must be translatable
+- **Tests**: Include tests for new features
+- **Documentation**: Update docs for new features
+
+## ⚠️ Important Development Notes
+
+### Docker-First Workflow
+- **Always restart containers** after code changes: `docker-compose restart client server`
+- **Hot reload is unreliable** in the Docker environment
+- **Database changes require** Prisma generate + migrate
+- **New translations require** client container restart
+
+### Common Issues
+- **Container won't start**: Check Docker Desktop is running
+- **Database connection fails**: Ensure PostgreSQL container is healthy
+- **API calls fail**: Verify backend container is running on port 5000
+- **Changes not visible**: Restart the appropriate container
+- **Admin access needed**: Use `admin@example.com` / `admin123`
+
+### URLs & Access
+- 🌐 Frontend: [http://localhost:3000](http://localhost:3000)
+- 🔧 Backend: [http://localhost:5000](http://localhost:5000)
+- 📚 API Docs: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+- 🛡️ Admin Panel: [http://localhost:3000/admin](http://localhost:3000/admin)
+
+## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## Support
+## 🆘 Support
 
-For support, email support@the-beans.app or create an issue on GitHub.
+- 📧 **Email**: support@the-beans.app
+- 🐛 **Issues**: [GitHub Issues](https://github.com/thephm/the-beans/issues)
+- 📚 **Documentation**: [./docs/](./docs/)
+- 🚀 **Setup Help**: [SETUP.md](./SETUP.md)
