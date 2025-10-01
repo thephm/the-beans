@@ -1,20 +1,29 @@
-# 🎉 Your Coffee App is Ready to Brew!
+# ☕ The Beans - Project Overview
 
-I've successfully created **The Beans** - a comprehensive coffee roaster discovery app with all the features you requested! Here's what I've built for you:
+**The Beans** is a modern, full-stack coffee roaster discovery platform designed to connect coffee enthusiasts with specialty roasters in their area. Built with a Docker-first development approach for consistency and reliability.
 
-## ✨ What's Included
+## 🎯 Project Vision
 
-### 🎨 **Beautiful Purple-Themed UI**
-- Custom Tailwind CSS configuration with your favorite lavender, violet, orchid colors
-- Smooth Framer Motion animations
-- Responsive design that works perfectly on mobile, tablet, and desktop
-- Progressive Web App (PWA) ready for mobile installation
+Create a beautiful, user-friendly platform where coffee lovers can:
+- **Discover** specialty coffee roasters near them
+- **Connect** with the coffee community through reviews and favorites
+- **Explore** the world of specialty coffee through detailed roaster profiles
+- **Share** their coffee experiences with photos and reviews
 
-### 🚀 **Full-Stack Architecture**
-- **Frontend**: Next.js 14 with TypeScript, React 18, Tailwind CSS
-- **Backend**: Node.js with Express.js, TypeScript
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: JWT-based secure login system
+## ✨ Feature Highlights
+
+### 🎨 **Beautiful Purple-Themed Design**
+- Custom Tailwind CSS with lavender, violet, and orchid color palette
+- Smooth animations and transitions using Framer Motion
+- Fully responsive design optimized for all devices
+- Progressive Web App (PWA) capabilities for mobile installation
+
+### 🏗️ **Modern Architecture**
+- **Frontend**: Next.js 14 (App Router) with TypeScript and React 18
+- **Backend**: Express.js API with TypeScript and Prisma ORM
+- **Database**: PostgreSQL with comprehensive relational schema
+- **DevOps**: Docker Compose orchestration for development
+- **Authentication**: Secure JWT-based authentication system
 
 ### 🌍 **Core Features**
 - **Roaster Discovery**: Find coffee roasters near you with location-based search

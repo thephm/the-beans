@@ -1,97 +1,307 @@
 # Architecture Overview
 
-## System Overview
+## 🏗️ System Overview
 
-The Beans is a full-stack web application for discovering coffee roasters. It is built with a modern JavaScript/TypeScript stack, using Docker for local development and deployment. The architecture is modular, with clear separation between frontend, backend, and database layers.
+The Beans is a modern full-stack web application for discovering specialty coffee roasters. Built with a **Docker-first development approach**, it features a clean separation between frontend, backend, and database layers using industry-standard technologies.
 
-## High-Level Architecture
+## 🎯 High-Level Architecture
 
 ```
-┌────────────┐      ┌────────────┐      ┌────────────┐
-│  Browser   │ <--> │  Frontend  │ <--> │  Backend   │ <--> │ Database │
-└────────────┘      └────────────┘      └────────────┘
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Browser   │◄──►│  Frontend   │◄──►│   Backend   │◄──►│  Database   │
+│             │    │             │    │             │    │             │
+│ React/Next  │    │ Next.js 14  │    │ Express.js  │    │ PostgreSQL  │
+│ TypeScript  │    │ TypeScript  │    │ Prisma ORM  │    │ Dockerized  │
+│ Tailwind    │    │ App Router  │    │ JWT Auth    │    │             │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
-- **Frontend**: Next.js (React, TypeScript, Tailwind CSS)
-- **Backend**: Node.js, Express, TypeScript, Prisma ORM
-- **Database**: PostgreSQL
+### 📦 Technology Stack
+- **Frontend**: Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express.js, TypeScript, Prisma ORM
+- **Database**: PostgreSQL (containerized for development)
+- **DevOps**: Docker Compose for orchestration
+- **Authentication**: JWT-based with bcrypt password hashing
 
-All services are containerized and orchestrated with Docker Compose for local development.
+All services are **containerized and orchestrated** with Docker Compose for consistent local development.
 
-## Frontend
+## 🌐 Frontend Architecture (`client/`)
 
-- Located in `client/`
-- Built with Next.js 14 (App Router), React 18, TypeScript
-- Uses Tailwind CSS for styling and Framer Motion for animations
-- Internationalization (i18n) with i18next
-- PWA support for mobile installation
-- Communicates with backend via REST API
-- Key pages: Home, Discover, Roasters, Favorites, Profile, Settings, About
+### Core Technologies
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript with strict typing
+- **Styling**: Tailwind CSS + custom purple theme
+- **State Management**: React Context (AuthContext, LanguageContext)
+- **Internationalization**: i18next (English/French support)
+- **API Client**: Centralized client with JWT token management
 
-## Backend
+### Key Features
+- **Responsive Design**: Mobile-first approach with Tailwind
+- **PWA Support**: App manifest for mobile installation
+- **Image Optimization**: Next.js Image component + Cloudinary integration
+- **SEO Optimized**: Meta tags and structured data
+- **Performance**: Code splitting and lazy loading
 
-- Located in `server/`
-- Node.js with Express.js and TypeScript
-- RESTful API with endpoints for authentication, user management, roasters, search, reviews, and favorites
-- Prisma ORM for database access
-- JWT-based authentication
-- Swagger UI for API documentation (`/api-docs`)
-- Cloudinary integration for image uploads
-- Security: Helmet, CORS, rate limiting, input validation
+### Page Structure
+```
+src/app/                    # App Router pages
+├── page.tsx               # Home page
+├── layout.tsx             # Root layout with providers
+├── discover/              # Roaster discovery
+├── roasters/              # Individual roaster pages
+├── favorites/             # User favorites
+├── profile/               # User profile management
+├── settings/              # User preferences
+├── admin/                 # Admin dashboard (protected)
+├── login/ & signup/       # Authentication flows
+└── about/                 # About page
+```
 
-## Database
+## 🔧 Backend Architecture (`server/`)
 
-- PostgreSQL (Dockerized for local dev)
-- Prisma schema defines models: User, Roaster, Review, Favorite, Notification, Comment
-- Relationships: Users can have favorites, reviews, notifications, etc.
+### Core Technologies
+- **Runtime**: Node.js with Express.js framework
+- **Language**: TypeScript with strict typing
+- **Database**: Prisma ORM for type-safe database access
+- **Authentication**: JWT tokens with bcrypt password hashing
+- **File Storage**: Cloudinary integration for image uploads
+- **Documentation**: Swagger UI at `/api-docs`
 
-## DevOps & Deployment
+### API Design Patterns
+- **RESTful Architecture**: Standard HTTP methods and status codes
+- **Middleware Chain**: Authentication, validation, error handling
+- **Input Validation**: express-validator for request sanitization
+- **Error Handling**: Consistent JSON error responses
+- **Rate Limiting**: Protection against abuse
 
-- Docker Compose orchestrates three main services: `client` (frontend), `server` (backend), `database` (Postgres)
-- Vercel for frontend hosting, Railway/Render for backend, Cloudflare for CDN/domain
+### Route Structure
+```
+src/routes/
+├── auth.ts               # Authentication endpoints
+├── users.ts              # User management (admin only)
+├── roasters.ts           # Roaster CRUD operations
+├── search.ts             # Search and filtering
+├── reviews.ts            # Review system
+├── favorites.ts          # User favorites
+├── notifications.ts      # User notifications
+└── uploads.ts           # File upload handling
+```
 
-## Project Structure
+### Security Features
+- **Helmet**: HTTP security headers
+- **CORS**: Cross-origin resource sharing configuration
+- **Rate Limiting**: Per-endpoint request throttling
+- **Input Sanitization**: XSS and injection prevention
+- **JWT Validation**: Token-based authentication middleware
+
+## 🗃️ Database Architecture
+
+### Database Technology
+- **Engine**: PostgreSQL (production-ready, ACID compliant)
+- **Development**: Dockerized container for consistency
+- **ORM**: Prisma for type-safe database operations
+- **Migrations**: Automated schema versioning and deployment
+
+### Data Model Relationships
+```
+User (1:many)
+├── Roaster (owns)
+├── Review (creates)
+├── Favorite (has)
+└── Notification (receives)
+
+Roaster (1:many)
+├── Review (receives)
+├── Favorite (in)
+└── Comment (has)
+```
+
+### Key Models (`prisma/schema.prisma`)
+- **User**: Authentication, profiles, role-based access
+- **Roaster**: Coffee shop data, location, specialties
+- **Review**: User ratings and feedback
+- **Favorite**: User's saved roasters
+- **Notification**: System and user notifications
+- **Comment**: Community discussions
+
+## 🐳 DevOps & Deployment
+
+### Local Development (Docker)
+```yaml
+docker-compose.yml orchestrates:
+├── client (frontend)     # Next.js on port 3000
+├── server (backend)      # Express.js on port 5000  
+└── database (postgres)   # PostgreSQL on port 5432
+```
+
+### Critical Development Workflow
+⚠️ **Container restarts required** for code changes:
+```bash
+# After frontend changes
+docker-compose restart client
+
+# After backend changes
+docker-compose restart server
+```
+
+### Production Deployment
+- **Frontend**: Vercel (automatic GitHub deployments)
+- **Backend**: Railway or Render (containerized deployment)
+- **Database**: Managed PostgreSQL (Railway/Render)
+- **CDN**: Cloudflare for static assets and domain
+- **File Storage**: Cloudinary for user-uploaded images
+
+### Environment Configuration
+```
+Development:  Docker Compose (.env files)
+Staging:      Railway/Render (environment variables)
+Production:   Railway/Render + Vercel (secure env vars)
+```
+
+## 📁 Detailed Project Structure
 
 ```
 the-beans/
-├── client/      # Next.js frontend
-├── server/      # Node.js backend
-├── docs/        # Documentation (docs-as-code)
-├── docker-compose.yml
-└── ...
+├── 🌐 client/                    # Next.js 14 Frontend
+│   ├── src/
+│   │   ├── app/                 # App Router (pages & layouts)
+│   │   ├── components/          # Reusable React components
+│   │   ├── contexts/            # React Context providers
+│   │   │   ├── AuthContext.tsx  # User authentication state
+│   │   │   └── LanguageContext.tsx # i18n language switching
+│   │   ├── lib/
+│   │   │   ├── api.ts          # Centralized API client
+│   │   │   └── utils.ts        # Helper functions
+│   │   └── types/              # TypeScript definitions
+│   ├── public/
+│   │   ├── locales/            # i18n translation files
+│   │   │   ├── en/common.json  # English translations
+│   │   │   └── fr/common.json  # French translations
+│   │   └── images/             # Static assets
+│   └── Dockerfile              # Frontend container
+│
+├── 🔧 server/                   # Express.js Backend
+│   ├── src/
+│   │   ├── routes/             # RESTful API endpoints
+│   │   ├── middleware/         # Auth, validation, error handling
+│   │   └── lib/               # Server utilities
+│   ├── prisma/
+│   │   ├── schema.prisma      # Database schema definition
+│   │   ├── migrations/        # Database version control
+│   │   └── seed.ts           # Development data seeding
+│   ├── uploads/               # Temporary file storage
+│   └── Dockerfile            # Backend container
+│
+├── 📚 docs/                    # Documentation (docs-as-code)
+│   ├── README.md              # Documentation index
+│   ├── architecture.md       # This file
+│   ├── glossary.md           # Terms and definitions
+│   └── [features]/           # Feature-specific docs
+│
+├── 🐳 docker-compose.yml       # Multi-service orchestration
+├── 📋 README.md               # Main project documentation
+├── ⚙️  SETUP.md               # Detailed setup instructions
+└── 🔧 Various configs         # ESLint, TypeScript, etc.
 ```
 
-## Key Flows
+## 🔄 Key Application Flows
 
-### User Authentication
-- JWT-based, with registration and login endpoints
-- Passwords hashed with bcrypt
+### 🔐 User Authentication Flow
+1. **Registration**: Email/password → bcrypt hashing → JWT token
+2. **Login**: Credentials validation → JWT token generation
+3. **Token Management**: Auto-refresh, localStorage persistence
+4. **Role-Based Access**: User vs Admin permissions
 
-### Roaster Discovery
-- Search and filter roasters by specialty, location, etc.
-- Roaster data includes images, specialties, reviews, and ratings
+### ☕ Roaster Discovery Flow
+1. **Search Interface**: Location, specialty, name filters
+2. **API Query**: Backend search with pagination
+3. **Results Display**: Card layout with images, ratings
+4. **Detail View**: Full roaster profile with reviews
 
-### Favorites & Reviews
-- Users can favorite roasters and leave reviews
+### ⭐ User Interaction Flow
+1. **Favorites**: Add/remove with optimistic UI updates
+2. **Reviews**: Create, edit, delete with validation
+3. **Notifications**: Real-time updates for user activity
+4. **Admin Actions**: User management, content moderation
 
-### User Profiles & Settings
-- Editable profile, notification and privacy settings
+### 🖼️ Image Upload Flow
+1. **Frontend**: File selection with preview
+2. **Backend**: Multer handling + Cloudinary upload
+3. **Database**: Store Cloudinary URL in roaster record
+4. **Display**: Optimized images via Next.js Image component
 
-## Security
-- Helmet for HTTP headers
-- CORS configured for frontend
-- Rate limiting on API endpoints
-- Input validation with express-validator
+## 🔒 Security Architecture
 
-## API Documentation
-- Swagger UI available at `/api-docs` on the backend server
+### Backend Security
+- **Helmet**: HTTP security headers (CSP, XSS protection)
+- **CORS**: Configured for frontend domain whitelist
+- **Rate Limiting**: Per-endpoint request throttling
+- **Input Validation**: express-validator sanitization
+- **Password Security**: bcrypt hashing with salt rounds
+- **JWT Security**: Signed tokens with expiration
 
-## Internationalization
-- All user-facing text is translatable (English/French supported)
+### Frontend Security
+- **XSS Prevention**: React's built-in escaping
+- **CSRF Protection**: SameSite cookies
+- **Content Security Policy**: Strict resource loading
+- **Secure API Calls**: HTTPS-only in production
 
-## Testing
-- Jest and Testing Library for frontend
-- Jest and Supertest for backend
+## 📚 API Documentation
+
+### Interactive Documentation
+- **Swagger UI**: Available at `http://localhost:5000/api-docs`
+- **Auto-Generated**: From route definitions and schemas
+- **Testing Interface**: Execute API calls directly from browser
+
+### API Standards
+- **RESTful Design**: Standard HTTP methods and status codes
+- **Consistent Responses**: Uniform JSON structure
+- **Error Handling**: Detailed error messages and codes
+
+## 🌐 Internationalization (i18n)
+
+### Translation System
+- **Framework**: i18next with React integration
+- **Languages**: English (default) + French
+- **File Structure**: JSON files in `client/public/locales/`
+- **Usage Pattern**: `{t('key.path', 'Fallback Text')}`
+
+### Implementation Details
+```typescript
+// Context usage
+const { t } = useTranslation();
+
+// Component usage
+<h1>{t('admin.users.title', 'User Management')}</h1>
+```
+
+## 🧪 Testing Strategy
+
+### Frontend Testing
+- **Unit Tests**: Jest + React Testing Library
+- **Component Tests**: Isolated component behavior
+- **Integration Tests**: User interaction flows
+- **E2E Tests**: Playwright for critical paths
+
+### Backend Testing
+- **Unit Tests**: Jest for individual functions
+- **Integration Tests**: Supertest for API endpoints
+- **Database Tests**: In-memory test database
+- **Security Tests**: Authentication and authorization
+
+### Development Testing
+- **Manual Testing**: Admin dashboard functionality
+- **Docker Testing**: Container orchestration validation
+- **Performance Testing**: Load testing with realistic data
 
 ---
-This architecture enables rapid feature development, strong security, and a great user experience across devices.
+
+## 🎯 Architecture Benefits
+
+This architecture provides:
+- **🚀 Rapid Development**: Docker-first workflow with hot reload
+- **🔒 Strong Security**: Multi-layered security approach
+- **📱 Great UX**: Responsive design and performance optimization
+- **🌍 Global Ready**: Full internationalization support
+- **🔧 Maintainable**: Clear separation of concerns and documentation
+- **📈 Scalable**: Modular design supporting horizontal scaling
