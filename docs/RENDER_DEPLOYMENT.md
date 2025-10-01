@@ -23,7 +23,7 @@ Ensure your repository includes the `render.yaml` file in the root directory.
 ### 3. Review Services
 Render will automatically detect the `render.yaml` file and show three services:
 - **the-beans-api** (Backend Express.js service)
-- **the-beans-frontend** (Next.js frontend service)  
+- **the-beans-frontend** (Next.js static site)  
 - **the-beans-db** (PostgreSQL database)
 
 ### 4. Configure Environment Variables
