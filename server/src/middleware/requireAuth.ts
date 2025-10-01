@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest } from '../types';
 
-export interface AuthenticatedRequest extends Request {
-  user?: { id: string };
-}
+export { AuthenticatedRequest };
 
 export const requireAuth = async (
   req: AuthenticatedRequest,

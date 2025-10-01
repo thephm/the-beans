@@ -282,7 +282,7 @@ router.post('/login', [
  *       401:
  *         description: Unauthorized
  */
-router.get('/me', async (req, res) => {
+router.get('/me', async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
