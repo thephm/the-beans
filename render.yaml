@@ -41,15 +41,14 @@ services:
         sync: false # Set to your custom frontend domain in Render dashboard
     autoDeploy: true
     
-  # Frontend Web Service (Next.js)
-  - type: web
+  # Frontend Static Site Service (Next.js)
+  - type: static
     name: the-beans-frontend
-    runtime: node
     region: oregon # Same region as backend for better performance
     plan: starter # Can upgrade for production
     rootDir: client
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    staticPublishPath: ./out
     envVars:
       - key: NODE_ENV
         value: production

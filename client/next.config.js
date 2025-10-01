@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Static export configuration for Render.com deployment
+  output: 'export',
+  trailingSlash: true,
+  distDir: 'out',
+  
   images: {
-    unoptimized: true, // Disable optimization for development
+    unoptimized: true, // Required for static export
     remotePatterns: [
       {
         protocol: 'https',

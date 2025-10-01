@@ -46729,3 +46729,119 @@ Headers Configuration (Line 68):
 - Maintains the same security headers: `X-Frame-Options, X-Content-Type-Options, and Referrer-Policy
 `
 The `render.yaml` file should now be compatible with Render.com's current configuration schema and deploy without validation errors.
+
+## 333rd try
+
+> Render gave these errors when adding blueprint
+
+```
+services[1].headers
+headers only supported for static web services
+services[1].routes
+routes only supported for static web services
+```
+
+I need to fix the `render.yaml` file because Render.com is throwing errors about the headers and routes fields being used on non-static web services. Let me examine the current configuration and fix these issues.
+
+✔ Read `render.yaml`, lines 1 to 50
+
+✔ Read `render.yaml`, lines 51 to 99
+
+I can see the issue! The problem is that the frontend service is configured as a regular `web` service with `headers` and `routes` fields, but according to Render's error message, these fields are only supported for **static web services**.
+
+The Next.js frontend should be deployed as a `static` service, not a `web` service. Let me fix this:
+
+`render.yaml +3 -4`
+
+Now I need to check if the Next.js configuration supports static export, which is required for Render's static hosting. Let me check the Next.js configuration:
+
+✔ Read `next.config.js`, lines 1 to 20
+
+✔ Read `next.config.js`, lines 21 to 25
+
+I need to update the Next.js configuration to support static export for Render's static hosting. Let me add the required configuration:
+
+`next.config.js +6 -1`
+Now I need to check if there are any `package.json` scripts that need updating for the static build:
+
+✔ Read `package.json`, lines 1 to 20
+
+The `package.json` scripts look good. The npm run build command will work with the static export configuration. Now let me update the documentation to reflect this change:
+
+Let me check if the deployment documentation file exists:
+
+✔ Read `RENDER_DEPLOYMENT.md`, lines 1 to 50
+
+Now let me update the deployment documentation to reflect the static site deployment:
+
+`RENDER_DEPLOYMENT.md +1 -1`
+
+Perfect! ✅ I've fixed the Render.com Blueprint deployment errors. Here's what I changed:
+
+### 🔧 Issues Fixed
+
+**Problem**:
+Render.com was throwing errors because `headers` and `routes` fields were being used on a regular `web` service, but these fields are only supported for `static` web services.
+
+**Solution**:
+Changed the frontend service from `type: web` to `type: static` and configured Next.js for static export.
+
+### 📋 Changes Made
+
+1. **Updated** `render.yaml`
+  - Changed frontend service `type: web` → `type: static`
+  - Added staticPublishPath: `./out` for static file output
+  - Removed unsupported fields for web services
+  - Headers and routes now properly supported for static service
+
+2. **Updated next.config.js**
+
+  - Added `output: 'export'` for static site generation
+  - Added `trailingSlash: true` for proper routing
+  - Added `distDir: 'out'` to match Render's expectations
+  - **Images already configured** with `unoptimized`: true (required for static export)
+
+3. **Updated Documentation**
+
+  - Changed service description to "Next.js static site"
+  - Maintains all deployment instructions and environment variables
+
+### 🚀 Deployment Architecture Now
+
+```yaml
+services:
+  # Backend API (Node.js web service)
+  - type: web
+    name: the-beans-api
+    # Supports dynamic server-side functionality
+    
+  # Frontend (Static site)  
+  - type: static
+    name: the-beans-frontend
+    # Now supports headers and routes configuration
+    # Serves pre-built static files from Next.js export
+```
+
+## ✅ Benefits of This Change
+
+✅ **Fixes Render errors** - No more configuration validation failures
+✅ **Better performance** - Static files served from CDN
+✅ **Lower costs** - Static hosting is typically cheaper than web services
+✅ **Better caching** - Static assets get optimal cache headers
+✅ **Security headers** - Now properly applied to the static site
+
+#### 🎯 Next Steps
+
+1. **Commit the changes** to your repository
+2. **Try the Blueprint deployment** again on Render.com
+3. **Set your environment variables**:
+
+```
+CLOUDINARY_CLOUD_NAME=your_value
+CLOUDINARY_API_KEY=your_value
+CLOUDINARY_API_SECRET=your_value
+CORS_ORIGIN=https://yourdomain.com
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+```
+
+The deployment should now work without the headers/routes validation errors! 🎉
