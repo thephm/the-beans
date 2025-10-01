@@ -145,7 +145,7 @@ docker-compose restart server
 ```
 
 ### Production Deployment
-- **Frontend**: Vercel (automatic GitHub deployments)
+- **Frontend**: Docker-based containerization
 - **Backend**: Railway or Render (containerized deployment)
 - **Database**: Managed PostgreSQL (Railway/Render)
 - **CDN**: Cloudflare for static assets and domain
@@ -155,7 +155,7 @@ docker-compose restart server
 ```
 Development:  Docker Compose (.env files)
 Staging:      Railway/Render (environment variables)
-Production:   Railway/Render + Vercel (secure env vars)
+Production:   Railway/Render + Docker (secure env vars)
 ```
 
 ## 📁 Detailed Project Structure

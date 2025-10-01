@@ -24,7 +24,7 @@ A beautiful, modern full-stack web application for discovering and exploring spe
 - **Frontend**: Next.js 14 (App Router) with TypeScript
 - **Backend**: Express.js API with Prisma ORM
 - **Database**: PostgreSQL
-- **Deployment**: Vercel (frontend) + Railway/Render (backend)
+- **Deployment**: Docker-based containerization
 - **CDN**: Cloudflare for assets and domain management
 
 ## 🐳 Quick Start (Docker - Recommended)
@@ -181,14 +181,8 @@ docker-compose exec server npx prisma migrate dev
 
 ## 🚀 Deployment
 
-### 🌐 Frontend (Vercel)
-1. Connect GitHub repository to Vercel
-2. Configure environment variables:
-   ```
-   NEXT_PUBLIC_API_URL=https://your-backend.railway.app
-   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
-   ```
-3. Deploy automatically on push to `main`
+### 🐳 Docker-Based Deployment
+The application is designed for Docker-based deployment. Use the included `docker-compose.yml` for production deployment with proper environment configuration.
 
 ### 🔧 Backend (Railway/Render)
 1. Connect GitHub repository to Railway or Render
