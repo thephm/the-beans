@@ -234,10 +234,8 @@ DATABASE_URL="postgresql://beans_user:secure_password_here@localhost:5432/the_be
 
 ## 🚀 Production Deployment
 
-### 🌐 Frontend (Vercel)
-1. **Connect** your GitHub repository to [Vercel](https://vercel.com)
-2. **Set environment variables** in Vercel dashboard
-3. **Deploy** automatically on push to main branch
+### 🐳 Docker-Based Deployment
+The application is designed for containerized deployment using Docker Compose. Configure your production environment variables and deploy using the included `docker-compose.yml`.
 
 ### 🔧 Backend (Railway/Render)
 1. **Connect** your GitHub repository to [Railway](https://railway.app) or [Render](https://render.com)

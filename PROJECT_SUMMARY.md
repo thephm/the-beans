@@ -110,8 +110,8 @@ Once running, visit `http://localhost:5000/api-docs` for complete API documentat
 
 ## 🚀 **Deployment Ready**
 
-### **Frontend (Vercel)**
-- Configured for one-click Vercel deployment
+### **Frontend (Docker-Based)**
+- Docker containerization for consistent deployment
 - Environment variables ready
 - Custom domain support with Cloudflare
 
