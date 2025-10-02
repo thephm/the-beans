@@ -4,40 +4,50 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create a test user for roaster ownership
-  const testUser = await prisma.user.upsert({
-    where: { email: 'coffee@lover.com' },
-    update: {},
-    create: {
-      email: 'coffee@lover.com',
-      username: 'coffeelover',
-      password: await bcrypt.hash('password123', 10),
-      firstName: 'Coffee',
-      lastName: 'Lover',
-      location: 'Everywhere',
-      latitude: 0,
-      longitude: 0,
-      role: 'user',
-      settings: {
-        preferences: {
-          showOnlyVerified: true,
-          distanceUnit: 'km',
-          roastLevel: 'no-preference',
-          brewingMethods: {
-            espresso: false,
-            pourOver: false,
-            frenchPress: false,
-            coldBrew: false
-          }
-        },
-        privacy: {
-          showProfile: true,
-          allowLocationTracking: false
-        }
-      }
-    },
-  });
   console.log('🌱 Starting database seeding...');
+
+  // Create a test user for roaster ownership
+  let testUser = await prisma.user.findUnique({
+    where: { email: 'coffee@lover.com' }
+  });
+
+  if (!testUser) {
+    // Check if username already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { username: 'coffeelover' }
+    });
+
+    testUser = await prisma.user.create({
+      data: {
+        email: 'coffee@lover.com',
+        username: existingUser ? `coffeelover_${Date.now()}` : 'coffeelover',
+        password: await bcrypt.hash('password123', 10),
+        firstName: 'Coffee',
+        lastName: 'Lover',
+        location: 'Everywhere',
+        latitude: 0,
+        longitude: 0,
+        role: 'user',
+        settings: {
+          preferences: {
+            showOnlyVerified: true,
+            distanceUnit: 'km',
+            roastLevel: 'no-preference',
+            brewingMethods: {
+              espresso: false,
+              pourOver: false,
+              frenchPress: false,
+              coldBrew: false
+            }
+          },
+          privacy: {
+            showProfile: true,
+            allowLocationTracking: false
+          }
+        }
+      },
+    });
+  }
 
 
   // Create default admin user from env vars if not exists
@@ -52,38 +62,55 @@ async function main() {
 
   const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
 
-  const adminUser = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      username: adminUsername,
-      password: hashedAdminPassword,
-      firstName: adminFirstName,
-      lastName: adminLastName,
-      location: adminLocation,
-      latitude: adminLatitude,
-      longitude: adminLongitude,
-      role: 'admin',
-      settings: {
-        preferences: {
-          showOnlyVerified: true,
-          distanceUnit: 'km',
-          roastLevel: 'no-preference',
-          brewingMethods: {
-            espresso: false,
-            pourOver: false,
-            frenchPress: false,
-            coldBrew: false
-          }
-        },
-        privacy: {
-          showProfile: true,
-          allowLocationTracking: false
-        }
-      }
-    },
+  // Check if admin user already exists by email or username
+  let adminUser = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: adminEmail },
+        { username: adminUsername }
+      ]
+    }
   });
+
+  if (!adminUser) {
+    // Create new admin user if none exists
+    adminUser = await prisma.user.create({
+      data: {
+        email: adminEmail,
+        username: adminUsername,
+        password: hashedAdminPassword,
+        firstName: adminFirstName,
+        lastName: adminLastName,
+        location: adminLocation,
+        latitude: adminLatitude,
+        longitude: adminLongitude,
+        role: 'admin',
+        settings: {
+          preferences: {
+            showOnlyVerified: true,
+            distanceUnit: 'km',
+            roastLevel: 'no-preference',
+            brewingMethods: {
+              espresso: false,
+              pourOver: false,
+              frenchPress: false,
+              coldBrew: false
+            }
+          },
+          privacy: {
+            showProfile: true,
+            allowLocationTracking: false
+          }
+        }
+      },
+    });
+  } else if (adminUser.role !== 'admin') {
+    // Update existing user to admin role if needed
+    adminUser = await prisma.user.update({
+      where: { id: adminUser.id },
+      data: { role: 'admin' }
+    });
+  }
   console.log('✅ Created/ensured admin user:', adminUser.email);
 
   // Create test roasters
