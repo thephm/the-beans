@@ -98,7 +98,7 @@ const prisma = new PrismaClient();
  */
 router.post('/register', [
   body('email').isEmail().normalizeEmail(),
-  body('username').isLength({ min: 3, max: 30 }).isAlphanumeric(),
+  body('username').isLength({ min: 3, max: 50 }),
   body('password').isLength({ min: 6 }),
   body('firstName').optional().isLength({ min: 1, max: 50 }),
   body('lastName').optional().isLength({ min: 1, max: 50 }),
