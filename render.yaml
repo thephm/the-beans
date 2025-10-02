@@ -38,7 +38,7 @@ services:
       - key: PORT
         value: 5000
       - key: CORS_ORIGIN
-        sync: false # IMPORTANT: Set to "https://the-beans-frontend.onrender.com" in Render dashboard
+        sync: false # IMPORTANT: Set to "https://thebeans.ca,https://the-beans-frontend.onrender.com" in Render dashboard
       - key: ADMIN_EMAIL
         sync: false # Set to your desired admin email
       - key: ADMIN_USERNAME  

@@ -46,7 +46,8 @@ const corsOrigins = process.env.CORS_ORIGIN
   : [
       'http://localhost:3000', 
       'http://localhost:5000',
-      'https://the-beans-frontend.onrender.com' // Production frontend
+      'https://the-beans-frontend.onrender.com', // Render frontend
+      'https://thebeans.ca' // Production custom domain
     ];
 
 app.use(cors({
