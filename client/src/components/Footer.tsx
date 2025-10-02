@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+import { getApiBaseUrl } from '@/lib/api'
 
 export function Footer() {
   const { t } = useTranslation()
@@ -80,7 +81,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="http://localhost:5000/api-docs" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <a href={`${getApiBaseUrl()}/api-docs`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                   {t('footer.apiDocs')}
                 </a>
               </li>

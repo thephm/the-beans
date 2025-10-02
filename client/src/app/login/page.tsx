@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { apiClient } from '@/lib/api'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -23,24 +24,11 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        login(data.token, data.user)
-        router.push('/discover')
-      } else {
-        const errorData = await response.json()
-        setError(errorData.error || 'Login failed')
-      }
-    } catch (error) {
-      setError('Network error. Please try again.')
+      const data = await apiClient.login(formData) as { token: string; user: any }
+      login(data.token, data.user)
+      router.push('/discover')
+    } catch (error: any) {
+      setError(error.message || 'Login failed')
     } finally {
       setLoading(false)
     }

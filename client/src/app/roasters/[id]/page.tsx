@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import RoasterImage from '@/components/RoasterImage'
+import { apiClient } from '@/lib/api'
 
 interface Roaster {
   id: string
@@ -107,21 +108,7 @@ export default function RoasterDetail() {
   const fetchRoaster = async (id: string) => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('token')
-      const headers: HeadersInit = {}
-      if (token) {
-        headers.Authorization = `Bearer ${token}`
-      }
-      
-      const response = await fetch(`http://localhost:5000/api/roasters/${id}`, {
-        headers
-      })
-      
-      if (!response.ok) {
-        throw new Error('Roaster not found')
-      }
-      
-      const data = await response.json()
+      const data = await apiClient.getRoaster(id as string) as Roaster
       setRoaster(data)
       
       // Check if roaster is in favorites

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
+import { apiClient } from '@/lib/api'
 
 export default function SignupPage() {
   const { t } = useTranslation()
@@ -32,28 +33,18 @@ export default function SignupPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        router.push('/')
-      } else {
-        const errorData = await response.json()
-        setError(errorData.error || 'Registration failed')
+      const userData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        username: formData.email // Use email as username for now
       }
-    } catch (error) {
-      setError('Network error. Please try again.')
+      
+      const data = await apiClient.register(userData)
+      router.push('/')
+    } catch (error: any) {
+      setError(error.message || 'Registration failed')
     } finally {
       setLoading(false)
     }

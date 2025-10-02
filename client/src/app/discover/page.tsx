@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { SearchSection } from '@/components/SearchSection'
 import RoasterImage from '@/components/RoasterImage'
+import { apiClient } from '@/lib/api'
 
 interface Roaster {
   id: string
@@ -109,27 +110,20 @@ export default function DiscoverPage() {
       if (filters.location) searchParams.append('location', filters.location)
       searchParams.append('distance', filters.distance.toString())
 
-      // Include authorization header if user is logged in
-      const token = localStorage.getItem('token')
-      const headers: HeadersInit = {}
-      if (token) {
-        headers.Authorization = `Bearer ${token}`
-      }
+      const searchParamsObj: Record<string, string> = {}
+      searchParams.forEach((value, key) => {
+        searchParamsObj[key] = value;
+      });
 
-      const response = await fetch(`http://localhost:5000/api/search/roasters?${searchParams}`, {
-        headers
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setRoasters(data.roasters || [])
+      const data = await apiClient.searchRoasters(searchParamsObj) as any
+      setRoasters(data.roasters || [])
         
-        // Trigger popular searches refetch after successful search
-        if (filters.search && filters.search.trim().length > 0) {
-          // Dispatch a custom event that SearchSection can listen to
-          window.dispatchEvent(new CustomEvent('searchCompleted', { 
-            detail: { query: filters.search } 
-          }))
-        }
+      // Trigger popular searches refetch after successful search
+      if (filters.search && filters.search.trim().length > 0) {
+        // Dispatch a custom event that SearchSection can listen to
+        window.dispatchEvent(new CustomEvent('searchCompleted', { 
+          detail: { query: filters.search } 
+        }))
       }
     } catch (error) {
       console.error('Search failed:', error)

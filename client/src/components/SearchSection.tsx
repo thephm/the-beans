@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios';
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { apiClient } from '@/lib/api'
 
 interface SearchSectionProps {
   onSearch?: (searchQuery: string, location: string) => void
@@ -27,22 +28,15 @@ export function SearchSection({
   // Fetch popular searches from backend
   const fetchPopularSearches = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/search/popular?limit=5');
+      const data = await apiClient.getPopularSearches(5) as any;
+      console.log('📊 Popular searches API response:', data);
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log('📊 Popular searches API response:', data);
-        
-        if (data && Array.isArray(data.popular)) {
-          const queries = data.popular.map((item: any) => item.query);
-          setPopularSearches(queries);
-          console.log('✅ Updated popular searches state:', queries);
-        } else {
-          console.log('❌ Invalid response format:', data);
-          setPopularSearches([]);
-        }
+      if (data && Array.isArray(data.popular)) {
+        const queries = data.popular.map((item: any) => item.query);
+        setPopularSearches(queries);
+        console.log('✅ Updated popular searches state:', queries);
       } else {
-        console.log('❌ HTTP error:', response.status, response.statusText);
+        console.log('❌ Invalid response format:', data);
         setPopularSearches([]);
       }
     } catch (error) {
