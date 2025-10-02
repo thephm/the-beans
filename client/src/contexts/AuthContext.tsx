@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { apiClient } from '@/lib/api'
 
 interface User {
   id: string
@@ -42,6 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const parsedUser = JSON.parse(userData)
         setUser(parsedUser)
+        // Ensure the API client has the token
+        apiClient.setToken(token)
       } catch (error) {
         console.error('Error parsing user data:', error)
         localStorage.removeItem('token')
@@ -56,12 +59,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
+    // Ensure the API client has the token
+    apiClient.setToken(token)
   }
 
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
+    // Clear the token from API client
+    apiClient.clearToken()
   }
 
   const value = {

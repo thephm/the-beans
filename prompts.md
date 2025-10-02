@@ -50811,6 +50811,8 @@ Fixes Render deployment issue with duplicate username constraint violations"
 
 ✔ `git push origin main`
 
+## 347th try
+
 > please be concise in your responses.when I try to register get HTTP 400: Bad Request
 
 https://github.com/thephm/the-beans/issues/91
@@ -50884,3 +50886,127 @@ Now restart the server to apply the changes:
 The issue was that the backend validation required usernames to be alphanumeric only, but the frontend was sending the email as the username (which contains @ and . characters).
 
 I've removed the `.isAlphanumeric()` validation and increased the max length to 50 to accommodate email addresses. Try registering again - it should work now.
+
+## 347 try
+
+> Changing settings doesn't work
+
+```bash
+api.ts:77  PUT http://localhost:5000/api/users/settings 401 (Unauthorized)
+request @ api.ts:77
+updateUserSettings @ api.ts:121
+handleSaveSettings @ page.tsx:65
+callCallback @ react-dom.development.js:20565
+invokeGuardedCallbackImpl @ react-dom.development.js:20614
+invokeGuardedCallback @ react-dom.development.js:20689
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:20703
+executeDispatch @ react-dom.development.js:32128
+processDispatchQueueItemsInOrder @ react-dom.development.js:32160
+processDispatchQueue @ react-dom.development.js:32173
+dispatchEventsForPlugins @ react-dom.development.js:32184
+eval @ react-dom.development.js:32374
+batchedUpdates$1 @ react-dom.development.js:24953
+batchedUpdates @ react-dom.development.js:28844
+dispatchEventForPluginEventSystem @ react-dom.development.js:32373
+dispatchEvent @ react-dom.development.js:30141
+dispatchDiscreteEvent @ react-dom.development.js:30112Understand this error
+page.tsx:70 Error saving settings: Error: HTTP 401: Unauthorized
+    at ApiClient.request (api.ts:84:13)
+    at async handleSaveSettings (page.tsx:65:7)
+```
+
+I can see there's a 401 Unauthorized error when trying to update user settings. This suggests an authentication issue with the API call. Let me investigate the current authentication setup and the settings API endpoint.
+
+✔ Created 5 todos
+
+Starting (1/5) Check API authentication setup
+
+✔ Read `api.ts`, lines 70 to 130
+
+Now let me check how the token is set and managed:
+
+✔ Read `api.ts`, lines 1 to 70
+
+✔ Starting (2/5) Check settings page implementation
+
+Now let me check the settings page to see how it's calling the API:
+
+✔ Read `page.tsx`, lines 60 to 80
+
+Let me check the top of the settings page to understand the import and initialization:
+
+✔ Read `page.tsx`, lines 1 to 40
+
+✔ Starting (3/5) Check backend settings route
+
+Now let me check the server-side settings endpoint:
+
+✔ Searched for files matching `**/server/src/routes/**/users*.ts`, 2 results
+
+✔ Read `users.ts`, lines 1 to 80
+
+Perfect! Now I can see the issue. The server-side `/users/settings` endpoint is using `requireAuth` middleware, which means it expects a valid JWT token. Let me check the authentication context and see if there's an issue with token management:
+
+✔ Starting (4/5) Check user authentication state
+
+✔ Read `AuthContext.tsx`, lines 1 to 80
+
+Now I need to check if the API client is properly being initialized with the token. Let me check if there's a mismatch between the AuthContext's token management and the API client's token management:
+
+✔ Read `api.ts`, lines 170 to 198
+
+I think I found the issue! Looking at the AuthContext and the API client, there's a potential race condition or synchronization issue. The AuthContext checks for a token in localStorage and sets the user, but the API client also tries to get the token from localStorage in its constructor. However, the API client might be initialized before the AuthContext loads the token from localStorage.
+
+Let me check when the apiClient gets the token set:
+
+✔ Searched text for `setToken` (`**/client/src/**`), 1 result
+
+Let me search for where the API client's token is being set:
+
+✔ Searched text for `apiClient.setToken` (`**/client/src/**`), no results
+
+Found the problem! The `apiClient.setToken()` method is never being called. The AuthContext manages the token in localStorage, but it never tells the API client about the token. The API client only gets the token from localStorage in its constructor, but if the user is already logged in when they visit the page, this synchronization never happens.
+
+✔ Starting (5/5) Fix authentication issue
+
+Now I'll fix this by updating the AuthContext to properly set the token in the API client when the user is loaded from localStorage:
+
+`AuthContext.tsx +1 -0`
+`AuthContext.tsx +2 -0`
+`AuthContext.tsx +2 -0`
+`AuthContext.tsx +2 -0`
+
+Now let's restart the client container to apply these changes:
+
+✔ `docker-compose restart client`
+
+✔ `docker-compose restart client`
+
+✔ Completed (5/5) Fix authentication issue
+
+## Perfect! I've identified and fixed the authentication issue. Here's what was happening:
+
+### Problem Analysis
+
+The 401 Unauthorized error was occurring because there was a synchronization issue between the `AuthContext` and the `ApiClient`:
+
+1. **AuthContext**: Managed user authentication state and stored the JWT token in `localStorage`
+2. **ApiClient**: Had its own token management but was never being updated when the user was already logged in
+3. **Race Condition**: When a user refreshed the page or navigated to settings, the `AuthContext` would load the user data from `localStorage`, but the `ApiClient` never got the updated token
+
+#### The Fix
+
+I updated the `AuthContext` to properly synchronize with the `ApiClient`:
+
+1. **Added API client import**: Import `apiClient` from the API library
+2. **Token sync on login**: When `login()` is called, now also calls `apiClient.setToken(token)`
+3. **Token sync on page load**: When loading existing auth data from localStorage, now also calls `apiClient.setToken(token)`
+4. **Token cleanup on logout**: When `logout()` is called, now also calls `apiClient.clearToken()`
+
+#### Changes Made
+
+- **File**: `AuthContext.tsx`
+- **Import added**: `import { apiClient } from '@/lib/api'`
+- **Three method updates**: Enhanced `login()`, `logout()`, and the `useEffect` hook to keep the API client in sync
+
+The container has been restarted, so the changes should now be live. Try updating your settings again - the 401 Unauthorized error should be resolved!
