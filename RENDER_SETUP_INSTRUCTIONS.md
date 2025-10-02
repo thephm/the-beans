@@ -7,7 +7,7 @@
 Go to your backend service on Render → Environment tab and add:
 
 ```bash
-CORS_ORIGIN=https://the-beans-frontend.onrender.com
+CORS_ORIGIN=https://thebeans.ca,https://the-beans-frontend.onrender.com
 NODE_ENV=production
 JWT_SECRET=<generate-secure-key>
 ```

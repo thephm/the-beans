@@ -51199,3 +51199,133 @@ Perfect! I've now thoroughly removed cafe/cafes references from:
 - ✅ Search labels and placeholders
 
 The About page should now be completely free of cafe references. The container has been restarted with a full rebuild to ensure all changes are applied. You can refresh the About page to see the updated content.
+
+> what do we have in the seed data for the admin account
+
+I'll check the seed data to see what admin account information is configured. Let me look at the seed file in the server directory.
+
+✔ Read `seed.ts`, lines 1 to 100
+
+Let me read more of the seed file to see the complete admin user configuration:
+
+✔ Read `seed.ts`, lines 70 to 150
+
+Based on the seed data, here are the admin account details:
+
+Default Admin Account Information:
+
+- **Email**: `admin@example.com` (or from `ADMIN_EMAIL` environment variable)
+- **Username**: `admin` (or from `ADMIN_USERNAME` environment variable)
+- **Password**: `admin123` (or from `ADMIN_PASSWORD` environment variable)
+- **First Name**: Admin (or from `ADMIN_FIRSTNAME` environment variable)
+- **Last Name**: `User` (or from `ADMIN_LASTNAME` environment variable)
+- **Location**: `Headquarters` (or from `ADMIN_LOCATION` environment variable)
+- **Role**: `admin`
+
+**Environment Variable Configuration**: The seed script allows you to customize the admin account using environment variables:
+
+- `ADMIN_EMAIL` - Admin email address
+- `ADMIN_USERNAME` - Admin username
+- `ADMIN_PASSWORD` - Admin password
+- `ADMIN_FIRSTNAME` - Admin first name
+- `ADMIN_LASTNAME` - Admin last name
+- `ADMIN_LOCATION` - Admin location
+- `ADMIN_LATITUDE` - Admin latitude coordinate
+- `ADMIN_LONGITUDE` - Admin longitude coordinate
+
+#### Default Login Credentials:
+
+- **Email**: admin@example.com
+- **Password**: admin123
+
+This matches what was mentioned in the project instructions. The admin user is created with full administrative privileges and can access the admin sections of the application.
+
+## 350th try
+
+> Failed to fetch error on render. Console: Access to fetch at 'https://the-beans-api.onrender.com/api/auth/login' from origin 'https://thebeans.ca' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+the-beans-api.onrender.com/api/auth/login:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+
+I can see you're encountering a CORS (Cross-Origin Resource Sharing) error when trying to make requests from your production frontend (https://thebeans.ca) to your API (https://the-beans-api.onrender.com). This is a common issue when deploying to production.
+
+Let me investigate the current CORS configuration and help you fix this issue.
+
+✔ Created 4 todos
+
+✔ Starting (1/4) Investigate current CORS configuration
+
+✔ Read `index.ts`, lines 1 to 50
+
+✔ Read `index.ts`, lines 40 to 80
+
+Now I can see the issue! The CORS configuration is set to allow `https://the-beans-frontend.onrender.com` but your actual production domain is `https://thebeans.ca`. Let me also check the client-side API configuration to confirm the setup.
+
+✔ Starting (2/4) Check frontend API configuration
+
+Read `api.ts`, lines 1 to 30
+
+The API configuration looks correct - it's pointing to `https://the-beans-api.onrender.com`. The issue is clearly that the CORS configuration on the server only allows `https://the-beans-frontend.onrender.com` but your actual production domain is `https://thebeans.ca`.
+
+✔ Starting (3/4) Update CORS configuration for production
+
+Now I'll fix the CORS configuration to include your actual production domain:
+
+`index.ts +2 -1`
+
+Let me also check if there's a `render.yaml` file that might need environment variables configured:
+
+✔ Read `render.yaml`, lines 1 to 50
+
+Perfect! I can see the render.yaml file has a CORS_ORIGIN environment variable that can be configured. This is the recommended approach for production - using environment variables rather than hardcoded values.
+
+Let me also check if there are any deployment documentation files that mention how to set these environment variables:
+
+✔ Read `RENDER_SETUP_INSTRUCTIONS.md`, lines 1 to 50
+
+Now I understand the full picture! The CORS_ORIGIN environment variable needs to be updated to include your production domain. Let me update the deployment instructions to reflect the correct domain:
+
+✔ Starting (4/4) Update deployment docs and deploy
+
+`RENDER_SETUP_INSTRUCTIONS.md +1 -1`
+`render.yaml +1 -1`
+
+✔ Completed (4/4) Update deployment docs and deploy
+
+## Summary of the CORS Issue and Fix
+
+The "Failed to fetch" error you're seeing is a CORS (Cross-Origin Resource Sharing) policy violation. Here's what's happening:
+
+### The Problem
+
+Your production website is hosted at https://thebeans.ca
+Your API is hosted at https://the-beans-api.onrender.com
+The API's CORS configuration only allowed requests from https://the-beans-frontend.onrender.com
+When your production site at https://thebeans.ca tries to make API calls, the server rejects them due to the origin mismatch
+
+### The Fix
+
+I've updated three key files:
+
+1. `index.ts` - Added `https://thebeans.ca` to the hardcoded CORS origins array
+2. `render.yaml` - Updated the comment to show both domains should be in `CORS_ORIGIN`
+3. `RENDER_SETUP_INSTRUCTIONS.md` - Updated the deployment instructions
+
+### Next Steps for Deployment
+
+To fix this in production, you need to:
+
+1. **Update the CORS_ORIGIN environment variable in Render**:
+
+  - Go to your `the-beans-api` service dashboard on Render
+  - Navigate to the "Environment" tab
+  - Update the `CORS_ORIGIN` variable to: `https://thebeans.ca,https://the-beans-frontend.onrender.com`
+
+2. **Redeploy the backend service**:
+
+  - After updating the environment variable, trigger a manual deploy of your API service
+  - The new CORS configuration will take effect
+3. **Test the login functionality**:
+
+  - Once deployed, try logging in again from `https://thebeans.ca`
+  - The CORS error should be resolved
+
+The changes I made to the code will ensure this configuration is properly documented for future deployments and will serve as a fallback if environment variables aren't set.
