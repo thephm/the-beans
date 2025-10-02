@@ -1,38 +1,25 @@
 // Determine API base URL with fallback for production
 const getApiBaseUrl = () => {
-  console.log('🔧 API Client Configuration:');
-  console.log('  NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
-  console.log('  NODE_ENV:', process.env.NODE_ENV);
-  console.log('  window exists:', typeof window !== 'undefined');
-  if (typeof window !== 'undefined') {
-    console.log('  hostname:', window.location.hostname);
-  }
-  
   // First, check for explicitly set environment variable
   if (process.env.NEXT_PUBLIC_API_URL) {
-    console.log('  ✅ Using NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
   // Check if we're in production environment
   if (process.env.NODE_ENV === 'production') {
-    console.log('  ✅ Using production URL: https://the-beans-api.onrender.com');
     return 'https://the-beans-api.onrender.com';
   }
   
   // If in production and no env var set, use the Render backend URL
   if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
-    console.log('  ✅ Using Render URL based on hostname: https://the-beans-api.onrender.com');
     return 'https://the-beans-api.onrender.com';
   }
   
   // Default to localhost for development
-  console.log('  ✅ Using localhost for development: http://localhost:5000');
   return 'http://localhost:5000';
 };
 
 const API_BASE_URL = getApiBaseUrl();
-console.log('🚀 Final API_BASE_URL:', API_BASE_URL);
 
 class ApiClient {
   private baseURL: string;

@@ -29,29 +29,24 @@ export function SearchSection({
   const fetchPopularSearches = async () => {
     try {
       const data = await apiClient.getPopularSearches(5) as any;
-      console.log('📊 Popular searches API response:', data);
       
       if (data && Array.isArray(data.popular)) {
         const queries = data.popular.map((item: any) => item.query);
         setPopularSearches(queries);
-        console.log('✅ Updated popular searches state:', queries);
       } else {
-        console.log('❌ Invalid response format:', data);
         setPopularSearches([]);
       }
     } catch (error) {
-      console.error('❌ Error fetching popular searches:', error);
+      console.error('Error fetching popular searches:', error);
       setPopularSearches([]);
     }
   };
 
   useEffect(() => {
-    console.log('🎬 SearchSection mounted, fetching popular searches...');
     fetchPopularSearches();
 
     // Listen for search completion events from discover page
     const handleSearchCompleted = () => {
-      console.log('🎯 Search completed event received, refetching popular searches...');
       setTimeout(fetchPopularSearches, 500);
     };
 
