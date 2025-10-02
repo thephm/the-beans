@@ -39,8 +39,14 @@ app.use(helmet({
   contentSecurityPolicy: false, // Disable CSP for development
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin requests for static files
 }));
+
+// Configure CORS origins based on environment
+const corsOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:3000', 'http://localhost:5000'];
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000'],
+  origin: corsOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -52,7 +58,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded images statically with CORS headers
 app.use('/uploads', (req: Request, res: Response, next: NextFunction) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  const frontendOrigins = corsOrigins.join(',');
+  res.header('Access-Control-Allow-Origin', frontendOrigins.includes(',') ? '*' : corsOrigins[0]);
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();

@@ -38,7 +38,7 @@ services:
       - key: PORT
         value: 5000
       - key: CORS_ORIGIN
-        sync: false # Set to your custom frontend domain in Render dashboard
+        sync: false # IMPORTANT: Set to "https://the-beans-frontend.onrender.com" in Render dashboard
     autoDeploy: true
     
   # Frontend Web Service (Next.js)
@@ -55,7 +55,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_API_URL
-        sync: false # Set to your custom API domain in Render dashboard
+        sync: false # IMPORTANT: Set to "https://the-beans-api.onrender.com" in Render dashboard
       - key: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
         sync: false # Set manually in Render dashboard
       - key: PORT
