@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, validationResult, param, query } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
-import { upload, deleteImage } from '../lib/localStorage';
+import { upload, deleteImage } from '../lib/cloudinary';
 import { canEditRoaster } from '../middleware/roasterAuth';
 
 const router = Router();
@@ -1124,16 +1124,17 @@ router.post('/:id/images', [
     }
 
     // Create image records in database
-    const imagePromises = files.map(async (file, index) => {
+    const imagePromises = files.map(async (file: any, index: number) => {
       const isPrimary = setPrimary ? parseInt(setPrimary) === index : false;
       
-      // Store just the filename, let frontend handle the URL
-      const imageUrl = file.filename;
+      // For Cloudinary, file.path is the full URL and file.filename is the public_id
+      const imageUrl = file.path; // Cloudinary URL
+      const publicId = file.filename; // Cloudinary public_id
       
       return prisma.roasterImage.create({
         data: {
           url: imageUrl,
-          publicId: file.filename, // Use filename as public ID for local storage
+          publicId: publicId,
           filename: file.originalname,
           description: imageDescriptions[index] || null,
           isPrimary,
