@@ -63,8 +63,15 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded images statically with CORS headers
 app.use('/uploads', (req: Request, res: Response, next: NextFunction) => {
-  const frontendOrigins = corsOrigins.join(',');
-  res.header('Access-Control-Allow-Origin', frontendOrigins.includes(',') ? '*' : corsOrigins[0]);
+  const origin = req.headers.origin;
+  if (origin && corsOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (corsOrigins.length === 1) {
+    res.header('Access-Control-Allow-Origin', corsOrigins[0]);
+  } else {
+    // For multiple origins, set to * for static assets
+    res.header('Access-Control-Allow-Origin', '*');
+  }
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
