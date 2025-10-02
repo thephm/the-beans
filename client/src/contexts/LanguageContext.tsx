@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from './AuthContext'
+import { apiClient } from '@/lib/api'
 
 export interface Language {
   code: string
@@ -87,14 +88,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      await fetch('http://localhost:5000/api/users/language', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ language: languageCode })
-      })
+      await apiClient.updateUserLanguage(languageCode)
     } catch (error) {
       console.error('Error updating user language preference:', error)
     }

@@ -1,4 +1,38 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// Determine API base URL with fallback for production
+const getApiBaseUrl = () => {
+  console.log('🔧 API Client Configuration:');
+  console.log('  NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+  console.log('  NODE_ENV:', process.env.NODE_ENV);
+  console.log('  window exists:', typeof window !== 'undefined');
+  if (typeof window !== 'undefined') {
+    console.log('  hostname:', window.location.hostname);
+  }
+  
+  // First, check for explicitly set environment variable
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    console.log('  ✅ Using NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Check if we're in production environment
+  if (process.env.NODE_ENV === 'production') {
+    console.log('  ✅ Using production URL: https://the-beans-api.onrender.com');
+    return 'https://the-beans-api.onrender.com';
+  }
+  
+  // If in production and no env var set, use the Render backend URL
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    console.log('  ✅ Using Render URL based on hostname: https://the-beans-api.onrender.com');
+    return 'https://the-beans-api.onrender.com';
+  }
+  
+  // Default to localhost for development
+  console.log('  ✅ Using localhost for development: http://localhost:5000');
+  return 'http://localhost:5000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log('🚀 Final API_BASE_URL:', API_BASE_URL);
 
 class ApiClient {
   private baseURL: string;
@@ -78,6 +112,25 @@ class ApiClient {
     return this.request('/auth/me');
   }
 
+  // User settings
+  async getUserSettings() {
+    return this.request('/users/settings');
+  }
+
+  async updateUserSettings(settings: any) {
+    return this.request('/users/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
+  }
+
+  async updateUserLanguage(language: string) {
+    return this.request('/users/language', {
+      method: 'PUT',
+      body: JSON.stringify({ language }),
+    });
+  }
+
   // Roasters
   async getRoasters(params?: Record<string, any>) {
     const searchParams = new URLSearchParams(params).toString();
@@ -115,6 +168,16 @@ class ApiClient {
     return this.request(`/search?${searchParams}`);
   }
 
+  async getPopularSearches(limit?: number) {
+    const params = limit ? `?limit=${limit}` : '';
+    return this.request(`/search/popular${params}`);
+  }
+
+  async searchRoasters(params: Record<string, any>) {
+    const searchParams = new URLSearchParams(params).toString();
+    return this.request(`/search/roasters?${searchParams}`);
+  }
+
   // Reviews
   async getReviews(params?: Record<string, any>) {
     const searchParams = new URLSearchParams(params).toString();
@@ -131,3 +194,4 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+export { getApiBaseUrl };

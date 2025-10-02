@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { apiClient } from '@/lib/api'
 
 export default function SettingsPage() {
   const { t } = useTranslation()
@@ -45,17 +46,8 @@ export default function SettingsPage() {
 
   const loadSettings = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:5000/api/users/settings', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setSettings((prev) => ({ ...prev, ...data.settings, language: user?.language || 'en' }))
-      }
+      const data = await apiClient.getUserSettings() as any
+      setSettings((prev) => ({ ...prev, ...data.settings, language: user?.language || 'en' }))
     } catch (error) {
       console.error('Error loading settings:', error)
     }
@@ -66,26 +58,14 @@ export default function SettingsPage() {
     setSaving(true)
     setSuccess(false)
     try {
-      const token = localStorage.getItem('token')
       // Save language preference if changed
       if (languageContext && settings.language !== user?.language) {
         await languageContext.changeLanguage(settings.language)
       }
-      const response = await fetch('http://localhost:5000/api/users/settings', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(settings)
-      })
-      if (response.ok) {
-        setSuccess(true)
-        setTimeout(() => setSuccess(false), 3000)
-        localStorage.setItem('settings', JSON.stringify(settings));
-      } else {
-        console.error('Failed to save settings, status:', response.status)
-      }
+      await apiClient.updateUserSettings(settings)
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 3000)
+      localStorage.setItem('settings', JSON.stringify(settings));
     } catch (error) {
       console.error('Error saving settings:', error)
     } finally {

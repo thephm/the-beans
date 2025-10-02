@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import RoasterImage from './RoasterImage'
+import { apiClient } from '@/lib/api'
 
 interface Roaster {
   id: string
@@ -93,20 +94,8 @@ export function FeaturedRoasters() {
 
   const fetchFeaturedRoasters = async () => {
     try {
-      // Include authorization header if user is logged in
-      const token = localStorage.getItem('token')
-      const headers: HeadersInit = {}
-      if (token) {
-        headers.Authorization = `Bearer ${token}`
-      }
-
-      const response = await fetch('http://localhost:5000/api/roasters?limit=3', {
-        headers
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setFeaturedRoasters(data.roasters || [])
-      }
+      const data = await apiClient.getRoasters({ limit: 3 }) as any
+      setFeaturedRoasters(data.roasters || [])
     } catch (error) {
       console.error('Failed to fetch featured roasters:', error)
     } finally {

@@ -43,7 +43,11 @@ app.use(helmet({
 // Configure CORS origins based on environment
 const corsOrigins = process.env.CORS_ORIGIN 
   ? process.env.CORS_ORIGIN.split(',')
-  : ['http://localhost:3000', 'http://localhost:5000'];
+  : [
+      'http://localhost:3000', 
+      'http://localhost:5000',
+      'https://the-beans-frontend.onrender.com' // Production frontend
+    ];
 
 app.use(cors({
   origin: corsOrigins,

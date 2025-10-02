@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import RoasterImage from '@/components/RoasterImage'
+import { apiClient } from '@/lib/api'
 
 interface Roaster {
   id: number
@@ -101,8 +102,7 @@ export default function FavoritesPage() {
 
         // Fetch roaster data
         if (favoriteRoasterIds.length > 0) {
-          const roastersResponse = await fetch('http://localhost:5000/api/roasters')
-          const roastersData = await roastersResponse.json()
+          const roastersData = await apiClient.getRoasters({}) as any
           // Handle both array and object response formats
           const allRoasters = roastersData.roasters || roastersData
           const favoriteRoastersData = allRoasters.filter((r: Roaster) => favoriteRoasterIds.includes(r.id.toString()))

@@ -17,6 +17,11 @@ const nextConfig = {
         port: '5000',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'the-beans-api.onrender.com',
+        pathname: '/uploads/**',
+      },
     ],
   },
 }
