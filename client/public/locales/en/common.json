@@ -254,7 +254,7 @@
     "features": {
       "discoverLocal": {
         "title": "Discover Local",
-        "description": "Find amazing coffee roasters and cafes in your neighborhood and beyond."
+        "description": "Find amazing coffee roasters in your neighborhood and beyond."
       },
       "buildCommunity": {
         "title": "Build Community", 
@@ -262,28 +262,28 @@
       },
       "qualityFirst": {
         "title": "Quality First",
-        "description": "Every roaster and cafe in our platform is carefully curated for excellence."
+        "description": "Every roaster in our platform is carefully curated for excellence."
       }
     },
     "story": {
       "title": "Our Story",
-      "paragraph1": "The Beans was born from a simple frustration: finding truly exceptional coffee shouldn't be hard. As coffee enthusiasts ourselves, we noticed that the best roasters and cafes were often hidden gems, known only to locals or discovered by chance.",
-      "paragraph2": "We created The Beans to change that. Our platform brings together passionate coffee roasters, welcoming cafe owners, and curious coffee lovers in one beautiful, easy-to-use community.",
-      "paragraph3": "Whether you're searching for that perfect espresso blend, looking for a cozy cafe to work from, or wanting to discover what's brewing in your neighborhood, The Beans is your guide to coffee excellence."
+      "paragraph1": "The Beans was born from a simple frustration: finding truly exceptional coffee shouldn't be hard. As coffee enthusiasts ourselves, we noticed that the best roasters were often hidden gems, known only to locals or discovered by chance.",
+      "paragraph2": "We created The Beans to change that. Our platform brings together passionate coffee roasters and curious coffee lovers in one beautiful, easy-to-use community.",
+      "paragraph3": "Whether you're searching for that perfect espresso blend, or wanting to discover what's roasting in your neighborhood, The Beans is your guide to coffee excellence."
     },
     "values": {
       "title": "Our Values",
       "sustainability": {
         "title": "🌱 Sustainability",
-        "description": "We champion roasters and cafes that prioritize ethical sourcing, fair trade practices, and environmental responsibility."
+        "description": "We champion roasters that prioritize ethical sourcing, fair trade practices, and environmental responsibility."
       },
       "community": {
         "title": "🤝 Community",
-        "description": "Coffee brings people together. We foster connections between coffee makers and coffee lovers that extend beyond transactions."
+        "description": "Coffee brings people together. We foster connections between coffee roasters and coffee lovers that extend beyond transactions."
       },
       "quality": {
         "title": "✨ Quality",
-        "description": "We believe everyone deserves exceptional coffee. That's why we carefully curate every roaster and cafe on our platform."
+        "description": "We believe everyone deserves exceptional coffee. That's why we carefully curate every roaster on our platform."
       },
       "innovation": {
         "title": "🚀 Innovation",
