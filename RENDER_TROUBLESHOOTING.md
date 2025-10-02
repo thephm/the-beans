@@ -1,5 +1,35 @@
 # Render.com Deployment Troubleshooting Guide
 
+## URGENT: CORS and API Connection Issues
+
+### Network Error / CORS Policy Error
+**Problem**: Frontend shows "Network error. Please try again" and console shows CORS errors like:
+```
+Access to fetch at 'http://localhost:5000/api/auth/login' from origin 'https://the-beans-frontend.onrender.com' has been blocked by CORS policy
+```
+
+**Root Cause**: Missing environment variables in production deployment.
+
+**Solution**: Set these environment variables in the Render Dashboard:
+
+#### For the-beans-api service:
+- `CORS_ORIGIN` = `https://the-beans-frontend.onrender.com`
+
+#### For the-beans-frontend service:
+- `NEXT_PUBLIC_API_URL` = `https://the-beans-api.onrender.com`
+
+**Steps to Fix**:
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click on your `the-beans-api` service
+3. Go to "Environment" tab
+4. Add `CORS_ORIGIN` with value `https://the-beans-frontend.onrender.com`
+5. Click on your `the-beans-frontend` service  
+6. Go to "Environment" tab
+7. Add `NEXT_PUBLIC_API_URL` with value `https://the-beans-api.onrender.com`
+8. Both services will automatically redeploy
+
+---
+
 ## Common Blueprint Deployment Failures
 
 ### 1. Build Command Issues
