@@ -50737,3 +50737,150 @@ Your next Render deployment should now succeed because:
 3. The seed script will populate your production database with initial data (admin user and sample roasters)
 
 The build command in your `render.yaml` is correctly configured to run the full deployment sequence: install dependencies → generate Prisma client → run migrations → seed database → build the application.
+
+## 345th try
+
+*(It's working on Render)*
+
+## Redeploy to Render with new ADMIN_EMAIL environment variable failed
+
+https://github.com/thephm/the-beans/issues/90
+
+I can see the issue with the Render deployment. The seeding process is failing because there's already a user with a duplicate `username` in the database. This is a common issue when deploying to a production database that already has seeded data.
+
+Let me examine the current seed file to understand what's happening and fix it.
+
+✔ Created 4 todos
+
+✔ Starting (1/4) Examine seed.ts file
+
+✔ Read `seed.ts`, lines 1 to 100
+
+✔ Read `seed.ts`, lines 100 to 184
+
+Now I can see the issue. The problem is at line 55 where we're trying to create an admin user. The seed script is using `upsert` with `where: { email: adminEmail }`, but there's already a user with the same `username` field that has a unique constraint. When the email doesn't match but the username does, it tries to create a new record which violates the unique constraint on `username`.
+
+✔ Starting (2/4) Fix seed script for production
+
+Let me fix the seed script by making it more robust to handle existing usernames. The issue is that we're upserting by email but the username field also has a unique constraint. I need to check for both email and username conflicts.
+
+`seed.ts +16 -6`
+
+The compile errors are just TypeScript issues that occur outside of the Docker environment. Now I need to fix the admin user creation part which is where the actual error is occurring:
+
+`seed.ts +21 -4`
+
+✔ Starting (3/4) Test seed script logic
+
+Let me test the seed script changes locally to make sure they work:
+
+✔ `docker-compose exec server npx prisma db seed`
+
+```bash
+Running seed command `ts-node prisma/seed.ts` ...
+🌱 Starting database seeding...
+✅ Created/ensured admin user: admin@example.com
+✅ Created roasters: [
+  'Blue Bottle Coffee',
+  'Stumptown Coffee Roasters',
+  'Intelligentsia Coffee'
+]
+🎉 Database seeding completed successfully!
+
+🌱  The seed command has been executed.
+```
+
+Great! The seed script is now working properly in the local environment. Let me commit these changes and redeploy to Render.
+
+✔ Starting (4/4) Deploy to Render
+
+✔ `git status`
+
+✔ `git add server/prisma/seed.ts`
+
+```bash
+git commit -m "Fix #90 seed script to handle existing users gracefully
+
+- Replace upsert with findFirst/create pattern to avoid unique constraint conflicts
+- Check for existing users by email OR username before creating
+- Handle both test user and admin user creation more robustly
+- Ensure admin role is properly assigned to existing users if needed
+
+Fixes Render deployment issue with duplicate username constraint violations"
+```
+
+✔ `git push origin main`
+
+> please be concise in your responses.when I try to register get HTTP 400: Bad Request
+
+https://github.com/thephm/the-beans/issues/91
+
+I'll help you diagnose the registration issue. Let me check the current logs and code to identify the problem.
+
+✔ `docker-compose logs --tail=30 server`
+
+```bash
+server-1  | [nodemon] starting `ts-node src/index.ts`
+server-1  | 172.18.0.1 - - [01/Oct/2025:20:20:44 +0000] "GET /health HTTP/1.1" 200 76 "-" "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-CA) WindowsPowerShell/5.1.26100.6584"
+server-1  | 172.18.0.1 - - [02/Oct/2025:01:16:59 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 200 113 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:01:16:59 +0000] "GET /api/roasters?limit=3 HTTP/1.1" 200 5832 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:28 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:28 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:28 +0000] "GET /api/search/roasters?distance=25 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:28 +0000] "GET /uploads/roaster-1759245248242-coffee4.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:28 +0000] "GET /uploads/roaster-1759232341050-coffee3.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:28 +0000] "GET /uploads/roaster-1759245953142-coffee1.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:37 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:37 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:37 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:13:59:37 +0000] "GET /api/search/roasters?distance=25 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | [nodemon] restarting due to changes...
+server-1  | [nodemon] starting `ts-node src/index.ts`
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:16 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:16 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:16 +0000] "GET /api/search/roasters?distance=25 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:16 +0000] "GET /uploads/roaster-1759232341050-coffee3.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:16 +0000] "GET /uploads/roaster-1759245248242-coffee4.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:16 +0000] "GET /uploads/roaster-1759245953142-coffee1.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:18 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:18 +0000] "GET /api/search/popular?limit=5 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:19 +0000] "GET /api/roasters?limit=3 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:19 +0000] "GET /api/roasters?limit=3 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:19 +0000] "GET /uploads/roaster-1759245248242-coffee4.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:19 +0000] "GET /uploads/roaster-1759232341050-coffee3.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:19 +0000] "GET /uploads/roaster-1759245953142-coffee1.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+server-1  | 172.18.0.1 - - [02/Oct/2025:14:49:49 +0000] "POST /api/auth/register HTTP/1.1" 400 202 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+```
+
+I can see the 400 error for the register endpoint. Let me check the registration route code to understand what validation might be failing:
+
+✔ Read `auth.ts`, lines 1 to 100
+
+Let me see the rest of the validation rules and the register handler:
+
+✔ Read `auth.ts`, lines 75 to 200
+
+Now let me check the frontend registration code to see what data is being sent:
+
+✔ Read `page.tsx`, lines 1 to 100
+
+I found the issue! The frontend is using the email as the username, but the backend validation requires the username to be alphanumeric only (line 100 in `auth.ts`: `body('username').isLength({ min: 3, max: 30 }).isAlphanumeric())`.
+
+Since emails contain @ symbols and dots, they fail the alphanumeric validation. Let me check if there's a username field in the signup form:
+
+The issue is clear: the frontend sets username: formData.email but the backend validates username as alphanumeric only. Fix options:
+
+1. **Quick fix**: Remove alphanumeric restriction from backend validation
+2. **Better fix**: Add a username field to the signup form
+
+I'll implement the quick fix by updating the validation to allow email format for usernames:
+
+`auth.ts +1 -1`
+
+Now restart the server to apply the changes:
+
+✔ `docker-compose restart server`
+
+The issue was that the backend validation required usernames to be alphanumeric only, but the frontend was sending the email as the username (which contains @ and . characters).
+
+I've removed the `.isAlphanumeric()` validation and increased the max length to 50 to accommodate email addresses. Try registering again - it should work now.
