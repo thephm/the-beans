@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'The Beans - Coffee Roaster Discovery',
-  description: 'Discover fresh coffee roasters and cafes near you',
+  description: 'Discover fresh coffee roasters near you',
   manifest: '/manifest.json',
 }
 

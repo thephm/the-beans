@@ -15,8 +15,8 @@
     "signOut": "Se déconnecter"
   },
   "footer": {
-    "tagline": "Connecter les amateurs de café aux torréfacteurs et cafés exceptionnels du monde entier.",
-    "description": "Votre destination ultime pour découvrir des torréfacteurs de café frais et des cafés incroyables. Rejoignez notre communauté d'amateurs de café et ne manquez plus jamais une excellente tasse.",
+    "tagline": "Connecter les amateurs de café aux torréfacteurs exceptionnels du monde entier.",
+    "description": "Votre destination ultime pour découvrir des torréfacteurs de café frais. Rejoignez notre communauté d'amateurs de café et ne manquez plus jamais une excellente tasse.",
     "mapView": "Vue carte",
     "support": "Support",
     "helpCenter": "Centre d'aide",
@@ -58,7 +58,7 @@
     "google": "Google",
     "twitter": "Twitter", 
     "joinCommunityTitle": "Rejoignez notre communauté !",
-    "joinCommunitySubtitle": "Créez votre compte gratuit et commencez à découvrir d'incroyables cafés",
+    "joinCommunitySubtitle": "Créez votre compte gratuit et commencez à découvrir d'incroyables torréfacteurs",
     "emailAddress": "Adresse e-mail",
     "creatingAccount": "Création du compte...",
     "passwordsNotMatch": "Les mots de passe ne correspondent pas",
@@ -68,9 +68,9 @@
     }
   },
   "search": {
-  "searchLabel": "Rechercher des torréfacteurs ou des cafés",
+  "searchLabel": "Rechercher des torréfacteurs",
   "locationLabel": "Emplacement",
-  "searchPlaceholder": "Rechercher des torréfacteurs ou des cafés",
+  "searchPlaceholder": "Rechercher des torréfacteurs",
   "locationPlaceholder": "Entrer l'emplacement",
   "searchButton": "Rechercher",
   "popularSearches": "Recherches populaires",
@@ -197,10 +197,10 @@
   "mi": "Miles",
   "hero": {
     "title": "Découvrez un café incroyable",
-    "subtitle": "Trouvez les meilleurs torréfacteurs de café locaux et cafés de votre région. De l'espresso artisanal aux grains de spécialité d'origine unique, découvrez votre tasse parfaite.",
+    "subtitle": "Trouvez les meilleurs torréfacteurs de café locaux de votre région. De l'espresso artisanal aux grains de spécialité d'origine unique, découvrez votre tasse parfaite.",
     "joinCommunity": "Rejoignez la communauté",
     "locationBased": "Basé sur la localisation",
-    "locationDescription": "Trouvez des torréfacteurs et des cafés près de votre emplacement",
+    "locationDescription": "Trouvez des torréfacteurs près de votre emplacement",
     "qualityBeans": "Grains de qualité",
     "qualityDescription": "Découvrez des torréfacteurs de café frais et artisanaux",
     "community": "Communauté",
@@ -268,7 +268,7 @@
       "title": "Notre Histoire",
       "paragraph1": "The Beans est né d'une simple frustration : trouver un café vraiment exceptionnel ne devrait pas être difficile. En tant qu'amateurs de café nous-mêmes, nous avons remarqué que les meilleurs torréfacteurs étaient souvent des joyaux cachés, connus seulement des locaux ou découverts par hasard.",
       "paragraph2": "Nous avons créé The Beans pour changer cela. Notre plateforme rassemble des torréfacteurs passionnés et des amateurs de café curieux dans une communauté belle et facile à utiliser.",
-      "paragraph3": "Que vous cherchiez ce mélange d'espresso parfait, que vous recherchiez un café confortable pour travailler, ou que vous vouliez découvrir ce qui se prépare dans votre quartier, The Beans est votre guide vers l'excellence du café."
+      "paragraph3": "Que vous cherchiez ce mélange d'espresso parfait, ou que vous vouliez découvrir ce qui se prépare dans votre quartier, The Beans est votre guide vers l'excellence du café."
     },
     "values": {
       "title": "Nos Valeurs",
