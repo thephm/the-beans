@@ -47,7 +47,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">{t('auth.welcomeBack')}</h2>
+          <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">{t('auth.welcomeBack')}</h2>
           <p className="mt-2 text-gray-600">
             {t('auth.signInToDiscover')}
           </p>
