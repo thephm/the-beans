@@ -494,5 +494,54 @@
       "email": "Écrivez-nous à :"
     },
     "lastUpdated": "Dernière mise à jour :"
+  },
+  "terms": {
+    "title": "Conditions d'utilisation",
+    "lastUpdated": "Dernière mise à jour : octobre 2025",
+    "welcome": {
+      "title": "1. Bienvenue sur The Beans",
+      "description": "The Beans est une plateforme qui aide les amateurs de café à découvrir des torréfacteurs locaux et à partager leurs expériences. En utilisant notre service, vous acceptez ces conditions."
+    },
+    "acceptance": {
+      "title": "2. Acceptation de ces conditions",
+      "description": "En créant un compte ou en utilisant The Beans, vous confirmez avoir au moins 13 ans et acceptez de suivre ces règles."
+    },
+    "userConduct": {
+      "title": "3. Comment utiliser The Beans",
+      "intro": "Vous pouvez :",
+      "prohibited": "Veuillez ne pas :",
+      "allowed": {
+        "discover": "Découvrir et évaluer des torréfacteurs de café",
+        "share": "Partager des avis honnêtes et des photos",
+        "connect": "Vous connecter avec d'autres amateurs de café",
+        "favorite": "Sauvegarder vos torréfacteurs favoris"
+      },
+      "forbidden": {
+        "spam": "Publier du spam ou de faux avis",
+        "harmful": "Partager du contenu nuisible ou inapproprié",
+        "impersonate": "Vous faire passer pour quelqu'un d'autre",
+        "violate": "Violer des lois ou règlements"
+      }
+    },
+    "content": {
+      "title": "4. Votre contenu",
+      "description": "Vous possédez les avis et photos que vous publiez. En les partageant sur The Beans, vous nous donnez la permission de les afficher pour aider d'autres utilisateurs à découvrir d'excellents cafés. Vous pouvez supprimer votre contenu à tout moment."
+    },
+    "privacy": {
+      "title": "5. Votre confidentialité",
+      "description": "Nous respectons votre vie privée et n'utilisons vos informations que pour améliorer votre expérience sur The Beans. Nous ne vendons pas vos données personnelles à des tiers."
+    },
+    "service": {
+      "title": "6. Notre service",
+      "description": "Nous travaillons dur pour maintenir The Beans en bon état de fonctionnement, mais nous ne pouvons pas garantir qu'il sera toujours parfait. Nous pourrions avoir besoin de mettre à jour ou d'interrompre temporairement le service pour maintenance."
+    },
+    "changes": {
+      "title": "7. Modifications de ces conditions",
+      "description": "Nous pourrions mettre à jour ces conditions occasionnellement. Si nous apportons des changements significatifs, nous vous en informerons. Continuer à utiliser The Beans signifie que vous acceptez les nouvelles conditions."
+    },
+    "contact": {
+      "title": "8. Questions ?",
+      "description": "Si vous avez des questions sur ces conditions, veuillez nous contacter à support@thebeans.app"
+    }
   }
 }

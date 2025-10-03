@@ -11,7 +11,7 @@ export function Hero() {
   const { user } = useAuth()
   
   return (
-    <section className={`pt-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-lavender-50 via-primary-50 to-orchid-50 ${user ? 'pb-0' : 'pb-16'}`}>
+    <section className={`pt-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-lavender-50 via-primary-50 to-orchid-50 ${user ? 'pb-0' : 'pb-16'}`}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
           <motion.div
@@ -20,7 +20,7 @@ export function Hero() {
             transition={{ duration: 0.8 }}
             className="opacity-100" // Fallback for SSR
           >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6 leading-relaxed pb-2">
               {t('hero.title')}
             </h1>
             <p className={`text-xl text-gray-600 max-w-3xl mx-auto ${user ? 'mb-4' : 'mb-8'}`}>
