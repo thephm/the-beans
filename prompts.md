@@ -52975,3 +52975,93 @@ Found and fixed the last remaining 🌍 **globe emoji** in the Hero component's 
 The entire The Beans application is now **100% emoji-free** and uses professional Material UI icons throughout, giving it a polished, modern, and professional appearance that eliminates any "AI-generated" feel!
 
 The application is ready for production deployment with a completely consistent and professional design system. 🎊
+
+2025-10-03
+
+## Remove Help Center in footer #101
+
+> Remove Help Center in footer
+
+https://github.com/thephm/the-beans/issues/101
+
+I'll help you remove the "Help Center" link from the footer. Let me first examine the footer component to see the current structure.
+
+✔ Read `Footer.tsx`, lines 1 to 100
+
+Let me see the rest of the Footer component:
+
+✔ Read `Footer.tsx`, lines 100 to 118
+
+Now I can see the Footer component structure. I need to remove the "Help Center" link which is on lines 72-76. Let me remove that list item:
+
+`Footer.tsx +0 -5`
+
+Perfect! I've successfully removed the "Help Center" link from the footer. The Help Center list item that was linking to /help with the translation key `{t('footer.helpCenter')}` has been removed from the Support section.
+
+Now I need to restart the client container so the changes take effect:
+
+✔ `docker-compose restart client`
+
+The "Help Center" link has been successfully removed from the footer. The changes have been applied and the client container has been restarted. The footer now shows:
+
+Support section:
+
+- Contact Us
+- API Docs
+- For Businesses
+
+The Help Center link that previously appeared first in the Support section has been completely removed.
+
+> did you remove the strings too?
+
+Good question! Let me check if the translation strings for "Help Center" still exist in the locales files. I should remove those as well since they're no longer being used.
+
+✔ Read `common.json`, lines 1 to 50
+
+Let me search for "helpCenter" in the English locale file:
+
+✔ Searched text for `helpCenter` (`**/client/public/locales/en/common.json`), 1 result
+
+Now let me check the French locale file:
+
+✔ Searched text for `helpCenter` (`**/client/public/locales/fr/common.json`), 1 result
+
+You're absolutely right! I didn't remove the translation strings. Let me remove the "helpCenter" entries from both the English and French locale files.
+
+First, let me read the context around line 201 in the English file:
+
+✔ Read `common.json`, lines 198 to 205
+
+Now let me check the French file context around line 22:
+
+✔ Read `common.json`, lines 19 to 26
+
+Now I'll remove the "helpCenter" line from both files.
+
+First, the English file:
+
+`common.json +0 -1`
+
+Now the French file:
+
+`common.json +0 -1`
+
+Now let me restart the client container to apply the translation changes:
+
+✔ `docker-compose restart client`
+
+Perfect! Now I've completed the full removal of the Help Center:
+
+1. ✅ Removed the Help Center link from the Footer component (`Footer.tsx`)
+
+2. ✅ Removed the translation strings from both locale files:
+  - "helpCenter": "Help Center" from common.json
+  - "helpCenter": "Centre d'aide" from common.json
+
+3. ✅ Restarted the client container to apply all changes
+
+The Help Center has been completely removed from both the UI and the translation files, so there are no unused strings remaining in the codebase.
+
+## 360th try
+
+*(Help Center is gone from footer)*
