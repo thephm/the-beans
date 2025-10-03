@@ -450,5 +450,50 @@
     "to": "to",
     "of": "of",
     "results": "results"
+  },
+  "cookies": {
+    "title": "Cookie Policy",
+    "subtitle": "Simple and clear information about how we use cookies on The Beans",
+    "whatAreCookies": {
+      "title": "What Are Cookies?",
+      "description": "Cookies are small text files that websites store on your device (computer, phone, or tablet) when you visit them. Think of them as tiny digital notes that help websites remember things about you.",
+      "analogy": "It's like when you visit your favorite coffee shop and the barista remembers your usual order - cookies help our website remember your preferences and provide a better experience."
+    },
+    "howWeUse": {
+      "title": "How We Use Cookies",
+      "essential": {
+        "title": "Essential Cookies (Always On)",
+        "description": "These cookies are necessary for our website to work properly. They help you log in, navigate between pages, and use basic features. We can't turn these off because the site wouldn't work without them."
+      },
+      "analytics": {
+        "title": "Analytics Cookies (Optional)",
+        "description": "These help us understand how people use our website so we can make it better. For example, they tell us which pages are most popular or if people are having trouble finding something."
+      },
+      "preferences": {
+        "title": "Preference Cookies (Optional)",
+        "description": "These remember your choices like your language preference (English or French), your favorite roasters, and other settings that make your experience more personalized."
+      }
+    },
+    "managing": {
+      "title": "Managing Your Cookie Preferences",
+      "description": "You have control over cookies! You can change your cookie settings at any time through your web browser. Here's how:",
+      "browserSettings": {
+        "title": "Browser Settings",
+        "chrome": "Chrome: Settings > Privacy and security > Cookies and other site data",
+        "firefox": "Firefox: Settings > Privacy & Security > Cookies and Site Data",
+        "safari": "Safari: Preferences > Privacy > Manage Website Data",
+        "edge": "Edge: Settings > Cookies and site permissions > Cookies and site data"
+      },
+      "warning": {
+        "title": "Important:",
+        "description": "If you disable essential cookies, some parts of our website may not work properly. Optional cookies can be disabled without affecting basic functionality."
+      }
+    },
+    "contact": {
+      "title": "Questions About Cookies?",
+      "description": "If you have any questions about how we use cookies or want to learn more about our privacy practices, feel free to contact us:",
+      "email": "Email us at:"
+    },
+    "lastUpdated": "Last updated:"
   }
 }

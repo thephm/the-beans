@@ -449,5 +449,50 @@
     "to": "à",
     "of": "sur",
     "results": "résultats"
+  },
+  "cookies": {
+    "title": "Politique des Cookies",
+    "subtitle": "Informations simples et claires sur l'utilisation des cookies sur The Beans",
+    "whatAreCookies": {
+      "title": "Que sont les Cookies ?",
+      "description": "Les cookies sont de petits fichiers texte que les sites web stockent sur votre appareil (ordinateur, téléphone ou tablette) lorsque vous les visitez. Pensez-y comme à de petites notes numériques qui aident les sites web à se souvenir de choses sur vous.",
+      "analogy": "C'est comme quand vous visitez votre café préféré et que le barista se souvient de votre commande habituelle - les cookies aident notre site web à se souvenir de vos préférences et à offrir une meilleure expérience."
+    },
+    "howWeUse": {
+      "title": "Comment Nous Utilisons les Cookies",
+      "essential": {
+        "title": "Cookies Essentiels (Toujours Activés)",
+        "description": "Ces cookies sont nécessaires au bon fonctionnement de notre site web. Ils vous aident à vous connecter, naviguer entre les pages et utiliser les fonctionnalités de base. Nous ne pouvons pas les désactiver car le site ne fonctionnerait pas sans eux."
+      },
+      "analytics": {
+        "title": "Cookies d'Analyse (Optionnels)",
+        "description": "Ceux-ci nous aident à comprendre comment les gens utilisent notre site web afin que nous puissions l'améliorer. Par exemple, ils nous disent quelles pages sont les plus populaires ou si les gens ont des difficultés à trouver quelque chose."
+      },
+      "preferences": {
+        "title": "Cookies de Préférence (Optionnels)",
+        "description": "Ceux-ci se souviennent de vos choix comme votre préférence linguistique (français ou anglais), vos torréfacteurs préférés et autres paramètres qui rendent votre expérience plus personnalisée."
+      }
+    },
+    "managing": {
+      "title": "Gérer Vos Préférences de Cookies",
+      "description": "Vous avez le contrôle sur les cookies ! Vous pouvez modifier vos paramètres de cookies à tout moment via votre navigateur web. Voici comment :",
+      "browserSettings": {
+        "title": "Paramètres du Navigateur",
+        "chrome": "Chrome : Paramètres > Confidentialité et sécurité > Cookies et autres données de site",
+        "firefox": "Firefox : Paramètres > Vie privée et sécurité > Cookies et données de site",
+        "safari": "Safari : Préférences > Confidentialité > Gérer les données de site web",
+        "edge": "Edge : Paramètres > Autorisations de cookies et de site > Cookies et données de site"
+      },
+      "warning": {
+        "title": "Important :",
+        "description": "Si vous désactivez les cookies essentiels, certaines parties de notre site web peuvent ne pas fonctionner correctement. Les cookies optionnels peuvent être désactivés sans affecter les fonctionnalités de base."
+      }
+    },
+    "contact": {
+      "title": "Questions sur les Cookies ?",
+      "description": "Si vous avez des questions sur notre utilisation des cookies ou si vous voulez en savoir plus sur nos pratiques de confidentialité, n'hésitez pas à nous contacter :",
+      "email": "Écrivez-nous à :"
+    },
+    "lastUpdated": "Dernière mise à jour :"
   }
 }
