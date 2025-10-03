@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { Coffee, Map, Group, Star } from '@mui/icons-material'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function AboutPage() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
@@ -141,12 +143,14 @@ export default function AboutPage() {
               >
                 {t('about.cta.startExploring')}
               </Link>
-              <Link
-                href="/signup"
-                className="border-2 border-primary-500 text-primary-600 px-8 py-3 rounded-lg hover:bg-primary-50 transition-colors text-lg"
-              >
-                {t('about.cta.joinCommunity')}
-              </Link>
+              {!user && (
+                <Link
+                  href="/signup"
+                  className="border-2 border-primary-500 text-primary-600 px-8 py-3 rounded-lg hover:bg-primary-50 transition-colors text-lg"
+                >
+                  {t('about.cta.joinCommunity')}
+                </Link>
+              )}
             </div>
           </div>
         </div>

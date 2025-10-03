@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
 import { Search } from '@mui/icons-material'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface SearchSectionProps {
   onSearch?: (searchQuery: string, location: string) => void
@@ -23,6 +24,7 @@ export function SearchSection({
   onLocationChange 
 }: SearchSectionProps) {
   const { t, i18n } = useTranslation()
+  const { user } = useAuth()
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
   const [localLocation, setLocalLocation] = useState(location)
   const [popularSearches, setPopularSearches] = useState<string[]>([])
@@ -121,7 +123,7 @@ export function SearchSection({
   }
 
   return (
-    <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
+    <section className={`px-4 sm:px-6 lg:px-8 bg-white ${user ? 'pt-8 pb-8' : 'py-8'}`}>
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -136,7 +138,7 @@ export function SearchSection({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-r from-lavender-50 to-orchid-50 rounded-2xl p-8 shadow-lg opacity-100"
+          className={`bg-gradient-to-r from-lavender-50 to-orchid-50 rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-8 pb-8' : 'p-8'}`}
         >
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="md:col-span-2">
