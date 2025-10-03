@@ -139,7 +139,7 @@
   },
   "favorites": {
     "title": "Your Favorites",
-    "subtitle": "Keep track of your favorite roasters",
+    "subtitle": "Keep track of your favorite roasters.",
     "roasters": "Favorite Roasters",
     "noFavorites": "No favorites yet",
     "startExploring": "Start exploring to add your favorites!",
@@ -246,7 +246,7 @@
   },
   "about": {
     "title": "About The Beans",
-    "subtitle": "Your guide to exceptional coffee",
+    "subtitle": "Your guide to exceptional coffee roasters.",
     "description": "Nous sommes passionnés de connecter les amateurs de café avec d'incroyables torréfacteurs. Découvrez votre prochaine infusion préférée avec nous.",
     "mission": {
       "title": "Our Mission",
