@@ -97,7 +97,9 @@
   "roasters": {
     "featured": "En vedette",
     "featuredDescription": "Découvrez un café exceptionnel de nos torréfacteurs en vedette",
+    "featuredDescriptionMobile": "Découvrez des torréfacteurs exceptionnels",
     "featuredTitle": "Torréfacteurs de café en vedette",
+    "featuredTitleMobile": "Torréfacteurs en vedette",
     "featuredSubtitle": "Découvrez un café exceptionnel de nos torréfacteurs en vedette",
     "viewDetails": "Voir les détails",
     "about": "À propos",
@@ -138,7 +140,9 @@
   },
   "discover": {
     "title": "Découvrir les torréfacteurs de café",
+    "titleMobile": "Découvrir les torréfacteurs",
     "subtitle": "Trouvez le torréfacteur de café parfait près de chez vous.",
+    "subtitleMobile": "Trouvez le torréfacteur parfait près de chez vous.",
     "viewDetails": "Voir les détails",
     "miles": "miles",
     "noResults": "Aucun résultat trouvé",

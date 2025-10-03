@@ -127,11 +127,13 @@ export function FeaturedRoasters() {
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t('roasters.featured')}{' '}
             <span className="bg-gradient-to-r from-primary-600 to-orchid-600 bg-clip-text text-transparent">
-              Coffee Roasters
+              <span className="block sm:hidden">Roasters</span>
+              <span className="hidden sm:block">Coffee Roasters</span>
             </span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {t('roasters.featuredDescription')}
+            <span className="block sm:hidden">{t('roasters.featuredDescriptionMobile')}</span>
+            <span className="hidden sm:block">{t('roasters.featuredDescription')}</span>
           </p>
         </motion.div>
 
