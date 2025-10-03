@@ -55,11 +55,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/map" className="text-gray-400 hover:text-white transition-colors">
-                  {t('footer.mapView')}
-                </Link>
-              </li>
-              <li>
                 <Link href="/favorites" className="text-gray-400 hover:text-white transition-colors">
                   {t('nav.favorites')}
                 </Link>

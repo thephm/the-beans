@@ -53142,10 +53142,63 @@ Deleted the entire `<li>` element containing the "For businesses" link that poin
 
   - Deleted the `"forBusinesses": "For Businesses"` key from the footer section
 
-✅ **Removed from French translations** (c`ommon.json`):
+✅ **Removed from French translations** (`common.json`):
 
   - Deleted the `"forBusinesses": "Pour les entreprises"` key from the footer section
 
 ✅ **Restarted the client container** to apply all changes
 
 The "For businesses" link and its corresponding translation strings in both English and French have been completely removed from the application. The footer will now only show "Contact Us" and "API Docs" in the Support section, without the "For businesses" option.
+
+## 361st try
+
+*(For Businesses is gone)*
+
+## Map view goes to dead page #100
+
+https://github.com/thephm/the-beans/issues/100
+
+> Remove Map view from footer and english and french strings. Be concise in your responses please.
+
+I'll remove the Map view from the footer and clean up the related translation strings.
+
+Created 4 todos
+
+Starting (1/4) Remove Map view from Footer component
+
+✔ Read `Footer.tsx`, lines 1 to 50
+
+✔ Read `Footer.tsx`, lines 50 to 108
+
+Now I'll remove the Map view link from the footer:
+
+`Footer.tsx +0 -5`
+
+Starting (2/4) Remove English map strings
+
+✔ Searched text for `mapView|map` (`**/client/public/locales/en/common.json`), 2 results
+
+✔ Read `common.json`, lines 195 to 205
+
+`common.json +0 -1`
+
+Starting (3/4) Remove French map strings
+
+✔ Searched text for `mapView|map` (`**/client/public/locales/fr/common.json`), 2 results
+
+✔ Read `common.json`, lines 15 to 25
+
+`common.json +0 -1`
+
+✔ Starting (4/4) Restart client container
+
+✔ `docker-compose restart client`
+
+Done. I've removed:
+
+- Map view link from F`ooter.tsx`
+- `mapView` translation key from English (`common.json`)
+- `mapView` translation key from French (`common.json`)
+- Restarted client container to apply changes
+
+The footer now only shows Discover and Favorites links in the Quick Links section.
