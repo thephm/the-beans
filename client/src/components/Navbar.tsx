@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { LanguageSelector } from './LanguageSelector'
 import { UserMenu } from './UserMenu'
+import { Coffee } from '@mui/icons-material'
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -50,7 +51,7 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">☕</span>
+              <Coffee sx={{ color: 'white', fontSize: 16 }} />
             </div>
             <span className="font-bold text-xl bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent">
               {t('app.name')}

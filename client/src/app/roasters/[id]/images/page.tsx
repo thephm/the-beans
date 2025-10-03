@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import ImageUpload from '@/components/ImageUpload';
 import { Roaster, RoasterImage } from '@/types';
+import { Warning, Lock } from '@mui/icons-material';
 
 export default function EditRoasterImages() {
   const { t } = useTranslation();
@@ -106,7 +107,9 @@ export default function EditRoasterImages() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">⚠️</div>
+            <div className="mb-4">
+              <Warning sx={{ fontSize: 96, color: '#f59e0b' }} />
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               {t('roaster.edit.error', 'Error Loading Roaster')}
             </h2>
@@ -128,7 +131,9 @@ export default function EditRoasterImages() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔒</div>
+            <div className="mb-4">
+              <Lock sx={{ fontSize: 96, color: '#ef4444' }} />
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               {t('roaster.edit.unauthorized', 'Access Denied')}
             </h2>

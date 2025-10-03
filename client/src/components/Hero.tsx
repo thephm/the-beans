@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+import { Coffee, LocationOn, Favorite, Public } from '@mui/icons-material'
 
 export function Hero() {
   const { t } = useTranslation()
@@ -33,15 +34,17 @@ export function Hero() {
           >
             <Link
               href="/discover"
-              className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
             >
-              🌍 {t('nav.discover')}
+              <Public sx={{ fontSize: 24 }} />
+              {t('nav.discover')}
             </Link>
             <Link
               href="/signup"
-              className="bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-primary-200 hover:border-primary-400 hover:bg-primary-50 transition-all"
+              className="bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-primary-200 hover:border-primary-400 hover:bg-primary-50 transition-all flex items-center gap-2"
             >
-              ☕ {t('hero.joinCommunity')}
+              <Coffee sx={{ fontSize: 24 }} />
+              {t('hero.joinCommunity')}
             </Link>
           </motion.div>
 
@@ -55,7 +58,7 @@ export function Hero() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-violet-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">📍</span>
+                    <LocationOn sx={{ color: 'white', fontSize: 32 }} />
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">{t('hero.locationBased')}</h3>
                   <p className="text-gray-600">{t('hero.locationDescription')}</p>
@@ -63,7 +66,7 @@ export function Hero() {
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">☕</span>
+                    <Coffee sx={{ color: 'white', fontSize: 32 }} />
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">{t('hero.qualityBeans')}</h3>
                   <p className="text-gray-600">{t('hero.qualityDescription')}</p>
@@ -71,7 +74,7 @@ export function Hero() {
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-orchid-500 to-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">💜</span>
+                    <Favorite sx={{ color: 'white', fontSize: 32 }} />
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">{t('hero.community')}</h3>
                   <p className="text-gray-600">{t('hero.communityDescription')}</p>

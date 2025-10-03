@@ -273,19 +273,19 @@
     "values": {
       "title": "Nos Valeurs",
       "sustainability": {
-        "title": "🌱 Durabilité",
+        "title": "Durabilité",
         "description": "Nous soutenons les torréfacteurs qui privilégient l'approvisionnement éthique, les pratiques de commerce équitable et la responsabilité environnementale."
       },
       "community": {
-        "title": "🤝 Communauté",
+        "title": "Communauté",
         "description": "Le café rassemble les gens. Nous favorisons les connexions entre les créateurs de café et les amateurs de café qui s'étendent au-delà des transactions."
       },
       "quality": {
-        "title": "✨ Qualité",
+        "title": "Qualité",
         "description": "Nous croyons que tout le monde mérite un café exceptionnel. C'est pourquoi nous sélectionnons soigneusement chaque torréfacteur sur notre plateforme."
       },
       "innovation": {
-        "title": "🚀 Innovation",
+        "title": "Innovation",
         "description": "Nous améliorons constamment notre plateforme pour rendre la découverte et la dégustation d'un excellent café plus faciles et plus délicieuses."
       }
     },
@@ -297,8 +297,8 @@
     "cta": {
       "title": "Prêt à Découvrir un Café Incroyable ?",
       "subtitle": "Rejoignez notre communauté et commencez à explorer le meilleur café que votre région a à offrir.",
-      "startExploring": "Commencer l'Exploration 🔍",
-      "joinCommunity": "Rejoindre la Communauté 💜"
+      "startExploring": "Commencer l'Exploration",
+      "joinCommunity": "Rejoindre la Communauté"
     }
   },
   "roasterDetail": {

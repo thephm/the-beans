@@ -274,19 +274,19 @@
     "values": {
       "title": "Our Values",
       "sustainability": {
-        "title": "🌱 Sustainability",
+        "title": "Sustainability",
         "description": "We champion roasters that prioritize ethical sourcing, fair trade practices, and environmental responsibility."
       },
       "community": {
-        "title": "🤝 Community",
+        "title": "Community",
         "description": "Coffee brings people together. We foster connections between coffee roasters and coffee lovers that extend beyond transactions."
       },
       "quality": {
-        "title": "✨ Quality",
+        "title": "Quality",
         "description": "We believe everyone deserves exceptional coffee. That's why we carefully curate every roaster on our platform."
       },
       "innovation": {
-        "title": "🚀 Innovation",
+        "title": "Innovation",
         "description": "We're constantly improving our platform to make discovering and enjoying great coffee easier and more delightful."
       }
     },
@@ -298,8 +298,8 @@
     "cta": {
       "title": "Ready to Discover Amazing Coffee?",
       "subtitle": "Join our community and start exploring the best coffee your area has to offer.",
-      "startExploring": "Start Exploring 🔍",
-      "joinCommunity": "Join the Community 💜"
+      "startExploring": "Start Exploring",
+      "joinCommunity": "Join the Community"
     }
   },
   "roasterDetail": {

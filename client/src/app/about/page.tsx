@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+import { Coffee, Map, Group, Star } from '@mui/icons-material'
 
 export default function AboutPage() {
   const { t } = useTranslation()
@@ -24,7 +25,7 @@ export default function AboutPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl">☕</span>
+                <Coffee sx={{ color: 'white', fontSize: 32 }} />
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('about.mission.title')}</h2>
             </div>
@@ -37,7 +38,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
               <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary-600 text-xl">🗺️</span>
+                <Map sx={{ color: '#2563eb', fontSize: 24 }} />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.features.discoverLocal.title')}</h3>
               <p className="text-gray-600">
@@ -47,7 +48,7 @@ export default function AboutPage() {
 
             <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
               <div className="w-12 h-12 bg-orchid-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-orchid-600 text-xl">👥</span>
+                <Group sx={{ color: '#a855f7', fontSize: 24 }} />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.features.buildCommunity.title')}</h3>
               <p className="text-gray-600">
@@ -57,7 +58,7 @@ export default function AboutPage() {
 
             <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
               <div className="w-12 h-12 bg-lavender-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-lavender-600 text-xl">⭐</span>
+                <Star sx={{ color: '#8b5cf6', fontSize: 24 }} />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{t('about.features.qualityFirst.title')}</h3>
               <p className="text-gray-600">
@@ -118,7 +119,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">{t('about.team.title')}</h2>
             <div className="text-center">
               <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-4xl">☕</span>
+                <Coffee sx={{ color: 'white', fontSize: 48 }} />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('about.team.subtitle')}</h3>
               <p className="text-gray-600 max-w-2xl mx-auto">

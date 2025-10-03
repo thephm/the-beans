@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import RoasterImage from './RoasterImage'
 import { apiClient } from '@/lib/api'
+import { Star, LocationOn, Favorite, FavoriteBorder } from '@mui/icons-material'
 
 interface Roaster {
   id: string
@@ -153,14 +154,18 @@ export function FeaturedRoasters() {
                   width={400}
                   height={300}
                 />
-                <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600">
-                  ⭐ {roaster.rating}
+                <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600 flex items-center gap-1">
+                  <Star sx={{ fontSize: 16 }} />
+                  {roaster.rating}
                 </div>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
                 {(roaster.city || roaster.state) && (
-                  <p className="text-gray-600 mb-2">📍 {[roaster.city, roaster.state].filter(Boolean).join(', ')}</p>
+                  <p className="text-gray-600 mb-2 flex items-center">
+                    <LocationOn sx={{ fontSize: 16, marginRight: 0.5 }} />
+                    {[roaster.city, roaster.state].filter(Boolean).join(', ')}
+                  </p>
                 )}
                 {userLocation && roaster.latitude && roaster.longitude ? (() => {
                   const dist = calcDistance(userLocation.lat, userLocation.lng, roaster.latitude, roaster.longitude, distanceUnit);
@@ -215,7 +220,7 @@ export function FeaturedRoasters() {
                     onClick={() => toggleFavorite(roaster.id)}
                     aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
                   >
-                    {favorites.includes(roaster.id) ? '❤️' : '🤍'}
+                    {favorites.includes(roaster.id) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
                   </button>
                 </div>
               </div>

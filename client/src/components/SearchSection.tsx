@@ -5,6 +5,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
+import { Search } from '@mui/icons-material'
 
 interface SearchSectionProps {
   onSearch?: (searchQuery: string, location: string) => void
@@ -171,9 +172,10 @@ export function SearchSection({
             <div className="md:col-span-1 flex items-end">
               <button
                 onClick={handleSearch}
-                className="w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 whitespace-nowrap"
+                className="w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 whitespace-nowrap flex items-center justify-center gap-2"
               >
-                🔍 {t('search.searchButton')}
+                <Search sx={{ fontSize: 20 }} />
+                {t('search.searchButton')}
               </button>
             </div>
           </div>

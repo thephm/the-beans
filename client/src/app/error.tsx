@@ -1,5 +1,7 @@
 'use client'
 
+import { Coffee } from '@mui/icons-material'
+
 export default function Error({
   error,
   reset,
@@ -10,7 +12,9 @@ export default function Error({
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
       <div className="text-center">
-        <div className="text-6xl mb-4">☕</div>
+        <div className="mb-4">
+          <Coffee sx={{ fontSize: 96, color: '#6b7280' }} />
+        </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong!</h2>
         <p className="text-gray-600 mb-6">
           We encountered an error while brewing your request.
