@@ -81,11 +81,6 @@ export function Footer() {
                   {t('footer.apiDocs')}
                 </a>
               </li>
-              <li>
-                <Link href="/business" className="text-gray-400 hover:text-white transition-colors">
-                  {t('footer.forBusinesses')}
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
