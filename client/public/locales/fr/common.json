@@ -150,7 +150,7 @@
   },
   "favorites": {
     "title": "Vos favoris",
-    "subtitle": "Suivez vos torréfacteurs préférés",
+    "subtitle": "Suivez vos torréfacteurs préférés.",
     "roasters": "Torréfacteurs favoris",
     "noFavorites": "Aucun favori pour le moment",
     "startExploring": "Commencez à explorer pour ajouter vos favoris !",
@@ -245,7 +245,7 @@
   },
   "about": {
     "title": "À propos de The Beans",
-    "subtitle": "Votre guide vers un café exceptionnel",
+    "subtitle": "Votre guide vers d'exceptionnels torréfacteurs de café.",
     "description": "Nous sommes passionnés par la connexion des amateurs de café avec d'incroyables torréfacteurs. Découvrez votre prochaine boisson préférée avec nous.",
     "mission": {
       "title": "Notre Mission",
