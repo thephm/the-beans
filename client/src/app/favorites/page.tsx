@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import RoasterImage from '@/components/RoasterImage'
 import { apiClient } from '@/lib/api'
+import { Star, HeartBroken } from '@mui/icons-material'
 
 interface Roaster {
   id: number
@@ -194,7 +195,7 @@ export default function FavoritesPage() {
                             </div>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <span className="text-yellow-400">★</span>
+                            <Star sx={{ fontSize: 16, color: '#fbbf24' }} />
                             <span className="text-sm font-medium text-gray-700">{roaster.rating}</span>
                           </div>
                         </div>
@@ -212,9 +213,10 @@ export default function FavoritesPage() {
                           </Link>
                           <button
                             onClick={() => toggleFavorite(roaster.id)}
-                            className="px-4 py-2 border-2 border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                            className="px-4 py-2 border-2 border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-1"
                           >
-                            💔 {t('favorites.remove')}
+                            <HeartBroken sx={{ fontSize: 16 }} />
+                            {t('favorites.remove')}
                           </button>
                         </div>
                       </div>

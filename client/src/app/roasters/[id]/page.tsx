@@ -7,6 +7,17 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import RoasterImage from '@/components/RoasterImage'
 import { apiClient } from '@/lib/api'
+import { 
+  Coffee, 
+  LocationOn, 
+  Favorite, 
+  FavoriteBorder, 
+  Language, 
+  Phone, 
+  Email, 
+  PhotoCamera,
+  Star
+} from '@mui/icons-material'
 
 interface Roaster {
   id: string
@@ -166,7 +177,9 @@ export default function RoasterDetail() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">☕</div>
+            <div className="mb-4">
+              <Coffee sx={{ fontSize: 96, color: '#6b7280' }} />
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Roaster Not Found</h2>
             <p className="text-gray-600 mb-6">{error || 'The roaster you\'re looking for doesn\'t exist.'}</p>
             <Link
@@ -209,7 +222,10 @@ export default function RoasterDetail() {
             <div className="absolute bottom-6 left-6 text-white">
               <h1 className="text-4xl font-bold mb-2">{roaster.name}</h1>
               {(roaster.city || roaster.state) && (
-                <p className="text-xl">📍 {[roaster.city, roaster.state].filter(Boolean).join(', ')}</p>
+                <p className="text-xl flex items-center">
+                  <LocationOn sx={{ fontSize: 24, marginRight: 1 }} />
+                  {[roaster.city, roaster.state].filter(Boolean).join(', ')}
+                </p>
               )}
             </div>
             <button
@@ -220,7 +236,7 @@ export default function RoasterDetail() {
                   : 'bg-white text-red-500 hover:bg-red-50'
               } shadow-lg transition-all transform hover:scale-110`}
             >
-              ❤️
+              {isFavorite ? <Favorite /> : <FavoriteBorder />}
             </button>
           </div>
 
@@ -232,7 +248,7 @@ export default function RoasterDetail() {
                 {/* Rating & Reviews */}
                 <div className="flex items-center mb-6">
                   <div className="flex items-center mr-6">
-                    <span className="text-yellow-400 text-2xl">⭐</span>
+                    <Star sx={{ fontSize: 32, color: '#fbbf24' }} />
                     <span className="text-2xl font-bold text-gray-900 ml-2">{roaster.rating}</span>
                     <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
                   </div>
@@ -258,9 +274,10 @@ export default function RoasterDetail() {
                       <Link
                         key={specialty}
                         href={`/discover?specialty=${encodeURIComponent(specialty)}`}
-                        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
+                        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer flex items-center gap-2"
                       >
-                        ☕ {translateSpecialty(specialty)}
+                        <Coffee sx={{ fontSize: 16 }} />
+                        {translateSpecialty(specialty)}
                       </Link>
                     ))}
                   </div>
@@ -272,7 +289,7 @@ export default function RoasterDetail() {
                   {roaster.onlineOnly ? (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="flex items-center">
-                        <span className="text-blue-600 text-lg mr-2">🌐</span>
+                        <Language sx={{ fontSize: 20, color: '#2563eb', marginRight: 1 }} />
                         <span className="text-blue-800 font-medium">{t('roasterDetail.onlineOnly', 'Online Only')}</span>
                       </div>
                       <p className="text-blue-700 text-sm mt-2">
@@ -313,7 +330,7 @@ export default function RoasterDetail() {
                   {/* Address */}
                   <div className="mb-4">
                     <div className="flex items-start">
-                      <span className="text-lg mr-2">📍</span>
+                      <LocationOn sx={{ fontSize: 20, color: '#6b7280', marginRight: 1, marginTop: 0.25 }} />
                       <div>
                         <p className="font-medium text-gray-900">{t('roasterDetail.address')}</p>
                         <p className="text-gray-600">{roaster.address}</p>
@@ -326,7 +343,7 @@ export default function RoasterDetail() {
                   {roaster.phone && (
                     <div className="mb-4">
                       <div className="flex items-center">
-                        <span className="text-lg mr-2">📞</span>
+                        <Phone sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
                         <div>
                           <p className="font-medium text-gray-900">{t('roasterDetail.phone')}</p>
                           <a 
@@ -344,7 +361,7 @@ export default function RoasterDetail() {
                   {roaster.website && (
                     <div className="mb-4">
                       <div className="flex items-center">
-                        <span className="text-lg mr-2">🌐</span>
+                        <Language sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
                         <div>
                           <p className="font-medium text-gray-900">{t('roasterDetail.website')}</p>
                           <a 
@@ -364,7 +381,7 @@ export default function RoasterDetail() {
                   {roaster.email && (
                     <div className="mb-6">
                       <div className="flex items-center">
-                        <span className="text-lg mr-2">✉️</span>
+                        <Email sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
                         <div>
                           <p className="font-medium text-gray-900">{t('roasterDetail.email')}</p>
                           <a 
@@ -407,21 +424,23 @@ export default function RoasterDetail() {
                     ) && (
                       <Link
                         href={`/roasters/${roaster.id}/images`}
-                        className="block w-full bg-blue-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all"
+                        className="block w-full bg-blue-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
                       >
-                        📸 {t('roasterDetail.manageImages', 'Manage Images')}
+                        <PhotoCamera sx={{ fontSize: 20 }} />
+                        {t('roasterDetail.manageImages', 'Manage Images')}
                       </Link>
                     )}
                     
                     <button
                       onClick={toggleFavorite}
-                      className={`w-full py-3 px-4 rounded-lg font-medium transition-all transform hover:scale-105 ${
+                      className={`w-full py-3 px-4 rounded-lg font-medium transition-all transform hover:scale-105 flex items-center justify-center gap-2 ${
                         isFavorite
                           ? 'bg-red-100 text-red-700 border-2 border-red-300 hover:bg-red-200'
                           : 'bg-white border-2 border-red-300 text-red-600 hover:bg-red-50'
                       }`}
                     >
-                      {isFavorite ? `❤️ ${t('roasterDetail.removeFromFavorites')}` : `🤍 ${t('roasterDetail.addToFavorites')}`}
+                      {isFavorite ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
+                      {isFavorite ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
                     </button>
                     
                     {roaster.website && (
@@ -429,9 +448,10 @@ export default function RoasterDetail() {
                         href={roaster.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-3 px-4 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105"
+                        className="block w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-3 px-4 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
                       >
-                        {t('roasterDetail.visitWebsite')} 🌐
+                        {t('roasterDetail.visitWebsite')}
+                        <Language sx={{ fontSize: 20 }} />
                       </a>
                     )}
                   </div>

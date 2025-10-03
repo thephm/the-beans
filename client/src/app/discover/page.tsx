@@ -8,6 +8,13 @@ import { useAuth } from '@/contexts/AuthContext'
 import { SearchSection } from '@/components/SearchSection'
 import RoasterImage from '@/components/RoasterImage'
 import { apiClient } from '@/lib/api'
+import { 
+  Coffee, 
+  LocationOn, 
+  Favorite, 
+  FavoriteBorder,
+  Star
+} from '@mui/icons-material'
 
 interface Roaster {
   id: string
@@ -210,12 +217,15 @@ export default function DiscoverPage() {
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{roaster.name}</h3>
                       <div className="flex items-center">
-                        <span className="text-yellow-400">⭐</span>
+                        <Star sx={{ fontSize: 20, color: '#fbbf24' }} />
                         <span className="text-gray-600 ml-1">{roaster.rating}</span>
                       </div>
                     </div>
                     {(roaster.city || roaster.state) && (
-                      <p className="text-gray-600 mb-2">📍 {[roaster.city, roaster.state].filter(Boolean).join(', ')}</p>
+                      <p className="text-gray-600 mb-2 flex items-center">
+                        <LocationOn sx={{ fontSize: 16, marginRight: 0.5 }} />
+                        {[roaster.city, roaster.state].filter(Boolean).join(', ')}
+                      </p>
                     )}
                     <p className="text-gray-700 mb-4">{roaster.description}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
@@ -228,9 +238,10 @@ export default function DiscoverPage() {
                               search: translateSpecialty(specialty)
                             }))
                           }}
-                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
+                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer flex items-center gap-1"
                         >
-                          ☕ {translateSpecialty(specialty)}
+                          <Coffee sx={{ fontSize: 14 }} />
+                          {translateSpecialty(specialty)}
                         </button>
                       ))}
                     </div>
@@ -244,7 +255,10 @@ export default function DiscoverPage() {
                           let dist = roaster.distance;
                           if (unit === 'km') dist = dist * 1.60934;
                           return (
-                            <span className="text-sm text-gray-500">📍 {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}</span>
+                            <span className="text-sm text-gray-500 flex items-center">
+                              <LocationOn sx={{ fontSize: 14, marginRight: 0.25 }} />
+                              {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}
+                            </span>
                           );
                         }
                         // If not, try to calculate from userLocation and roaster lat/lng
@@ -259,7 +273,10 @@ export default function DiscoverPage() {
                           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
                           const dist = R * c;
                           return (
-                            <span className="text-sm text-gray-500">📍 {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}</span>
+                            <span className="text-sm text-gray-500 flex items-center">
+                              <LocationOn sx={{ fontSize: 14, marginRight: 0.25 }} />
+                              {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}
+                            </span>
                           );
                         }
                         return null;
@@ -289,7 +306,7 @@ export default function DiscoverPage() {
                         }`}
                         aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
                       >
-                        {favorites.includes(roaster.id) ? '❤️' : '🤍'}
+                        {favorites.includes(roaster.id) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
                       </button>
                     </div>
                   </div>
@@ -297,7 +314,9 @@ export default function DiscoverPage() {
               ))
             ) : (
               <div className="col-span-full text-center py-12">
-                <div className="text-6xl mb-4">☕</div>
+                <div className="mb-4">
+                  <Coffee sx={{ fontSize: 96, color: '#6b7280' }} />
+                </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('roasters.noRoastersFound')}</h3>
                 <p className="text-gray-600">{t('discover.tryAdjusting')}</p>
               </div>

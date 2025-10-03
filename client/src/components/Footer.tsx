@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { getApiBaseUrl } from '@/lib/api'
+import { Coffee } from '@mui/icons-material'
 
 export function Footer() {
   const { t } = useTranslation()
@@ -15,7 +16,7 @@ export function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">☕</span>
+                <Coffee sx={{ color: 'white', fontSize: 16 }} />
               </div>
               <span className="font-bold text-xl">The Beans</span>
             </div>

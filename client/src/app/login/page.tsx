@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
+import { Email, VpnKey } from '@mui/icons-material'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -128,8 +129,14 @@ export default function LoginPage() {
           <div className="mt-6 p-4 bg-lavender-50 rounded-lg border border-lavender-200">
             <h3 className="text-sm font-medium text-lavender-800 mb-2">{t('auth.demo.title')}</h3>
             <p className="text-sm text-lavender-700">
-              📧 Email: coffee@lover.com<br />
-              🔑 Password: password123
+              <span className="flex items-center gap-1 mb-1">
+                <Email sx={{ fontSize: 16 }} />
+                Email: coffee@lover.com
+              </span>
+              <span className="flex items-center gap-1">
+                <VpnKey sx={{ fontSize: 16 }} />
+                Password: password123
+              </span>
             </p>
             <button
               onClick={() => setFormData({ email: 'coffee@lover.com', password: 'password123' })}
