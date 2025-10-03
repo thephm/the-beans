@@ -53520,3 +53520,221 @@ Perfect! Now for logged-in users, the search pane has:
 This removes the internal top padding above the search fields while keeping the padding above the green search pane intact, creating a tighter, more efficient layout for logged-in users.
 
 ## 370th try
+
+*(looks great, less noisy if a member)*
+
+> If mobile, on the main page make some text shorter but leave it as is for desktop/laptop browsers. The "Featured Coffee Roasters" make it "Featured Roasters" and the "Discover exceptional coffee from our featured roasters" make "Discover exceptional roasters"
+
+I need to make the text shorter on mobile devices for better responsive design. Let me find where these text elements are located and update them to show shorter text on mobile while keeping the full text on desktop.
+
+✔ Searched text for `Featured Coffee Roasters|Discover exceptional coffee from our featured roasters` (`**/client/src/**/*.{tsx,ts}`), no results
+
+Let me search for these text strings using translation keys:
+
+✔ Searched text for `Featured.*Coffee.*Roasters|Discover exceptional coffee` (`**/client/public/locales/**/*.json`), 3 results
+
+Perfect! I found the text in the translation files. Now let me check where these translation keys are used in the components:
+
+Let me check the FeaturedRoasters component to see the current implementation: 
+
+✔ Searched text for `featuredTitle|FeaturedDescription|featuredSubtitle` (`**/client/src/**/*.{tsx,ts}`), 1 result
+
+✔ Read `FeaturedRoasters.tsx`, lines 120 to 150
+
+I can see the issue! The title is hardcoded as "Coffee Roasters" in the component. Let me read more of this component to understand the full structure:
+
+✔ Read `FeaturedRoasters.tsx`, lines 125 to 140
+
+Now I understand the structure. I need to:
+
+Update the hardcoded "Coffee Roasters" to use responsive text (show "Roasters" on mobile, "Coffee Roasters" on desktop)
+Update the description to show shorter text on mobile
+Let me first add new translation keys for the mobile versions. I'll update the English translation file:
+
+✔ Read `common.json`, lines 85 to 95
+
+Now I'll add mobile-specific translation keys to the English file:
+
+`common.json +2 -0`
+
+Now I need to add the same keys to the French translation file:
+
+✔ Read `common.json`, lines 85 to 95
+
+Let me find the roasters section in the French file:
+
+✔ Read `common.json`, lines 95 to 110
+
+Now I'll add the mobile-specific translation keys to the French file:
+
+`common.json +2 -0`
+
+Now I need to update the FeaturedRoasters component to use responsive text. I'll modify it to show different text on mobile vs desktop:
+
+`FeaturedRoasters.tsx +4 -2`
+
+Now let me restart the client container to apply the changes
+
+✔ `docker-compose restart client`
+
+## Perfect! I've successfully implemented responsive text for the Featured Roasters section. Here's what I changed:
+
+### Summary of Changes:
+
+#### Translation keys added:
+
+- English: `featuredDescriptionMobile: "Discover exceptional roasters"` and `featuredTitleMobile: "Featured Roasters"`
+- French: `featuredDescriptionMobile: "Découvrez des torréfacteurs exceptionnels"` and `featuredTitleMobile: "Torréfacteurs en vedette"`
+
+#### Component changes in `FeaturedRoasters.tsx`:
+
+- **Title**: Now shows "Featured Roasters" on mobile (`sm:hidden`) and "Featured Coffee Roasters" on desktop (`hidden sm:block`)
+- **Description**: Now shows "Discover exceptional roasters" on mobile and "Discover exceptional coffee from our featured roasters" on desktop
+Responsive behavior:
+
+- **Mobile devices**: Shows the shorter, more concise text
+- **Desktop/laptop browsers**: Shows the full, original text
+- **Breakpoint**: Uses Tailwind's `sm:` prefix (640px and up for desktop text)
+
+The changes maintain the existing styling and animations while providing a cleaner, more mobile-friendly experience with shorter text that fits better on smaller screens.
+
+## 371st try
+
+> When mobile change "Find the perfect coffee roaster near you" to "Find the perfect roaster near you"
+
+I'll help you make the text shorter on mobile devices for the search section. Let me first find where this text is located.
+
+✔ Searched text for `Find the perfect coffee roaster near you` (`**/client/src/**/*.{tsx,ts}`), no results
+
+Let me search in the translation files:
+
+✔ Searched text for `Find the perfect coffee roaster near you` (`**/client/public/locales/**/*.json), 2 results
+
+Great! Now let me find where this translation key is used in the components:
+
+✔ Searched text for `subtitle.*search|search.*subtitle` (`**/client/src/**/*.{tsx,ts}`), no results
+
+Let me search more broadly for the search section:
+
+✔ Searched text for `search.subtitle` (`**/client/src/**/*.{tsx,ts}`), no results
+
+Let me check the SearchSection component directly:
+
+✔ Read `SearchSection.tsx`, lines 1 to 50
+
+Let me continue reading the SearchSection component to find the title and subtitle:
+
+✔ Read `SearchSection.tsx`, lines 50 to 100
+
+Let me continue reading to find the title and subtitle rendering:
+
+✔ Read `SearchSection.tsx`, lines 100 to 150
+
+Let me search for "Search for roasters" text that should be in the title:
+
+It seems the title "Find the perfect coffee roaster near you" might be in a different section. Let me check the search section more carefully in the translation file:
+
+✔ Read `common.json`, lines 120 to 140
+
+Perfect! I found it. The text "Find the perfect coffee roaster near you." is in the `discover.subtitle` key. Now I need to:
+
+Add a mobile version of this text to the translation files
+Update the component that uses this text to show different versions on mobile vs desktop
+First, let me add the mobile version to the English translation file:
+
+`common.json +1 -0`
+
+Now let me add the mobile version to the French translation file. Let me first find the discover section in French:
+
+✔ Searched text for `discover` (`**/client/public/locales/fr/common.json`), 4 results
+
+✔ Read `common.json`, lines 140 to 150
+
+Now I'll add the mobile version to the French file:
+
+`common.json +1 -0`
+
+Now I need to find where the `discover.subtitle` is used in the components. Let me search for it:
+
+✔ Searched text for `discover.subtitle` (`**/cient/src/**/*.{tsx,ts}`), 1 result
+
+Great! Now let me check the discover page to see the context and update it to use responsive text:
+
+✔ Read `page.tsx`, lines 160 to 180
+
+Perfect! Now I'll update the discover page to use responsive text:
+
+`page.tsx +2 -1`
+
+Now let me restart the client container to apply the changes:
+
+✔ `docker-compose restart client`
+
+## Perfect! I've successfully implemented responsive text for the discover page subtitle. Here's what I changed:
+
+### Summary of Changes:
+
+**Translation keys added**:
+
+- English: `subtitleMobile: "Find the perfect roaster near you."` (removed "coffee" from the original text)
+- French: subtitleMobile: `"Trouvez le torréfacteur parfait près de chez vous."` (removed "de café" from the original text)
+
+**Component changes in** `discover/page.tsx`:
+
+- **Subtitle**: Now shows "Find the perfect roaster near you" on mobile `(block sm:hidden)` and "Find the perfect coffee roaster near you" on desktop `(hidden sm:block)`
+
+**Responsive behavior**:
+
+- **Mobile devices**: Shows the shorter text "Find the perfect roaster near you"
+- **Desktop/laptop browsers**: Shows the full text "Find the perfect coffee roaster near you"
+- **Breakpoint**: Uses Tailwind's `sm:` prefix (640px and up for desktop text)
+
+The change makes the text more concise on mobile devices while preserving the full descriptive text on larger screens, improving the mobile user experience by reducing text clutter on smaller screens.
+
+## 372nd try
+
+> Better! For Mobile only change the main heading "Discover Coffee Roasters" to just "Discover Roasters"
+
+I'll help you make the main heading shorter on mobile devices. I need to update the "Discover Coffee Roasters" heading to show "Discover Roasters" on mobile while keeping the full text on desktop.
+
+Let me first add a mobile version to the translation files:
+
+`common.json +1 -0`
+
+Now let me add the mobile version to the French translation file:
+
+`common.json +1 -0`
+
+Now I need to update the discover page to use responsive text for the title:
+
+`page.tsx +2 -1`
+
+Now let me restart the client container to apply the changes:
+
+✔ `docker-compose restart client`
+
+## Perfect! I've successfully updated the main heading to be responsive. Here's what I changed:
+
+### Summary of Changes:
+
+#### Translation keys added:
+
+- English: titleMobile: `"Discover Roasters"` (removed "Coffee" from the original title)
+- French: titleMobile: `"Découvrir les torréfacteurs"` (removed "de café" from the original title)
+ 
+#### Component changes in `discover/page.tsx`:
+
+- **Main heading**: Now shows "Discover Roasters" on mobile (`block sm:hidden`) and "Discover Coffee Roasters" on desktop (`hidden sm:block`)
+
+#### Responsive behavior:
+
+- **Mobile devices**: Shows the shorter title "Discover Roasters"
+- **Desktop/laptop browsers**: Shows the full title "Discover Coffee Roasters"
+- **Breakpoint**: Uses Tailwind's `sm:` prefix (640px and up for desktop text)
+
+Now both the main heading and subtitle are optimized for mobile devices:
+
+- **Mobile**: "Discover Roasters" + "Find the perfect roaster near you"
+- **Desktop**: "Discover Coffee Roasters" + "Find the perfect coffee roaster near you"
+
+This creates a cleaner, more concise experience on mobile while maintaining the full descriptive text on larger screens.

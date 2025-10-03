@@ -86,7 +86,9 @@
   "roasters": {
     "featured": "Featured",
     "featuredDescription": "Discover exceptional coffee from our featured roasters",
+    "featuredDescriptionMobile": "Discover exceptional roasters",
     "featuredTitle": "Featured Coffee Roasters",
+    "featuredTitleMobile": "Featured Roasters",
     "featuredSubtitle": "Discover exceptional coffee from our featured roasters",
     "viewDetails": "View Details",
     "about": "About",
@@ -127,7 +129,9 @@
   },
   "discover": {
     "title": "Discover Coffee Roasters",
+    "titleMobile": "Discover Roasters",
     "subtitle": "Find the perfect coffee roaster near you.",
+    "subtitleMobile": "Find the perfect roaster near you.",
     "viewDetails": "View Details",
     "miles": "miles",
     "noResults": "No results found",

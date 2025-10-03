@@ -163,10 +163,12 @@ export default function DiscoverPage() {
           {/* Header */}
           <div className="text-center mb-4">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
-              {t('discover.title')}
+              <span className="block sm:hidden">{t('discover.titleMobile')}</span>
+              <span className="hidden sm:block">{t('discover.title')}</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {t('discover.subtitle')}
+              <span className="block sm:hidden">{t('discover.subtitleMobile')}</span>
+              <span className="hidden sm:block">{t('discover.subtitle')}</span>
             </p>
           </div>
 
