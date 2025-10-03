@@ -53065,3 +53065,87 @@ The Help Center has been completely removed from both the UI and the translation
 ## 360th try
 
 *(Help Center is gone from footer)*
+
+## Remove "For businesses" in footer 
+
+https://github.com/thephm/the-beans/issues/102
+
+> Remove "For businesses" in footer and the english and french strings
+
+I'll help you remove the "For businesses" text from the footer and the related translation strings. Let me first examine the footer component and the translation files to identify all the places that need to be updated.
+
+✔ Created 7 todos
+
+Now let me start by examining the Footer component:
+
+Starting (1/7) Examine footer component
+
+✔ Read `Footer.tsx`, lines 1 to 100
+
+Let me see the rest of the Footer component:
+
+✔ Read `Footer.tsx`, lines 101 to 113
+
+Perfect! I found the "For businesses" reference in the Footer component on line 86. Now let me check the translation files to find the corresponding strings:
+
+✔ Starting (2/7) Check English translation strings
+
+✔ Read `common.json`, lines 1 to 300
+
+I can see the "forBusinesses" key in the footer section. Now let me check the French translation file:
+
+✔ Starting (3/7) Check French translation strings
+
+✔ Searched text for `forBusinesses` (`**/client/public/locales/fr/common.json`), 1 result
+
+Perfect! Now I have all the information I need. Let me start removing these elements:
+
+1. First, let me remove the "For businesses" link from the Footer component:
+
+✔ Starting (4/7) Remove footer reference
+
+`Footer.tsx +0 -5`
+
+2. Now, let me remove the "forBusinesses" key from the English translation file:
+
+✔ Starting (5/7) Remove English strings
+
+`common.json +0 -1`
+
+3. Now, let me remove the "forBusinesses" key from the French translation file:
+
+✔ Starting (6/7) Remove French strings
+
+Let me first check the context around the French translation to make sure I have the right context:
+
+✔ Read `common.json`, lines 20 to 30
+
+`common.json +0 -1`
+
+4. Finally, let me restart the client container to apply the changes:
+
+✔ Starting (7/7) Restart client container
+
+✔ `docker-compose restart client`
+
+✔ Completed (7/7) Restart client container
+
+## Perfect! I have successfully removed the "For businesses" text from the footer and all related translation strings. Here's what I accomplished:
+
+### Summary of Changes
+
+✅ Removed from Footer component (`Footer.tsx`):
+
+Deleted the entire `<li>` element containing the "For businesses" link that pointed to `/business`
+
+✅ Removed from English translations (`common.json`):
+
+  - Deleted the `"forBusinesses": "For Businesses"` key from the footer section
+
+✅ **Removed from French translations** (c`ommon.json`):
+
+  - Deleted the `"forBusinesses": "Pour les entreprises"` key from the footer section
+
+✅ **Restarted the client container** to apply all changes
+
+The "For businesses" link and its corresponding translation strings in both English and French have been completely removed from the application. The footer will now only show "Contact Us" and "API Docs" in the Support section, without the "For businesses" option.
