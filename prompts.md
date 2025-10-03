@@ -53202,3 +53202,36 @@ Done. I've removed:
 - Restarted client container to apply changes
 
 The footer now only shows Discover and Favorites links in the Quick Links section.
+
+## Remove socials icons #106
+
+https://github.com/thephm/the-beans/issues/106
+
+> Remove socials icons and add one for instagram that goes to https://www.instagram.com/thebeans.ca
+
+I'll help you remove the social icons and add an Instagram icon that links to the Instagram account. Let me first examine the current social icons implementation to understand the structure.
+
+✔ Searched codebase for `"social icons facebook twitter github instagram"`, 3 results
+
+Let me search more specifically for the Footer component since social icons are commonly placed there:
+
+✔ Read `Footer.tsx`, lines 1 to 100
+
+Perfect! I can see the social icons in the Footer component. Currently there are Facebook, Instagram (with incorrect SVG path), and Twitter icons. I need to remove Facebook and Twitter, and update the Instagram icon to use the correct SVG path and link to `https://www.instagram.com/thebeans.ca`.
+
+`Footer.tsx +2 -14`
+
+Now I need to restart the client container for the changes to take effect, as mentioned in the project instructions:
+
+✔ `docker-compose restart client`
+
+## Perfect! I've successfully updated the Footer component to:
+
+1. Removed the Facebook and Twitter social icons
+2. Updated the Instagram icon with:
+  - Proper Instagram SVG path (the correct Instagram logo shape)
+  - Link to `https://www.instagram.com/thebeans.ca`
+  - Added `target="_blank"` and `rel="noopener noreferrer"` for security when opening external links
+  - Maintained the existing styling and hover effects
+
+The changes are now live after restarting the client container. The footer will now show only the Instagram icon that properly links to The Beans' Instagram account.
