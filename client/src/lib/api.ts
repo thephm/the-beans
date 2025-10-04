@@ -178,6 +178,21 @@ class ApiClient {
       body: JSON.stringify(reviewData),
     });
   }
+
+  // Admin audit logs methods
+  async getAuditLogs(params?: Record<string, any>) {
+    const searchParams = params ? new URLSearchParams(params).toString() : '';
+    const endpoint = searchParams ? `/admin/audit-logs?${searchParams}` : '/admin/audit-logs';
+    return this.request(endpoint);
+  }
+
+  async getAuditLogStats() {
+    return this.request('/admin/audit-logs/stats');
+  }
+
+  async getAuditLogById(id: string) {
+    return this.request(`/admin/audit-logs/${id}`);
+  }
 }
 
 export const apiClient = new ApiClient();

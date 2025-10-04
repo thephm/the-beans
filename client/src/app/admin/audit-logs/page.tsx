@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { AuditLog, AuditLogFilters, AuditLogStats, User } from '../../../types';
+import { apiClient } from '../../../lib/api';
 import Link from 'next/link';
 
 interface AuditLogResponse {
@@ -71,29 +72,17 @@ export default function AuditLogsPage() {
 
   const fetchAuditLogs = async () => {
     try {
-      const params = new URLSearchParams();
+      const params: Record<string, string> = {};
       
-      if (filters.page) params.append('page', filters.page.toString());
-      if (filters.limit) params.append('limit', filters.limit.toString());
-      if (filters.action) params.append('action', filters.action);
-      if (filters.entityType) params.append('entityType', filters.entityType);
-      if (filters.userId) params.append('userId', filters.userId);
-      if (filters.startDate) params.append('startDate', filters.startDate);
-      if (filters.endDate) params.append('endDate', filters.endDate);
+      if (filters.page) params.page = filters.page.toString();
+      if (filters.limit) params.limit = filters.limit.toString();
+      if (filters.action) params.action = filters.action;
+      if (filters.entityType) params.entityType = filters.entityType;
+      if (filters.userId) params.userId = filters.userId;
+      if (filters.startDate) params.startDate = filters.startDate;
+      if (filters.endDate) params.endDate = filters.endDate;
 
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/audit-logs?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch audit logs');
-      }
-
-      const data: AuditLogResponse = await response.json();
+      const data = await apiClient.getAuditLogs(params) as AuditLogResponse;
       setAuditLogs(data.auditLogs);
       setCurrentPage(data.pagination.page);
       setTotalPages(data.pagination.totalPages);
@@ -105,19 +94,7 @@ export default function AuditLogsPage() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/audit-logs/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch stats');
-      }
-
-      const data: AuditLogStats = await response.json();
+      const data = await apiClient.getAuditLogStats() as AuditLogStats;
       setStats(data);
     } catch (err) {
       console.error('Fetch stats error:', err);
@@ -483,7 +460,7 @@ export default function AuditLogsPage() {
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
-                  Changes {selectedLog.action} {selectedLog.entityType}
+                  {selectedLog.action} {selectedLog.entityType}
                 </h3>
                 <button
                   onClick={() => setSelectedLog(null)}
