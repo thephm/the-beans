@@ -164,7 +164,6 @@ export default function FavoritesPage() {
             <div className="space-y-12">
               {/* Favorite Roasters */}
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('favorites.roasters')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {favoriteRoasters.map((roaster) => (
                     <div key={roaster.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all group">

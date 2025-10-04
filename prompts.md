@@ -54993,3 +54993,37 @@ Perfect! I've added the missing period to "Customize your experience" in both th
 - French Desktop: "Personnalisez votre expérience de découverte de café."
 
 The client container has been restarted to apply the changes.
+
+## 389th try
+
+*(the change worked, checked in)*
+
+## Remove extra "Favorite Roasters" sub-heading under /favorites
+
+> Remove extra "Favorite Roasters" sub-heading under /favorites
+
+I'll help you remove the extra "Favorite Roasters" sub-heading from the favorites page. Let me first examine the current favorites page structure to understand what needs to be changed.
+
+Searched codebase for "favorites page component Favorite Roasters heading", 11 results
+
+✔ Read `page.tsx`, lines 120 to 170
+
+Perfect! I found the extra "Favorite Roasters" sub-heading. Based on the image you shared, there's both a main title "Your Favorites" at the top and then an extra "Favorite Roasters" heading (line 161) that appears redundant since the page is already clearly about favorites. Let me remove this sub-heading:
+
+`page.tsx +0 -1`
+
+Now let me restart the client container to apply the changes:
+
+✔ `docker-compose restart client`
+
+## Perfect! I've successfully removed the extra "Favorite Roasters" sub-heading from the favorites page. The page now has:
+
+1. **Main title**: "Your Favorites" at the top
+2. **Subtitle**: "Keep track of your favorite roasters."
+3. **Content**: The roasters grid directly without the redundant sub-heading
+
+The change removes the unnecessary "Favorite Roasters" heading that was appearing under the main title, making the page cleaner and less redundant. The client container has been restarted so the changes should be visible when you refresh the favorites page.
+
+## 389th try
+
+*(it's gone)*
