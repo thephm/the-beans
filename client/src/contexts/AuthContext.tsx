@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { apiClient } from '@/lib/api'
 
 interface User {
@@ -19,6 +19,7 @@ interface AuthContextType {
   isAuthenticated: boolean
   login: (token: string, user: User) => void
   logout: () => void
+  refreshUser: () => Promise<void>
   loading: boolean
 }
 
@@ -71,11 +72,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     apiClient.clearToken()
   }
 
+  const refreshUser = useCallback(async () => {
+    const token = localStorage.getItem('token')
+    if (!token) return
+
+    try {
+      const userData = await apiClient.getCurrentUser() as User
+      setUser(userData)
+      localStorage.setItem('user', JSON.stringify(userData))
+    } catch (error) {
+      console.error('Error refreshing user data:', error)
+      // If refresh fails, might be invalid token, so logout
+      logout()
+    }
+  }, [])
+
   const value = {
     user,
     isAuthenticated: !!user,
     login,
     logout,
+    refreshUser,
     loading
   }
 

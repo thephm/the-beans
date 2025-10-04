@@ -304,6 +304,7 @@ router.get('/me', async (req: Request, res: Response) => {
         latitude: true,
         longitude: true,
         language: true,
+        role: true,
         createdAt: true,
       }
     });

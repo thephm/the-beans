@@ -3,6 +3,7 @@ import { body, validationResult, param, query } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { upload, deleteImage } from '../lib/cloudinary';
 import { canEditRoaster } from '../middleware/roasterAuth';
+import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -539,7 +540,7 @@ router.post('/', [
   body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialties').optional().isArray().withMessage('Specialties must be an array'),
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
-], requireAuth, async (req: any, res: any) => {
+], requireAuth, auditBefore('roaster', 'CREATE'), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -571,7 +572,10 @@ router.post('/', [
     delete roasterData.ownerEmail;
 
     const roaster = await prisma.roaster.create({
-      data: roasterData,
+      data: {
+        ...roasterData,
+        createdById: req.userId, // Track who created it
+      },
       include: {
         owner: {
           select: {
@@ -585,6 +589,9 @@ router.post('/', [
       }
     });
 
+    // Store entity for audit logging
+    res.locals.auditEntity = roaster;
+
     res.status(201).json({
       message: 'Roaster created successfully',
       roaster,
@@ -593,7 +600,7 @@ router.post('/', [
     console.error('Create roaster error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 /**
  * @swagger
@@ -677,7 +684,7 @@ router.put('/:id', [
   body('featured').optional().isBoolean().withMessage('Featured must be true or false'),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
-], requireAuth, async (req: any, res: any) => {
+], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -728,7 +735,10 @@ router.put('/:id', [
 
     const roaster = await prisma.roaster.update({
       where: { id },
-      data: updateData,
+      data: {
+        ...updateData,
+        updatedById: req.userId, // Track who updated it
+      },
       include: {
         owner: {
           select: {
@@ -742,6 +752,9 @@ router.put('/:id', [
       }
     });
 
+    // Store entity for audit logging
+    res.locals.auditEntity = roaster;
+
     res.json({
       message: 'Roaster updated successfully',
       roaster,
@@ -753,7 +766,7 @@ router.put('/:id', [
     }
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 /**
  * @swagger
@@ -779,7 +792,7 @@ router.put('/:id', [
  */
 router.delete('/:id', [
   param('id').isString(),
-], requireAuth, async (req: any, res: any) => {
+], requireAuth, auditBefore('roaster', 'DELETE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -798,6 +811,9 @@ router.delete('/:id', [
 
     const { id } = req.params;
 
+    // Store the deleted entity for audit (it's already captured in oldValues)
+    res.locals.auditEntity = req.auditData?.oldValues || { id };
+
     await prisma.roaster.delete({
       where: { id }
     });
@@ -812,7 +828,7 @@ router.delete('/:id', [
     }
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 /**
  * @swagger

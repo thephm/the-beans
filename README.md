@@ -17,7 +17,8 @@ A beautiful, modern full-stack web application for discovering and exploring spe
 - 🌐 **Internationalization**: Full i18n support (English/French)
 - 💜 **Beautiful Design**: Purple-themed UI with lavender, violet, and orchid colors
 - 🔒 **Admin Dashboard**: Complete user and role management (admin only)
-- 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- � **Audit Logging**: Comprehensive activity tracking with geolocation and change history
+- �📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
 - 🐳 **Docker-First**: Containerized development and deployment
 
 ### Architecture
@@ -112,6 +113,7 @@ Comprehensive documentation is maintained in the [`docs/`](./docs/) directory fo
 - 👤 [User Profiles](./docs/profile/README.md)
 - ⚙️ [Settings & Preferences](./docs/settings/README.md)
 - 🛡️ [Admin Dashboard](./docs/admin/README.md)
+- 📊 [Audit Logging](./docs/admin/audit-logging.md)
 
 ## 🏗️ Project Structure
 

@@ -7,6 +7,8 @@
 
 **App Router**: Next.js routing system used in the frontend for page navigation.
 
+**Audit Log**: A comprehensive record of system activities tracking who performed what actions, when they occurred, and from where (including IP geolocation).
+
 **Authentication (Auth)**: The process of verifying user identity, including login, signup, and JWT token management.
 
 **Authorization**: Granting or denying access to resources based on user roles or permissions.
@@ -26,6 +28,8 @@
 **i18n (Internationalization)**: Support for multiple languages (English, French) using i18next.
 
 **JWT (JSON Web Token)**: A token format used for securely transmitting user authentication data between client and server.
+
+**Geolocation**: The process of determining the geographic location (city, country) from an IP address for audit tracking purposes.
 
 **Notification**: A message sent to users about events like new roasters or reviews.
 

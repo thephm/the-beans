@@ -27,7 +27,7 @@
   },
   "auth": {
     "welcomeBack": "Bon retour !",
-    "signInToDiscover": "Connectez-vous pour découvrir un café incroyable",
+    "signInToDiscover": "Connectez-vous pour découvrir un café incroyable.",
     "email": "Adresse e-mail",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
@@ -363,6 +363,48 @@
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
       "deleteConfirm": "Supprimer",
       "deleteCancel": "Annuler"
+    },
+    "auditLogs": {
+      "title": "Journal d'audit",
+      "description": "Suivre tous les changements du système et les activités des utilisateurs",
+      "filters": {
+        "action": "Action",
+        "entityType": "Type d'entité",
+        "userId": "ID utilisateur",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "apply": "Appliquer",
+        "clear": "Effacer",
+        "allActions": "Toutes les actions",
+        "allTypes": "Tous les types"
+      },
+      "table": {
+        "dateTime": "Date et heure",
+        "user": "Utilisateur", 
+        "action": "Action",
+        "entity": "Entité",
+        "location": "Localisation",
+        "changes": "Modifications",
+        "viewChanges": "Voir les modifications",
+        "noChanges": "Aucune modification"
+      },
+      "stats": {
+        "totalLogs": "Total des journaux",
+        "recentLogs": "Derniers 30 jours",
+        "actions": "Actions",
+        "entityTypes": "Types d'entités",
+        "topUsers": "Utilisateurs les plus actifs"
+      },
+      "changeModal": {
+        "title": "Détails des modifications",
+        "date": "Date",
+        "user": "Utilisateur",
+        "ipAddress": "Adresse IP",
+        "location": "Localisation",
+        "fieldChanges": "Modifications des champs",
+        "oldValue": "Ancienne valeur",
+        "newValue": "Nouvelle valeur"
+      }
     }
   },
   "adminForms": {
@@ -414,6 +456,7 @@
   "adminSection": {
     "users": "Utilisateurs",
     "roasters": "Torréfacteurs",
+    "auditLogs": "Journal d'audit",
     "roasters.unverified": "Torréfacteurs Non Vérifiés",
     "roasters.unverified.title": "Torréfacteurs Non Vérifiés",
     "roasters.unverified.description": "Examiner et vérifier les torréfacteurs en attente d'approbation",

@@ -16,7 +16,7 @@
   },
   "auth": {
     "welcomeBack": "Welcome back!",
-    "signInToDiscover": "Sign in to discover amazing coffee",
+    "signInToDiscover": "Sign in to discover amazing coffee.",
     "email": "Email address",
     "password": "Password",
     "confirmPassword": "Confirm password",
@@ -364,6 +364,48 @@
       "confirmDelete": "Are you sure you want to delete this user?",
       "deleteConfirm": "Delete",
       "deleteCancel": "Cancel"
+    },
+    "auditLogs": {
+      "title": "Audit Logs",
+      "description": "Track all system changes and user activities",
+      "filters": {
+        "action": "Action",
+        "entityType": "Entity Type",
+        "userId": "User ID",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "apply": "Apply",
+        "clear": "Clear",
+        "allActions": "All Actions",
+        "allTypes": "All Types"
+      },
+      "table": {
+        "dateTime": "Date & Time",
+        "user": "User", 
+        "action": "Action",
+        "entity": "Entity",
+        "location": "Location",
+        "changes": "Changes",
+        "viewChanges": "View Changes",
+        "noChanges": "No changes"
+      },
+      "stats": {
+        "totalLogs": "Total Logs",
+        "recentLogs": "Last 30 Days",
+        "actions": "Actions",
+        "entityTypes": "Entity Types",
+        "topUsers": "Top Users"
+      },
+      "changeModal": {
+        "title": "Changes Details",
+        "date": "Date",
+        "user": "User",
+        "ipAddress": "IP Address",
+        "location": "Location",
+        "fieldChanges": "Field Changes",
+        "oldValue": "Old Value",
+        "newValue": "New Value"
+      }
     }
   },
   "adminForms": {
@@ -415,6 +457,7 @@
   "adminSection": {
     "users": "Users",
     "roasters": "Roasters",
+    "auditLogs": "Audit Logs",
     "roasters.unverified": "Unverified Roasters",
     "roasters.unverified.title": "Unverified Roasters",
     "roasters.unverified.description": "Review and verify roasters waiting for approval",

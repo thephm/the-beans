@@ -32,6 +32,7 @@ The Beans is a full-stack web application for discovering, reviewing, and managi
 
 #### Administrative Features  
 - 🛡️ [**Admin Dashboard**](./admin/README.md) - User management and system administration
+- 📊 [**Audit Logging**](./admin/audit-logging.md) - Comprehensive activity tracking and monitoring
 
 ## 🐳 Development Notes
 

@@ -41,14 +41,17 @@ Create a beautiful, user-friendly platform where coffee lovers can:
 ### 🔒 **Secure & Professional**
 - RESTful API with comprehensive Swagger documentation
 - JWT authentication with secure password hashing
+- Comprehensive audit logging with IP geolocation tracking
 - Input validation and sanitization
 - Rate limiting and security headers
 - CORS configuration
+- Admin dashboard with activity monitoring
 
 ### 📊 **Database Schema**
 Complete database design with:
 - Users, Roasters, Reviews, Comments
 - Favorites system, Notifications
+- Comprehensive Audit Logging with geolocation tracking
 - Geolocation support for proximity search
 - Flexible JSON fields for hours and metadata
 

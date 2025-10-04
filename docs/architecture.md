@@ -105,24 +105,32 @@ src/routes/
 ### Data Model Relationships
 ```
 User (1:many)
-├── Roaster (owns)
-├── Review (creates)
+├── Roaster (owns/creates/updates)
+├── Review (creates/updates)
 ├── Favorite (has)
-└── Notification (receives)
+├── Notification (receives)
+└── AuditLog (performs actions)
 
 Roaster (1:many)
 ├── Review (receives)
 ├── Favorite (in)
-└── Comment (has)
+├── Comment (has)
+├── CreatedBy (User audit)
+└── UpdatedBy (User audit)
+
+AuditLog (many:1)
+└── User (performed by)
 ```
 
 ### Key Models (`prisma/schema.prisma`)
 - **User**: Authentication, profiles, role-based access
-- **Roaster**: Coffee shop data, location, specialties
-- **Review**: User ratings and feedback
+- **Roaster**: Coffee shop data, location, specialties (with audit tracking)
+- **Review**: User ratings and feedback (with audit tracking)
+- **Bean**: Coffee product information (with audit tracking)
 - **Favorite**: User's saved roasters
 - **Notification**: System and user notifications
 - **Comment**: Community discussions
+- **AuditLog**: Comprehensive activity tracking with geolocation
 
 ## 🐳 DevOps & Deployment
 
@@ -158,6 +166,80 @@ Staging:      Railway/Render (environment variables)
 Production:   Railway/Render + Docker (secure env vars)
 ```
 
+## 📊 Audit Logging System
+
+### Overview
+Comprehensive audit trail system that tracks all system changes with detailed metadata for compliance, security, and debugging.
+
+### Features
+- **Who**: User identification with profile links
+- **What**: Entity-level tracking (roasters, reviews, beans, users)
+- **When**: Precise timestamps (YYYY-MM-DD HH:MM:SS)
+- **Where**: IP geolocation (city, country) via ipapi.co
+- **How**: Field-level change detection with before/after values
+
+### Architecture Components
+
+#### Backend Infrastructure
+```
+AuditService (auditService.ts)
+├── IP Geolocation (with caching)
+├── Change Detection (field-level)
+├── Async Logging (non-blocking)
+└── Error Isolation (audit failures don't break operations)
+
+AuditMiddleware (auditMiddleware.ts)  
+├── Pre-operation capture (old values)
+├── Post-operation logging (new values)
+├── Route-level integration
+└── Flexible entity support
+
+Admin API Routes (/api/admin/audit-logs)
+├── Paginated log retrieval
+├── Advanced filtering
+├── Statistics dashboard
+└── Individual log details
+```
+
+#### Database Schema
+```sql
+AuditLog {
+  action:      CREATE | UPDATE | DELETE
+  entityType:  roaster | review | bean | user
+  entityId:    UUID of affected record
+  entityName:  Display name for UI
+  changes:     JSON field-level diff {field: {old, new}}
+  ipAddress:   Client IP (with proxy detection)
+  userAgent:   Browser/client information  
+  city:        Geolocation city
+  country:     Geolocation country
+  userId:      User who performed action
+  createdAt:   Precise timestamp
+}
+
+// Enhanced entity models with audit tracking
+Roaster/Review/Bean {
+  createdById: UUID  // Who created
+  updatedById: UUID  // Who last updated
+  // ... existing fields
+}
+```
+
+#### Frontend Admin Interface
+- **Dashboard**: Activity statistics and trends
+- **Filtering**: By user, action, entity, date range
+- **Change Viewer**: Side-by-side old/new value comparison
+- **Navigation**: Integrated into admin dropdown menu
+- **Internationalization**: English/French translations
+
+### Security & Performance
+- **Access Control**: Admin-only access to audit logs
+- **IP Detection**: Handles proxies and load balancers
+- **Geolocation Caching**: Reduces API calls for repeated IPs  
+- **Async Processing**: Audit logging never blocks main operations
+- **Database Indexing**: Optimized queries on common filters
+- **Error Handling**: Robust error isolation and logging
+
 ## 📁 Detailed Project Structure
 
 ```
@@ -183,8 +265,11 @@ the-beans/
 ├── 🔧 server/                   # Express.js Backend
 │   ├── src/
 │   │   ├── routes/             # RESTful API endpoints
+│   │   │   └── auditLogs.ts   # Admin audit log API
 │   │   ├── middleware/         # Auth, validation, error handling
+│   │   │   └── auditMiddleware.ts # Audit logging middleware
 │   │   └── lib/               # Server utilities
+│   │       └── auditService.ts # Audit logging service
 │   ├── prisma/
 │   │   ├── schema.prisma      # Database schema definition
 │   │   ├── migrations/        # Database version control

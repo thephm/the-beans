@@ -50,11 +50,15 @@ export interface Roaster {
   reviewCount: number;
   createdAt: string;
   updatedAt: string;
+  createdById?: string;
+  updatedById?: string;
   owner?: User;
   beans?: Bean[];
   reviews?: Review[];
   roasterImages?: RoasterImage[];
   isFavorited?: boolean;
+  createdBy?: User;
+  updatedBy?: User;
 }
 
 export interface Bean {
@@ -70,7 +74,11 @@ export interface Bean {
   availability: boolean;
   createdAt: string;
   updatedAt: string;
+  createdById?: string;
+  updatedById?: string;
   roaster?: Roaster;
+  createdBy?: User;
+  updatedBy?: User;
 }
 
 export interface Review {
@@ -82,9 +90,13 @@ export interface Review {
   helpful: number;
   createdAt: string;
   updatedAt: string;
+  createdById?: string;
+  updatedById?: string;
   user?: User;
   roaster?: Roaster;
   comments?: Comment[];
+  createdBy?: User;
+  updatedBy?: User;
 }
 
 export interface Comment {
@@ -139,4 +151,37 @@ export interface SearchFilters {
   latitude?: number;
   longitude?: number;
   radius?: number;
+}
+
+export interface AuditLog {
+  id: string;
+  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  entityType: string;
+  entityId: string;
+  entityName?: string;
+  changes?: Record<string, { old: any; new: any }>;
+  ipAddress?: string;
+  userAgent?: string;
+  city?: string;
+  country?: string;
+  createdAt: string;
+  user: User;
+}
+
+export interface AuditLogFilters {
+  page?: number;
+  limit?: number;
+  action?: 'CREATE' | 'UPDATE' | 'DELETE';
+  entityType?: string;
+  userId?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface AuditLogStats {
+  totalLogs: number;
+  recentLogs: number;
+  actionStats: Array<{ action: string; count: number }>;
+  entityTypeStats: Array<{ entityType: string; count: number }>;
+  topUsers: Array<{ user: User; count: number }>;
 }
