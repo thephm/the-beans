@@ -370,6 +370,8 @@
       "basicInformation": "Informations de Base",
       "name": "Nom",
       "description": "Description",
+      "ownerEmail": "E-mail du propriétaire",
+      "ownerEmailPlaceholder": "Laisser vide pour aucun propriétaire",
       "email": "E-mail",
       "phone": "Téléphone",
       "website": "Site web",
