@@ -92,7 +92,8 @@ export default function SettingsPage() {
               {t('settings.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {t('settings.description')}
+              <span className="sm:hidden">{t('settings.descriptionMobile')}</span>
+              <span className="hidden sm:inline">{t('settings.description')}</span>
             </p>
           </div>
 

@@ -172,7 +172,8 @@
   "settings": {
     "title": "Paramètres",
     "subtitle": "Gérez vos préférences et les paramètres de votre compte",
-    "description": "Personnalisez votre expérience de découverte de café",
+    "description": "Personnalisez votre expérience de découverte de café.",
+    "descriptionMobile": "Personnalisez votre expérience.",
     "language": "Langue",
     "selectLanguage": "Sélectionner la langue",
     "notifications": "Notifications",

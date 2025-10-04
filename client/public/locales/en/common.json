@@ -161,7 +161,8 @@
   "settings": {
     "title": "Settings",
     "subtitle": "Manage your preferences and account settings",
-    "description": "Customize your coffee discovery experience",
+    "description": "Customize your coffee discovery experience.",
+    "descriptionMobile": "Customize your experience.",
     "language": "Language",
     "selectLanguage": "Select Language",
     "notifications": "Notifications",
