@@ -538,6 +538,7 @@ router.post('/', [
   body('latitude').optional().isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
   body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialties').optional().isArray().withMessage('Specialties must be an array'),
+  body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
 ], requireAuth, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -545,10 +546,29 @@ router.post('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    let ownerId = req.userId; // Default to current user
+    
+    // If ownerEmail is provided, find the owner by email
+    if (req.body.ownerEmail && req.body.ownerEmail.trim() !== '') {
+      const ownerUser = await prisma.user.findUnique({
+        where: { email: req.body.ownerEmail },
+        select: { id: true }
+      });
+      
+      if (!ownerUser) {
+        return res.status(400).json({ error: 'Owner email not found. User must be registered first.' });
+      }
+      
+      ownerId = ownerUser.id;
+    }
+
     const roasterData = {
       ...req.body,
-      ownerId: req.userId,
+      ownerId: ownerId,
     };
+    
+    // Remove ownerEmail from data as it's not part of the schema
+    delete roasterData.ownerEmail;
 
     const roaster = await prisma.roaster.create({
       data: roasterData,
@@ -559,6 +579,7 @@ router.post('/', [
             username: true,
             firstName: true,
             lastName: true,
+            email: true,
           }
         }
       }
@@ -655,6 +676,7 @@ router.put('/:id', [
   body('verified').optional().isBoolean().withMessage('Verified must be true or false'),
   body('featured').optional().isBoolean().withMessage('Featured must be true or false'),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
+  body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
 ], requireAuth, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -675,6 +697,28 @@ router.put('/:id', [
     const { id } = req.params;
     const updateData = { ...req.body };
 
+    // Handle ownerEmail if provided
+    if (updateData.ownerEmail !== undefined) {
+      if (updateData.ownerEmail && updateData.ownerEmail.trim() !== '') {
+        const ownerUser = await prisma.user.findUnique({
+          where: { email: updateData.ownerEmail },
+          select: { id: true }
+        });
+        
+        if (!ownerUser) {
+          return res.status(400).json({ error: 'Owner email not found. User must be registered first.' });
+        }
+        
+        updateData.ownerId = ownerUser.id;
+      } else {
+        // If ownerEmail is empty, set ownerId to null (no owner)
+        updateData.ownerId = null;
+      }
+      
+      // Remove ownerEmail from data as it's not part of the schema
+      delete updateData.ownerEmail;
+    }
+
     // Remove undefined values
     Object.keys(updateData).forEach(key => {
       if (updateData[key] === undefined) {
@@ -692,6 +736,7 @@ router.put('/:id', [
             username: true,
             firstName: true,
             lastName: true,
+            email: true,
           }
         }
       }
