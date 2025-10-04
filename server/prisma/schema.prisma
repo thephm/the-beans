@@ -44,6 +44,15 @@ model User {
   notifications Notification[]
   comments     Comment[]
   uploadedImages RoasterImage[]
+  
+  // Audit relationships
+  createdRoasters Roaster[] @relation("RoasterCreatedBy")
+  updatedRoasters Roaster[] @relation("RoasterUpdatedBy")
+  createdReviews  Review[]  @relation("ReviewCreatedBy")
+  updatedReviews  Review[]  @relation("ReviewUpdatedBy")
+  createdBeans    Bean[]    @relation("BeanCreatedBy")
+  updatedBeans    Bean[]    @relation("BeanUpdatedBy")
+  auditLogs       AuditLog[]
 
   @@map("users")
 }
@@ -73,6 +82,10 @@ model Roaster {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Audit tracking
+  createdById String?
+  updatedById String?
+
   // Relationships
   owner    User?    @relation(fields: [ownerId], references: [id])
   ownerId  String?
@@ -80,6 +93,10 @@ model Roaster {
   favorites Favorite[]
   beans    Bean[]
   roasterImages RoasterImage[]
+  
+  // Audit relationships
+  createdBy User? @relation("RoasterCreatedBy", fields: [createdById], references: [id])
+  updatedBy User? @relation("RoasterUpdatedBy", fields: [updatedById], references: [id])
 
   @@unique([name])
   @@map("roasters")
@@ -118,9 +135,17 @@ model Bean {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Audit tracking
+  createdById String?
+  updatedById String?
+
   // Relationships
   roaster   Roaster @relation(fields: [roasterId], references: [id])
   roasterId String
+  
+  // Audit relationships
+  createdBy User? @relation("BeanCreatedBy", fields: [createdById], references: [id])
+  updatedBy User? @relation("BeanUpdatedBy", fields: [updatedById], references: [id])
 
   @@map("beans")
 }
@@ -135,12 +160,20 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Audit tracking
+  createdById String?
+  updatedById String?
+
   // Relationships
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   roaster   Roaster? @relation(fields: [roasterId], references: [id])
   roasterId String?
   comments  Comment[]
+  
+  // Audit relationships
+  createdBy User? @relation("ReviewCreatedBy", fields: [createdById], references: [id])
+  updatedBy User? @relation("ReviewUpdatedBy", fields: [updatedById], references: [id])
 
   @@map("reviews")
 }
@@ -188,4 +221,27 @@ model Notification {
   userId String
 
   @@map("notifications")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // CREATE, UPDATE, DELETE
+  entityType  String   // roaster, review, bean, user, etc.
+  entityId    String   // ID of the affected entity
+  entityName  String?  // Display name for the entity (e.g., roaster name)
+  changes     Json?    // Field-level changes: { "field": { "old": "value", "new": "value" } }
+  ipAddress   String?  // IP address of the user
+  userAgent   String?  // Browser/client information
+  city        String?  // Geolocation city
+  country     String?  // Geolocation country
+  createdAt   DateTime @default(now())
+
+  // Relationships
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

@@ -13,6 +13,7 @@ import userRoutes from './routes/users';
 import roasterRoutes from './routes/roasters';
 import reviewRoutes from './routes/reviews';
 import searchRoutes from './routes/search';
+import auditLogRoutes from './routes/auditLogs';
 
 // Load environment variables
 dotenv.config();
@@ -30,7 +31,7 @@ const generalLimiter = rateLimit({
 // Stricter rate limiting for auth endpoints only
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // limit auth attempts
+  max: 200, // increased temporarily for development
   message: 'Too many authentication attempts, please try again later.',
 });
 
@@ -133,6 +134,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/roasters', roasterRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

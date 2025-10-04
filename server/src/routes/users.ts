@@ -4,6 +4,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
+import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -12,7 +13,7 @@ const prisma = new PrismaClient();
 // Update user language preference (any authenticated user can update their own language)
 router.put('/language', [
   body('language').isLength({ min: 2, max: 5 }).withMessage('Language code must be 2-5 characters'),
-], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+], requireAuth, auditBefore('user', 'UPDATE'), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -20,13 +21,23 @@ router.put('/language', [
     }
 
     const userId = req.user?.id;
+    req.userId = userId; // Set for audit middleware
     const { language } = req.body;
 
+    // Capture old values for audit
+    const oldUser = await prisma.user.findUnique({ where: { id: userId } });
+    req.auditData.oldValues = oldUser;
+    console.log('Language update - audit setup:', { userId, hasAuditData: !!req.auditData, hasOldUser: !!oldUser });
+
     // Update user language in database
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { language }
     });
+
+    // Store entity for audit logging
+    res.locals.auditEntity = updatedUser;
+    console.log('Language update - storing entity:', { entityId: updatedUser.id, language: updatedUser.language });
 
     res.json({ 
       message: 'Language preference updated successfully',
@@ -36,18 +47,27 @@ router.put('/language', [
     console.error('Error updating language preference:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 // Update user settings
-router.put('/settings', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/settings', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, res: any) => {
   try {
     const userId = req.user?.id;
+    req.userId = userId; // Set for audit middleware
     const settings = req.body;
+
+    // Capture old values for audit
+    const oldUser = await prisma.user.findUnique({ where: { id: userId } });
+    req.auditData.oldValues = oldUser;
     // Persist settings to database
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { settings } as any
     });
+
+    // Store entity for audit logging
+    res.locals.auditEntity = updatedUser;
+
     res.json({ 
       success: true, 
       message: 'Settings updated successfully',
@@ -57,31 +77,48 @@ router.put('/settings', requireAuth, async (req: AuthenticatedRequest, res: Resp
     console.error('Error updating user settings:', error);
     res.status(500).json({ error: 'Failed to update settings' });
   }
-});
+}, auditAfter());
 
 // Admin: Update a user (role, language, etc.)
-router.put('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, res: any) => {
   try {
+    req.userId = req.user?.id; // Set for audit middleware
     const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
     const { id } = req.params;
+    
+    // Capture old values for audit
+    const oldUser = await prisma.user.findUnique({ where: { id } });
+    req.auditData.oldValues = oldUser;
+    console.log('Admin update - audit setup:', { adminId: req.userId, targetUserId: id, hasOldUser: !!oldUser });
+    
     const { role, language, firstName, lastName } = req.body;
     const updated = await prisma.user.update({
       where: { id },
       data: { role, language, firstName, lastName },
     });
+
+    // Store entity for audit logging
+    res.locals.auditEntity = updated;
+    console.log('Admin update - stored entity for audit:', { entityId: updated.id, hasEntity: !!res.locals.auditEntity });
+
+    // Call audit logging directly since middleware doesn't run after response
+    const auditMiddleware = auditAfter();
+    await auditMiddleware(req, res, () => {});
+
     res.json({ success: true, user: updated });
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ error: 'Failed to update user' });
   }
-});
+}, auditAfter());
 
 // Admin: Delete a user
-router.delete('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/:id', requireAuth, auditBefore('user', 'DELETE'), captureOldValues(prisma.user), async (req: any, res: any) => {
   try {
+    req.userId = req.user?.id; // Set for audit middleware
     const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
@@ -93,7 +130,7 @@ router.delete('/:id', requireAuth, async (req: AuthenticatedRequest, res: Respon
     console.error('Error deleting user:', error);
     res.status(500).json({ error: 'Failed to delete user' });
   }
-});
+}, auditAfter());
 
 // Get user settings
 router.get('/settings', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
