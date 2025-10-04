@@ -240,9 +240,8 @@ export default function DiscoverPage() {
                               search: translateSpecialty(specialty)
                             }))
                           }}
-                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer flex items-center gap-1"
+                          className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                         >
-                          <Coffee sx={{ fontSize: 14 }} />
                           {translateSpecialty(specialty)}
                         </button>
                       ))}

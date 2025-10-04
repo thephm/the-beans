@@ -274,9 +274,8 @@ export default function RoasterDetail() {
                       <Link
                         key={specialty}
                         href={`/discover?specialty=${encodeURIComponent(specialty)}`}
-                        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer flex items-center gap-2"
+                        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                       >
-                        <Coffee sx={{ fontSize: 16 }} />
                         {translateSpecialty(specialty)}
                       </Link>
                     ))}

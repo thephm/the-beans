@@ -54537,3 +54537,61 @@ Now let me restart the client container to apply the translation changes:
 
 The changes have been applied to both translation files and the client container has been restarted. The favorites page subtitle will now properly end with a period in both English and French!
 
+## Remove the coffee icons in the specialty pills #114
+
+I'll help you remove the coffee icons from the specialty pills. Let me first search for where these specialty pills are implemented in the codebase.
+
+Searched codebase for "specialty pills coffee icons", 26 results
+
+Now let me search for specialty pills specifically to find where they are implemented:
+
+✔ Searched text for `Coffee.*fontSize.*14` (`**/.tsx`), 1 result
+
+Perfect! I found where the coffee icons are in the specialty pills. Let me look at that specific section of the discover page:
+
+✔ Read `page.tsx`, lines 240 to 260
+
+Now let me check for other places where specialty pills might have coffee icons. Let me search for other instances of Coffee icons with specialty:
+
+✔ Searched text for `Coffee.*sx.*fontSize` (`**/*.tsx`), 13 results
+
+
+I can see there are Coffee icons on the roaster detail page (line 279) with fontSize 16. Let me check both places - the discover page (already found) and the roaster detail page:
+
+✔ Read `page.tsx`, lines 275 to 285
+
+Let me also check if there are coffee icons in the FeaturedRoasters component for specialty pills:
+
+✔ Searched text for `Coffee` (`**/FeaturedRoasters.tsx`), 1 result
+
+Let me check around line 170-190 in FeaturedRoasters to see the specialty pills:
+
+✔ Read `FeaturedRoasters.tsx`, lines 165 to 195
+
+Great! Now I can see there are no Coffee icons in the FeaturedRoasters specialty pills, but there are Coffee icons in:
+
+1. **Discover page** (line 245): In the roaster card specialty pills
+2. **Roaster detail page** (line 279): In the specialty pills section
+
+Let me now remove these Coffee icons from both locations:
+
+`page.tsx +1 -2`
+`page.tsx +1 -2`
+
+Now I need to restart the client container to apply the changes:
+
+`docker-compose restart client`
+
+## Perfect! I've successfully removed the coffee icons from the specialty pills in two locations:
+
+1. **Discover page**: Removed the `<Coffee sx={{ fontSize: 14 }} />` icon from roaster card specialty pills
+2. **Roaster detail page**: Removed the `<Coffee sx={{ fontSize: 16 }} />` icon from the specialty section pills
+
+The changes also removed the unnecessary styling classes that were used for icon spacing:
+
+- Removed `flex items-center gap-1` from discover page pills
+- Removed `flex items-center gap-2` from roaster detail page pills
+
+The specialty pills will now display just the text without the coffee icons, maintaining their pill styling and clickable functionality. The client container has been restarted, so the changes should be visible immediately when you refresh the application.
+
+C
