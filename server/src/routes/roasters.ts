@@ -969,7 +969,7 @@ router.get('/admin/unverified', [
  */
 router.patch('/:id/verify', [
   param('id').isString(),
-], requireAuth, async (req: any, res: any) => {
+], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1003,6 +1003,9 @@ router.patch('/:id/verify', [
       }
     });
 
+    // Store entity for audit logging
+    res.locals.auditEntity = roaster;
+
     res.json({
       message: 'Roaster verified successfully',
       roaster,
@@ -1014,7 +1017,7 @@ router.patch('/:id/verify', [
     }
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 // Helper function to calculate distance between two points
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -1157,7 +1160,7 @@ router.get('/:id/images', [
  */
 router.post('/:id/images', [
   param('id').isString(),
-], requireAuth, canEditRoaster, upload.array('images', 10), async (req: any, res: any) => {
+], requireAuth, auditBefore('roaster_image', 'CREATE'), canEditRoaster, upload.array('images', 10), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1235,6 +1238,9 @@ router.post('/:id/images', [
       }
     });
 
+    // Store entity for audit logging
+    res.locals.auditEntity = createdImages.length > 0 ? createdImages[0] : null;
+
     res.status(201).json({
       message: 'Images uploaded successfully',
       images: createdImages.map(img => ({
@@ -1250,7 +1256,7 @@ router.post('/:id/images', [
     console.error('Upload roaster images error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 /**
  * @swagger
@@ -1297,7 +1303,7 @@ router.put('/:id/images/:imageId', [
   param('imageId').isString(),
   body('description').optional().isString(),
   body('isPrimary').optional().isBoolean(),
-], requireAuth, canEditRoaster, async (req: any, res: any) => {
+], requireAuth, auditBefore('roaster_image', 'UPDATE'), captureOldValues(prisma.roasterImage, 'imageId'), canEditRoaster, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1352,6 +1358,9 @@ router.put('/:id/images/:imageId', [
       }
     });
 
+    // Store entity for audit logging
+    res.locals.auditEntity = updatedImage;
+
     res.json({
       message: 'Image updated successfully',
       image: {
@@ -1367,7 +1376,7 @@ router.put('/:id/images/:imageId', [
     console.error('Update roaster image error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 /**
  * @swagger
@@ -1401,7 +1410,7 @@ router.put('/:id/images/:imageId', [
 router.delete('/:id/images/:imageId', [
   param('id').isString(),
   param('imageId').isString(),
-], requireAuth, canEditRoaster, async (req: any, res: any) => {
+], requireAuth, auditBefore('roaster_image', 'DELETE'), captureOldValues(prisma.roasterImage, 'imageId'), canEditRoaster, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1447,6 +1456,9 @@ router.delete('/:id/images/:imageId', [
       }
     });
 
+    // Store entity for audit logging (use captured old values)
+    res.locals.auditEntity = req.auditData?.oldValues || { id: imageId };
+
     res.json({
       message: 'Image deleted successfully',
     });
@@ -1454,7 +1466,7 @@ router.delete('/:id/images/:imageId', [
     console.error('Delete roaster image error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+}, auditAfter());
 
 export default router;
 // trigger restart

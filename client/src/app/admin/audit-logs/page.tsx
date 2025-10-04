@@ -401,8 +401,9 @@ export default function AuditLogsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div>
-                      {log.city && log.country ? `${log.city}, ${log.country}` : 
-                       log.city || log.country || 'Unknown'}
+                      {log.city && log.country && log.city !== 'Unknown' && log.country !== 'Unknown' ? 
+                        `${log.city}, ${log.country}` : 
+                        (log.city && log.city !== 'Unknown') || (log.country && log.country !== 'Unknown') || 'Unknown'}
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -482,7 +483,7 @@ export default function AuditLogsPage() {
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
-                  Changes Details - {selectedLog.entityType} {selectedLog.action}
+                  Changes {selectedLog.action} {selectedLog.entityType}
                 </h3>
                 <button
                   onClick={() => setSelectedLog(null)}
@@ -499,39 +500,54 @@ export default function AuditLogsPage() {
                   <div><span className="font-semibold">Date:</span> {formatDate(selectedLog.createdAt)}</div>
                   <div><span className="font-semibold">User:</span> {selectedLog.user.username}</div>
                   <div><span className="font-semibold">IP Address:</span> {selectedLog.ipAddress || 'Unknown'}</div>
-                  <div><span className="font-semibold">Location:</span> {selectedLog.city}, {selectedLog.country}</div>
+                  <div><span className="font-semibold">Location:</span> {selectedLog.city && selectedLog.country && selectedLog.city !== 'Unknown' && selectedLog.country !== 'Unknown' ? `${selectedLog.city}, ${selectedLog.country}` : (selectedLog.city && selectedLog.city !== 'Unknown') || (selectedLog.country && selectedLog.country !== 'Unknown') || 'Unknown'}</div>
                 </div>
               </div>
 
               {selectedLog.changes && (
                 <div className="max-h-96 overflow-y-auto">
-                  <h4 className="text-md font-semibold text-gray-800 mb-2">Field Changes:</h4>
-                  <div className="space-y-3">
+                  <h4 className="text-md font-semibold text-gray-800 mb-2">
+                    {selectedLog.action === 'CREATE' ? 'Field values:' : 'Field Changes:'}
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {Object.entries(selectedLog.changes).map(([field, change]) => (
                       <div key={field} className="border rounded p-3">
-                        <div className="font-semibold text-sm text-gray-700 mb-2 capitalize">
+                        <div className={`font-semibold text-sm mb-2 capitalize ${
+                          selectedLog.action === 'CREATE' ? 'text-blue-600' : 'text-gray-700'
+                        }`}>
                           {field.replace(/([A-Z])/g, ' $1').trim()}
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div>
-                            <span className="text-red-600 font-medium">Old Value:</span>
-                            <div className="mt-1 p-2 bg-red-50 border border-red-200 rounded">
-                              {typeof change.old === 'object' ? 
-                                JSON.stringify(change.old, null, 2) : 
-                                String(change.old || 'null')
-                              }
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-green-600 font-medium">New Value:</span>
-                            <div className="mt-1 p-2 bg-green-50 border border-green-200 rounded">
+                        {selectedLog.action === 'CREATE' ? (
+                          <div className="text-sm">
+                            <div className="p-2 bg-blue-50 border border-blue-200 rounded">
                               {typeof change.new === 'object' ? 
                                 JSON.stringify(change.new, null, 2) : 
-                                String(change.new || 'null')
+                                String(change.new || '')
                               }
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="text-sm">
+                            <div className="grid grid-cols-2 gap-2 mb-1">
+                              <span className="text-red-600 font-medium">Old Value:</span>
+                              <span className="text-green-600 font-medium">New Value:</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="p-2 bg-red-50 border border-red-200 rounded">
+                                {typeof change.old === 'object' ? 
+                                  JSON.stringify(change.old, null, 2) : 
+                                  String(change.old || 'null')
+                                }
+                              </div>
+                              <div className="p-2 bg-green-50 border border-green-200 rounded">
+                                {typeof change.new === 'object' ? 
+                                  JSON.stringify(change.new, null, 2) : 
+                                  String(change.new || 'null')
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
