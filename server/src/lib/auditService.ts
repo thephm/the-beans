@@ -16,8 +16,8 @@ export interface AuditLogData {
 }
 
 interface GeolocationData {
-  city?: string;
-  country?: string;
+  city?: string | null;
+  country?: string | null;
 }
 
 // Cache for IP geolocation to avoid excessive API calls
@@ -46,8 +46,8 @@ async function getGeolocation(ipAddress: string): Promise<GeolocationData> {
     });
 
     const data: GeolocationData = {
-      city: response.data.city || 'Unknown',
-      country: response.data.country_name || 'Unknown'
+      city: response.data.city || null,
+      country: response.data.country_name || null
     };
 
     // Cache the result
@@ -56,7 +56,7 @@ async function getGeolocation(ipAddress: string): Promise<GeolocationData> {
     return data;
   } catch (error) {
     console.error('Geolocation lookup failed:', error);
-    const fallback = { city: 'Unknown', country: 'Unknown' };
+    const fallback = { city: null, country: null };
     geoCache.set(ipAddress, fallback);
     return fallback;
   }
@@ -125,8 +125,44 @@ export async function createAuditLog(data: AuditLogData): Promise<void> {
       }
     }
 
+    // For CREATE actions, show new values (excluding sensitive fields)
+    if (data.action === 'CREATE' && data.newValues) {
+      const createChanges: Record<string, any> = {};
+      const sensitiveFields = ['password', 'hashedPassword', 'token', 'secret', 'createdAt', 'updatedAt'];
+      
+      // Define field order for better presentation
+      const fieldOrder = ['id', 'language', 'firstName', 'lastName', 'username', 'email'];
+      const otherFields: string[] = [];
+      
+      // First, collect all field names and separate ordered from others
+      if (data.newValues) {
+        Object.keys(data.newValues).forEach(key => {
+          if (!sensitiveFields.includes(key) && data.newValues![key] !== undefined && data.newValues![key] !== null) {
+            if (!fieldOrder.includes(key)) {
+              otherFields.push(key);
+            }
+          }
+        });
+        
+        // Add fields in the specified order, then any remaining fields
+        [...fieldOrder, ...otherFields].forEach(key => {
+          const value = data.newValues![key];
+          if (!sensitiveFields.includes(key) && value !== undefined && value !== null) {
+            createChanges[key] = {
+              old: null,
+              new: value
+            };
+          }
+        });
+      }
+      
+      if (Object.keys(createChanges).length > 0) {
+        changes = createChanges;
+      }
+    }
+
     // Get geolocation data
-    const geoData = data.ipAddress ? await getGeolocation(data.ipAddress) : { city: 'Unknown', country: 'Unknown' };
+    const geoData = data.ipAddress ? await getGeolocation(data.ipAddress) : { city: null, country: null };
 
     // Create the audit log entry
     await prisma.auditLog.create({

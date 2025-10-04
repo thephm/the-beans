@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
+import { auditBefore, auditAfter } from '../middleware/auditMiddleware';
+import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -102,8 +104,14 @@ router.post('/register', [
   body('password').isLength({ min: 6 }),
   body('firstName').optional().isLength({ min: 1, max: 50 }),
   body('lastName').optional().isLength({ min: 1, max: 50 }),
-], async (req: Request, res: Response) => {
+], async (req: any, res: any) => {
   try {
+    // Set up audit context before validation
+    req.auditData = {
+      entityType: 'user',
+      action: 'CREATE' as const
+    };
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -155,12 +163,36 @@ router.post('/register', [
       }
     });
 
+    // Set up audit logging - use the newly created user ID for audit
+    req.userId = user.id;
+    
+    // Store entity for audit logging
+    res.locals.auditEntity = user;
+
     // Generate JWT token
     const token = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '7d' }
     );
+
+    // Create audit log manually since we need the user ID from the created user
+    if (req.auditData && req.userId) {
+      const auditLogData = {
+        action: req.auditData.action,
+        entityType: req.auditData.entityType,
+        entityId: user.id,
+        entityName: getEntityName(req.auditData.entityType, user),
+        userId: req.userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        oldValues: req.auditData.oldValues,
+        newValues: user
+      };
+      
+      // Create audit log asynchronously (don't block the response)
+      setTimeout(() => createAuditLog(auditLogData), 0);
+    }
 
     res.status(201).json({
       message: 'User created successfully',
