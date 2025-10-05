@@ -118,11 +118,20 @@ const AdminUsersPage: React.FC = () => {
   const cancelDelete = () => setDeletingId(null);
   const doDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete user');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/users/${id}`, { 
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to delete user');
+      }
       setDeletingId(null);
       fetchUsers();
     } catch (err: any) {
+      console.error('Delete user error:', err);
       setError(err.message || 'Unknown error');
     }
   };
