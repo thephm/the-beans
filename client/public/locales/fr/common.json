@@ -541,6 +541,102 @@
     },
     "lastUpdated": "Dernière mise à jour :"
   },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour : octobre 2025",
+    "intro": {
+      "title": "1. Introduction",
+      "description": "The Beans (« nous », « notre » ou « nos ») s'engage à protéger votre vie privée. Cette politique de confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre plateforme de découverte de torréfacteurs de café."
+    },
+    "dataCollection": {
+      "title": "2. Informations que nous collectons",
+      "personal": {
+        "title": "Informations personnelles",
+        "email": "Adresse e-mail (pour la création de compte et la communication)",
+        "username": "Nom d'utilisateur (pour l'identification du profil public)",
+        "profile": "Informations de profil que vous choisissez de fournir",
+        "location": "Données de localisation lors de la recherche de torréfacteurs à proximité"
+      },
+      "usage": {
+        "title": "Informations d'utilisation",
+        "reviews": "Avis, notes et photos que vous soumettez",
+        "favorites": "Torréfacteurs que vous mettez en favoris ou signalez",
+        "interactions": "Vos interactions avec les torréfacteurs et autres utilisateurs",
+        "preferences": "Langue et autres préférences"
+      },
+      "technical": {
+        "title": "Informations techniques",
+        "device": "Informations sur l'appareil et type de navigateur",
+        "ip": "Adresse IP et localisation générale",
+        "cookies": "Cookies et technologies de suivi similaires",
+        "logs": "Données de journalisation et analyses d'utilisation"
+      }
+    },
+    "dataUsage": {
+      "title": "3. Comment nous utilisons vos informations",
+      "intro": "Nous utilisons vos informations pour :",
+      "provide": "Fournir et maintenir notre service de découverte de torréfacteurs",
+      "personalize": "Personnaliser votre expérience et vos recommandations",
+      "communicate": "Communiquer avec vous concernant votre compte et nos services",
+      "improve": "Améliorer notre plateforme et développer de nouvelles fonctionnalités",
+      "security": "Protéger contre la fraude et assurer la sécurité de la plateforme",
+      "legal": "Respecter les obligations légales et résoudre les conflits"
+    },
+    "dataSharing": {
+      "title": "4. Partage et divulgation d'informations",
+      "intro": "Nous ne vendons pas vos informations personnelles. Nous pouvons partager des informations dans les circonstances suivantes :",
+      "public": "Les informations publiques comme les avis et notes sont visibles par les autres utilisateurs",
+      "consent": "Avec votre consentement explicite pour des fins spécifiques",
+      "legal": "Lorsque requis par la loi ou pour protéger nos droits légaux",
+      "business": "En lien avec un transfert d'entreprise ou une acquisition",
+      "aggregated": "Données agrégées et anonymisées pour analyses et recherche"
+    },
+    "cookies": {
+      "title": "5. Cookies et suivi",
+      "description": "Nous utilisons des cookies et technologies similaires pour améliorer votre expérience :",
+      "essential": "Cookies essentiels pour la connexion et la sécurité",
+      "preferences": "Cookies de préférence pour mémoriser vos paramètres",
+      "analytics": "Cookies d'analyse pour comprendre les modèles d'utilisation",
+      "control": "Vous pouvez contrôler les cookies via les paramètres de votre navigateur, bien que certaines fonctionnalités puissent ne pas fonctionner sans certains cookies."
+    },
+    "security": {
+      "title": "6. Sécurité des données",
+      "description": "Nous mettons en place des mesures techniques et organisationnelles appropriées pour protéger vos informations personnelles contre l'accès non autorisé, la modification, la divulgation ou la destruction. Cependant, aucune méthode de transmission sur Internet n'est sécurisée à 100%."
+    },
+    "retention": {
+      "title": "7. Conservation des données",
+      "description": "Nous conservons vos informations personnelles aussi longtemps que nécessaire pour fournir nos services et atteindre les objectifs décrits dans cette politique. Vous pouvez supprimer votre compte à tout moment, après quoi nous supprimerons ou anonymiserons vos données personnelles dans les 30 jours."
+    },
+    "rights": {
+      "title": "8. Vos droits et choix",
+      "intro": "Vous avez les droits suivants concernant vos informations personnelles :",
+      "access": "Accéder et examiner vos données personnelles",
+      "correct": "Corriger les informations inexactes ou incomplètes",
+      "delete": "Demander la suppression de vos données personnelles",
+      "export": "Exporter vos données dans un format portable",
+      "restrict": "Restreindre le traitement de vos informations",
+      "withdraw": "Retirer le consentement lorsque le traitement est basé sur le consentement",
+      "contact": "Pour exercer ces droits, veuillez nous contacter via les paramètres de votre compte ou nous envoyer un e-mail directement."
+    },
+    "international": {
+      "title": "9. Utilisateurs internationaux",
+      "description": "The Beans est basée au Canada. Si vous accédez à notre service depuis l'extérieur du Canada, veuillez noter que vos informations peuvent être transférées, stockées et traitées au Canada où nos serveurs sont situés et notre base de données centrale est exploitée."
+    },
+    "children": {
+      "title": "10. Confidentialité des enfants",
+      "description": "Notre service ne s'adresse pas aux enfants de moins de 13 ans. Nous ne collectons pas sciemment d'informations personnelles d'enfants de moins de 13 ans. Si nous apprenons que nous avons collecté de telles informations, nous les supprimerons immédiatement."
+    },
+    "changes": {
+      "title": "11. Modifications de cette politique",
+      "description": "Nous pouvons mettre à jour cette politique de confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle politique sur cette page et en mettant à jour la date de « Dernière mise à jour ». Nous vous encourageons à consulter cette politique périodiquement."
+    },
+    "contact": {
+      "title": "12. Nous contacter",
+      "description": "Si vous avez des questions sur cette politique de confidentialité ou nos pratiques de confidentialité, veuillez nous contacter :",
+      "email": "E-mail : privacy@thebeans.ca",
+      "platform": "Via le formulaire de contact de notre plateforme"
+    }
+  },
   "terms": {
     "title": "Conditions d'utilisation",
     "lastUpdated": "Dernière mise à jour : octobre 2025",
