@@ -1164,6 +1164,7 @@ router.post('/:id/images', [
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      res.locals.errorMessage = `Validation failed: ${errors.array().map(e => e.msg).join(', ')}`;
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -1240,7 +1241,6 @@ router.post('/:id/images', [
 
     // Store entity for audit logging
     res.locals.auditEntity = createdImages.length > 0 ? createdImages[0] : null;
-
     res.status(201).json({
       message: 'Images uploaded successfully',
       images: createdImages.map(img => ({
@@ -1254,6 +1254,7 @@ router.post('/:id/images', [
     });
   } catch (error) {
     console.error('Upload roaster images error:', error);
+    res.locals.errorMessage = error instanceof Error ? error.message : 'Internal server error';
     res.status(500).json({ error: 'Internal server error' });
   }
 }, auditAfter());

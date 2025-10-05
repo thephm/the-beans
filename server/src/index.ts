@@ -62,22 +62,6 @@ app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded images statically with CORS headers
-app.use('/uploads', (req: Request, res: Response, next: NextFunction) => {
-  const origin = req.headers.origin;
-  if (origin && corsOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  } else if (corsOrigins.length === 1) {
-    res.header('Access-Control-Allow-Origin', corsOrigins[0]);
-  } else {
-    // For multiple origins, set to * for static assets
-    res.header('Access-Control-Allow-Origin', '*');
-  }
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-}, express.static('uploads'));
-
 // Swagger configuration
 const swaggerOptions = {
   definition: {
