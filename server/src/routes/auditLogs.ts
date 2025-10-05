@@ -242,8 +242,8 @@ router.get('/audit-logs/stats',
         })
       ]);
 
-      // Get user details for top users
-      const topUserIds = topUsers.map(u => u.userId);
+      // Get user details for top users (filter out null userIds)
+      const topUserIds = topUsers.map(u => u.userId).filter((id): id is string => id !== null);
       const userDetails = await prisma.user.findMany({
         where: { id: { in: topUserIds } },
         select: {
@@ -255,13 +255,15 @@ router.get('/audit-logs/stats',
         }
       });
 
-      const topUsersWithDetails = topUsers.map(stat => {
-        const user = userDetails.find(u => u.id === stat.userId);
-        return {
-          user,
-          count: stat._count.userId
-        };
-      });
+      const topUsersWithDetails = topUsers
+        .filter(stat => stat.userId !== null)
+        .map(stat => {
+          const user = userDetails.find(u => u.id === stat.userId);
+          return {
+            user,
+            count: stat._count.userId
+          };
+        });
 
       res.json({
         totalLogs,

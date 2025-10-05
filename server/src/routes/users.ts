@@ -5,6 +5,7 @@ import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
+import { createAuditLog } from '../lib/auditService';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -131,18 +132,50 @@ router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, 
 router.delete('/:id', requireAuth, auditBefore('user', 'DELETE'), captureOldValues(prisma.user), async (req: any, res: any) => {
   try {
     req.userId = req.user?.id; // Set for audit middleware
+    console.log('User DELETE - audit setup:', { userId: req.userId, hasAuditData: !!req.auditData, hasOldValues: !!res.locals.oldValues });
+    
     const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
     const { id } = req.params;
+    
+    // Store the user being deleted for audit
+    const userToDelete = await prisma.user.findUnique({ where: { id } });
+    if (userToDelete) {
+      res.locals.auditEntity = {
+        entityName: 'user',
+        entityId: userToDelete.id,
+        entityData: userToDelete
+      };
+    }
+    
     await prisma.user.delete({ where: { id } });
+    
+    // Create audit log manually (same pattern as roasters)
+    if (req.auditData && req.userId) {
+      console.log('Creating user DELETE audit log manually:', { action: 'DELETE', entityId: id, userId: req.userId });
+      await createAuditLog({
+        action: 'DELETE',
+        entityType: 'user',
+        entityId: id,
+        userId: req.userId,
+        oldValues: res.locals.oldValues || userToDelete,
+        newValues: undefined, // DELETE operations have no new values
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      });
+      console.log('User DELETE audit log created successfully');
+    } else {
+      console.log('User DELETE audit log skipped:', { hasAuditData: !!req.auditData, hasUserId: !!req.userId });
+    }
+    
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting user:', error);
     res.status(500).json({ error: 'Failed to delete user' });
   }
-}, auditAfter());
+});
 
 // Get user settings
 router.get('/settings', requireAuth, async (req: AuthenticatedRequest, res: Response) => {

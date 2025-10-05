@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { User } from '../../../../../types';
+import { formatDateToYYYYMMDD, formatDateTimeToYYYYMMDD } from '../../../../../lib/dateUtils';
 
 const ROLES = ['user', 'admin'];
 const LANGUAGES = ['en', 'fr'];
@@ -257,16 +258,16 @@ const EditUserPage: React.FC = () => {
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="text-xs text-gray-400">
               {user.createdBy ? (
-                <>Created by <Link href={`/admin/users/${user.createdBy.id}/edit`} className="text-blue-600 hover:text-blue-800">{user.createdBy.username}</Link> on {new Date(user.createdAt).toISOString().split('T')[0]} at {new Date(user.createdAt).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}.</>
+                <>Created by <Link href={`/admin/users/${user.createdBy.id}/edit`} className="text-blue-600 hover:text-blue-800">{user.createdBy.username}</Link> on {formatDateTimeToYYYYMMDD(user.createdAt)}.</>
               ) : (
-                <>Created on {new Date(user.createdAt).toISOString().split('T')[0]} at {new Date(user.createdAt).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}.</>
+                <>Created on {formatDateTimeToYYYYMMDD(user.createdAt)}.</>
               )}
               {user.updatedAt && (
                 <span>
                   {user.updatedBy ? (
-                    <> Updated by <Link href={`/admin/users/${user.updatedBy.id}/edit`} className="text-blue-600 hover:text-blue-800">{user.updatedBy.username}</Link> on {new Date(user.updatedAt).toISOString().split('T')[0]} at {new Date(user.updatedAt).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}.</>
+                    <> Updated by <Link href={`/admin/users/${user.updatedBy.id}/edit`} className="text-blue-600 hover:text-blue-800">{user.updatedBy.username}</Link> on {formatDateTimeToYYYYMMDD(user.updatedAt)}.</>
                   ) : (
-                    <> Updated on {new Date(user.updatedAt).toISOString().split('T')[0]} at {new Date(user.updatedAt).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}.</>
+                    <> Updated on {formatDateTimeToYYYYMMDD(user.updatedAt)}.</>
                   )}
                 </span>
               )}
@@ -275,18 +276,18 @@ const EditUserPage: React.FC = () => {
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-8">
+        <div className="flex flex-row justify-end gap-3 mt-8">
           <button
             onClick={handleCancel}
             disabled={saving}
-            className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex-1 min-w-0 max-w-[120px]"
           >
             {t('admin.users.cancel', 'Cancel')}
           </button>
           <button
             onClick={saveEdit}
             disabled={saving}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center flex-1 min-w-0 max-w-[120px]"
           >
             {saving ? (
               <>

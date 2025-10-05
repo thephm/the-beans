@@ -177,7 +177,7 @@ export interface AuditLog {
   city?: string;
   country?: string;
   createdAt: string;
-  user: User;
+  user: User | null;
 }
 
 export interface AuditLogFilters {
