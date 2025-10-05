@@ -4,18 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  firstName?: string;
-  lastName?: string;
-  language?: string;
-  role?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import { User } from '../../../../../types';
 
 const ROLES = ['user', 'admin'];
 const LANGUAGES = ['en', 'fr'];
