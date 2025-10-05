@@ -10,7 +10,18 @@ export interface User {
   latitude?: number;
   longitude?: number;
   createdAt: string;
+  updatedAt?: string;
   role?: string;
+  createdById?: string;
+  updatedById?: string;
+  createdBy?: {
+    id: string;
+    username: string;
+  };
+  updatedBy?: {
+    id: string;
+    username: string;
+  };
 }
 
 export interface RoasterImage {

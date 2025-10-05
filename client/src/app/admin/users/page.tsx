@@ -19,8 +19,7 @@ interface User {
   updatedAt?: string;
 }
 
-const ROLES = ['user', 'admin'];
-const LANGUAGES = ['en', 'fr'];
+
 
 const AdminUsersPage: React.FC = () => {
   const { t } = useTranslation();
@@ -28,12 +27,8 @@ const AdminUsersPage: React.FC = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [editData, setEditData] = useState<Partial<User>>({});
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -74,45 +69,7 @@ const AdminUsersPage: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const openEditModal = (user: User) => {
-    setEditingUser(user);
-    setEditData({ 
-      role: user.role, 
-      language: user.language,
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName
-    });
-    setShowEditModal(true);
-  };
 
-  const closeEditModal = () => {
-    setShowEditModal(false);
-    setEditingUser(null);
-    setEditData({});
-  };
-
-  const saveEdit = async () => {
-    if (!editingUser) return;
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/users/${editingUser.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify(editData),
-      });
-      if (!res.ok) throw new Error('Failed to update user');
-      closeEditModal();
-      fetchUsers();
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
-    }
-  };
 
   const confirmDelete = (id: string) => setDeletingId(id);
   const cancelDelete = () => setDeletingId(null);
@@ -192,12 +149,12 @@ const AdminUsersPage: React.FC = () => {
             {/* User Header */}
             <div className="flex justify-between items-start mb-3">
               <div>
-                <button
-                  onClick={() => openEditModal(user)}
+                <Link
+                  href={`/admin/users/${user.id}/edit`}
                   className="text-lg font-semibold text-blue-600 hover:text-blue-800 text-left"
                 >
                   {user.username}
-                </button>
+                </Link>
                 <div className="flex items-center space-x-2 mt-1">
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                     user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
@@ -245,12 +202,12 @@ const AdminUsersPage: React.FC = () => {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => openEditModal(user)}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded"
+              <Link
+                href={`/admin/users/${user.id}/edit`}
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded inline-block text-center"
               >
                 {t('admin.users.edit', 'Edit')}
-              </button>
+              </Link>
               <button
                 onClick={() => confirmDelete(user.id)}
                 className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
@@ -314,12 +271,12 @@ const AdminUsersPage: React.FC = () => {
             {filteredUsers.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="py-3 px-4 text-left">
-                  <button
-                    onClick={() => openEditModal(user)}
+                  <Link
+                    href={`/admin/users/${user.id}/edit`}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
                     {user.username}
-                  </button>
+                  </Link>
                 </td>
                 <td className="py-3 px-4 text-left">
                   <a
@@ -348,12 +305,12 @@ const AdminUsersPage: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-center">
                   <div className="flex justify-center space-x-2">
-                    <button
-                      onClick={() => openEditModal(user)}
-                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded"
+                    <Link
+                      href={`/admin/users/${user.id}/edit`}
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded inline-block text-center"
                     >
                       {t('admin.users.edit', 'Edit')}
-                    </button>
+                    </Link>
                     <button
                       onClick={() => confirmDelete(user.id)}
                       className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
@@ -391,111 +348,7 @@ const AdminUsersPage: React.FC = () => {
         </table>
       </div>
 
-      {/* Edit User Modal */}
-      {showEditModal && editingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-4">
-              {t('admin.users.editUser', 'Edit User')}
-            </h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.users.username', 'Username')}
-                </label>
-                <input
-                  type="text"
-                  value={editData.username || ''}
-                  onChange={(e) => setEditData(prev => ({ ...prev, username: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.users.email', 'Email')}
-                </label>
-                <input
-                  type="email"
-                  value={editData.email || ''}
-                  onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.users.firstName', 'First Name')}
-                </label>
-                <input
-                  type="text"
-                  value={editData.firstName || ''}
-                  onChange={(e) => setEditData(prev => ({ ...prev, firstName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.users.lastName', 'Last Name')}
-                </label>
-                <input
-                  type="text"
-                  value={editData.lastName || ''}
-                  onChange={(e) => setEditData(prev => ({ ...prev, lastName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.users.role', 'Role')}
-                </label>
-                <select
-                  value={editData.role || ''}
-                  onChange={(e) => setEditData(prev => ({ ...prev, role: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {ROLES.map(role => (
-                    <option key={role} value={role}>{role}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.users.language', 'Language')}
-                </label>
-                <select
-                  value={editData.language || ''}
-                  onChange={(e) => setEditData(prev => ({ ...prev, language: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {LANGUAGES.map(lang => (
-                    <option key={lang} value={lang}>{lang.toUpperCase()}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={closeEditModal}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                {t('admin.users.cancel', 'Cancel')}
-              </button>
-              <button
-                onClick={saveEdit}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-              >
-                {t('admin.users.save', 'Save')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

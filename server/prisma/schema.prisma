@@ -36,6 +36,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   settings   Json?
+  
+  // Audit fields
+  createdById String?
+  updatedById String?
 
   // Relationships
   roasters     Roaster[]
@@ -46,6 +50,12 @@ model User {
   uploadedImages RoasterImage[]
   
   // Audit relationships
+  createdBy User? @relation("UserCreatedBy", fields: [createdById], references: [id])
+  updatedBy User? @relation("UserUpdatedBy", fields: [updatedById], references: [id])
+  
+  // Reverse audit relationships
+  createdUsers    User[]    @relation("UserCreatedBy")
+  updatedUsers    User[]    @relation("UserUpdatedBy")
   createdRoasters Roaster[] @relation("RoasterCreatedBy")
   updatedRoasters Roaster[] @relation("RoasterUpdatedBy")
   createdReviews  Review[]  @relation("ReviewCreatedBy")

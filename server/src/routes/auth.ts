@@ -148,6 +148,8 @@ router.post('/register', [
         password: hashedPassword,
         firstName,
         lastName,
+        // For self-registration, createdById is null (user created themselves)
+        createdById: null,
       },
       select: {
         id: true,
