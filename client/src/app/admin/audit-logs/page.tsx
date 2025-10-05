@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { AuditLog, AuditLogFilters, AuditLogStats, User } from '../../../types';
 import { apiClient } from '../../../lib/api';
 import Link from 'next/link';
+import { formatDateToYYYYMMDD, formatTimeToHHMM } from '../../../lib/dateUtils';
 
 interface AuditLogResponse {
   auditLogs: AuditLog[];
@@ -129,15 +130,11 @@ export default function AuditLogsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
+    return formatDateToYYYYMMDD(dateString);
+  };
+
+  const formatTime = (dateString: string) => {
+    return formatTimeToHHMM(dateString);
   };
 
   const getActionColor = (action: string) => {
@@ -314,7 +311,10 @@ export default function AuditLogsPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date & Time
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Time
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   User
@@ -339,19 +339,26 @@ export default function AuditLogsPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatDate(log.createdAt)}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {formatTime(log.createdAt)}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div>
                         <div className="text-sm font-medium text-gray-900">
-                          <Link 
-                            href={`/admin/users`} 
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            {log.user.username}
-                          </Link>
+                          {log.user ? (
+                            <Link 
+                              href={`/admin/users`} 
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              {log.user.username}
+                            </Link>
+                          ) : (
+                            <span className="text-gray-500 italic">Deleted User</span>
+                          )}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {log.user.email}
+                          {log.user?.email || 'No email available'}
                         </div>
                       </div>
                     </div>
@@ -414,8 +421,10 @@ export default function AuditLogsPage() {
           <div key={log.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
             <div className="flex justify-between items-start mb-3">
               <div className="flex-1">
-                <div className="text-xs text-gray-500 mb-1">
-                  {formatDate(log.createdAt)}
+                <div className="flex items-center space-x-2 text-xs text-gray-500 mb-1">
+                  <span>{formatDate(log.createdAt)}</span>
+                  <span>•</span>
+                  <span>{formatTime(log.createdAt)}</span>
                 </div>
                 <div className="flex items-center space-x-2 mb-2">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getActionColor(log.action)}`}>
@@ -431,12 +440,16 @@ export default function AuditLogsPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-xs text-gray-500 font-medium">User:</span>
-                <Link 
-                  href={`/admin/users`} 
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  {log.user.username}
-                </Link>
+                {log.user ? (
+                  <Link 
+                    href={`/admin/users`} 
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    {log.user.username}
+                  </Link>
+                ) : (
+                  <span className="text-sm text-gray-500 italic">Deleted User</span>
+                )}
               </div>
               
               <div className="flex justify-between">
@@ -557,7 +570,8 @@ export default function AuditLogsPage() {
               <div className="mb-4 p-4 bg-gray-50 rounded">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div><span className="font-semibold">Date:</span> {formatDate(selectedLog.createdAt)}</div>
-                  <div><span className="font-semibold">User:</span> {selectedLog.user.username}</div>
+                  <div><span className="font-semibold">Time:</span> {formatTime(selectedLog.createdAt)}</div>
+                  <div><span className="font-semibold">User:</span> {selectedLog.user?.username || 'Deleted User'}</div>
                   <div><span className="font-semibold">IP Address:</span> {selectedLog.ipAddress || 'Unknown'}</div>
                   <div><span className="font-semibold">Location:</span> {selectedLog.city && selectedLog.country && selectedLog.city !== 'Unknown' && selectedLog.country !== 'Unknown' ? `${selectedLog.city}, ${selectedLog.country}` : (selectedLog.city && selectedLog.city !== 'Unknown') || (selectedLog.country && selectedLog.country !== 'Unknown') || 'Unknown'}</div>
                 </div>

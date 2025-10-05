@@ -247,8 +247,8 @@ model AuditLog {
   createdAt   DateTime @default(now())
 
   // Relationships
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
 
   @@index([entityType, entityId])
   @@index([userId])

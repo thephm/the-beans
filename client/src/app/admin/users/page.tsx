@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
 
 interface User {
   id: string;
@@ -193,10 +194,10 @@ const AdminUsersPage: React.FC = () => {
             {/* Dates */}
             <div className="mb-3 text-xs text-gray-500 space-y-1">
               {user.createdAt && (
-                <div>Created: {new Date(user.createdAt).toLocaleDateString()}</div>
+                <div>Created: {formatDateToYYYYMMDD(user.createdAt)}</div>
               )}
               {user.updatedAt && (
-                <div>Updated: {new Date(user.updatedAt).toLocaleDateString()}</div>
+                <div>Updated: {formatDateToYYYYMMDD(user.updatedAt)}</div>
               )}
             </div>
 
@@ -301,7 +302,7 @@ const AdminUsersPage: React.FC = () => {
                   )}
                 </td>
                 <td className="py-3 px-4 text-center text-sm text-gray-600">
-                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
+                  {user.createdAt ? formatDateToYYYYMMDD(user.createdAt) : ''}
                 </td>
                 <td className="py-3 px-4 text-center">
                   <div className="flex justify-center space-x-2">
