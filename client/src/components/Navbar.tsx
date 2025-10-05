@@ -97,7 +97,11 @@ export function Navbar() {
                     <Link 
                       href="/admin/roasters" 
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsAdminMenuOpen(false)}
+                      onClick={() => {
+                        setIsAdminMenuOpen(false);
+                        // Force a full navigation to clear query parameters
+                        window.location.href = '/admin/roasters';
+                      }}
                     >
                       {t('adminSection.roasters', 'Roasters')}
                     </Link>
@@ -179,7 +183,11 @@ export function Navbar() {
                   <Link 
                     href="/admin/roasters" 
                     className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      // Force a full navigation to clear query parameters
+                      window.location.href = '/admin/roasters';
+                    }}
                   >
                     {t('adminSection.roasters', 'Roasters')}
                   </Link>
