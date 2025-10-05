@@ -27,9 +27,9 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://beans_user:2w3E4r%T@database:5432/the_beans_db
       - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-      - CLOUDINARY_CLOUD_NAME=thebeans
-      - CLOUDINARY_API_KEY=736536845848695
-      - CLOUDINARY_API_SECRET=Hpfx2f2omr9tyyr0LDy8qsJhfn4
+      - CLOUDINARY_CLOUD_NAME=cloud-name-here
+      - CLOUDINARY_API_KEY=api-key-here
+      - CLOUDINARY_API_SECRET=secret-here
     depends_on:
       - database
     networks:
