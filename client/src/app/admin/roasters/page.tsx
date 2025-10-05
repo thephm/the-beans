@@ -57,7 +57,15 @@ const AdminRoastersPage: React.FC = () => {
       const editId = searchParams.get('edit');
       if (editId && editId.trim() !== '') {
         setEditingId(editId);
+      } else {
+        // If no edit parameter, make sure we're showing the list
+        setEditingId(null);
+        setShowAddForm(false);
       }
+    } else {
+      // If no search params at all, reset to list view
+      setEditingId(null);
+      setShowAddForm(false);
     }
   }, [searchParams]);
 
@@ -150,11 +158,11 @@ const AdminRoastersPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 pt-28 pl-32 pr-32">
-      <div className="mb-6 ml-16 mr-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Roasters</h1>
+    <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Roasters</h1>
       </div>
-      <div className="ml-16 mr-16">
+      <div>
         <div className="flex justify-between items-center mb-6">
           <div></div>
           <div className="flex items-center gap-8">
@@ -176,85 +184,150 @@ const AdminRoastersPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.name', 'Name')}</th>
-              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.location', 'Location')}</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.rating', 'Rating')}</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.verified', 'Verified')}</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.featured', 'Featured')}</th>
-              <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminSection.roasters.actions', 'Actions')}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {Array.isArray(roasters) && roasters
-              .filter(roaster => showUnverifiedOnly ? !roaster.verified : true)
-              .map((roaster) => (
-              <tr key={roaster.id} className="hover:bg-gray-50">
-                <td className="py-3 px-4">
-                  <Link
-                    href={`/roasters/${roaster.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 font-medium"
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-4">
+          {Array.isArray(roasters) && roasters
+            .filter(roaster => showUnverifiedOnly ? !roaster.verified : true)
+            .map((roaster) => (
+            <div key={roaster.id} className="bg-white shadow-md rounded-lg p-4 border border-gray-200">
+              <div className="flex justify-between items-start mb-3">
+                <button
+                  onClick={() => handleEdit(roaster.id)}
+                  className="text-lg font-semibold text-blue-600 hover:text-blue-800 text-left"
+                >
+                  {roaster.name}
+                </button>
+                <div className="flex space-x-1">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    ★ {roaster.rating.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-sm text-gray-600 mb-3">
+                📍 {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
+              </div>
+              
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  roaster.verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {roaster.verified ? '✓ Verified' : '⚠ Unverified'}
+                </span>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  roaster.featured ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {roaster.featured ? '⭐ Featured' : 'Not Featured'}
+                </span>
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => handleEdit(roaster.id)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium"
+                >
+                  {t('adminSection.roasters.edit', 'Edit')}
+                </button>
+                <button
+                  onClick={() => confirmDelete(roaster.id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-medium"
+                >
+                  {t('adminSection.roasters.delete', 'Delete')}
+                </button>
+                {!roaster.verified && (
+                  <button
+                    onClick={() => handleVerify(roaster.id)}
+                    disabled={verifyingId === roaster.id}
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium disabled:opacity-50"
                   >
-                    {roaster.name}
-                  </Link>
-                </td>
-                <td className="py-3 px-4 text-gray-600">
-                  {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
-                </td>
-                <td className="py-3 px-4 text-center">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    {roaster.rating.toFixed(1)}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-center">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    roaster.verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {roaster.verified ? t('admin.roasters.yes', 'Yes') : t('admin.roasters.no', 'No')}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-center">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    roaster.featured ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {roaster.featured ? t('admin.roasters.yes', 'Yes') : t('admin.roasters.no', 'No')}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-left">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEdit(roaster.id)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                    >
-                      {t('adminSection.roasters.edit', 'Edit')}
-                    </button>
-                    <button
-                      onClick={() => confirmDelete(roaster.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
-                    >
-                      {t('adminSection.roasters.delete', 'Delete')}
-                    </button>
-                    {!roaster.verified && (
+                    {verifyingId === roaster.id ? 'Verifying...' : 'Verify'}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.name', 'Name')}</th>
+                  <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.location', 'Location')}</th>
+                  <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.rating', 'Rating')}</th>
+                  <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.verified', 'Verified')}</th>
+                  <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.featured', 'Featured')}</th>
+                  <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminSection.roasters.actions', 'Actions')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {Array.isArray(roasters) && roasters
+                  .filter(roaster => showUnverifiedOnly ? !roaster.verified : true)
+                  .map((roaster) => (
+                  <tr key={roaster.id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4">
                       <button
-                        onClick={() => handleVerify(roaster.id)}
-                        disabled={verifyingId === roaster.id}
-                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
+                        onClick={() => handleEdit(roaster.id)}
+                        className="text-blue-600 hover:text-blue-800 font-medium text-left underline"
                       >
-                        {verifyingId === roaster.id ? 'Verifying...' : 'Verify'}
+                        {roaster.name}
                       </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600">
+                      {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        {roaster.rating.toFixed(1)}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        roaster.verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {roaster.verified ? t('admin.roasters.yes', 'Yes') : t('admin.roasters.no', 'No')}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        roaster.featured ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {roaster.featured ? t('admin.roasters.yes', 'Yes') : t('admin.roasters.no', 'No')}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-left">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEdit(roaster.id)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                          {t('adminSection.roasters.edit', 'Edit')}
+                        </button>
+                        <button
+                          onClick={() => confirmDelete(roaster.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                          {t('adminSection.roasters.delete', 'Delete')}
+                        </button>
+                        {!roaster.verified && (
+                          <button
+                            onClick={() => handleVerify(roaster.id)}
+                            disabled={verifyingId === roaster.id}
+                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
+                          >
+                            {verifyingId === roaster.id ? 'Verifying...' : 'Verify'}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
       {/* Delete Confirmation Modal */}
       {deletingId && (
@@ -526,16 +599,25 @@ const RoasterForm: React.FC<{
   };
 
   return (
-    <div className="p-4 pt-28 pl-32 pr-32">
-      <div className="mb-6 ml-16 mr-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+    <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
+      <div className="mb-6 max-w-6xl mx-auto">
+        {/* Breadcrumb Navigation */}
+        <nav className="mb-4">
+          <button
+            onClick={onCancel}
+            className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+          >
+            ← {t('adminSection.roasters', 'Roasters')}
+          </button>
+        </nav>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           {roaster 
             ? t('adminForms.roasters.editRoaster', 'Edit Roaster') 
             : t('admin.roasters.addTitle', 'Add Roaster')
           }
         </h1>
       </div>
-      <div className="ml-16 mr-16">
+      <div className="max-w-6xl mx-auto">
 
         {error && (
           <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -651,7 +733,7 @@ const RoasterForm: React.FC<{
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('adminForms.roasters.city', 'City')}
@@ -678,7 +760,7 @@ const RoasterForm: React.FC<{
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.roasters.zipCode', 'Zip Code')}
@@ -705,7 +787,7 @@ const RoasterForm: React.FC<{
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.roasters.latitude', 'Latitude')}
@@ -771,27 +853,29 @@ const RoasterForm: React.FC<{
                   </h4>
                   <div className="space-y-3">
                     {Object.entries(formData.hours as Record<string, any>).map(([day, dayHours]: [string, any]) => (
-                      <div key={day} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-md">
-                        <div className="w-24">
-                          <label className="text-sm font-medium text-gray-700 capitalize">
-                            {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
-                          </label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={dayHours?.closed || false}
-                            onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                          />
-                          <span className="text-sm text-gray-600">
-                            {t('adminForms.roasters.hours.closed', 'Closed')}
-                          </span>
+                      <div key={day} className="p-3 bg-gray-50 rounded-md space-y-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                          <div className="w-full sm:w-24">
+                            <label className="text-sm font-medium text-gray-700 capitalize">
+                              {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={dayHours?.closed || false}
+                              onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <span className="text-sm text-gray-600">
+                              {t('adminForms.roasters.hours.closed', 'Closed')}
+                            </span>
+                          </div>
                         </div>
                         {!dayHours?.closed && (
-                          <>
+                          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 sm:pl-28">
                             <div className="flex items-center space-x-2">
-                              <label className="text-sm text-gray-600">
+                              <label className="text-sm text-gray-600 w-12">
                                 {t('adminForms.roasters.hours.open', 'Open')}:
                               </label>
                               <input
@@ -802,7 +886,7 @@ const RoasterForm: React.FC<{
                               />
                             </div>
                             <div className="flex items-center space-x-2">
-                              <label className="text-sm text-gray-600">
+                              <label className="text-sm text-gray-600 w-12">
                                 {t('adminForms.roasters.hours.close', 'Close')}:
                               </label>
                               <input
@@ -812,7 +896,7 @@ const RoasterForm: React.FC<{
                                 className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                               />
                             </div>
-                          </>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -881,18 +965,18 @@ const RoasterForm: React.FC<{
           )}
 
           {/* Form Actions */}
-          <div className="mt-8 flex justify-end space-x-4 pt-4 border-t">
+          <div className="mt-8 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4 border-t">
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="w-full sm:w-auto px-6 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               {t('adminForms.roasters.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading 
                 ? t('adminForms.roasters.saving', 'Saving...') 
