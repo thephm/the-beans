@@ -32,7 +32,10 @@ router.put('/language', [
     // Update user language in database
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { language }
+      data: { 
+        language,
+        updatedById: userId // User updated their own language preference
+      }
     });
 
     // Store entity for audit logging
@@ -62,7 +65,10 @@ router.put('/settings', requireAuth, auditBefore('user', 'UPDATE'), async (req: 
     // Persist settings to database
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { settings } as any
+      data: { 
+        settings,
+        updatedById: userId // User updated their own settings
+      } as any
     });
 
     // Store entity for audit logging
@@ -97,7 +103,13 @@ router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, 
     const { role, language, firstName, lastName } = req.body;
     const updated = await prisma.user.update({
       where: { id },
-      data: { role, language, firstName, lastName },
+      data: { 
+        role, 
+        language, 
+        firstName, 
+        lastName,
+        updatedById: req.userId // Set who updated this user
+      },
     });
 
     // Store entity for audit logging
@@ -191,12 +203,76 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
         createdAt: true,
         updatedAt: true,
         role: true,
+        createdById: true,
+        updatedById: true,
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        updatedBy: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
       }
     });
     res.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// Admin: Get a specific user by ID
+router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    // Fetch requesting user's role
+    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
+    if (!me || me.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden: Admins only' });
+    }
+    
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        language: true,
+        createdAt: true,
+        updatedAt: true,
+        role: true,
+        createdById: true,
+        updatedById: true,
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        updatedBy: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+      }
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
   }
 });
 

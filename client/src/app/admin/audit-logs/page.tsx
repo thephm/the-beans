@@ -364,12 +364,16 @@ export default function AuditLogsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900 capitalize">
-                        <Link 
-                          href={getEntityLink(log)} 
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          {log.entityType}
-                        </Link>
+                        {log.action === 'DELETE' ? (
+                          <span>{log.entityType}</span>
+                        ) : (
+                          <Link 
+                            href={getEntityLink(log)} 
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            {log.entityType}
+                          </Link>
+                        )}
                       </div>
                       <div className="text-sm text-gray-500 truncate max-w-xs">
                         {log.entityName || log.entityId}
@@ -391,6 +395,8 @@ export default function AuditLogsPage() {
                       >
                         View Changes ({Object.keys(log.changes).length})
                       </button>
+                    ) : log.action === 'DELETE' ? (
+                      <span className="text-sm text-gray-400">Deleted</span>
                     ) : (
                       <span className="text-sm text-gray-400">No changes</span>
                     )}
@@ -435,12 +441,18 @@ export default function AuditLogsPage() {
               
               <div className="flex justify-between">
                 <span className="text-xs text-gray-500 font-medium">Entity:</span>
-                <Link 
-                  href={getEntityLink(log)} 
-                  className="text-sm text-blue-600 hover:text-blue-800 truncate max-w-[180px]"
-                >
-                  {log.entityName || log.entityId}
-                </Link>
+                {log.action === 'DELETE' ? (
+                  <span className="text-sm text-gray-700 truncate max-w-[180px]">
+                    {log.entityName || log.entityId}
+                  </span>
+                ) : (
+                  <Link 
+                    href={getEntityLink(log)} 
+                    className="text-sm text-blue-600 hover:text-blue-800 truncate max-w-[180px]"
+                  >
+                    {log.entityName || log.entityId}
+                  </Link>
+                )}
               </div>
               
               <div className="flex justify-between">
@@ -461,6 +473,8 @@ export default function AuditLogsPage() {
                   >
                     View ({Object.keys(log.changes).length})
                   </button>
+                ) : log.action === 'DELETE' ? (
+                  <span className="text-sm text-gray-400">Deleted</span>
                 ) : (
                   <span className="text-sm text-gray-400">No changes</span>
                 )}
