@@ -183,6 +183,13 @@ export function Navbar() {
                   >
                     {t('adminSection.roasters', 'Roasters')}
                   </Link>
+                  <Link 
+                    href="/admin/audit-logs" 
+                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('adminSection.auditLogs', 'Audit Logs')}
+                  </Link>
                 </div>
               )}
               
