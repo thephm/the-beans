@@ -307,8 +307,8 @@ export default function AuditLogsPage() {
         </div>
       </div>
 
-      {/* Audit Logs Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {/* Audit Logs - Desktop Table View */}
+      <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -400,58 +400,126 @@ export default function AuditLogsPage() {
             </tbody>
           </table>
         </div>
+      </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => changePage(Math.max(1, currentPage - 1))}
-                disabled={currentPage <= 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage >= totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Page <span className="font-medium">{currentPage}</span> of{' '}
-                  <span className="font-medium">{totalPages}</span>
-                </p>
+      {/* Audit Logs - Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {auditLogs.map((log) => (
+          <div key={log.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-1">
+                  {formatDate(log.createdAt)}
+                </div>
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getActionColor(log.action)}`}>
+                    {log.action}
+                  </span>
+                  <span className="text-sm text-gray-600 capitalize">
+                    {log.entityType}
+                  </span>
+                </div>
               </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const page = i + Math.max(1, currentPage - 2);
-                    if (page > totalPages) return null;
-                    return (
-                      <button
-                        key={page}
-                        onClick={() => changePage(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          page === currentPage
-                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    );
-                  })}
-                </nav>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-xs text-gray-500 font-medium">User:</span>
+                <Link 
+                  href={`/admin/users`} 
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  {log.user.username}
+                </Link>
+              </div>
+              
+              <div className="flex justify-between">
+                <span className="text-xs text-gray-500 font-medium">Entity:</span>
+                <Link 
+                  href={getEntityLink(log)} 
+                  className="text-sm text-blue-600 hover:text-blue-800 truncate max-w-[180px]"
+                >
+                  {log.entityName || log.entityId}
+                </Link>
+              </div>
+              
+              <div className="flex justify-between">
+                <span className="text-xs text-gray-500 font-medium">Location:</span>
+                <span className="text-sm text-gray-700">
+                  {log.city && log.country && log.city !== 'Unknown' && log.country !== 'Unknown' ? 
+                    `${log.city}, ${log.country}` : 
+                    (log.city && log.city !== 'Unknown') || (log.country && log.country !== 'Unknown') || 'Unknown'}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                <span className="text-xs text-gray-500 font-medium">Changes:</span>
+                {log.changes && Object.keys(log.changes).length > 0 ? (
+                  <button
+                    onClick={() => setSelectedLog(log)}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    View ({Object.keys(log.changes).length})
+                  </button>
+                ) : (
+                  <span className="text-sm text-gray-400">No changes</span>
+                )}
               </div>
             </div>
           </div>
-        )}
+        ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-6 rounded-lg shadow">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => changePage(Math.max(1, currentPage - 1))}
+              disabled={currentPage <= 1}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage >= totalPages}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Page <span className="font-medium">{currentPage}</span> of{' '}
+                <span className="font-medium">{totalPages}</span>
+              </p>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const page = i + Math.max(1, currentPage - 2);
+                  if (page > totalPages) return null;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => changePage(page)}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                        page === currentPage
+                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Changes Modal */}
       {selectedLog && (
