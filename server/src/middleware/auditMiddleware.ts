@@ -21,28 +21,36 @@ export function auditBefore(entityType: string, action: 'CREATE' | 'UPDATE' | 'D
 export function auditAfter() {
   return async (req: any, res: any, next: any) => {
     console.log('auditAfter called:', { statusCode: res.statusCode, hasAuditData: !!req.auditData, hasUserId: !!req.userId });
-    // Only log if the operation was successful (2xx status codes)
-    if (res.statusCode >= 200 && res.statusCode < 300 && req.auditData && req.userId) {
+    
+    // Log both successful AND failed operations
+    if (req.auditData && req.userId) {
       try {
         // Extract entity information from the response or request
         const entity = res.locals.auditEntity || res.locals.entity;
         const entityId = entity?.id || req.params.id;
         
-        if (!entityId) {
-          console.warn('No entity ID available for audit logging');
-          return next();
-        }
-
+        // For failed operations, we might not have an entity, so use a placeholder
+        const finalEntityId = entityId || 'unknown';
+        
+        // Determine if operation was successful
+        const isSuccess = res.statusCode >= 200 && res.statusCode < 300;
+        
         const auditLogData: AuditLogData = {
           action: req.auditData.action,
           entityType: req.auditData.entityType,
-          entityId,
+          entityId: finalEntityId,
           entityName: entity ? getEntityName(req.auditData.entityType, entity) : undefined,
           userId: req.userId,
           ipAddress: getClientIP(req),
           userAgent: getUserAgent(req),
           oldValues: req.auditData.oldValues,
-          newValues: entity
+          newValues: isSuccess ? entity : undefined,
+          // Add failure information for failed operations
+          metadata: isSuccess ? undefined : {
+            failed: true,
+            statusCode: res.statusCode,
+            error: res.locals.errorMessage || 'Operation failed'
+          }
         };
 
         // Create audit log asynchronously (don't block the response)

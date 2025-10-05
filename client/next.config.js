@@ -11,17 +11,7 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '5000',
-        pathname: '/uploads/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'the-beans-api.onrender.com',
-        pathname: '/uploads/**',
-      },
+
     ],
   },
 }

@@ -868,7 +868,7 @@ const RoasterForm: React.FC<{
           {/* Images Section - Only show when editing existing roaster and images are loaded */}
           {roaster && roaster.id && imagesLoaded && (
             <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
                 {t('adminForms.roasters.images', 'Images')}
               </h3>
               <SimpleImageUpload

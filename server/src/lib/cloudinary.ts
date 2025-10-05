@@ -2,6 +2,18 @@ import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
+// Validate Cloudinary environment variables
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  throw new Error(
+    'Missing Cloudinary configuration! Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET environment variables.'
+  );
+}
+
+// Warn if using test credentials
+if (process.env.CLOUDINARY_CLOUD_NAME === 'test-cloud') {
+  console.warn('⚠️  Using test Cloudinary credentials - image uploads will fail but server will start for testing');
+}
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

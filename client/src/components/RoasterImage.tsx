@@ -18,30 +18,34 @@ const RoasterImage: React.FC<RoasterImageProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   
+  // Filter out image-specific classes for fallback div
+  const fallbackClassName = className
+    .split(' ')
+    .filter(cls => !['object-cover', 'object-contain', 'object-fill'].includes(cls))
+    .join(' ');
+  
   // Handle undefined/null src values
   if (!src) {
     return (
       <div 
-        className={`flex items-center justify-center bg-gray-200 text-gray-500 ${className}`}
+        className={`flex items-center justify-center bg-gray-200 text-gray-500 ${fallbackClassName}`}
         style={{ width, height }}
       >
-        <span>No Image</span>
+        <span className="text-sm font-medium">Image not available</span>
       </div>
     );
   }
   
-  // If src is just a filename, construct the full backend URL
-  const imageUrl = src.includes('http') 
-    ? src 
-    : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/uploads/${src}`;
+  // With Cloudinary, all image URLs should be full URLs
+  const imageUrl = src;
 
   if (imageError) {
     return (
       <div 
-        className={`flex items-center justify-center bg-gray-200 text-gray-500 ${className}`}
+        className={`flex items-center justify-center bg-gray-200 text-gray-500 ${fallbackClassName}`}
         style={{ width, height }}
       >
-        Image not available
+        <span className="text-sm font-medium">Image not available</span>
       </div>
     );
   }
