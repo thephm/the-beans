@@ -133,6 +133,12 @@ export default function RoasterDetail() {
   }
 
   const toggleFavorite = () => {
+    // Check if user is authenticated
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
     if (!roaster) return
     
     const favorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')

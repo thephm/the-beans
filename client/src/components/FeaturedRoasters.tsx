@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import RoasterImage from './RoasterImage'
@@ -25,6 +26,7 @@ interface Roaster {
 export function FeaturedRoasters() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
+  const router = useRouter()
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
@@ -39,6 +41,12 @@ export function FeaturedRoasters() {
   }, []);
 
   const toggleFavorite = (roasterId: string) => {
+    // Check if user is authenticated
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
     let updatedFavorites
     if (favorites.includes(roasterId)) {
       updatedFavorites = favorites.filter(id => id !== roasterId)
