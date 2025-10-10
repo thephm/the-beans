@@ -64735,7 +64735,7 @@ Try deleting a user now - you should see:
 
 This is the proper enterprise solution that maintains audit integrity while allowing user management! 🎉
 
-## try
+## 464th try
 
 > you broke the login completely, UI says "Failed to fetch`
 
@@ -64882,3 +64882,141 @@ Updated the audit logs route to:
 - ✅ **Statistics work** - Audit log stats handle deleted users gracefully
 
 The login functionality should now work properly. The "Failed to fetch" error was caused by the server being down due to the compilation error, which has now been resolved! 🎉
+
+2025-10-10
+
+## Clicking favorite when not logged in should send me to login screen #131
+https://github.com/thephm/the-beans/issues/131
+
+> Clicking favorite when not logged in should send me to login screen
+
+I'll help you implement the functionality to redirect unauthenticated users to the login screen when they try to favorite a roaster. Let me first explore the current implementation to understand how favorites work.
+
+✔ Created 4 todos
+
+✔ Starting (1/4) Analyze current favorites implementation
+
+Let me search for favorite-related functionality in the codebase:
+
+Now let me look at the `AuthContext` to understand how authentication is handled:
+
+✔ Read `AuthContext.tsx`, lines 1 to 50
+
+✔ Starting (2/4) Check authentication context usage
+
+✔ Read `AuthContext.tsx`, lines 50 to 113
+
+✔ Starting (3/4) Implement login redirect on favorite click
+
+Perfect! Now I understand the current implementation. I can see that:
+
+1. **Authentication Context**: The `useAuth()` hook provides a `user` object that is `null` when not authenticated and contains user data when authenticated. There's also an `isAuthenticated` boolean.
+
+2. **Favorite Functionality**: Currently implemented in several places:
+
+  - `/discover page`
+  - `/roasters/[id]` page (roaster detail)
+  - `FeaturedRoasters.tsx`
+  - `/favorites` page
+
+3. **Current Behavior**: The favorite buttons currently work with localStorage regardless of authentication status, meaning unauthenticated users can "favorite" items locally.
+
+I need to modify the `toggleFavorite` functions in these components to check for authentication and redirect to login if the user is not logged in. Let me start with the Discover page:
+
+✔ Read `page.tsx`, lines 40 to 80
+
+Now let me modify the toggleFavorite function in the Discover page to check authentication first:
+
+`page.tsx +6 -0`
+
+Now let me update the `FeaturedRoasters` component:
+
+✔ Read `FeaturedRoasters.tsx`, lines 35 to 80
+
+I need to add useRouter import to FeaturedRoasters first:
+
+✔ Read `FeaturedRoasters.tsx`, lines 1 to 15
+
+`FeaturedRoasters.tsx +1 -0`
+
+Now let me add the router variable and update the toggleFavorite function in FeaturedRoasters:
+
+✔ Read `FeaturedRoasters.tsx`, lines 25 to 35
+
+`FeaturedRoasters.tsx +1 -0`
+
+Now update the toggleFavorite function in FeaturedRoasters:
+
+`FeaturedRoasters.tsx +6 -0`
+
+Now let me update the roaster detail page. First let me check where the toggleFavorite function is:
+
+✔ Read `page.tsx`, lines 130 to 150
+
+`page.tsx +6 -0`
+
+Now let me check if there are any other places where favorites are handled. Let me check the roasters page (the list page):
+
+✔ Searched for files matching `**/client/src/app/roasters/page.tsx`, no matches
+
+✔ Read `roasters`
+
+Let me search for other files that might have favorites functionality:
+
+✔ Searched text for `toggleFavorites` (`**/client/src/**), 9 results
+
+I need to also update the favorites page. Let me check that one:
+
+✔ Read `page.tsx`, lines 55 to 90
+
+Good! I can see that the favorites page already has authentication protection with a redirect to login if not authenticated, so the toggleFavorite function there doesn't need additional authentication checks since the user will already be redirected to login if they're not authenticated.
+
+Now let me restart the Docker container to test the changes:
+
+✔ Starting (4/4) Test the implementation
+
+✔ `docker-compose restart client`
+
+*Auto approved by rule `docker-compose`*
+
+✔ Completed (4/4) Test the implementation
+
+Perfect! I have successfully implemented the functionality you requested. Here's a summary of the changes made:
+
+## ✅ Implementation Complete
+
+I've modified the favorite button functionality in all relevant components to redirect unauthenticated users to the login screen when they try to favorite a roaster. Here's what was changed:
+
+Modified Components:
+
+1. **Discover Page** (`page.tsx`)
+
+   - Added authentication check to `toggleFavorite` function
+   - Redirects to `/login` if user is not authenticated
+
+2. **Featured Roasters Component** (`FeaturedRoasters.tsx`)
+
+  - Added `useRouter` import
+  - Added authentication check to `toggleFavorite` function
+  - Redirects to `/login` if user is not authenticated
+
+3. **Roaster Detail Page** (`page.tsx`)
+
+  - Added authentication check to toggleFavorite function
+  - Redirects to `/login` if user is not authenticated
+
+How It Works:
+
+- **Before**: Unauthenticated users could click favorite buttons and they would work with localStorage only
+- **After**: When an unauthenticated user clicks any favorite button, they are immediately redirected to the login screen using `router.push('/login')`
+
+Note on Favorites Page:
+
+The favorites page (`/favorites`) already had authentication protection built-in with a `useEffect` that redirects unauthenticated users to login, so no changes were needed there.
+
+The Docker client container has been restarted to apply the changes. Now when you visit the app and try to favorite any roaster without being logged in, you'll be redirected to the login screen! 🔒❤️
+
+## 465th try
+
+*(bug is fixed, redirects to login page now!)*
+

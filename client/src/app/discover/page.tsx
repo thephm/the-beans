@@ -57,6 +57,12 @@ export default function DiscoverPage() {
   }, [])
 
   const toggleFavorite = (roasterId: string) => {
+    // Check if user is authenticated
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
     let updatedFavorites
     if (favorites.includes(roasterId)) {
       updatedFavorites = favorites.filter(id => id !== roasterId)
