@@ -377,13 +377,13 @@ const RoasterForm: React.FC<{
   const convertHoursFormat = (hours: any) => {
     if (!hours) {
       return {
-        monday: { open: '08:00', close: '18:00', closed: false },
-        tuesday: { open: '08:00', close: '18:00', closed: false },
-        wednesday: { open: '08:00', close: '18:00', closed: false },
-        thursday: { open: '08:00', close: '18:00', closed: false },
-        friday: { open: '08:00', close: '18:00', closed: false },
-        saturday: { open: '08:00', close: '18:00', closed: false },
-        sunday: { open: '08:00', close: '18:00', closed: false },
+        monday: { open: '', close: '', closed: true },
+        tuesday: { open: '', close: '', closed: true },
+        wednesday: { open: '', close: '', closed: true },
+        thursday: { open: '', close: '', closed: true },
+        friday: { open: '', close: '', closed: true },
+        saturday: { open: '', close: '', closed: true },
+        sunday: { open: '', close: '', closed: true },
       };
     }
 
@@ -404,7 +404,7 @@ const RoasterForm: React.FC<{
         const [open, close] = dayHours.split('-');
         convertedHours[day] = { open: open || '', close: close || '', closed: false };
       } else {
-        convertedHours[day] = { open: '08:00', close: '18:00', closed: false };
+        convertedHours[day] = { open: '', close: '', closed: true };
       }
     });
 
