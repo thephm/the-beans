@@ -381,8 +381,8 @@
       "langEn": "English",
       "langFr": "French",
       "search": "Search by username, email, or name...",
-      "total": "users total",
-      "filtered": "of users"
+      "total": "{{count}} users total",
+      "filtered": "{{filteredCount}} of {{totalCount}} users"
     },
     "auditLogs": {
       "title": "Audit Logs",
