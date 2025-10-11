@@ -333,16 +333,22 @@ export default function RoasterDetail() {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.contactInfo')}</h3>
                   
                   {/* Address */}
-                  <div className="mb-4">
-                    <div className="flex items-start">
-                      <LocationOn sx={{ fontSize: 20, color: '#6b7280', marginRight: 1, marginTop: 0.25 }} />
-                      <div>
-                        <p className="font-medium text-gray-900">{t('roasterDetail.address')}</p>
-                        <p className="text-gray-600">{roaster.address}</p>
-                        <p className="text-gray-600">{roaster.city}, {roaster.state}</p>
+                  {(roaster.address || roaster.city || roaster.state) && (
+                    <div className="mb-4">
+                      <div className="flex items-start">
+                        <LocationOn sx={{ fontSize: 20, color: '#6b7280', marginRight: 1, marginTop: 0.25 }} />
+                        <div>
+                          <p className="font-medium text-gray-900">{t('roasterDetail.address')}</p>
+                          {roaster.address && <p className="text-gray-600">{roaster.address}</p>}
+                          {(roaster.city || roaster.state) && (
+                            <p className="text-gray-600">
+                              {[roaster.city, roaster.state].filter(Boolean).join(', ')}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Phone */}
                   {roaster.phone && (
