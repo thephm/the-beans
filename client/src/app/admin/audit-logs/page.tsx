@@ -568,12 +568,15 @@ export default function AuditLogsPage() {
               </div>
               
               <div className="mb-4 p-4 bg-gray-50 rounded">
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-900">
-                  <div><span className="font-semibold">Date:</span> {formatDate(selectedLog.createdAt)}</div>
-                  <div><span className="font-semibold">Time:</span> {formatTime(selectedLog.createdAt)}</div>
-                  <div><span className="font-semibold">User:</span> {selectedLog.user?.username || 'Deleted User'}</div>
-                  <div><span className="font-semibold">IP Address:</span> {selectedLog.ipAddress || 'Unknown'}</div>
-                  <div><span className="font-semibold">Location:</span> {selectedLog.city && selectedLog.country && selectedLog.city !== 'Unknown' && selectedLog.country !== 'Unknown' ? `${selectedLog.city}, ${selectedLog.country}` : (selectedLog.city && selectedLog.city !== 'Unknown') || (selectedLog.country && selectedLog.country !== 'Unknown') || 'Unknown'}</div>
+                <div className="space-y-2 text-sm text-gray-900">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><span className="font-semibold">Date:</span> {formatDate(selectedLog.createdAt)}</div>
+                    <div><span className="font-semibold">Time:</span> {formatTime(selectedLog.createdAt)}</div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
+                    <div><span className="font-semibold">User:</span> {selectedLog.user?.username || 'Deleted User'}</div>
+                    <div><span className="font-semibold">IP Address:</span> {selectedLog.ipAddress || 'Unknown'}</div>
+                  </div>
                 </div>
               </div>
 
@@ -591,8 +594,8 @@ export default function AuditLogsPage() {
                       const hasLongContent = ['images', 'imageUrl', 'photos'].includes(field.toLowerCase()) || 
                         oldStr.length > 50 || 
                         newStr.length > 50 ||
-                        (typeof change.old === 'object') ||
-                        (typeof change.new === 'object');
+                        (typeof change.old === 'object' && change.old !== null) ||
+                        (typeof change.new === 'object' && change.new !== null);
 
                       return (
                         <div key={field} className="border rounded p-3">
@@ -635,13 +638,13 @@ export default function AuditLogsPage() {
                                   </div>
                                 </div>
                               ) : (
-                                // Responsive layout for short content - side by side on larger screens, stacked on mobile
+                                // Responsive layout for short content - side by side on all screen sizes for very short content
                                 <div>
-                                  <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mb-1">
+                                  <div className="grid grid-cols-2 gap-2 mb-1">
                                     <span className="text-red-600 font-medium">Old Value:</span>
                                     <span className="text-green-600 font-medium">New Value:</span>
                                   </div>
-                                  <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div className="p-2 bg-red-50 border border-red-200 rounded text-gray-900 break-words">
                                       {typeof change.old === 'object' ? 
                                         JSON.stringify(change.old, null, 2) : 
