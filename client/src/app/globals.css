@@ -16,6 +16,7 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+/* Disabled automatic dark mode to prevent white text issues on mobile
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
@@ -23,9 +24,10 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+*/
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: #111827; /* Force dark gray text */
   background: linear-gradient(
       to bottom,
       transparent,

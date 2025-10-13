@@ -551,7 +551,7 @@ export default function AuditLogsPage() {
       {/* Changes Modal */}
       {selectedLog && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white text-gray-900">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
@@ -568,7 +568,7 @@ export default function AuditLogsPage() {
               </div>
               
               <div className="mb-4 p-4 bg-gray-50 rounded">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-900">
                   <div><span className="font-semibold">Date:</span> {formatDate(selectedLog.createdAt)}</div>
                   <div><span className="font-semibold">Time:</span> {formatTime(selectedLog.createdAt)}</div>
                   <div><span className="font-semibold">User:</span> {selectedLog.user?.username || 'Deleted User'}</div>
@@ -592,7 +592,7 @@ export default function AuditLogsPage() {
                         </div>
                         {selectedLog.action === 'CREATE' ? (
                           <div className="text-sm">
-                            <div className="p-2 bg-blue-50 border border-blue-200 rounded">
+                            <div className="p-2 bg-blue-50 border border-blue-200 rounded text-gray-900">
                               {typeof change.new === 'object' ? 
                                 JSON.stringify(change.new, null, 2) : 
                                 String(change.new || '')
@@ -606,13 +606,13 @@ export default function AuditLogsPage() {
                               <span className="text-green-600 font-medium">New Value:</span>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                              <div className="p-2 bg-red-50 border border-red-200 rounded">
+                              <div className="p-2 bg-red-50 border border-red-200 rounded text-gray-900">
                                 {typeof change.old === 'object' ? 
                                   JSON.stringify(change.old, null, 2) : 
                                   String(change.old || 'null')
                                 }
                               </div>
-                              <div className="p-2 bg-green-50 border border-green-200 rounded">
+                              <div className="p-2 bg-green-50 border border-green-200 rounded text-gray-900">
                                 {typeof change.new === 'object' ? 
                                   JSON.stringify(change.new, null, 2) : 
                                   String(change.new || 'null')
