@@ -67579,6 +67579,10 @@ The authentication system is working correctly on both local and production envi
 
 ## 486th try
 
+## Audit log entry hard to read for images #135
+
+https://github.com/thephm/the-beans/issues/135
+
 > On chrome, viewing an audit log entry I see Owner and Images side by side and for Images it doesn't fit, should be on a separate line see screenshot attached
 
 I can see the issue from the screenshot! The audit log entry detail modal is showing the "Owner" and "Images" field changes side by side, but the "Images" field content is too long and gets cut off. The long Cloudinary URLs don't fit properly in the horizontal layout.
@@ -67679,9 +67683,8 @@ Let me modify the logic to be more responsive - it should display side by side o
 
 Now let me restart the client container to apply these responsive layout improvements:
 
-
-docker-compose restart client
-Auto approved by rule docker-compose
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
 
 Perfect! I've improved the layout to be more responsive and space-efficient. Here's what changed:
 
@@ -67784,3 +67787,198 @@ New Value:
 ```
 
 The fix ensures that only truly long content (like image URLs over 50 characters) gets the vertical stacked layout, while short values like "null", "true", "false", or short names display efficiently side by side. 🎯
+
+## 488th try
+
+*(It's good enough, don't want to spend more time on this, checking in)*
+
+## Audit dialog on mobile and other audit issued #128
+
+https://github.com/thephm/the-beans/issues/128
+
+On mobile, the email address overlaps the IP address, in that case can move the IP address down, let's hide location as it's always unknown
+
+I can see from the image that you're looking at an audit log modal where the IP address overlaps with the email address on mobile devices. Let me examine the audit logging components and fix this layout issue by moving the IP address down and hiding the location field since it's always "Unknown".
+
+✔ Read `page.tsx`, lines 1 to 50
+
+✔ Searched text for `selectedLog.*modal|UPDATE.*roaster` (`**/client/src/app/admin/audit-logs/page.tsx`), no results
+
+Let me search for the modal rendering code in the audit logs file:
+
+✔ Read `page.tsx`, lines 550 to 674
+
+Now I can see the issue. The problem is in the modal where the user information is displayed in a grid grid-cols-2 layout. On mobile devices, this causes the email address to overlap with the IP address. I need to modify the layout to:
+
+Move the IP address to its own row below the user
+Hide the location field since it's always "Unknown"
+Let me fix this:
+
+`page.tsx +3 -2`
+
+Now let me restart the client container to apply the changes:
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the mobile layout issue in the audit log modal. Here's what I changed:
+
+### Changes Made:
+
+1. **Restructured the layout**: Changed from a rigid grid grid-cols-2 layout to a more flexible space-y-2 layout with strategic grouping
+2. **Fixed the overlap**: Moved the IP address to its own full-width row below the user, preventing the email/IP overlap on mobile
+3. **Removed location field**: Since it's always "Unknown", I completely removed it to reduce clutter
+4. **Preserved date/time grouping**: Kept the date and time on the same row since they're shorter and work well together
+
+### New Layout Structure:
+
+- **Row 1**: Date | Time (side by side - these are short)
+- **Row 2**: User (full width - prevents email overflow)
+- **Row 3**: IP Address (full width - no more overlap)
+
+The client container has been restarted, so the changes should now be live. The modal will now display properly on mobile devices without the email address overlapping the IP address, and the unnecessary "Unknown" location field has been removed for a cleaner interface.
+
+## 489th try
+
+> you made the change on mobile and desktop but on desktop browser there's enough room to keep them side by side :(
+
+  ou're absolutely right! I made the change too aggressive - on desktop there's plenty of room to keep the user and IP address side by side. Let me fix this by making it responsive so it stacks on mobile but stays side by side on desktop.
+
+`page.tsx +2 -0`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Now I've made it properly responsive:
+
+### Updated Layout:
+
+- **Mobile** (`grid-cols-1`): User and IP Address stack vertically to prevent overlap
+- **Desktop** (`md:grid-cols-2`): User and IP Address display side by side as before
+- **Date/Time**: Always side by side since they're short enough
+- **Location**: Still removed since it's always "Unknown"
+The layout will now:
+
+- **On mobile**: Stack the user and IP address vertically to prevent the email overlap issue
+- **On desktop/tablet**: Keep them side by side to make efficient use of the available space
+
+The client container has been restarted, so you should now see the proper responsive behavior!
+
+## 490th try
+
+> better, thanks! I notice the owner still has the old and new value on different lines :(
+
+  I see the issue! The "Owner" field is still using the vertical layout (stacked old/new values) when it should use the horizontal layout since "null" is short content. Let me check why it's not using the side-by-side layout for short content like it should.
+
+✔ Read `page.tsx`, lines 580 to 630
+
+✔ Read `page.tsx`, lines 630 to 677
+
+I found the issue! The logic is correct, but the responsive layout for short content is using `sm:grid-cols-2` which means it only goes side-by-side on small screens and up. However, for "null" values which are very short, we should make it side-by-side even on mobile. Let me improve the responsive breakpoint:
+
+`page.tsx +3 -3`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Now I've fixed the issue. The problem was that even for short content like "null", it was using responsive breakpoints that stacked the old/new values on mobile.
+
+### What I changed:
+
+- **Before**: Short content used `flex flex-col sm:grid sm:grid-cols-2` which meant it stacked on mobile and went side-by-side only on small screens and up
+- **After**: Short content now uses `grid grid-cols-2` which means it's always side-by-side, even on mobile
+
+Since "null" and other short values are very compact, they can comfortably fit side-by-side even on mobile screens. Now the "Owner" field and other short content fields will display the old and new values side-by-side on all screen sizes, while long content (like image URLs) will still stack vertically for better readability.
+
+The client container has been restarted, so the fix should now be live!
+
+## 491st try
+
+> that didn't fix it
+
+You're right! Looking at the image, I can see the "Owner" field is still stacking vertically (Old Value and New Value on separate lines) instead of side-by-side like it should be for short content. Let me check what's happening with the logic that determines whether content is "long" or "short".
+
+Read page.tsx, lines 590 to 600
+
+I see the issue! The logic checks for specific field names like 'images', 'imageUrl', 'photos' in lowercase, but the field name is 'Owner' (with capital O). However, that's not the issue since 'owner' is not in that list. Let me debug this by checking if there's something about how the values are being processed.
+
+Looking at the image, I can see that "Owner" shows "null" for both old and new values, which should definitely be short content (4 characters). But I notice that "Images" is correctly showing as stacked (vertical) because it has a long URL. This means the logic is working for "Images" but not for "Owner".
+
+Let me examine if there's something specific about how null values are being handled:
+
+`page.tsx +3 -0`
+
+`docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Now, can you open the audit log modal again and check the browser console (F12 -> Console tab) to see what the debug output shows for the "Owner" field? This will help us understand why it's being treated as long content when it should be short.
+
+```bash
+example.com/test-image.jpg:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+page.tsx:601 Field: name, oldStr: "Stumptown Coffee Roasters" (25), newStr: "Test Roaster Update" (19), hasLongContent: false
+page.tsx:601 Field: owner, oldStr: "null" (4), newStr: "null" (4), hasLongContent: true
+page.tsx:601 Field: images, oldStr: "["https://res.cloudinary.com/thebeans/image/upload/v1759632213/roaster-images/roaster-1759632212763-stumptown2.jpg"]" (116), newStr: "["https://example.com/test-image.jpg"]" (38), hasLongContent: true
+page.tsx:601 Field: name, oldStr: "Stumptown Coffee Roasters" (25), newStr: "Test Roaster Update" (19), hasLongContent: false
+page.tsx:601 Field: owner, oldStr: "null" (4), newStr: "null" (4), hasLongContent: true
+page.tsx:601 Field: images, oldStr: "["https://res.cloudinary.com/thebeans/image/upload/v1759632213/roaster-images/roaster-1759632212763-stumptown2.jpg"]" (116), newStr: "["https://example.com/test-image.jpg"]" (38), hasLongContent: true
+hot-reloader-client.js:187 [Fast Refresh] rebuilding
+hot-reloader-client.js:44 [Fast Refresh] done in 1993ms
+```
+
+Perfect! I found the issue! Looking at the console output:
+
+```
+Field: owner, oldStr: "null" (4), newStr: "null" (4), hasLongContent: true
+```
+
+The owner field is showing `hasLongContent: true` even though both values are only 4 characters long. This means one of the other conditions in the `hasLongContent` check is evaluating to `true`.
+
+Looking at the logic, it must be that change.old or change.new is being detected as an object type, even though it's displaying as "null". Let me add more detailed logging to see what's happening:
+
+`page.tsx +16 -6`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Now please open the audit log modal again and check the console output. This will show us exactly which condition is causing the owner field to be treated as long content.
+
+> still looks the same, here's the console output
+
+```shell
+Field: owner
+page.tsx:606   oldStr: "null" (4), typeof old: undefined, actual old: undefined
+page.tsx:607   newStr: "null" (4), typeof new: object, actual new: null
+page.tsx:608   isSpecialField: false, oldTooLong: false, newTooLong: false
+page.tsx:609   oldIsObject: false, newIsObject: true
+page.tsx:610   hasLongContent: true
+page.tsx:605 Field: owner
+page.tsx:606   oldStr: "null" (4), typeof old: undefined, actual old: undefined
+page.tsx:607   newStr: "null" (4), typeof new: object, actual new: null
+page.tsx:608   isSpecialField: false, oldTooLong: false, newTooLong: false
+page.tsx:609   oldIsObject: false, newIsObject: true
+page.tsx:610   hasLongContent: true
+```
+
+Perfect! I found the issue! The problem is that null in JavaScript has typeof null === 'object' (this is a well-known JavaScript quirk). So even though the value is null, it's being detected as an object type, which triggers the hasLongContent condition.
+
+Let me fix this by updating the logic to specifically handle null values:
+
+`page.tsx +5 -18`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the issue. The problem was a classic JavaScript gotcha: typeof `null === 'object'`. Even though null is not actually an object, JavaScript's `typeof` operator returns `'object'` for `null` values.
+
+### What I fixed:
+
+- **Before**: `(typeof change.old === 'object') || (typeof change.new === 'object')` - This was treating `null` as an object
+- **After**: `(typeof change.old === 'object' && change.old !== null) || (typeof change.new === 'object' && change.new !== null)` - This properly excludes `null` values from being treated as objects
+
+Now the "Owner" field with `null` values should display side-by-side as short content, while actual objects and arrays will still be treated as long content and display vertically.
+
+The client container has been restarted, so the fix should now be live! Try opening the audit log modal again and the Owner field should now show Old Value and New Value side-by-side.
+
+## 492nd try
+
+*(fixed!)*
