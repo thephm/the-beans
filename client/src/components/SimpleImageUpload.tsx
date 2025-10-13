@@ -223,9 +223,11 @@ export default function SimpleImageUpload({
               {uploading ? t('adminForms.roasters.saving', 'Uploading...') : t('adminForms.roasters.addImages', 'Add Images')}
             </button>
           </div>
-          <p className="text-base text-gray-600 mt-2 text-right font-medium">
-            {t('adminForms.roasters.imageGuidelines', 'Recommended: 800×450px minimum • JPG, PNG, WebP • Max 5MB each')}
-          </p>
+          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-700 font-medium">
+              {t('adminForms.roasters.imageGuidelines', 'Recommended: 800×450px minimum • JPG, PNG, WebP • Max 5MB each')}
+            </p>
+          </div>
         </div>
       )}
 
