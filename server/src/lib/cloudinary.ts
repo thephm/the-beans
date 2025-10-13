@@ -68,6 +68,36 @@ export const upload = multer({
   },
 });
 
+// Function to upload image from URL to Cloudinary
+export const uploadImageFromUrl = async (imageUrl: string, roasterId: string): Promise<{ url: string; publicId: string } | null> => {
+  try {
+    const timestamp = Date.now();
+    const publicId = `roaster-${timestamp}-${roasterId}`;
+    
+    const result = await cloudinary.uploader.upload(imageUrl, {
+      folder: 'roaster-images',
+      public_id: publicId,
+      transformation: [
+        {
+          width: 1200,
+          height: 800,
+          crop: 'limit',
+          quality: 'auto:good',
+          fetch_format: 'auto'
+        }
+      ]
+    });
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id
+    };
+  } catch (error) {
+    console.error('Error uploading image from URL to Cloudinary:', error);
+    return null;
+  }
+};
+
 // Function to delete image from Cloudinary
 export const deleteImage = async (publicId: string): Promise<boolean> => {
   try {

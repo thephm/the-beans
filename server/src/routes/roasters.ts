@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, validationResult, param, query } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
-import { upload, deleteImage } from '../lib/cloudinary';
+import { upload, deleteImage, uploadImageFromUrl } from '../lib/cloudinary';
 import { canEditRoaster } from '../middleware/roasterAuth';
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
@@ -592,6 +592,45 @@ router.post('/', [
       }
     });
 
+    // Process any image URLs in the images array - upload them to Cloudinary
+    if (roasterData.images && Array.isArray(roasterData.images) && roasterData.images.length > 0) {
+      try {
+        const imageUploadPromises = roasterData.images.map(async (imageUrl: string, index: number) => {
+          // Check if it's an external URL (not already a Cloudinary URL)
+          if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http') && !imageUrl.includes('cloudinary.com')) {
+            const uploadResult = await uploadImageFromUrl(imageUrl, roaster.id);
+            if (uploadResult) {
+              // Create a RoasterImage record
+              await prisma.roasterImage.create({
+                data: {
+                  roasterId: roaster.id,
+                  url: uploadResult.url,
+                  publicId: uploadResult.publicId,
+                  isPrimary: index === 0, // First image is primary
+                  uploadedById: req.userId,
+                }
+              });
+              return uploadResult.url;
+            }
+          }
+          return imageUrl; // Return original URL if already processed or failed
+        });
+
+        const processedImages = await Promise.all(imageUploadPromises);
+        
+        // Update the roaster's images array with the new Cloudinary URLs
+        await prisma.roaster.update({
+          where: { id: roaster.id },
+          data: { 
+            images: processedImages.filter(Boolean) // Remove any null/undefined results
+          }
+        });
+      } catch (imageError) {
+        console.error('Error processing images for roaster:', imageError);
+        // Don't fail the roaster creation if image processing fails
+      }
+    }
+
     // Store entity for audit logging
     res.locals.auditEntity = roaster;
     console.log('Roaster creation - stored entity for audit:', { roasterId: roaster.id, hasAuditEntity: !!res.locals.auditEntity });
@@ -779,6 +818,50 @@ router.put('/:id', [
         }
       }
     });
+
+    // Process any image URLs in the images array - upload them to Cloudinary
+    if (updateData.images && Array.isArray(updateData.images) && updateData.images.length > 0) {
+      try {
+        const imageUploadPromises = updateData.images.map(async (imageUrl: string, index: number) => {
+          // Check if it's an external URL (not already a Cloudinary URL)
+          if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http') && !imageUrl.includes('cloudinary.com')) {
+            const uploadResult = await uploadImageFromUrl(imageUrl, roaster.id);
+            if (uploadResult) {
+              // Check if this roaster already has images, to determine if this should be primary
+              const existingImageCount = await prisma.roasterImage.count({
+                where: { roasterId: roaster.id }
+              });
+              
+              // Create a RoasterImage record
+              await prisma.roasterImage.create({
+                data: {
+                  roasterId: roaster.id,
+                  url: uploadResult.url,
+                  publicId: uploadResult.publicId,
+                  isPrimary: existingImageCount === 0 && index === 0, // First image is primary only if no existing images
+                  uploadedById: req.userId,
+                }
+              });
+              return uploadResult.url;
+            }
+          }
+          return imageUrl; // Return original URL if already processed or failed
+        });
+
+        const processedImages = await Promise.all(imageUploadPromises);
+        
+        // Update the roaster's images array with the new Cloudinary URLs
+        await prisma.roaster.update({
+          where: { id: roaster.id },
+          data: { 
+            images: processedImages.filter(Boolean) // Remove any null/undefined results
+          }
+        });
+      } catch (imageError) {
+        console.error('Error processing images for roaster update:', imageError);
+        // Don't fail the roaster update if image processing fails
+      }
+    }
 
     // Store entity for audit logging
     res.locals.auditEntity = roaster;

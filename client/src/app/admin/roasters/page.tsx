@@ -373,6 +373,41 @@ const RoasterForm: React.FC<{
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
+  // Utility function to convert Unsplash URLs to proper image URLs
+  const convertToImageUrl = (url: string): string => {
+    if (!url) return url;
+    
+    console.log('Processing URL:', url);
+    
+    // Handle Unsplash URLs
+    if (url.includes('unsplash.com')) {
+      // If it's already a direct images.unsplash.com URL, return as is
+      if (url.includes('images.unsplash.com')) {
+        console.log('Already a direct image URL:', url);
+        return url;
+      }
+      
+      // Convert various Unsplash URL formats to direct image URLs
+      if (url.includes('/photos/')) {
+        const photoPathMatch = url.match(/\/photos\/([^/?#]+)/);
+        if (photoPathMatch) {
+          const photoId = photoPathMatch[1];
+          console.log('Extracted photo ID:', photoId);
+          
+          // For URLs like https://unsplash.com/photos/ZmOhgTobRQI
+          // The photo ID is directly after /photos/
+          const directImageUrl = `https://images.unsplash.com/photo-${photoId}?w=800&h=600&fit=crop&auto=format&q=80`;
+          console.log('Converting to:', directImageUrl);
+          
+          return directImageUrl;
+        }
+      }
+    }
+    
+    console.log('No conversion needed, returning original URL:', url);
+    return url; // Return original URL if not Unsplash or already processed
+  };
+
   // Helper function to convert old hours format to new format
   const convertHoursFormat = (hours: any) => {
     if (!hours) {
@@ -431,6 +466,7 @@ const RoasterForm: React.FC<{
     onlineOnly: roaster?.onlineOnly || false,
     hours: convertHoursFormat(roaster?.hours),
     ownerEmail: roaster?.owner?.email || '',
+    images: roaster?.images || [],
   });
 
   // Fetch images when editing existing roaster
@@ -625,11 +661,11 @@ const RoasterForm: React.FC<{
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
+            <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+              <h3 className="text-xl font-semibold text-gray-800 select-none">
                 {t('adminForms.roasters.basicInformation', 'Basic Information')}
               </h3>
               
@@ -715,8 +751,8 @@ const RoasterForm: React.FC<{
             </div>
 
             {/* Location & Details */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">
+            <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+              <h3 className="text-xl font-semibold text-gray-800 select-none">
                 {t('adminForms.roasters.locationDetails', 'Location & Details')}
               </h3>
 
@@ -815,95 +851,38 @@ const RoasterForm: React.FC<{
                   />
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.specialties', 'Specialties')} 
-                  <span className="text-sm text-gray-500 ml-1">({t('adminForms.roasters.specialtiesHint', 'comma separated')})</span>
-                </label>
-                <input
-                  type="text"
-                  name="specialties"
-                  value={formData.specialties}
-                  onChange={handleInputChange}
-                  placeholder="espresso, pour over, cold brew"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+          {/* Specialties Pane */}
+          <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
+              {t('adminForms.roasters.specialties', 'Specialties')}
+            </h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('adminForms.roasters.specialties', 'Specialties')} 
+                <span className="text-sm text-gray-500 ml-1">({t('adminForms.roasters.specialtiesHint', 'comma separated')})</span>
+              </label>
+              <input
+                type="text"
+                name="specialties"
+                value={formData.specialties}
+                onChange={handleInputChange}
+                placeholder="espresso, pour over, cold brew"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
 
-              {/* Online Only Section */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="onlineOnly"
-                  checked={formData.onlineOnly}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label className="ml-2 block text-sm text-gray-700">
-                  {t('adminForms.roasters.onlineOnly', 'Online Only')}
-                </label>
-              </div>
-
-              {/* Hours Section - Only show if not online only */}
-              {!formData.onlineOnly && (
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-3">
-                    {t('adminForms.roasters.hours.title', 'Opening Hours')}
-                  </h4>
-                  <div className="space-y-3">
-                    {Object.entries(formData.hours as Record<string, any>).map(([day, dayHours]: [string, any]) => (
-                      <div key={day} className="p-3 bg-gray-50 rounded-md space-y-2">
-                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                          <div className="w-full sm:w-24">
-                            <label className="text-sm font-medium text-gray-700 capitalize">
-                              {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={dayHours?.closed || false}
-                              onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <span className="text-sm text-gray-600">
-                              {t('adminForms.roasters.hours.closed', 'Closed')}
-                            </span>
-                          </div>
-                        </div>
-                        {!dayHours?.closed && (
-                          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 sm:pl-28">
-                            <div className="flex items-center space-x-2">
-                              <label className="text-sm text-gray-600 w-12">
-                                {t('adminForms.roasters.hours.open', 'Open')}:
-                              </label>
-                              <input
-                                type="time"
-                                value={dayHours?.open || '08:00'}
-                                onChange={(e) => handleHoursChange(day, 'open', e.target.value)}
-                                className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                              />
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <label className="text-sm text-gray-600 w-12">
-                                {t('adminForms.roasters.hours.close', 'Close')}:
-                              </label>
-                              <input
-                                type="time"
-                                value={dayHours?.close || '18:00'}
-                                onChange={(e) => handleHoursChange(day, 'close', e.target.value)}
-                                className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
+          {/* Settings Pane - Online Only, Rating, Verified, Featured */}
+          <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
+              {t('adminForms.roasters.settings', 'Settings')}
+            </h3>
+            
+            <div className="space-y-4">
+              {/* Rating */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('adminForms.roasters.rating', 'Rating')}
@@ -916,11 +895,12 @@ const RoasterForm: React.FC<{
                   name="rating"
                   value={formData.rating}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
-              <div className="space-y-3">
+              {/* Checkboxes on same line with responsive stacking */}
+              <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-3 sm:space-y-0">
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -929,7 +909,7 @@ const RoasterForm: React.FC<{
                     onChange={handleInputChange}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label className="ml-2 block text-sm text-gray-700">
+                  <label className="ml-2 block text-sm font-medium text-gray-700">
                     {t('adminForms.roasters.verified', 'Verified')}
                   </label>
                 </div>
@@ -941,19 +921,90 @@ const RoasterForm: React.FC<{
                     onChange={handleInputChange}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label className="ml-2 block text-sm text-gray-700">
+                  <label className="ml-2 block text-sm font-medium text-gray-700">
                     {t('adminForms.roasters.featured', 'Featured')}
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="onlineOnly"
+                    checked={formData.onlineOnly}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 block text-sm font-medium text-gray-700">
+                    {t('adminForms.roasters.onlineOnly', 'Online Only')}
                   </label>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Opening Hours Section - Only show if not online only */}
+          {!formData.onlineOnly && (
+            <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+              <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
+                {t('adminForms.roasters.hours.title', 'Opening Hours')}
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {Object.entries(formData.hours as Record<string, any>).map(([day, dayHours]: [string, any]) => (
+                  <div key={day} className="p-3 bg-white rounded-md space-y-2 border border-gray-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                      <div className="w-full sm:w-24">
+                        <label className="text-sm font-medium text-gray-700 capitalize">
+                          {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={dayHours?.closed || false}
+                          onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-gray-600">
+                          {t('adminForms.roasters.hours.closed', 'Closed')}
+                        </span>
+                      </div>
+                    </div>
+                    {!dayHours?.closed && (
+                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 sm:pl-28">
+                        <div className="flex items-center space-x-2">
+                          <label className="text-sm text-gray-600 w-12">
+                            {t('adminForms.roasters.hours.open', 'Open')}:
+                          </label>
+                          <input
+                            type="time"
+                            value={dayHours?.open || '08:00'}
+                            onChange={(e) => handleHoursChange(day, 'open', e.target.value)}
+                            className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <label className="text-sm text-gray-600 w-12">
+                            {t('adminForms.roasters.hours.close', 'Close')}:
+                          </label>
+                          <input
+                            type="time"
+                            value={dayHours?.close || '18:00'}
+                            onChange={(e) => handleHoursChange(day, 'close', e.target.value)}
+                            className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Images Section - Only show when editing existing roaster and images are loaded */}
           {roaster && roaster.id && imagesLoaded && (
-            <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
               <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
-                {t('adminForms.roasters.images', 'Images')}
+                {t('adminForms.roasters.uploadedImages', 'Uploaded Images')}
               </h3>
               <SimpleImageUpload
                 roasterId={roaster.id}
@@ -964,8 +1015,117 @@ const RoasterForm: React.FC<{
             </div>
           )}
 
+          {/* URL Images Section - Show when editing existing roaster with URL images */}
+          {roaster && roaster.id && (
+            <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+              <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
+                {t('adminForms.roasters.urlImages', 'URL Images')} ({(formData.images || []).length})
+              </h3>
+              
+              {/* Existing URL Images */}
+              {formData.images && formData.images.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                  {formData.images.map((imageUrl, index) => (
+                    <div key={index} className="relative group">
+                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border">
+                        <img
+                          src={convertToImageUrl(imageUrl)}
+                          alt={`${formData.name} - Image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.log('Image failed to load:', convertToImageUrl(imageUrl));
+                            // Try alternative format for Unsplash
+                            if (imageUrl.includes('unsplash.com') && !e.currentTarget.src.includes('/images/default-cafe.svg')) {
+                              const photoId = imageUrl.match(/\/photos\/([^/?#]+)/)?.[1];
+                              if (photoId) {
+                                e.currentTarget.src = `https://images.unsplash.com/${photoId}?w=800&h=600&fit=crop&auto=format&q=80`;
+                                return;
+                              }
+                            }
+                            e.currentTarget.src = '/images/default-cafe.svg';
+                          }}
+                          onLoad={() => {
+                            console.log('Image loaded successfully:', convertToImageUrl(imageUrl));
+                          }}
+                        />
+                      </div>
+                      <div className="mt-1 flex items-center justify-between">
+                        <input
+                          type="text"
+                          value={imageUrl}
+                          onChange={(e) => {
+                            const newImages = [...(formData.images || [])];
+                            newImages[index] = e.target.value;
+                            setFormData({ ...formData, images: newImages });
+                          }}
+                          className="text-xs text-gray-600 bg-white border rounded px-2 py-1 w-full mr-2"
+                          placeholder="Image URL"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = (formData.images || []).filter((_, i) => i !== index);
+                            setFormData({ ...formData, images: newImages });
+                          }}
+                          className="text-red-500 hover:text-red-700 text-sm font-bold px-2 py-1"
+                          title="Remove image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add New URL Image */}
+              <div className="mb-4">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Add image URL (e.g., https://unsplash.com/photos/coffee-abc123def or direct URL)"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const input = e.target as HTMLInputElement;
+                        const newUrl = input.value.trim();
+                        if (newUrl && newUrl.startsWith('http')) {
+                          const convertedUrl = convertToImageUrl(newUrl);
+                          const newImages = [...(formData.images || []), convertedUrl];
+                          setFormData({ ...formData, images: newImages });
+                          input.value = '';
+                        }
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                      const newUrl = input.value.trim();
+                      if (newUrl && newUrl.startsWith('http')) {
+                        const convertedUrl = convertToImageUrl(newUrl);
+                        const newImages = [...(formData.images || []), convertedUrl];
+                        setFormData({ ...formData, images: newImages });
+                        input.value = '';
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                <p className="font-medium">ℹ️ About URL Images:</p>
+                <p>Image URLs serve as fallback images when uploaded images are not accessible.</p>
+              </div>
+            </div>
+          )}
+
           {/* Form Actions */}
-          <div className="mt-8 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4 border-t">
+          <div className="mt-8 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4">
             <button
               type="button"
               onClick={onCancel}

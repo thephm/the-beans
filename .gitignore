@@ -152,3 +152,8 @@ prisma/migrations/
 
 # Cloudinary uploads
 uploads/
+
+# Test data files
+test.json
+failed_posts*
+test-image.txt
