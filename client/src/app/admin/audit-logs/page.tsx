@@ -582,47 +582,86 @@ export default function AuditLogsPage() {
                   <h4 className="text-md font-semibold text-gray-800 mb-2">
                     {selectedLog.action === 'CREATE' ? 'Field values:' : 'Field Changes:'}
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {Object.entries(selectedLog.changes).map(([field, change]) => (
-                      <div key={field} className="border rounded p-3">
-                        <div className={`font-semibold text-sm mb-2 capitalize ${
-                          selectedLog.action === 'CREATE' ? 'text-blue-600' : 'text-gray-700'
-                        }`}>
-                          {field.replace(/([A-Z])/g, ' $1').trim()}
-                        </div>
-                        {selectedLog.action === 'CREATE' ? (
-                          <div className="text-sm">
-                            <div className="p-2 bg-blue-50 border border-blue-200 rounded text-gray-900">
-                              {typeof change.new === 'object' ? 
-                                JSON.stringify(change.new, null, 2) : 
-                                String(change.new || '')
-                              }
-                            </div>
+                  <div className="space-y-4">
+                    {Object.entries(selectedLog.changes).map(([field, change]) => {
+                      // Check if the field contains long content (like URLs or images)
+                      const oldStr = typeof change.old === 'object' ? JSON.stringify(change.old) : String(change.old || 'null');
+                      const newStr = typeof change.new === 'object' ? JSON.stringify(change.new) : String(change.new || 'null');
+                      
+                      const hasLongContent = ['images', 'imageUrl', 'photos'].includes(field.toLowerCase()) || 
+                        oldStr.length > 50 || 
+                        newStr.length > 50 ||
+                        (typeof change.old === 'object') ||
+                        (typeof change.new === 'object');
+
+                      return (
+                        <div key={field} className="border rounded p-3">
+                          <div className={`font-semibold text-sm mb-2 capitalize ${
+                            selectedLog.action === 'CREATE' ? 'text-blue-600' : 'text-gray-700'
+                          }`}>
+                            {field.replace(/([A-Z])/g, ' $1').trim()}
                           </div>
-                        ) : (
-                          <div className="text-sm">
-                            <div className="grid grid-cols-2 gap-2 mb-1">
-                              <span className="text-red-600 font-medium">Old Value:</span>
-                              <span className="text-green-600 font-medium">New Value:</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="p-2 bg-red-50 border border-red-200 rounded text-gray-900">
-                                {typeof change.old === 'object' ? 
-                                  JSON.stringify(change.old, null, 2) : 
-                                  String(change.old || 'null')
-                                }
-                              </div>
-                              <div className="p-2 bg-green-50 border border-green-200 rounded text-gray-900">
+                          {selectedLog.action === 'CREATE' ? (
+                            <div className="text-sm">
+                              <div className="p-2 bg-blue-50 border border-blue-200 rounded text-gray-900 break-all">
                                 {typeof change.new === 'object' ? 
                                   JSON.stringify(change.new, null, 2) : 
-                                  String(change.new || 'null')
+                                  String(change.new || '')
                                 }
                               </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                          ) : (
+                            <div className="text-sm">
+                              {hasLongContent ? (
+                                // Stack vertically for long content - always vertical
+                                <div className="space-y-3">
+                                  <div>
+                                    <span className="text-red-600 font-medium block mb-1">Old Value:</span>
+                                    <div className="p-2 bg-red-50 border border-red-200 rounded text-gray-900 break-all">
+                                      {typeof change.old === 'object' ? 
+                                        JSON.stringify(change.old, null, 2) : 
+                                        String(change.old || 'null')
+                                      }
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="text-green-600 font-medium block mb-1">New Value:</span>
+                                    <div className="p-2 bg-green-50 border border-green-200 rounded text-gray-900 break-all">
+                                      {typeof change.new === 'object' ? 
+                                        JSON.stringify(change.new, null, 2) : 
+                                        String(change.new || 'null')
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                // Responsive layout for short content - side by side on larger screens, stacked on mobile
+                                <div>
+                                  <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mb-1">
+                                    <span className="text-red-600 font-medium">Old Value:</span>
+                                    <span className="text-green-600 font-medium">New Value:</span>
+                                  </div>
+                                  <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
+                                    <div className="p-2 bg-red-50 border border-red-200 rounded text-gray-900 break-words">
+                                      {typeof change.old === 'object' ? 
+                                        JSON.stringify(change.old, null, 2) : 
+                                        String(change.old || 'null')
+                                      }
+                                    </div>
+                                    <div className="p-2 bg-green-50 border border-green-200 rounded text-gray-900 break-words">
+                                      {typeof change.new === 'object' ? 
+                                        JSON.stringify(change.new, null, 2) : 
+                                        String(change.new || 'null')
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

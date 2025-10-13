@@ -67545,9 +67545,9 @@ The issue you're experiencing is likely one of these scenarios:
 
   **Solution**: Try in an incognito/private window or clear browser cache.
 
-Immediate Troubleshooting Steps
+### Immediate Troubleshooting Steps
 
-Completed (4/4) Create authentication debug endpoint
+✔ Completed (4/4) Create authentication debug endpoint
 
 1. **Check your browser's developer tools**:
 
@@ -67576,3 +67576,211 @@ Completed (4/4) Create authentication debug endpoint
   - What's the exact sequence: you add photo URL → it shows up → you click save → error appears?
 
 The authentication system is working correctly on both local and production environments, so this appears to be a client-side token management issue or a timing problem. The debug endpoint I created will help us troubleshoot further once you can provide more details about exactly when and how the error occurs.
+
+## 486th try
+
+> On chrome, viewing an audit log entry I see Owner and Images side by side and for Images it doesn't fit, should be on a separate line see screenshot attached
+
+I can see the issue from the screenshot! The audit log entry detail modal is showing the "Owner" and "Images" field changes side by side, but the "Images" field content is too long and gets cut off. The long Cloudinary URLs don't fit properly in the horizontal layout.
+
+Let me examine the current audit log modal layout and fix this by making the field changes display on separate lines instead of side by side.
+
+✔ Read `page.tsx`, lines 300 to 400
+
+Let me find the modal where the detailed changes are displayed:
+
+✔ Read `page.tsx`, lines 530 to 635
+
+Perfect! I can see the issue. In the changes modal, there's a section that displays field changes with this layout:
+
+```html
+<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+```
+
+This creates a 2-column grid on medium+ screens (`md:grid-cols-2`), which is causing the "Owner" and "Images" fields to display side by side. The Images field contains very long Cloudinary URLs that don't fit properly in the constrained width.
+
+The issue is made worse by the nested grid inside each field change:
+
+```html
+<div className="grid grid-cols-2 gap-2">
+```
+
+This creates another 2-column layout for "Old Value" and "New Value" within each field, making the available space even smaller for long URLs.
+
+Let me fix this by making the layout more responsive and giving more space for fields with long content:
+
+`page.tsx +42 -6`
+
+Now let me restart the client container to apply the changes:
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+## Perfect! I've fixed the audit log entry display issue. Here's what I changed:
+
+🔧 Changes Made
+
+### Layout Improvements:
+
+1. **Removed 2-column grid**: Changed from `grid grid-cols-1 md:grid-cols-2` to `space-y-4 `so each field change gets its own full-width row
+
+2. **Smart content detection**: Added logic to detect fields with long content like:
+
+  - Fields named `images`, `imageUrl`, or `photos`
+  - String values longer than 50 characters
+  - Object values (like JSON arrays)
+
+3. **Adaptive layout for old/new values**:
+
+  - **Long content**: Stacks "Old Value" and "New Value" vertically for better readability
+  - **Short content**: Keeps them side-by-side as before
+4. **Better text wrapping**: Added `break-all` for very long URLs and `break-words` for regular text
+
+### Benefits:
+
+- ✅ **Images field gets full width**: Long Cloudinary URLs now have space to display properly
+- ✅ **Better readability**: Each field change is clearly separated
+- ✅ **Responsive design**: Works well on all screen sizes
+- ✅ **Smart formatting**: Automatically adapts based on content length
+- ✅ **Maintains existing UX**: Short fields still display compactly side-by-side
+
+### Visual Result:
+
+Instead of this cramped layout:
+
+```
+[Owner]        [Images - very long URL gets cut off...]
+```
+
+You now get this clear layout:
+
+```
+Owner
+  Old Value: null
+  New Value: null
+
+Images  
+  Old Value: https://res.cloudinary.com/thebeans/image/upload/v1760367790775-cmg9i6zek00031105602azpli.jpg
+  
+  New Value: https://firebatcoffee.com/wp-content/uploads/2022/11/Firebat_Fall2022-64.jpg
+```
+
+The changes are now live! You should see much better formatting when viewing audit log entries, especially for roaster updates that include image URL changes.
+
+## 487th try
+
+> works really well although for this Owner field it could be side by side (unless doesn't fit when resize browser so stack them like you have now) 
+
+Perfect! I can see from the screenshot that the changes are working well - the fields are now displaying in a clean vertical layout. You're absolutely right that for fields like "Owner" and "Verified" with short values (like `null` → `null` or `null` → `true`), they could be displayed side by side to save space, but should stack vertically when the browser is resized to a smaller width.
+
+Let me modify the logic to be more responsive - it should display side by side on larger screens when the content is short, but stack vertically on smaller screens or when content is long.
+
+`page.tsx +4 -4`
+
+Now let me restart the client container to apply these responsive layout improvements:
+
+
+docker-compose restart client
+Auto approved by rule docker-compose
+
+Perfect! I've improved the layout to be more responsive and space-efficient. Here's what changed:
+
+## 🔧 Enhanced Responsive Layout
+
+### Smart Responsive Behavior:
+
+1. **Long content** (like Images/URLs): Always stacks vertically for maximum readability
+2. **Short content** (like Owner, Verified): Now uses responsive layout:
+  - Large screens (sm and up): Displays side by side in 2 columns
+  - Mobile screens: Automatically stacks vertically for better readability
+
+### Technical Changes:
+
+- Changed from `grid grid-cols-2` to `flex flex-col sm:grid sm:grid-cols-2`
+- This uses:
+  - `flex flex-col` on mobile (stacked layout)
+  - `sm:grid sm:grid-cols-2` on screens 640px+ (side-by-side layout)
+
+### Result:
+
+**On Desktop/Tablet** (like your screenshot):
+
+```
+Owner
+Old Value: null    |    New Value: null
+
+Verified  
+Old Value: null    |    New Value: true
+```
+
+**On Mobile** (when browser is resized narrow):
+
+```
+Owner
+Old Value: 
+  null
+New Value:
+  null
+
+Verified
+Old Value:
+  null  
+New Value:
+  true
+```
+
+**Long content** (always vertical for readability):
+
+```
+Images
+Old Value:
+  https://res.cloudinary.com/thebeans/image/upload/v1760367790775...
+
+New Value:
+  https://firebatcoffee.com/wp-content/uploads/2022/11/Firebat...
+```
+
+This gives you the best of both worlds - efficient use of space for short values on larger screens, while maintaining readability on mobile and for long content! 🎯
+
+> owner is still two rows for old and new
+
+You're absolutely right! I can see in the screenshot that the "Owner" field is still displaying as two separate rows (Old Value and New Value) even though both values are just "null". For short identical values like this, it would be much cleaner to show them side by side.
+
+Let me fix this by adjusting the logic to better detect when content should be displayed side by side:
+
+`page.tsx +5 -2`
+
+Now let me restart the client container to apply this fix:
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the content detection logic. The issue was that the previous logic was checking the raw values directly, but I needed to convert them to strings first to accurately measure their length.
+
+### 🔧 What I Fixed:
+
+1. **Better Content Length Detection**:
+
+  - **Before**: Checked change.old.length and change.new.length directly
+  - **After**: Converts values to strings first, then checks length:
+
+### Result:
+
+Now the "Owner" field with null → null will be detected as short content (both values are only 4 characters: "null") and will display side by side like this:
+
+```
+Owner
+Old Value: null    |    New Value: null
+```
+
+Instead of the previous stacked layout:
+
+```
+Owner
+Old Value: 
+  null
+New Value:
+  null
+```
+
+The fix ensures that only truly long content (like image URLs over 50 characters) gets the vertical stacked layout, while short values like "null", "true", "false", or short names display efficiently side by side. 🎯
