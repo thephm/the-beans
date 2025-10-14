@@ -83,6 +83,12 @@ model Roaster {
   longitude   Float?
   images      String[]
   hours       Json?    // Store opening hours as JSON
+  
+  // Owner contact information
+  ownerName   String?  // Owner's name
+  ownerEmail  String?  // Owner's email (duplicate of email field for clarity)
+  ownerBio    String?  // Owner's biography/description
+  ownerMobile String?  // Owner's mobile phone number
   onlineOnly  Boolean  @default(false) // True if roaster operates online only (no physical location)
   specialties String[] // Array of specialties like "Espresso", "Single Origin", etc.
   verified    Boolean  @default(false)

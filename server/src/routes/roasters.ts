@@ -541,6 +541,9 @@ router.post('/', [
   body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialties').optional().isArray().withMessage('Specialties must be an array'),
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
+  body('ownerName').optional().isLength({ max: 100 }).withMessage('Owner name must be less than 100 characters'),
+  body('ownerBio').optional().isLength({ max: 1000 }).withMessage('Owner bio must be less than 1000 characters'),
+  body('ownerMobile').optional().isLength({ max: 20 }).withMessage('Owner mobile must be less than 20 characters'),
 ], requireAuth, auditBefore('roaster', 'CREATE'), async (req: any, res: any) => {
   try {
     console.log('Roaster creation - audit setup:', { userId: req.userId, hasAuditData: !!req.auditData });
@@ -749,6 +752,9 @@ router.put('/:id', [
   body('featured').optional().isBoolean().withMessage('Featured must be true or false'),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
+  body('ownerName').optional().isLength({ max: 100 }).withMessage('Owner name must be less than 100 characters'),
+  body('ownerBio').optional().isLength({ max: 1000 }).withMessage('Owner bio must be less than 1000 characters'),
+  body('ownerMobile').optional().isLength({ max: 20 }).withMessage('Owner mobile must be less than 20 characters'),
 ], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
     console.log('Roaster UPDATE - audit setup:', { userId: req.userId, hasAuditData: !!req.auditData, hasOldValues: !!req.auditData?.oldValues });

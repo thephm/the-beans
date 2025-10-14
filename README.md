@@ -7,10 +7,11 @@ A beautiful, modern full-stack web application for discovering and exploring spe
 ### Core Features
 - 🌍 **Location-based Discovery**: Find coffee roasters near you
 - ☕ **Roaster Profiles**: Detailed information including contact info, hours, and bean offerings
-- 👥 **User Authentication**: Secure sign up and login system
+- � **Owner Contact Information**: Store roaster owner details (name, email, bio, mobile)
+- �👥 **User Authentication**: Secure sign up and login system
 - ⭐ **Reviews & Favorites**: Rate roasters and save your favorites
-- � **Image Uploads**: Upload and share roaster photos
-- � **Notifications**: Stay updated on new roasters and activity
+- 📸 **Image Uploads**: Upload and share roaster photos
+- 🔔 **Notifications**: Stay updated on new roasters and activity
 
 ### Technical Features
 - 🔒 **Secure API**: RESTful API with comprehensive Swagger documentation

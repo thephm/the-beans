@@ -57,7 +57,11 @@ Create a new roaster (requires authentication).
 	"zipCode": "...",
 	"latitude": 0,
 	"longitude": 0,
-	"specialties": ["Espresso", ...]
+	"specialties": ["Espresso", ...],
+	"ownerName": "...",
+	"ownerEmail": "...",
+	"ownerBio": "...",
+	"ownerMobile": "..."
 }
 ```
 
@@ -95,7 +99,7 @@ Delete an image (requires authentication and ownership).
 
 ## Roaster Object Fields
 
-- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `_count`
+- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `ownerName`, `ownerEmail`, `ownerBio`, `ownerMobile`, `beans`, `reviews`, `_count`
 
 
 See the Swagger (OpenAPI) documentation for full field details.
