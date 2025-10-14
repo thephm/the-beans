@@ -56,6 +56,12 @@ export interface Roaster {
   hours?: Record<string, any>;
   onlineOnly?: boolean; // True if roaster operates online only (no physical location)
   specialties: string[];
+  
+  // Owner contact information
+  ownerName?: string;
+  ownerEmail?: string;
+  ownerBio?: string;
+  ownerMobile?: string;
   verified: boolean;
   featured: boolean;
   rating: number;

@@ -11,6 +11,9 @@ List of requirements and user stories for roasters.
 - Roaster profiles display ratings, review counts, specialties, contact info, and hours.
 - Authenticated users can create new roasters.
 - Roaster data is available in multiple languages.
+- Roaster owners can provide detailed contact information (name, email, bio, mobile).
+- Admin users can manage roaster owner contact information through the admin interface.
+- Owner contact information is optional but enhances roaster profiles when provided.
 
 ## Non-Functional Requirements
 - API must respond within 1 second for standard queries.

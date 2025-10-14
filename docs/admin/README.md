@@ -13,6 +13,7 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 - View and edit all roasters
 - Verify roaster information
 - Manage roaster ownership
+- Update roaster owner contact information (name, email, bio, mobile)
 
 ### Audit Logging
 - Comprehensive activity tracking and monitoring
