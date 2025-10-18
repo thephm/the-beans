@@ -48,6 +48,9 @@ model User {
   notifications Notification[]
   comments     Comment[]
   uploadedImages RoasterImage[]
+  personRoles RoasterPerson[] @relation("UserPersonRole")
+  createdPeople RoasterPerson[] @relation("PersonCreatedBy")
+  updatedPeople RoasterPerson[] @relation("PersonUpdatedBy")
   
   // Audit relationships
   createdBy User? @relation("UserCreatedBy", fields: [createdById], references: [id])
@@ -84,11 +87,11 @@ model Roaster {
   images      String[]
   hours       Json?    // Store opening hours as JSON
   
-  // Owner contact information
-  ownerName   String?  // Owner's name
-  ownerEmail  String?  // Owner's email (duplicate of email field for clarity)
-  ownerBio    String?  // Owner's biography/description
-  ownerMobile String?  // Owner's mobile phone number
+  // Legacy owner contact fields (for backward compatibility during migration)
+  ownerName   String?  // Owner's name (deprecated - use people instead)
+  ownerEmail  String?  // Owner's email (deprecated - use people instead)
+  ownerBio    String?  // Owner's biography/description (deprecated - use people instead)
+  ownerMobile String?  // Owner's mobile phone number (deprecated - use people instead)
   onlineOnly  Boolean  @default(false) // True if roaster operates online only (no physical location)
   specialties String[] // Array of specialties like "Espresso", "Single Origin", etc.
   verified    Boolean  @default(false)
@@ -105,6 +108,7 @@ model Roaster {
   // Relationships
   owner    User?    @relation(fields: [ownerId], references: [id])
   ownerId  String?
+  people RoasterPerson[]
   reviews  Review[]
   favorites Favorite[]
   beans    Bean[]
@@ -116,6 +120,42 @@ model Roaster {
 
   @@unique([name])
   @@map("roasters")
+}
+
+model RoasterPerson {
+  id        String   @id @default(cuid())
+  roasterId String
+  roaster   Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+  
+  // Contact information
+  name      String
+  email     String?  // Optional - may not be a registered user
+  mobile    String?
+  bio       String?
+  
+  // Link to registered user (optional)
+  userId    String?
+  user      User?    @relation("UserPersonRole", fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Roles (multiple roles per person)
+  roles     String[] // Array of role names: "owner", "admin", "billing"
+  
+  // Status
+  isActive  Boolean  @default(true)
+  isPrimary Boolean  @default(false) // Primary contact for the roaster
+  
+  // Audit fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdById String?
+  updatedById String?
+  
+  // Audit relationships  
+  createdBy User? @relation("PersonCreatedBy", fields: [createdById], references: [id])
+  updatedBy User? @relation("PersonUpdatedBy", fields: [updatedById], references: [id])
+  
+  @@unique([roasterId, email]) // Prevent duplicate emails per roaster
+  @@map("roaster_people")
 }
 
 model RoasterImage {
