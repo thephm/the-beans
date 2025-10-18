@@ -57,7 +57,10 @@ export interface Roaster {
   onlineOnly?: boolean; // True if roaster operates online only (no physical location)
   specialties: string[];
   
-  // Owner contact information
+  // People system
+  people?: RoasterPerson[];
+  
+  // Legacy owner fields (for backward compatibility during transition)
   ownerName?: string;
   ownerEmail?: string;
   ownerBio?: string;
@@ -194,6 +197,40 @@ export interface AuditLogFilters {
   userId?: string;
   startDate?: string;
   endDate?: string;
+}
+
+export enum PersonRole {
+  OWNER = "owner",
+  ADMIN = "admin", 
+  BILLING = "billing"
+}
+
+export interface RoasterPerson {
+  id: string;
+  roasterId: string;
+  name: string;
+  email?: string;
+  mobile?: string;
+  bio?: string;
+  userId?: string;
+  user?: User;
+  roles: PersonRole[];
+  isActive: boolean;
+  isPrimary: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdById?: string;
+  updatedById?: string;
+  createdBy?: User;
+  updatedBy?: User;
+}
+
+export interface PersonPermissions {
+  canEditRoaster: boolean;
+  canManagePeople: boolean;
+  canViewBilling: boolean;
+  canEditBilling: boolean;
+  canDeleteRoaster: boolean;
 }
 
 export interface AuditLogStats {

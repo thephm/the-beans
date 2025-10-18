@@ -1,0 +1,405 @@
+import { Router } from 'express';
+import { body, param, validationResult } from 'express-validator';
+import { PrismaClient } from '@prisma/client';
+
+const router = Router();
+const prisma = new PrismaClient();
+
+// Stakeholder roles enum
+export enum StakeholderRole {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  BILLING = 'billing'
+}
+
+// Permission helper functions
+export function getStakeholderPermissions(roles: string[]): any {
+  const permissions = {
+    canEditRoaster: false,
+    canManageStakeholders: false,
+    canViewBilling: false,
+    canEditBilling: false,
+    canDeleteRoaster: false
+  };
+
+  for (const role of roles) {
+    switch (role) {
+      case StakeholderRole.OWNER:
+        permissions.canEditRoaster = true;
+        permissions.canManageStakeholders = true;
+        permissions.canViewBilling = true;
+        permissions.canEditBilling = true;
+        permissions.canDeleteRoaster = true;
+        break;
+      case StakeholderRole.ADMIN:
+        permissions.canEditRoaster = true;
+        permissions.canViewBilling = true;
+        break;
+      case StakeholderRole.BILLING:
+        permissions.canViewBilling = true;
+        permissions.canEditBilling = true;
+        break;
+    }
+  }
+
+  return permissions;
+}
+
+// Check if user has stakeholder permissions for a roaster
+async function hasStakeholderPermission(userId: string, roasterId: string, requiredPermission: keyof any): Promise<boolean> {
+  const stakeholder = await prisma.roasterStakeholder.findFirst({
+    where: {
+      roasterId,
+      OR: [
+        { userId },
+        { email: await getUserEmail(userId) }
+      ],
+      isActive: true
+    }
+  });
+
+  if (!stakeholder) return false;
+
+  const permissions = getStakeholderPermissions(stakeholder.roles);
+  return permissions[requiredPermission] || false;
+}
+
+async function getUserEmail(userId: string): Promise<string | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true }
+  });
+  return user?.email || null;
+}
+
+// GET /api/stakeholders/:roasterId - Get all stakeholders for a roaster
+router.get('/:roasterId', [
+  param('roasterId').isString().notEmpty()
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { roasterId } = req.params;
+    const userId = req.userId;
+
+    // Check if user is admin OR has permission to view this roaster's stakeholders
+    const isAdmin = req.userRole === 'admin';
+    const hasPermission = await hasStakeholderPermission(userId, roasterId, 'canManageStakeholders');
+
+    if (!isAdmin && !hasPermission) {
+      return res.status(403).json({ error: 'Insufficient permissions to view stakeholders' });
+    }
+
+    const stakeholders = await prisma.roasterStakeholder.findMany({
+      where: { roasterId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            firstName: true,
+            lastName: true
+          }
+        },
+        createdBy: {
+          select: {
+            id: true,
+            username: true
+          }
+        }
+      },
+      orderBy: [
+        { isPrimary: 'desc' },
+        { createdAt: 'asc' }
+      ]
+    });
+
+    // Add permissions to each stakeholder
+    const stakeholdersWithPermissions = stakeholders.map((stakeholder: any) => ({
+      ...stakeholder,
+      permissions: getStakeholderPermissions(stakeholder.roles)
+    }));
+
+    res.json({
+      stakeholders: stakeholdersWithPermissions,
+      count: stakeholders.length
+    });
+
+  } catch (error) {
+    console.error('Get stakeholders error:', error);
+    res.status(500).json({ error: 'Failed to retrieve stakeholders' });
+  }
+});
+
+// POST /api/stakeholders - Create a new stakeholder
+router.post('/', [
+  body('roasterId').isString().notEmpty(),
+  body('name').isString().isLength({ min: 1, max: 100 }),
+  body('email').optional().isEmail(),
+  body('mobile').optional().isString().isLength({ max: 20 }),
+  body('bio').optional().isString().isLength({ max: 1000 }),
+  body('roles').isArray().notEmpty().withMessage('At least one role is required'),
+  body('roles.*').isIn(['owner', 'admin', 'billing']),
+  body('isPrimary').optional().isBoolean()
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { roasterId, name, email, mobile, bio, roles, isPrimary } = req.body;
+    const userId = req.userId;
+
+    // Check if user is admin OR has permission to manage stakeholders for this roaster
+    const isAdmin = req.userRole === 'admin';
+    const hasPermission = await hasStakeholderPermission(userId, roasterId, 'canManageStakeholders');
+
+    if (!isAdmin && !hasPermission) {
+      return res.status(403).json({ error: 'Insufficient permissions to add stakeholders' });
+    }
+
+    // Verify roaster exists
+    const roaster = await prisma.roaster.findUnique({
+      where: { id: roasterId }
+    });
+
+    if (!roaster) {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+
+    // Check for duplicate email within this roaster
+    if (email) {
+      const existingStakeholder = await prisma.roasterStakeholder.findFirst({
+        where: {
+          roasterId,
+          email,
+          isActive: true
+        }
+      });
+
+      if (existingStakeholder) {
+        return res.status(400).json({ error: 'A stakeholder with this email already exists for this roaster' });
+      }
+    }
+
+    // If setting as primary, unset other primary stakeholders
+    if (isPrimary) {
+      await prisma.roasterStakeholder.updateMany({
+        where: {
+          roasterId,
+          isPrimary: true
+        },
+        data: {
+          isPrimary: false
+        }
+      });
+    }
+
+    // Try to link with existing user by email
+    let linkedUserId = null;
+    if (email) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true }
+      });
+      linkedUserId = existingUser?.id;
+    }
+
+    const stakeholder = await prisma.roasterStakeholder.create({
+      data: {
+        roasterId,
+        name,
+        email,
+        mobile,
+        bio,
+        userId: linkedUserId,
+        roles,
+        isPrimary: isPrimary || false,
+        createdById: userId
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            firstName: true,
+            lastName: true
+          }
+        }
+      }
+    });
+
+    res.status(201).json({
+      message: 'Stakeholder created successfully',
+      stakeholder: {
+        ...stakeholder,
+        permissions: getStakeholderPermissions(stakeholder.roles)
+      }
+    });
+
+  } catch (error) {
+    console.error('Create stakeholder error:', error);
+    res.status(500).json({ error: 'Failed to create stakeholder' });
+  }
+});
+
+// PUT /api/stakeholders/:id - Update a stakeholder
+router.put('/:id', [
+  param('id').isString().notEmpty(),
+  body('name').optional().isString().isLength({ min: 1, max: 100 }),
+  body('email').optional().isEmail(),
+  body('mobile').optional().isString().isLength({ max: 20 }),
+  body('bio').optional().isString().isLength({ max: 1000 }),
+  body('roles').optional().isArray().notEmpty(),
+  body('roles.*').optional().isIn(['owner', 'admin', 'billing']),
+  body('isPrimary').optional().isBoolean(),
+  body('isActive').optional().isBoolean()
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const userId = req.userId;
+    const updateData = req.body;
+
+    // Get existing stakeholder
+    const existingStakeholder = await prisma.roasterStakeholder.findUnique({
+      where: { id },
+      include: { roaster: true }
+    });
+
+    if (!existingStakeholder) {
+      return res.status(404).json({ error: 'Stakeholder not found' });
+    }
+
+    // Check permissions
+    const isAdmin = req.userRole === 'admin';
+    const hasPermission = await hasStakeholderPermission(userId, existingStakeholder.roasterId, 'canManageStakeholders');
+
+    if (!isAdmin && !hasPermission) {
+      return res.status(403).json({ error: 'Insufficient permissions to update stakeholder' });
+    }
+
+    // If setting as primary, unset other primary stakeholders
+    if (updateData.isPrimary) {
+      await prisma.roasterStakeholder.updateMany({
+        where: {
+          roasterId: existingStakeholder.roasterId,
+          isPrimary: true,
+          id: { not: id }
+        },
+        data: {
+          isPrimary: false
+        }
+      });
+    }
+
+    // Try to link with existing user if email changed
+    if (updateData.email && updateData.email !== existingStakeholder.email) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: updateData.email },
+        select: { id: true }
+      });
+      updateData.userId = existingUser?.id;
+    }
+
+    const updatedStakeholder = await prisma.roasterStakeholder.update({
+      where: { id },
+      data: {
+        ...updateData,
+        updatedById: userId
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            firstName: true,
+            lastName: true
+          }
+        }
+      }
+    });
+
+    res.json({
+      message: 'Stakeholder updated successfully',
+      stakeholder: {
+        ...updatedStakeholder,
+        permissions: getStakeholderPermissions(updatedStakeholder.roles)
+      }
+    });
+
+  } catch (error) {
+    console.error('Update stakeholder error:', error);
+    res.status(500).json({ error: 'Failed to update stakeholder' });
+  }
+});
+
+// DELETE /api/stakeholders/:id - Delete a stakeholder
+router.delete('/:id', [
+  param('id').isString().notEmpty()
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const userId = req.userId;
+
+    // Get existing stakeholder
+    const existingStakeholder = await prisma.roasterStakeholder.findUnique({
+      where: { id }
+    });
+
+    if (!existingStakeholder) {
+      return res.status(404).json({ error: 'Stakeholder not found' });
+    }
+
+    // Check permissions
+    const isAdmin = req.userRole === 'admin';
+    const hasPermission = await hasStakeholderPermission(userId, existingStakeholder.roasterId, 'canManageStakeholders');
+
+    if (!isAdmin && !hasPermission) {
+      return res.status(403).json({ error: 'Insufficient permissions to delete stakeholder' });
+    }
+
+    // Prevent deletion of the last owner
+    const ownerCount = await prisma.roasterStakeholder.count({
+      where: {
+        roasterId: existingStakeholder.roasterId,
+        roles: { has: 'owner' },
+        isActive: true
+      }
+    });
+
+    if (ownerCount === 1 && existingStakeholder.roles.includes('owner')) {
+      return res.status(400).json({ 
+        error: 'Cannot delete the last owner. Please assign ownership to another stakeholder first.' 
+      });
+    }
+
+    await prisma.roasterStakeholder.delete({
+      where: { id }
+    });
+
+    res.json({ message: 'Stakeholder deleted successfully' });
+
+  } catch (error) {
+    console.error('Delete stakeholder error:', error);
+    res.status(500).json({ error: 'Failed to delete stakeholder' });
+  }
+});
+
+export default router;

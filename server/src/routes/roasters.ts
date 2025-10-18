@@ -268,6 +268,24 @@ router.get('/', [
             lastName: true,
           }
         },
+        people: {
+          where: { isActive: true },
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              }
+            }
+          },
+          orderBy: [
+            { isPrimary: 'desc' },
+            { createdAt: 'asc' }
+          ]
+        },
         roasterImages: {
           orderBy: [
             { isPrimary: 'desc' },
@@ -540,6 +558,13 @@ router.post('/', [
   body('latitude').optional().isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
   body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialties').optional().isArray().withMessage('Specialties must be an array'),
+  // New nested owner contact validation
+  body('ownerContact.email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
+  body('ownerContact.name').optional().isLength({ max: 100 }).withMessage('Owner name must be less than 100 characters'),
+  body('ownerContact.bio').optional().isLength({ max: 1000 }).withMessage('Owner bio must be less than 1000 characters'),
+  body('ownerContact.mobile').optional().isLength({ max: 20 }).withMessage('Owner mobile must be less than 20 characters'),
+  
+  // Legacy individual field validation (for backward compatibility)
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   body('ownerName').optional().isLength({ max: 100 }).withMessage('Owner name must be less than 100 characters'),
   body('ownerBio').optional().isLength({ max: 1000 }).withMessage('Owner bio must be less than 1000 characters'),

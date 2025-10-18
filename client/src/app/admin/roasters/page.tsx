@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Roaster, RoasterImage } from '@/types';
+import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '@/types';
 import SimpleImageUpload from '@/components/SimpleImageUpload';
 
 const AdminRoastersPage: React.FC = () => {
@@ -20,6 +20,19 @@ const AdminRoastersPage: React.FC = () => {
   const [showUnverifiedOnly, setShowUnverifiedOnly] = useState(false);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [images, setImages] = useState<RoasterImage[]>([]);
+
+  // person management state
+  const [people, setPeople] = useState<RoasterPerson[]>([]);
+  const [showAddPerson, setShowAddPerson] = useState(false);
+  const [editingPerson, setEditingPerson] = useState<RoasterPerson | null>(null);
+  const [personForm, setpersonForm] = useState({
+    name: '',
+    email: '',
+    mobile: '',
+    bio: '',
+    roles: [] as PersonRole[],
+    isPrimary: false
+  });
 
   const fetchRoasters = async () => {
     setLoading(true);
@@ -373,6 +386,19 @@ const RoasterForm: React.FC<{
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
+  // person management state
+  const [people, setPeople] = useState<RoasterPerson[]>([]);
+  const [showAddPerson, setShowAddPerson] = useState(false);
+  const [editingPerson, setEditingPerson] = useState<RoasterPerson | null>(null);
+  const [personForm, setpersonForm] = useState({
+    name: '',
+    email: '',
+    mobile: '',
+    bio: '',
+    roles: [] as PersonRole[],
+    isPrimary: false
+  });
+
   // Utility function to convert Unsplash URLs to proper image URLs
   const convertToImageUrl = (url: string): string => {
     if (!url) return url;
@@ -465,10 +491,6 @@ const RoasterForm: React.FC<{
     rating: roaster?.rating || 0,
     onlineOnly: roaster?.onlineOnly || false,
     hours: convertHoursFormat(roaster?.hours),
-    ownerEmail: roaster?.owner?.email || '',
-    ownerName: roaster?.ownerName || '',
-    ownerBio: roaster?.ownerBio || '',
-    ownerMobile: roaster?.ownerMobile || '',
     images: roaster?.images || [],
   });
 
@@ -634,6 +656,159 @@ const RoasterForm: React.FC<{
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // person management functions
+  const fetchPeople = async () => {
+    if (!roaster?.id) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/people/${roaster.id}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPeople(data.people || []);
+      }
+    } catch (error) {
+      console.error('Error fetching people:', error);
+    }
+  };
+
+  const resetPersonForm = () => {
+    setpersonForm({
+      name: '',
+      email: '',
+      mobile: '',
+      bio: '',
+      roles: [],
+      isPrimary: false
+    });
+    setEditingPerson(null);
+    setShowAddPerson(false);
+  };
+
+  const handleAddPerson = () => {
+    resetPersonForm();
+    setShowAddPerson(true);
+  };
+
+  const handleEditPerson = (person: RoasterPerson) => {
+    setpersonForm({
+      name: person.name,
+      email: person.email || '',
+      mobile: person.mobile || '',
+      bio: person.bio || '',
+      roles: person.roles,
+      isPrimary: person.isPrimary
+    });
+    setEditingPerson(person);
+    setShowAddPerson(true);
+  };
+
+  const handlePersonRoleChange = (role: PersonRole, checked: boolean) => {
+    setpersonForm(prev => ({
+      ...prev,
+      roles: checked 
+        ? [...prev.roles, role]
+        : prev.roles.filter(r => r !== role)
+    }));
+  };
+
+  const submitPerson = async () => {
+    if (!roaster?.id && !formData.name) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      
+      const url = editingPerson 
+        ? `${apiUrl}/api/people/${editingPerson.id}`
+        : `${apiUrl}/api/people`;
+      
+      const method = editingPerson ? 'PUT' : 'POST';
+      
+      const payload = {
+        ...personForm,
+        roasterId: roaster?.id || 'temp' // Will be set after roaster creation
+      };
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        resetPersonForm();
+        if (roaster?.id) {
+          fetchPeople(); // Only fetch if roaster exists
+        }
+      } else {
+        const errorData = await response.json();
+        
+        // Handle validation errors with specific field messages
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const errorMessages = errorData.errors.map((err: any) => err.msg).join(', ');
+          throw new Error(errorMessages);
+        }
+        
+        throw new Error(errorData.error || 'Failed to save person');
+      }
+    } catch (error) {
+      console.error('Error saving person:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save person');
+    }
+  };
+
+  const deletePerson = async (personId: string) => {
+    if (!confirm('Are you sure you want to delete this person?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${apiUrl}/api/people/${personId}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+
+      if (response.ok) {
+        fetchPeople();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete person');
+      }
+    } catch (error) {
+      console.error('Error deleting person:', error);
+      setError('Failed to delete person');
+    }
+  };
+
+  // Fetch people when editing existing roaster
+  React.useEffect(() => {
+    if (roaster?.id) {
+      fetchPeople();
+    }
+  }, [roaster?.id]);
+
+  const getRoleBadgeColor = (role: PersonRole) => {
+    switch (role) {
+      case PersonRole.OWNER:
+        return 'bg-purple-100 text-purple-800';
+      case PersonRole.ADMIN:
+        return 'bg-blue-100 text-blue-800';
+      case PersonRole.BILLING:
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -843,71 +1018,330 @@ const RoasterForm: React.FC<{
             </div>
           </div>
 
-          {/* Owner Information Pane */}
+          {/* Contacts Pane */}
           <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50">
-            <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
-              {t('adminForms.roasters.ownerInformation', 'Owner Information')}
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('adminForms.roasters.ownerName', 'Owner Name')}
-                  </label>
-                  <input
-                    type="text"
-                    name="ownerName"
-                    value={formData.ownerName}
-                    onChange={handleInputChange}
-                    placeholder={t('adminForms.roasters.ownerNamePlaceholder', 'Owner\'s full name')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('adminForms.roasters.ownerEmail', 'Owner Email')}
-                  </label>
-                  <input
-                    type="email"
-                    name="ownerEmail"
-                    value={formData.ownerEmail}
-                    onChange={handleInputChange}
-                    placeholder={t('adminForms.roasters.ownerEmailPlaceholder', 'Leave blank for no owner')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="w-full lg:w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.ownerMobile', 'Owner Mobile')}
-                </label>
-                <input
-                  type="tel"
-                  name="ownerMobile"
-                  value={formData.ownerMobile}
-                  onChange={handleInputChange}
-                  placeholder={t('adminForms.roasters.ownerMobilePlaceholder', 'Owner\'s mobile phone number')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.ownerBio', 'Owner Bio')}
-                </label>
-                <textarea
-                  name="ownerBio"
-                  value={formData.ownerBio}
-                  onChange={handleInputChange}
-                  rows={6}
-                  placeholder={t('adminForms.roasters.ownerBioPlaceholder', 'Brief biography about the roaster owner')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold text-gray-800 select-none">
+                {t('adminForms.roasters.contacts', 'Contacts')}
+              </h3>
+              <button
+                type="button"
+                onClick={handleAddPerson}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              >
+                {t('adminForms.roasters.addContact', 'Add Contact')}
+              </button>
             </div>
+
+            {/* Existing people */}
+            {people.length > 0 ? (
+              <div className="space-y-3 mb-4">
+                {people.map((person) => (
+                  <div key={person.id}>
+                    {editingPerson?.id === person.id ? (
+                      /* Edit Form for this person */
+                      <div className="bg-white p-4 rounded-lg border border-blue-300">
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="font-medium text-gray-900">
+                            {t('adminForms.roasters.editContact', 'Edit Contact')}
+                          </h4>
+                          <button
+                            type="button"
+                            onClick={resetPersonForm}
+                            className="text-gray-500 hover:text-gray-700"
+                          >
+                            ✕
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {t('adminForms.roasters.contactName', 'Name')} *
+                            </label>
+                            <input
+                              type="text"
+                              value={personForm.name}
+                              onChange={(e) => setpersonForm(prev => ({...prev, name: e.target.value}))}
+                              placeholder="Full name"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {t('adminForms.roasters.contactEmail', 'Email')}
+                            </label>
+                            <input
+                              type="email"
+                              value={personForm.email}
+                              onChange={(e) => setpersonForm(prev => ({...prev, email: e.target.value}))}
+                              placeholder="email@example.com"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {t('adminForms.roasters.contactMobile', 'Mobile')}
+                            </label>
+                            <input
+                              type="tel"
+                              value={personForm.mobile}
+                              onChange={(e) => setpersonForm(prev => ({...prev, mobile: e.target.value}))}
+                              placeholder="+1 (555) 123-4567"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                          <div className="flex items-center">
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={personForm.isPrimary}
+                                onChange={(e) => setpersonForm(prev => ({...prev, isPrimary: e.target.checked}))}
+                                className="mr-2 accent-blue-600"
+                              />
+                              <span className="text-sm text-gray-700">
+                                {t('adminForms.roasters.primaryContact', 'Primary Contact')}
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            {t('adminForms.roasters.contactRoles', 'Roles')} *
+                          </label>
+                          <div className="flex gap-4">
+                            {Object.values(PersonRole).map((role) => (
+                              <label key={role} className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={personForm.roles.includes(role)}
+                                  onChange={(e) => handlePersonRoleChange(role, e.target.checked)}
+                                  className="mr-2 accent-blue-600"
+                                />
+                                <span className="text-sm text-gray-700 capitalize">{role}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminForms.roasters.contactBio', 'Bio')}
+                          </label>
+                          <textarea
+                            value={personForm.bio}
+                            onChange={(e) => setpersonForm(prev => ({...prev, bio: e.target.value}))}
+                            rows={3}
+                            placeholder="Brief description or role details..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={submitPerson}
+                            disabled={!personForm.name || personForm.roles.length === 0}
+                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                          >
+                            {t('common.save', 'Save')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={resetPersonForm}
+                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm"
+                          >
+                            {t('common.cancel', 'Cancel')}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Read-only card for this person */
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-medium text-gray-900">{person.name}</h4>
+                              {person.isPrimary && (
+                                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                                  Primary
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-600 mb-2">
+                              {person.email && <div>📧 {person.email}</div>}
+                              {person.mobile && <div>📞 {person.mobile}</div>}
+                            </div>
+                            <div className="flex gap-1 mb-2">
+                              {person.roles.map((role) => (
+                                <span
+                                  key={role}
+                                  className={`text-xs px-2 py-1 rounded ${getRoleBadgeColor(role)}`}
+                                >
+                                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                                </span>
+                              ))}
+                            </div>
+                            {person.bio && (
+                              <p className="text-sm text-gray-600 mt-2">{person.bio}</p>
+                            )}
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            <button
+                              type="button"
+                              onClick={() => handleEditPerson(person)}
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deletePerson(person.id)}
+                              className="text-red-600 hover:text-red-800 text-sm"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-500 text-center py-8 bg-white rounded-lg border-2 border-dashed border-gray-300">
+                {t('adminForms.roasters.noContacts', 'No contacts added yet. Add a contact to get started.')}
+              </div>
+            )}
+
+            {/* Add New person Form */}
+            {showAddPerson && !editingPerson && (
+              <div className="bg-white p-4 rounded-lg border border-gray-300 mt-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-medium text-gray-900">
+                    {t('adminForms.roasters.addNewContact', 'Add New Contact')}
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={resetPersonForm}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.contactName', 'Name')} *
+                    </label>
+                    <input
+                      type="text"
+                      value={personForm.name}
+                      onChange={(e) => setpersonForm(prev => ({...prev, name: e.target.value}))}
+                      placeholder="Full name"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.contactEmail', 'Email')}
+                    </label>
+                    <input
+                      type="email"
+                      value={personForm.email}
+                      onChange={(e) => setpersonForm(prev => ({...prev, email: e.target.value}))}
+                      placeholder="email@example.com"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.contactMobile', 'Mobile')}
+                    </label>
+                    <input
+                      type="tel"
+                      value={personForm.mobile}
+                      onChange={(e) => setpersonForm(prev => ({...prev, mobile: e.target.value}))}
+                      placeholder="+1 (555) 123-4567"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={personForm.isPrimary}
+                        onChange={(e) => setpersonForm(prev => ({...prev, isPrimary: e.target.checked}))}
+                        className="mr-2 accent-blue-600"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {t('adminForms.roasters.primaryContact', 'Primary Contact')}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('adminForms.roasters.contactRoles', 'Roles')} *
+                  </label>
+                  <div className="flex gap-4">
+                    {Object.values(PersonRole).map((role) => (
+                      <label key={role} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={personForm.roles.includes(role)}
+                          onChange={(e) => handlePersonRoleChange(role, e.target.checked)}
+                          className="mr-2 accent-blue-600"
+                        />
+                        <span className="text-sm text-gray-700 capitalize">{role}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('adminForms.roasters.contactBio', 'Bio')}
+                  </label>
+                  <textarea
+                    value={personForm.bio}
+                    onChange={(e) => setpersonForm(prev => ({...prev, bio: e.target.value}))}
+                    rows={3}
+                    placeholder="Brief description or role details..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={submitPerson}
+                    disabled={!personForm.name || personForm.roles.length === 0}
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+                  >
+                    {t('adminForms.roasters.saveContact', 'Save Contact')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetPersonForm}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 text-sm"
+                  >
+                    {t('adminForms.roasters.cancel', 'Cancel')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Specialties Pane */}
