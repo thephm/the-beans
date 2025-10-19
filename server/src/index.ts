@@ -16,6 +16,8 @@ import reviewRoutes from './routes/reviews';
 import searchRoutes from './routes/search';
 import auditLogRoutes from './routes/auditLogs';
 import debugRoutes from './routes/debug';
+import regionRoutes from './routes/regions';
+import countryRoutes from './routes/countries';
 
 // Load environment variables
 dotenv.config();
@@ -121,6 +123,8 @@ app.use('/api/roasters', roasterRoutes);
 app.use('/api/people', peopleRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/regions', regionRoutes);
+app.use('/api/countries', countryRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 app.use('/api/debug', debugRoutes); // Debug authentication routes
 

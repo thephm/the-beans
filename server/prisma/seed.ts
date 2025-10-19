@@ -197,6 +197,100 @@ async function main() {
 
   console.log('✅ Created roasters:', [roaster1.name, roaster2.name, roaster3.name]);
 
+  // Seed regions and countries
+  console.log('📍 Seeding coffee origin regions and countries...');
+  
+  // Create regions
+  const latinAmerica = await prisma.region.upsert({
+    where: { name: 'Latin America' },
+    update: {},
+    create: {
+      name: 'Latin America',
+      description: 'Central and South American coffee growing regions'
+    }
+  });
+
+  const africa = await prisma.region.upsert({
+    where: { name: 'Africa' },
+    update: {},
+    create: {
+      name: 'Africa',
+      description: 'African coffee growing regions'
+    }
+  });
+
+  const asiaPacific = await prisma.region.upsert({
+    where: { name: 'Asia/Pacific' },
+    update: {},
+    create: {
+      name: 'Asia/Pacific',
+      description: 'Asian and Pacific coffee growing regions'
+    }
+  });
+
+  const caribbean = await prisma.region.upsert({
+    where: { name: 'Caribbean' },
+    update: {},
+    create: {
+      name: 'Caribbean',
+      description: 'Caribbean coffee growing regions'
+    }
+  });
+
+  // Create countries with ISO codes and flag SVGs using flagpedia.net CDN
+  const countries = [
+    // Latin America
+    { name: 'Brazil', code: 'BR', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/br.webp' },
+    { name: 'Colombia', code: 'CO', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/co.webp' },
+    { name: 'Guatemala', code: 'GT', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/gt.webp' },
+    { name: 'Costa Rica', code: 'CR', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/cr.webp' },
+    { name: 'Honduras', code: 'HN', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/hn.webp' },
+    { name: 'Mexico', code: 'MX', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/mx.webp' },
+    { name: 'Peru', code: 'PE', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/pe.webp' },
+    { name: 'Nicaragua', code: 'NI', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ni.webp' },
+    { name: 'El Salvador', code: 'SV', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/sv.webp' },
+    { name: 'Panama', code: 'PA', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/pa.webp' },
+    { name: 'Ecuador', code: 'EC', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ec.webp' },
+    { name: 'Bolivia', code: 'BO', regionId: latinAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/bo.webp' },
+    
+    // Africa
+    { name: 'Ethiopia', code: 'ET', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/et.webp' },
+    { name: 'Kenya', code: 'KE', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ke.webp' },
+    { name: 'Tanzania', code: 'TZ', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/tz.webp' },
+    { name: 'Rwanda', code: 'RW', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/rw.webp' },
+    { name: 'Burundi', code: 'BI', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/bi.webp' },
+    { name: 'Uganda', code: 'UG', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ug.webp' },
+    { name: 'Malawi', code: 'MW', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/mw.webp' },
+    { name: 'Zambia', code: 'ZM', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/zm.webp' },
+    { name: 'Democratic Republic of Congo', code: 'CD', regionId: africa.id, flagSvg: 'https://flagpedia.net/data/flags/w580/cd.webp' },
+    
+    // Asia/Pacific
+    { name: 'Indonesia', code: 'ID', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/id.webp' },
+    { name: 'Vietnam', code: 'VN', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/vn.webp' },
+    { name: 'India', code: 'IN', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/in.webp' },
+    { name: 'Papua New Guinea', code: 'PG', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/pg.webp' },
+    { name: 'Yemen', code: 'YE', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ye.webp' },
+    { name: 'Thailand', code: 'TH', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/th.webp' },
+    { name: 'Myanmar', code: 'MM', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/mm.webp' },
+    { name: 'Philippines', code: 'PH', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ph.webp' },
+    { name: 'China', code: 'CN', regionId: asiaPacific.id, flagSvg: 'https://flagpedia.net/data/flags/w580/cn.webp' },
+    
+    // Caribbean
+    { name: 'Jamaica', code: 'JM', regionId: caribbean.id, flagSvg: 'https://flagpedia.net/data/flags/w580/jm.webp' },
+    { name: 'Haiti', code: 'HT', regionId: caribbean.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ht.webp' },
+    { name: 'Dominican Republic', code: 'DO', regionId: caribbean.id, flagSvg: 'https://flagpedia.net/data/flags/w580/do.webp' },
+    { name: 'Puerto Rico', code: 'PR', regionId: caribbean.id, flagSvg: 'https://flagpedia.net/data/flags/w580/pr.webp' },
+  ];
+
+  for (const country of countries) {
+    await prisma.country.upsert({
+      where: { code: country.code },
+      update: {},
+      create: country
+    });
+  }
+
+  console.log('✅ Seeded regions and countries successfully!');
   console.log('🎉 Database seeding completed successfully!');
 }
 
