@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -7,7 +6,11 @@ import Link from 'next/link';
 import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '@/types';
 import SimpleImageUpload from '@/components/SimpleImageUpload';
 
+
 const AdminRoastersPage: React.FC = () => {
+  useEffect(() => {
+    fetchRoasters();
+  }, []);
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -43,346 +46,222 @@ const AdminRoastersPage: React.FC = () => {
       const res = await fetch(`${apiUrl}/api/roasters`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Failed to fetch roasters: ${res.status} ${errorText}`);
-      }
-      
       const data = await res.json();
-      // Handle different response formats
-      const roastersArray = Array.isArray(data) ? data : (data.data || data.roasters || []);
-      setRoasters(roastersArray);
+      setRoasters(data.roasters || []);
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  useEffect(() => {
-    fetchRoasters();
-  }, []);
-
-  // Handle URL parameters for direct editing
-  useEffect(() => {
-    if (searchParams) {
-      const editId = searchParams.get('edit');
-      if (editId && editId.trim() !== '') {
-        setEditingId(editId);
-      } else {
-        // If no edit parameter, make sure we're showing the list
-        setEditingId(null);
-        setShowAddForm(false);
-      }
-    } else {
-      // If no search params at all, reset to list view
-      setEditingId(null);
-      setShowAddForm(false);
-    }
-  }, [searchParams]);
-
-  const handleEdit = (id: string) => {
-    setEditingId(id);
-  };
-
-  const handleAdd = () => {
-    setShowAddForm(true);
-  };
-
-  const confirmDelete = (id: string) => setDeletingId(id);
-  const cancelDelete = () => setDeletingId(null);
-  
-  const doDelete = async (id: string) => {
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/roasters/${id}`, { 
-        method: 'DELETE',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-      });
-      if (!res.ok) throw new Error('Failed to delete roaster');
-      setDeletingId(null);
-      fetchRoasters();
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
-    }
-  };
-
-  const handleVerify = async (roasterId: string) => {
-    setVerifyingId(roasterId);
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/roasters/${roasterId}/verify`, {
-        method: 'PATCH',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-      });
-      if (!res.ok) throw new Error('Failed to verify roaster');
-      fetchRoasters();
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
-    } finally {
-      setVerifyingId(null);
-    }
-  };
 
   const onFormSuccess = () => {
     setEditingId(null);
     setShowAddForm(false);
     fetchRoasters();
-    
-    // Check if there's a returnTo parameter to navigate back
-    if (searchParams) {
-      const returnTo = searchParams.get('returnTo');
-      if (returnTo) {
-        router.push(returnTo);
-        return;
-      }
-    }
   };
 
   const onFormCancel = () => {
     setEditingId(null);
     setShowAddForm(false);
-    
-    // Check if there's a returnTo parameter to navigate back
-    if (searchParams) {
-      const returnTo = searchParams.get('returnTo');
-      if (returnTo) {
-        router.push(returnTo);
-        return;
-      }
-    }
   };
-
-  if (loading) return <div className="p-4">{t('loading', 'Loading...')}</div>;
-  if (error) return <div className="p-4 text-red-600">{t('error')}: {error}</div>;
 
   if (editingId || showAddForm) {
     const roaster = editingId ? roasters.find(r => r.id === editingId) : undefined;
-    return (
-      <RoasterForm 
-        roaster={roaster}
-        onSuccess={onFormSuccess}
-        onCancel={onFormCancel}
-      />
-    );
+    return <RoasterForm roaster={roaster} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
   }
 
+  // Render the list of roasters
   return (
-    <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Roasters</h1>
+    <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
+      <div className="mb-6 max-w-6xl mx-auto flex justify-between items-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('adminSection.roasters', 'Roasters')}</h1>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={() => setShowAddForm(true)}
+        >
+          {t('admin.roasters.addTitle', 'Add Roaster')}
+        </button>
       </div>
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <div></div>
-          <div className="flex items-center gap-8">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={showUnverifiedOnly}
-                onChange={(e) => setShowUnverifiedOnly(e.target.checked)}
-                className="mr-2 accent-blue-600"
-              />
-              <span className="text-gray-700">{t('adminSection.roasters.showUnverifiedOnly', 'Show unverified only')}</span>
-            </label>
-            <button
-              onClick={handleAdd}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              {t('adminSection.roasters.addNew', 'Add Roaster')}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Card View */}
-        <div className="md:hidden space-y-4">
-          {Array.isArray(roasters) && roasters
-            .filter(roaster => showUnverifiedOnly ? !roaster.verified : true)
-            .map((roaster) => (
-            <div key={roaster.id} className="bg-white shadow-md rounded-lg p-4 border border-gray-200">
-              <div className="flex justify-between items-start mb-3">
-                <button
-                  onClick={() => handleEdit(roaster.id)}
-                  className="text-lg font-semibold text-blue-600 hover:text-blue-800 text-left"
-                >
-                  {roaster.name}
-                </button>
-                <div className="flex space-x-1">
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    ★ {roaster.rating.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="text-sm text-gray-600 mb-3">
-                📍 {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  roaster.verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {roaster.verified ? '✓ Verified' : '⚠ Unverified'}
-                </span>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  roaster.featured ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {roaster.featured ? '⭐ Featured' : 'Not Featured'}
-                </span>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => handleEdit(roaster.id)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium"
-                >
-                  {t('adminSection.roasters.edit', 'Edit')}
-                </button>
-                <button
-                  onClick={() => confirmDelete(roaster.id)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-medium"
-                >
-                  {t('adminSection.roasters.delete', 'Delete')}
-                </button>
-                {!roaster.verified && (
-                  <button
-                    onClick={() => handleVerify(roaster.id)}
-                    disabled={verifyingId === roaster.id}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium disabled:opacity-50"
-                  >
-                    {verifyingId === roaster.id ? 'Verifying...' : 'Verify'}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Desktop Table View */}
-        <div className="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="max-w-6xl mx-auto">
+        {roasters.length === 0 ? (
+          <div className="text-gray-500 text-center py-12">{t('admin.roasters.noRoasters', 'No roasters found.')}</div>
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full table-auto">
-              <thead className="bg-gray-50">
+            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+              <thead>
                 <tr>
-                  <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.name', 'Name')}</th>
-                  <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminForms.roasters.location', 'Location')}</th>
-                  <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.rating', 'Rating')}</th>
-                  <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.verified', 'Verified')}</th>
-                  <th className="py-3 px-4 text-center font-medium text-gray-900">{t('adminForms.roasters.featured', 'Featured')}</th>
-                  <th className="py-3 px-4 text-left font-medium text-gray-900">{t('adminSection.roasters.actions', 'Actions')}</th>
+                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.name', 'Name')}</th>
+                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.city', 'City')}</th>
+                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.country', 'Country')}</th>
+                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.verified', 'Verified')}</th>
+                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.featured', 'Featured')}</th>
+                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.rating', 'Rating')}</th>
+                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.actions', 'Actions')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
-                {Array.isArray(roasters) && roasters
-                  .filter(roaster => showUnverifiedOnly ? !roaster.verified : true)
-                  .map((roaster) => (
-                  <tr key={roaster.id} className="hover:bg-gray-50">
-                    <td className="py-3 px-4">
+              <tbody>
+                {roasters.map((roaster) => (
+                  <tr key={roaster.id} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-2 font-medium">{roaster.name}</td>
+                    <td className="px-4 py-2">{roaster.city || '-'}</td>
+                    <td className="px-4 py-2">{roaster.country || '-'}</td>
+                    <td className="px-4 py-2">{roaster.verified ? '✔️' : ''}</td>
+                    <td className="px-4 py-2">{roaster.featured ? '⭐' : ''}</td>
+                    <td className="px-4 py-2">{roaster.rating || '-'}</td>
+                    <td className="px-4 py-2">
                       <button
-                        onClick={() => handleEdit(roaster.id)}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-left underline"
+                        className="text-blue-600 hover:underline mr-2"
+                        onClick={() => setEditingId(roaster.id)}
                       >
-                        {roaster.name}
+                        {t('adminForms.roasters.edit', 'Edit')}
                       </button>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600">
-                      {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        {roaster.rating.toFixed(1)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        roaster.verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {roaster.verified ? t('admin.roasters.yes', 'Yes') : t('admin.roasters.no', 'No')}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        roaster.featured ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {roaster.featured ? t('admin.roasters.yes', 'Yes') : t('admin.roasters.no', 'No')}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-left">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleEdit(roaster.id)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                        >
-                          {t('adminSection.roasters.edit', 'Edit')}
-                        </button>
-                        <button
-                          onClick={() => confirmDelete(roaster.id)}
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
-                        >
-                          {t('adminSection.roasters.delete', 'Delete')}
-                        </button>
-                        {!roaster.verified && (
-                          <button
-                            onClick={() => handleVerify(roaster.id)}
-                            disabled={verifyingId === roaster.id}
-                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
-                          >
-                            {verifyingId === roaster.id ? 'Verifying...' : 'Verify'}
-                          </button>
-                        )}
-                      </div>
+                      <button
+                        className="text-red-600 hover:underline"
+                        onClick={() => setDeletingId(roaster.id)}
+                      >
+                        {t('adminForms.roasters.delete', 'Delete')}
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
-
-      {/* Delete Confirmation Modal */}
-      {deletingId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t('admin.roasters.confirmDeleteTitle', 'Confirm Delete')}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {t('admin.roasters.confirmDelete', 'Are you sure you want to delete this roaster? This action cannot be undone.')}
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={cancelDelete}
-                className="px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
-              >
-                {t('admin.roasters.cancel', 'Cancel')}
-              </button>
-              <button
-                onClick={() => doDelete(deletingId)}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                {t('admin.roasters.deleteConfirm', 'Delete')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );
 };
 
-// RoasterForm component will be defined next
-const RoasterForm: React.FC<{
+interface RoasterFormProps {
   roaster?: Roaster;
   onSuccess: () => void;
   onCancel: () => void;
-}> = ({ roaster, onSuccess, onCancel }) => {
+}
+
+const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel }) => {
+  // Fetch and set selected source countries when editing a roaster
+  useEffect(() => {
+    if (roaster?.id) {
+      fetchSourceCountries();
+    }
+  }, [roaster?.id]);
+  // Fetch available countries when form mounts
+  useEffect(() => {
+    fetchCountries();
+  }, []);
+  const [formData, setFormData] = useState({
+    name: roaster?.name || '',
+    description: roaster?.description || '',
+    email: roaster?.email || '',
+    phone: roaster?.phone || '',
+    website: roaster?.website || '',
+    address: roaster?.address || '',
+    city: roaster?.city || '',
+    state: roaster?.state || '',
+    zipCode: roaster?.zipCode || '',
+    country: roaster?.country || '',
+    latitude: roaster?.latitude || '',
+    longitude: roaster?.longitude || '',
+    specialties: roaster?.specialties?.join(', ') || '',
+    verified: roaster?.verified || false,
+    featured: roaster?.featured || false,
+    rating: roaster?.rating || 0,
+    onlineOnly: roaster?.onlineOnly || false,
+    hours: roaster?.hours || {},
+    images: roaster?.images || [],
+    ownerName: roaster?.ownerName || '',
+    ownerEmail: roaster?.ownerEmail || '',
+    ownerBio: roaster?.ownerBio || '',
+    ownerMobile: roaster?.ownerMobile || '',
+  });
+  useEffect(() => {
+    if (roaster?.id) {
+      const fetchRoaster = async () => {
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+          const res = await fetch(`${apiUrl}/api/roasters/${roaster.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setFormData({
+              name: data.name || '',
+              description: data.description || '',
+              email: data.email || '',
+              phone: data.phone || '',
+              website: data.website || '',
+              address: data.address || '',
+              city: data.city || '',
+              state: data.state || '',
+              zipCode: data.zipCode || '',
+              country: data.country || '',
+              latitude: data.latitude || '',
+              longitude: data.longitude || '',
+              specialties: data.specialties?.join(', ') || '',
+              verified: data.verified || false,
+              featured: data.featured || false,
+              rating: data.rating || 0,
+              onlineOnly: data.onlineOnly || false,
+              hours: convertHoursFormat(data.hours),
+              images: data.images || [],
+              ownerName: data.ownerName || '',
+              ownerEmail: data.ownerEmail || '',
+              ownerBio: data.ownerBio || '',
+              ownerMobile: data.ownerMobile || '',
+            });
+          }
+        } catch (err) {
+          // Optionally handle error
+        }
+      };
+      fetchRoaster();
+    }
+  }, [roaster?.id]);
+
+  // Fetch images when editing existing roaster
+  useEffect(() => {
+    if (roaster?.id) {
+      fetchImages();
+    }
+  }, [roaster?.id]);
+  // Handles input changes for all fields
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type, checked } = e.target as HTMLInputElement;
+    setFormData((prev: any) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  // Handles changes for hours fields
+  const handleHoursChange = (day: string, field: string, value: any) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      hours: {
+        ...prev.hours,
+        [day]: {
+          ...prev.hours?.[day],
+          [field]: value,
+        },
+      },
+    }));
+  };
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Reusable chevron component
+  const ChevronIcon = ({ isExpanded }: { isExpanded: boolean }) => (
+    <svg 
+      className={`w-5 h-5 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  );
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
@@ -399,11 +278,29 @@ const RoasterForm: React.FC<{
     isPrimary: false
   });
 
+  // Source countries state
+  const [availableCountries, setAvailableCountries] = useState<any[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [countriesLoading, setCountriesLoading] = useState(false);
+  const [sourceCountriesExpanded, setSourceCountriesExpanded] = useState(true);
+  
+  // Section expand/collapse state
+  const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
+  const [locationExpanded, setLocationExpanded] = useState(true);
+  const [contactsExpanded, setContactsExpanded] = useState(true);
+  const [specialtiesExpanded, setSpecialtiesExpanded] = useState(true);
+  const [settingsExpanded, setSettingsExpanded] = useState(true);
+
+  // Basic form UI for editing roaster
+  // ...existing code...
+  const [hoursExpanded, setHoursExpanded] = useState(true);
+  const [imagesExpanded, setImagesExpanded] = useState(true);
+
   // Utility function to convert Unsplash URLs to proper image URLs
   const convertToImageUrl = (url: string): string => {
     if (!url) return url;
     
-    console.log('Processing URL:', url);
+
     
     // Handle Unsplash URLs
     if (url.includes('unsplash.com')) {
@@ -430,12 +327,79 @@ const RoasterForm: React.FC<{
       }
     }
     
-    console.log('No conversion needed, returning original URL:', url);
+
     return url; // Return original URL if not Unsplash or already processed
   };
 
   // Helper function to convert old hours format to new format
   const convertHoursFormat = (hours: any) => {
+  // Restore missing handleInputChange function
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    setFormData(prev => ({
+      ...prev,
+      [name]: newValue
+    }));
+  };
+
+  // Restore missing handleHoursChange function
+  const handleHoursChange = (day: string, field: string, value: string | boolean) => {
+    setFormData(prev => {
+      const currentDay = (prev.hours as any)[day];
+      let newValue = value;
+      // If toggling 'closed' to false, set default times if not present
+      if (field === 'closed' && value === false) {
+        // Always set both open and close to defaults if not present
+        return {
+          ...prev,
+          hours: {
+            ...prev.hours,
+            [day]: {
+              closed: false,
+              open: '08:00',
+              close: '18:00',
+            }
+          }
+        };
+      }
+      // Time validation logic
+      if (field === 'open' && typeof value === 'string') {
+        const closeTime = currentDay?.close;
+        if (closeTime && value >= closeTime) {
+          const [hours, minutes] = value.split(':');
+          const newCloseHour = Math.min(23, parseInt(hours) + 1);
+          newValue = value;
+          return {
+            ...prev,
+            hours: {
+              ...prev.hours,
+              [day]: {
+                ...currentDay,
+                open: newValue,
+                close: `${newCloseHour.toString().padStart(2, '0')}:${minutes}`
+              }
+            }
+          };
+        }
+      } else if (field === 'close' && typeof value === 'string') {
+        const openTime = currentDay?.open;
+        if (openTime && value <= openTime) {
+          return prev;
+        }
+      }
+      return {
+        ...prev,
+        hours: {
+          ...prev.hours,
+          [day]: {
+            ...currentDay,
+            [field]: newValue
+          }
+        }
+      };
+    });
+  };
     if (!hours) {
       return {
         monday: { open: '', close: '', closed: true },
@@ -472,27 +436,6 @@ const RoasterForm: React.FC<{
     return convertedHours;
   };
 
-  const [formData, setFormData] = useState({
-    name: roaster?.name || '',
-    description: roaster?.description || '',
-    email: roaster?.email || '',
-    phone: roaster?.phone || '',
-    website: roaster?.website || '',
-    address: roaster?.address || '',
-    city: roaster?.city || '',
-    state: roaster?.state || '',
-    zipCode: roaster?.zipCode || '',
-    country: roaster?.country || '',
-    latitude: roaster?.latitude || '',
-    longitude: roaster?.longitude || '',
-    specialties: roaster?.specialties?.join(', ') || '',
-    verified: roaster?.verified || false,
-    featured: roaster?.featured || false,
-    rating: roaster?.rating || 0,
-    onlineOnly: roaster?.onlineOnly || false,
-    hours: convertHoursFormat(roaster?.hours),
-    images: roaster?.images || [],
-  });
 
   // Fetch images when editing existing roaster
   const fetchImages = async () => {
@@ -512,89 +455,40 @@ const RoasterForm: React.FC<{
     }
   };
 
-  // Load images when component mounts with existing roaster (delayed to prevent auto-trigger)
-  React.useEffect(() => {
-    if (roaster?.id && !imagesLoaded) {
-      const timer = setTimeout(() => {
-        fetchImages();
-      }, 1000); // Delay to prevent auto-trigger
-      
-      return () => clearTimeout(timer);
+  // Fetch all available countries for source country selection
+  const fetchCountries = async () => {
+    try {
+      setCountriesLoading(true);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/countries`);
+      if (response.ok) {
+        const countries = await response.json();
+        setAvailableCountries(countries);
+      }
+    } catch (error) {
+      console.error('Error fetching countries:', error);
+    } finally {
+      setCountriesLoading(false);
     }
-  }, [roaster?.id, imagesLoaded]);
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+  // Fetch roaster's current source countries
+  const fetchSourceCountries = async () => {
+    if (!roaster?.id) return;
     
-    setFormData(prev => {
-      const updatedData = {
-        ...prev,
-        [name]: newValue
-      };
-      
-      // If onlineOnly is being checked, set all hours to closed
-      if (name === 'onlineOnly' && newValue === true) {
-        updatedData.hours = {
-          monday: { closed: true, open: '', close: '' },
-          tuesday: { closed: true, open: '', close: '' },
-          wednesday: { closed: true, open: '', close: '' },
-          thursday: { closed: true, open: '', close: '' },
-          friday: { closed: true, open: '', close: '' },
-          saturday: { closed: true, open: '', close: '' },
-          sunday: { closed: true, open: '', close: '' }
-        };
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/roasters/${roaster.id}/source-countries`);
+      if (response.ok) {
+        const countries = await response.json();
+        setSelectedCountries(countries.map((c: any) => c.id));
       }
-      
-      return updatedData;
-    });
+    } catch (error) {
+      console.error('Error fetching source countries:', error);
+    }
   };
 
-  const handleHoursChange = (day: string, field: string, value: string | boolean) => {
-    setFormData(prev => {
-      const currentDay = (prev.hours as any)[day];
-      let newValue = value;
-      
-      // Time validation logic
-      if (field === 'open' && typeof value === 'string') {
-        const closeTime = currentDay?.close;
-        if (closeTime && value >= closeTime) {
-          // If opening time is after closing time, adjust closing time
-          const [hours, minutes] = value.split(':');
-          const newCloseHour = Math.min(23, parseInt(hours) + 1);
-          newValue = value;
-          return {
-            ...prev,
-            hours: {
-              ...prev.hours,
-              [day]: {
-                ...currentDay,
-                open: newValue,
-                close: `${newCloseHour.toString().padStart(2, '0')}:${minutes}`
-              }
-            }
-          };
-        }
-      } else if (field === 'close' && typeof value === 'string') {
-        const openTime = currentDay?.open;
-        if (openTime && value <= openTime) {
-          // If closing time is before opening time, don't allow it
-          return prev;
-        }
-      }
-      
-      return {
-        ...prev,
-        hours: {
-          ...prev.hours,
-          [day]: {
-            ...currentDay,
-            [field]: newValue
-          }
-        }
-      };
-    });
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -609,10 +503,11 @@ const RoasterForm: React.FC<{
       Object.entries(formData.hours as any).forEach(([day, dayData]: [string, any]) => {
         if (dayData.closed) {
           convertedHours[day] = 'closed';
-        } else if (dayData.open && dayData.close) {
-          convertedHours[day] = `${dayData.open}-${dayData.close}`;
         } else {
-          convertedHours[day] = '';
+          // Always persist open/close, defaulting if missing
+          const open = dayData.open || '08:00';
+          const close = dayData.close || '18:00';
+          convertedHours[day] = `${open}-${close}`;
         }
       });
 
@@ -651,6 +546,58 @@ const RoasterForm: React.FC<{
         throw new Error(errorData.error || errorData.message || 'Failed to save roaster');
       }
 
+      const savedRoaster = await res.json();
+      const roasterId = roaster?.id || savedRoaster.id;
+
+      // Update source countries if roaster was saved successfully
+      if (roasterId) {
+        const sourceCountriesRes = await fetch(`${apiUrl}/api/roasters/${roasterId}/source-countries`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ countryIds: selectedCountries }),
+        });
+
+        if (!sourceCountriesRes.ok) {
+          console.error('Failed to update source countries');
+          // Don't throw error here as the roaster was successfully saved
+        }
+      }
+
+      // After saving, fetch the updated roaster and update formData
+      if (roasterId) {
+        const res = await fetch(`${apiUrl}/api/roasters/${roasterId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFormData({
+            name: data.name || '',
+            description: data.description || '',
+            email: data.email || '',
+            phone: data.phone || '',
+            website: data.website || '',
+            address: data.address || '',
+            city: data.city || '',
+            state: data.state || '',
+            zipCode: data.zipCode || '',
+            country: data.country || '',
+            latitude: data.latitude || '',
+            longitude: data.longitude || '',
+            specialties: data.specialties?.join(', ') || '',
+            verified: data.verified || false,
+            featured: data.featured || false,
+            rating: data.rating || 0,
+            onlineOnly: data.onlineOnly || false,
+            hours: convertHoursFormat(data.hours),
+            images: data.images || [],
+            ownerName: data.ownerName || '',
+            ownerEmail: data.ownerEmail || '',
+            ownerBio: data.ownerBio || '',
+            ownerMobile: data.ownerMobile || '',
+          });
+        }
+      }
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Unknown error');
@@ -747,6 +694,8 @@ const RoasterForm: React.FC<{
       });
 
       if (response.ok) {
+        setEditingPerson(null);
+        setShowAddPerson(false);
         resetPersonForm();
         if (roaster?.id) {
           fetchPeople(); // Only fetch if roaster exists
@@ -832,190 +781,309 @@ const RoasterForm: React.FC<{
         </h1>
       </div>
       <div className="max-w-6xl mx-auto">
-
         {error && (
           <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Information */}
             <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
-              <h3 className="text-xl font-semibold text-gray-800 select-none">
-                {t('adminForms.roasters.basicInformation', 'Basic Information')}
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                  {t('adminForms.roasters.basicInformation', 'Basic Information')}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setBasicInfoExpanded(!basicInfoExpanded)}
+                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  title={basicInfoExpanded ? 'Collapse section' : 'Expand section'}
+                >
+                  <svg 
+                    className="w-4 h-4 transition-transform duration-200" 
+                    style={{ transform: basicInfoExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.name', 'Name')} *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.description', 'Description')}
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={5}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.email', 'Email')}
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.phone', 'Phone')}
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.website', 'Website')}
-                </label>
-                <input
-                  type="url"
-                  name="website"
-                  value={formData.website}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+              {basicInfoExpanded && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.name', 'Name')} *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.description', 'Description')}
+                    </label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      rows={5}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.email', 'Email')}
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.phone', 'Phone')}
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.website', 'Website')}
+                    </label>
+                    <input
+                      type="url"
+                      name="website"
+                      value={formData.website}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Location & Details */}
             <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
-              <h3 className="text-xl font-semibold text-gray-800 select-none">
-                {t('adminForms.roasters.locationDetails', 'Location & Details')}
-              </h3>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('adminForms.roasters.address', 'Address')}
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                  {t('adminForms.roasters.locationDetails', 'Location & Details')}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setLocationExpanded(!locationExpanded)}
+                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  title={locationExpanded ? 'Collapse section' : 'Expand section'}
+                >
+                  <svg 
+                    className="w-4 h-4 transition-transform duration-200" 
+                    style={{ transform: locationExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('adminForms.roasters.city', 'City')}
-                  </label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('adminForms.roasters.state', 'State')}
-                  </label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.roasters.zipCode', 'Zip Code')}
-                  </label>
-                  <input
-                    type="text"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.roasters.country', 'Country')}
-                  </label>
-                  <input
-                    type="text"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.roasters.latitude', 'Latitude')}
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="latitude"
-                    value={formData.latitude}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.roasters.longitude', 'Longitude')}
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="longitude"
-                    value={formData.longitude}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
+              
+              {locationExpanded && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.address', 'Address')}
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('adminForms.roasters.city', 'City')}
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('adminForms.roasters.state', 'State')}
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('admin.roasters.zipCode', 'Zip Code')}
+                      </label>
+                      <input
+                        type="text"
+                        name="zipCode"
+                        value={formData.zipCode}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('admin.roasters.country', 'Country')}
+                      </label>
+                      <input
+                        type="text"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('admin.roasters.latitude', 'Latitude')}
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        name="latitude"
+                        value={formData.latitude}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('admin.roasters.longitude', 'Longitude')}
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        name="longitude"
+                        value={formData.longitude}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
+          </div>
+
+          {/* Source Countries */}
+          <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-800 select-none">
+                {t('adminForms.roasters.sourceCountries', 'Source Countries')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSourceCountriesExpanded(!sourceCountriesExpanded)}
+                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                title={sourceCountriesExpanded ? 'Collapse section' : 'Expand section'}
+              >
+                <svg 
+                  className="w-4 h-4 transition-transform duration-200" 
+                  style={{ transform: sourceCountriesExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+            
+            {sourceCountriesExpanded && (
+              <>
+                <p className="text-sm text-gray-600">
+                  {t('adminForms.roasters.sourceCountriesDescription', 'Select the coffee origin countries that this roaster sources from.')}
+                </p>
+                
+                {countriesLoading ? (
+                  <div className="text-center py-4">
+                    <div className="text-gray-500">{t('common.loading', 'Loading...')}</div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                {availableCountries.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-[500px] overflow-y-auto border border-gray-200 rounded-md p-3 bg-white">
+                    {availableCountries.map((country) => (
+                      <label key={country.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer min-w-0" title={country.name}>
+                        <input
+                          type="checkbox"
+                          checked={selectedCountries.includes(country.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCountries(prev => [...prev, country.id]);
+                            } else {
+                              setSelectedCountries(prev => prev.filter(id => id !== country.id));
+                            }
+                          }}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                        />
+                        <div className="flex items-center space-x-1 min-w-0 overflow-hidden">
+                          {country.flagSvg && (
+                            <img 
+                              src={country.flagSvg} 
+                              alt={`${country.name} flag`}
+                              className="w-4 h-3 flex-shrink-0 object-cover rounded-sm"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          )}
+                          <span className="text-sm text-gray-700 truncate block">{country.name}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-gray-500 text-sm">
+                    {t('adminForms.roasters.noCountriesAvailable', 'No countries available')}
+                  </div>
+                )}
+                {selectedCountries.length > 0 && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    {t('adminForms.roasters.selectedCountriesCount', 'Selected countries: {{count}}', { count: selectedCountries.length })}
+                  </div>
+                  )}
+                </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Contacts Pane */}
@@ -1024,352 +1092,170 @@ const RoasterForm: React.FC<{
               <h3 className="text-xl font-semibold text-gray-800 select-none">
                 {t('adminForms.roasters.contacts', 'Contacts')}
               </h3>
-              <button
-                type="button"
-                onClick={handleAddPerson}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-              >
-                {t('adminForms.roasters.addContact', 'Add Contact')}
-              </button>
-            </div>
-
-            {/* Existing people */}
-            {people.length > 0 ? (
-              <div className="space-y-3 mb-4">
-                {people.map((person) => (
-                  <div key={person.id}>
-                    {editingPerson?.id === person.id ? (
-                      /* Edit Form for this person */
-                      <div className="bg-white p-4 rounded-lg border border-blue-300">
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="font-medium text-gray-900">
-                            {t('adminForms.roasters.editContact', 'Edit Contact')}
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={resetPersonForm}
-                            className="text-gray-500 hover:text-gray-700"
-                          >
-                            ✕
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {t('adminForms.roasters.contactName', 'Name')} *
-                            </label>
-                            <input
-                              type="text"
-                              value={personForm.name}
-                              onChange={(e) => setpersonForm(prev => ({...prev, name: e.target.value}))}
-                              placeholder="Full name"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {t('adminForms.roasters.contactEmail', 'Email')}
-                            </label>
-                            <input
-                              type="email"
-                              value={personForm.email}
-                              onChange={(e) => setpersonForm(prev => ({...prev, email: e.target.value}))}
-                              placeholder="email@example.com"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {t('adminForms.roasters.contactMobile', 'Mobile')}
-                            </label>
-                            <input
-                              type="tel"
-                              value={personForm.mobile}
-                              onChange={(e) => setpersonForm(prev => ({...prev, mobile: e.target.value}))}
-                              placeholder="+1 (555) 123-4567"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                          <div className="flex items-center">
-                            <label className="flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={personForm.isPrimary}
-                                onChange={(e) => setpersonForm(prev => ({...prev, isPrimary: e.target.checked}))}
-                                className="mr-2 accent-blue-600"
-                              />
-                              <span className="text-sm text-gray-700">
-                                {t('adminForms.roasters.primaryContact', 'Primary Contact')}
-                              </span>
-                            </label>
-                          </div>
-                        </div>
-
-                        <div className="mb-4">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('adminForms.roasters.contactRoles', 'Roles')} *
-                          </label>
-                          <div className="flex gap-4">
-                            {Object.values(PersonRole).map((role) => (
-                              <label key={role} className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={personForm.roles.includes(role)}
-                                  onChange={(e) => handlePersonRoleChange(role, e.target.checked)}
-                                  className="mr-2 accent-blue-600"
-                                />
-                                <span className="text-sm text-gray-700 capitalize">{role}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="mb-4">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {t('adminForms.roasters.contactBio', 'Bio')}
-                          </label>
-                          <textarea
-                            value={personForm.bio}
-                            onChange={(e) => setpersonForm(prev => ({...prev, bio: e.target.value}))}
-                            rows={3}
-                            placeholder="Brief description or role details..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={submitPerson}
-                            disabled={!personForm.name || personForm.roles.length === 0}
-                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
-                          >
-                            {t('common.save', 'Save')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={resetPersonForm}
-                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm"
-                          >
-                            {t('common.cancel', 'Cancel')}
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      /* Read-only card for this person */
-                      <div className="bg-white p-4 rounded-lg border border-gray-200">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-medium text-gray-900">{person.name}</h4>
-                              {person.isPrimary && (
-                                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                                  Primary
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-sm text-gray-600 mb-2">
-                              {person.email && <div>📧 {person.email}</div>}
-                              {person.mobile && <div>📞 {person.mobile}</div>}
-                            </div>
-                            <div className="flex gap-1 mb-2">
-                              {person.roles.map((role) => (
-                                <span
-                                  key={role}
-                                  className={`text-xs px-2 py-1 rounded ${getRoleBadgeColor(role)}`}
-                                >
-                                  {role.charAt(0).toUpperCase() + role.slice(1)}
-                                </span>
-                              ))}
-                            </div>
-                            {person.bio && (
-                              <p className="text-sm text-gray-600 mt-2">{person.bio}</p>
-                            )}
-                          </div>
-                          <div className="flex gap-2 ml-4">
-                            <button
-                              type="button"
-                              onClick={() => handleEditPerson(person)}
-                              className="text-blue-600 hover:text-blue-800 text-sm"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => deletePerson(person.id)}
-                              className="text-red-600 hover:text-red-800 text-sm"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-gray-500 text-center py-8 bg-white rounded-lg border-2 border-dashed border-gray-300">
-                {t('adminForms.roasters.noContacts', 'No contacts added yet. Add a contact to get started.')}
-              </div>
-            )}
-
-            {/* Add New person Form */}
-            {showAddPerson && !editingPerson && (
-              <div className="bg-white p-4 rounded-lg border border-gray-300 mt-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-medium text-gray-900">
-                    {t('adminForms.roasters.addNewContact', 'Add New Contact')}
-                  </h4>
-                  <button
-                    type="button"
-                    onClick={resetPersonForm}
-                    className="text-gray-500 hover:text-gray-700"
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleAddPerson}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                >
+                  {t('adminForms.roasters.addContact', 'Add Contact')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setContactsExpanded(!contactsExpanded)}
+                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  title={contactsExpanded ? 'Collapse section' : 'Expand section'}
+                >
+                  <svg 
+                    className="w-4 h-4 transition-transform duration-200" 
+                    style={{ transform: contactsExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
                   >
-                    ✕
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('adminForms.roasters.contactName', 'Name')} *
-                    </label>
-                    <input
-                      type="text"
-                      value={personForm.name}
-                      onChange={(e) => setpersonForm(prev => ({...prev, name: e.target.value}))}
-                      placeholder="Full name"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('adminForms.roasters.contactEmail', 'Email')}
-                    </label>
-                    <input
-                      type="email"
-                      value={personForm.email}
-                      onChange={(e) => setpersonForm(prev => ({...prev, email: e.target.value}))}
-                      placeholder="email@example.com"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('adminForms.roasters.contactMobile', 'Mobile')}
-                    </label>
-                    <input
-                      type="tel"
-                      value={personForm.mobile}
-                      onChange={(e) => setpersonForm(prev => ({...prev, mobile: e.target.value}))}
-                      placeholder="+1 (555) 123-4567"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={personForm.isPrimary}
-                        onChange={(e) => setpersonForm(prev => ({...prev, isPrimary: e.target.checked}))}
-                        className="mr-2 accent-blue-600"
-                      />
-                      <span className="text-sm text-gray-700">
-                        {t('adminForms.roasters.primaryContact', 'Primary Contact')}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('adminForms.roasters.contactRoles', 'Roles')} *
-                  </label>
-                  <div className="flex gap-4">
-                    {Object.values(PersonRole).map((role) => (
-                      <label key={role} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={personForm.roles.includes(role)}
-                          onChange={(e) => handlePersonRoleChange(role, e.target.checked)}
-                          className="mr-2 accent-blue-600"
-                        />
-                        <span className="text-sm text-gray-700 capitalize">{role}</span>
-                      </label>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            {contactsExpanded && (
+              <>
+                {/* Render contact cards for existing contacts */}
+                {people.length > 0 ? (
+                  <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {people.map((person) => (
+                      <div key={person.id} className="w-full">
+                        {editingPerson && editingPerson.id === person.id ? (
+                          <div className="border rounded-lg p-4 bg-blue-50 mb-4 mx-auto w-full">
+                            <div className="space-y-3">
+                              <input type="text" placeholder="Name" value={personForm.name} onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
+                              <input type="email" placeholder="Email" value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                              <input type="text" placeholder="Mobile" value={personForm.mobile} onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                              <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                              <div className="flex gap-2">
+                                <label className="flex items-center text-sm"><input type="checkbox" checked={personForm.isPrimary} onChange={e => setpersonForm(f => ({ ...f, isPrimary: e.target.checked }))} /> Primary</label>
+                              </div>
+                              <div className="flex gap-2">
+                                <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => submitPerson()}>Save</button>
+                                <button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" onClick={resetPersonForm}>Cancel</button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="border rounded-lg p-4 bg-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between mx-auto w-full">
+                            <div>
+                              <div className="font-semibold text-gray-900">{person.name}</div>
+                              {person.email && <div className="text-sm text-gray-700">{person.email}</div>}
+                              {person.mobile && <div className="text-sm text-gray-700">{person.mobile}</div>}
+                              {person.bio && <div className="text-xs text-gray-500 mt-1">{person.bio}</div>}
+                            </div>
+                            <div className="mt-2 sm:mt-0 flex gap-2">
+                              <button type="button" className="text-blue-600 hover:underline" onClick={() => handleEditPerson(person)}>
+                                Edit
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('adminForms.roasters.contactBio', 'Bio')}
-                  </label>
-                  <textarea
-                    value={personForm.bio}
-                    onChange={(e) => setpersonForm(prev => ({...prev, bio: e.target.value}))}
-                    rows={3}
-                    placeholder="Brief description or role details..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={submitPerson}
-                    disabled={!personForm.name || personForm.roles.length === 0}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
-                  >
-                    {t('adminForms.roasters.saveContact', 'Save Contact')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={resetPersonForm}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 text-sm"
-                  >
-                    {t('adminForms.roasters.cancel', 'Cancel')}
-                  </button>
-                </div>
-              </div>
+                ) : (
+                  <div className="text-gray-500 mb-4">No contacts found for this roaster.</div>
+                )}
+                {/* Inline add contact form */}
+                {showAddPerson && !editingPerson && (
+                  <div className="border rounded-lg p-4 bg-blue-50 mb-4 mx-auto max-w-xl">
+                    <div className="space-y-3">
+                      <input type="text" placeholder="Name" value={personForm.name} onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
+                      <input type="email" placeholder="Email" value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                      <input type="text" placeholder="Mobile" value={personForm.mobile} onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                      <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                      <div className="flex gap-2">
+                        <label className="flex items-center text-sm"><input type="checkbox" checked={personForm.isPrimary} onChange={e => setpersonForm(f => ({ ...f, isPrimary: e.target.checked }))} /><span className="ml-2">Primary</span></label>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => submitPerson()}>Save</button>
+                        <button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" onClick={resetPersonForm}>Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
+            
+            {/* ...existing code... */}
 
           {/* Specialties Pane */}
           <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50">
-            <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
-              {t('adminForms.roasters.specialties', 'Specialties')}
-            </h3>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('adminForms.roasters.specialties', 'Specialties')} 
-                <span className="text-sm text-gray-500 ml-1">({t('adminForms.roasters.specialtiesHint', 'comma separated')})</span>
-              </label>
-              <input
-                type="text"
-                name="specialties"
-                value={formData.specialties}
-                onChange={handleInputChange}
-                placeholder="espresso, pour over, cold brew"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-800 select-none">
+                {t('adminForms.roasters.specialties', 'Specialties')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSpecialtiesExpanded(!specialtiesExpanded)}
+                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                title={specialtiesExpanded ? 'Collapse section' : 'Expand section'}
+              >
+                <svg 
+                  className="w-4 h-4 transition-transform duration-200" 
+                  style={{ transform: specialtiesExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             </div>
+            
+            {specialtiesExpanded && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('adminForms.roasters.specialties', 'Specialties')} 
+                    <span className="text-sm text-gray-500 ml-1">({t('adminForms.roasters.specialtiesHint', 'comma separated')})</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="specialties"
+                    value={formData.specialties}
+                    onChange={handleInputChange}
+                    placeholder="espresso, pour over, cold brew"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Settings Pane - Online Only, Rating, Verified, Featured */}
           <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
-            <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
-              {t('adminForms.roasters.settings', 'Settings')}
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-800 select-none">
+                {t('adminForms.roasters.settings', 'Settings')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSettingsExpanded(!settingsExpanded)}
+                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                title={settingsExpanded ? 'Collapse section' : 'Expand section'}
+              >
+                <svg 
+                  className="w-4 h-4 transition-transform duration-200" 
+                  style={{ transform: settingsExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+            
+            {settingsExpanded && (
+              <div className="space-y-4">
             
             <div className="space-y-4">
               {/* Rating */}
@@ -1429,14 +1315,37 @@ const RoasterForm: React.FC<{
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* Opening Hours Section - Only show if not online only */}
-          {!formData.onlineOnly && (
+        {/* Opening Hours Section - Only show if not online only */}
+        {!formData.onlineOnly && (
             <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
-                {t('adminForms.roasters.hours.title', 'Opening Hours')}
-              </h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                  {t('adminForms.roasters.hours.title', 'Opening Hours')}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setHoursExpanded(!hoursExpanded)}
+                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  title={hoursExpanded ? 'Collapse section' : 'Expand section'}
+                >
+                  <svg 
+                    className="w-4 h-4 transition-transform duration-200" 
+                    style={{ transform: hoursExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+              
+              {hoursExpanded && (
+                <div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {Object.entries(formData.hours as Record<string, any>).map(([day, dayHours]: [string, any]) => (
                   <div key={day} className="p-3 bg-white rounded-md space-y-2 border border-gray-200">
@@ -1487,26 +1396,51 @@ const RoasterForm: React.FC<{
                   </div>
                 ))}
               </div>
+                </div>
+              )}
             </div>
           )}
 
           {/* Images Section - Only show when editing existing roaster and images are loaded */}
-          {roaster && roaster.id && imagesLoaded && (
+          {roaster?.id && imagesLoaded && (
             <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
-                {t('adminForms.roasters.uploadedImages', 'Uploaded Images')}
-              </h3>
-              <SimpleImageUpload
-                roasterId={roaster.id}
-                existingImages={images}
-                onImagesUpdated={(updatedImages) => setImages(updatedImages)}
-                canEdit={true}
-              />
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                  {t('adminForms.roasters.uploadedImages', 'Uploaded Images')}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setImagesExpanded(!imagesExpanded)}
+                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  title={imagesExpanded ? 'Collapse section' : 'Expand section'}
+                >
+                  <svg 
+                    className="w-4 h-4 transition-transform duration-200" 
+                    style={{ transform: imagesExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+              
+              {imagesExpanded && (
+                <div>
+                  <SimpleImageUpload
+                    roasterId={roaster?.id ?? ""}
+                    existingImages={images}
+                    onImagesUpdated={(updatedImages) => setImages(updatedImages)}
+                    canEdit={true}
+                  />
+                </div>
+              )}
             </div>
           )}
 
           {/* URL Images Section - Show when editing existing roaster with URL images */}
-          {roaster && roaster.id && (
+          {roaster?.id && (
             <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
               <h3 className="text-xl font-semibold text-gray-800 mb-6 select-none">
                 {t('adminForms.roasters.urlImages', 'URL Images')} ({(formData.images || []).length})
@@ -1523,7 +1457,7 @@ const RoasterForm: React.FC<{
                           alt={`${formData.name} - Image ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            console.log('Image failed to load:', convertToImageUrl(imageUrl));
+
                             // Try alternative format for Unsplash
                             if (imageUrl.includes('unsplash.com') && !e.currentTarget.src.includes('/images/default-cafe.svg')) {
                               const photoId = imageUrl.match(/\/photos\/([^/?#]+)/)?.[1];
@@ -1535,7 +1469,7 @@ const RoasterForm: React.FC<{
                             e.currentTarget.src = '/images/default-cafe.svg';
                           }}
                           onLoad={() => {
-                            console.log('Image loaded successfully:', convertToImageUrl(imageUrl));
+
                           }}
                         />
                       </div>
@@ -1638,6 +1572,6 @@ const RoasterForm: React.FC<{
       </div>
     </div>
   );
-};
+}
 
 export default AdminRoastersPage;

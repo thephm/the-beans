@@ -1658,5 +1658,179 @@ router.delete('/:id/images/:imageId', [
   }
 }, auditAfter());
 
+/**
+ * @swagger
+ * /api/roasters/{id}/source-countries:
+ *   get:
+ *     summary: Get roaster's source countries
+ *     tags: [Roasters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of source countries for the roaster
+ *       404:
+ *         description: Roaster not found
+ */
+router.get('/:id/source-countries', async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+
+    const roaster = await prisma.roaster.findUnique({
+      where: { id },
+      include: {
+        sourceCountries: {
+          include: {
+            country: {
+              include: {
+                region: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!roaster) {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+
+    const countries = roaster.sourceCountries.map(sc => sc.country);
+    res.json(countries);
+  } catch (error) {
+    console.error('Error fetching roaster source countries:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/roasters/{id}/source-countries:
+ *   put:
+ *     summary: Update roaster's source countries
+ *     tags: [Roasters]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               countryIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Source countries updated successfully
+ *       404:
+ *         description: Roaster not found
+ *       403:
+ *         description: Not authorized to edit this roaster
+ */
+router.put('/:id/source-countries', [
+  requireAuth,
+  param('id').isString().notEmpty(),
+  body('countryIds').isArray(),
+  body('countryIds.*').isString().notEmpty()
+], async (req: any, res: any) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { id } = req.params;
+    const { countryIds } = req.body;
+
+    // Check if roaster exists and user has permission
+    const roaster = await prisma.roaster.findUnique({
+      where: { id }
+    });
+
+    if (!roaster) {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+
+    // Check authorization
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // Check if user can edit this roaster (admin or owner)
+    const isAdmin = user.role === 'admin';
+    const isOwner = roaster.ownerId === req.userId;
+    
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ error: 'Not authorized to edit this roaster' });
+    }
+
+    // Validate that all country IDs exist
+    if (countryIds.length > 0) {
+      const countries = await prisma.country.findMany({
+        where: { id: { in: countryIds } }
+      });
+
+      if (countries.length !== countryIds.length) {
+        return res.status(400).json({ error: 'One or more country IDs are invalid' });
+      }
+    }
+
+    // Remove existing source countries and add new ones
+    await prisma.roasterSourceCountry.deleteMany({
+      where: { roasterId: id }
+    });
+
+    if (countryIds.length > 0) {
+      await prisma.roasterSourceCountry.createMany({
+        data: countryIds.map((countryId: string) => ({
+          roasterId: id,
+          countryId
+        }))
+      });
+    }
+
+    // Fetch updated roaster with source countries
+    const updatedRoaster = await prisma.roaster.findUnique({
+      where: { id },
+      include: {
+        sourceCountries: {
+          include: {
+            country: {
+              include: {
+                region: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const countries = updatedRoaster?.sourceCountries.map(sc => sc.country) || [];
+    res.json({
+      message: 'Source countries updated successfully',
+      countries
+    });
+  } catch (error) {
+    console.error('Error updating roaster source countries:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
 // trigger restart

@@ -60,6 +60,9 @@ export interface Roaster {
   // People system
   people?: RoasterPerson[];
   
+  // Source countries
+  sourceCountries?: RoasterSourceCountry[];
+  
   // Legacy owner fields (for backward compatibility during transition)
   ownerName?: string;
   ownerEmail?: string;
@@ -80,6 +83,35 @@ export interface Roaster {
   isFavorited?: boolean;
   createdBy?: User;
   updatedBy?: User;
+}
+
+export interface Region {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  countries?: Country[];
+}
+
+export interface Country {
+  id: string;
+  name: string;
+  code: string; // ISO 2-letter country code
+  flagSvg?: string; // Scalable vector flag (SVG content or URL)
+  createdAt: string;
+  updatedAt: string;
+  regionId: string;
+  region?: Region;
+}
+
+export interface RoasterSourceCountry {
+  id: string;
+  roasterId: string;
+  countryId: string;
+  createdAt: string;
+  roaster?: Roaster;
+  country?: Country;
 }
 
 export interface Bean {

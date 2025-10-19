@@ -113,6 +113,7 @@ model Roaster {
   favorites Favorite[]
   beans    Bean[]
   roasterImages RoasterImage[]
+  sourceCountries RoasterSourceCountry[]
   
   // Audit relationships
   createdBy User? @relation("RoasterCreatedBy", fields: [createdById], references: [id])
@@ -277,6 +278,49 @@ model Notification {
   userId String
 
   @@map("notifications")
+}
+
+model Region {
+  id          String    @id @default(cuid())
+  name        String    @unique // Latin America, Africa, Asia/Pacific, Caribbean
+  description String?   // Optional description of the region
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  countries   Country[]
+  
+  @@map("regions")
+}
+
+model Country {
+  id          String    @id @default(cuid())
+  name        String    @unique // Brazil, Colombia, etc.
+  code        String    @unique @db.VarChar(2) // ISO 2-letter country code (BR, CO, etc.)
+  flagSvg     String?   // Scalable vector flag (SVG content or URL)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  region      Region    @relation(fields: [regionId], references: [id])
+  regionId    String
+  roasters    RoasterSourceCountry[]
+  
+  @@map("countries")
+}
+
+model RoasterSourceCountry {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relationships
+  roaster   Roaster @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+  roasterId String
+  country   Country @relation(fields: [countryId], references: [id])
+  countryId String
+
+  @@unique([roasterId, countryId]) // Prevent duplicate country associations per roaster
+  @@map("roaster_source_countries")
 }
 
 model AuditLog {
