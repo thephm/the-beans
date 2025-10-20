@@ -87,11 +87,7 @@ model Roaster {
   images      String[]
   hours       Json?    // Store opening hours as JSON
   
-  // Legacy owner contact fields (for backward compatibility during migration)
-  ownerName   String?  // Owner's name (deprecated - use people instead)
-  ownerEmail  String?  // Owner's email (deprecated - use people instead)
-  ownerBio    String?  // Owner's biography/description (deprecated - use people instead)
-  ownerMobile String?  // Owner's mobile phone number (deprecated - use people instead)
+  // Contact fields now managed via RoasterPerson (People/CRM)
   onlineOnly  Boolean  @default(false) // True if roaster operates online only (no physical location)
   specialties String[] // Array of specialties like "Espresso", "Single Origin", etc.
   verified    Boolean  @default(false)
