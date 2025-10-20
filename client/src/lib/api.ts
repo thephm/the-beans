@@ -1,20 +1,18 @@
+
 // Determine API base URL with fallback for production
 const getApiBaseUrl = () => {
   // First, check for explicitly set environment variable
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  
   // Check if we're in production environment
   if (process.env.NODE_ENV === 'production') {
     return 'https://the-beans-api.onrender.com';
   }
-  
   // If in production and no env var set, use the Render backend URL
   if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
     return 'https://the-beans-api.onrender.com';
   }
-  
   // Default to localhost for development
   return 'http://localhost:5000';
 };
@@ -31,6 +29,40 @@ class ApiClient {
       this.token = localStorage.getItem('token');
     }
   }
+
+  // ...existing code...
+
+  // People (contacts/CRM)
+  async getPeople(params?: Record<string, any>) {
+    const searchParams = params ? new URLSearchParams(params).toString() : '';
+    const endpoint = searchParams ? `/people?${searchParams}` : '/people';
+    return this.request(endpoint);
+  }
+
+  async getPeopleForRoaster(roasterId: string) {
+    return this.request(`/people/${roasterId}`);
+  }
+
+  async createPerson(personData: any) {
+    return this.request('/people', {
+      method: 'POST',
+      body: JSON.stringify(personData),
+    });
+  }
+
+  async updatePerson(id: string, personData: any) {
+    return this.request(`/people/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(personData),
+    });
+  }
+
+  async deletePerson(id: string) {
+    return this.request(`/people/${id}`, {
+      method: 'DELETE',
+    });
+  }
+  // ...existing code...
 
   setToken(token: string) {
     this.token = token;

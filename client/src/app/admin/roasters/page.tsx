@@ -781,11 +781,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         </h1>
       </div>
       <div className="max-w-6xl mx-auto">
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
+        {/* ...existing code... */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Information */}
@@ -1127,6 +1123,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       <div key={person.id} className="w-full">
                         {editingPerson && editingPerson.id === person.id ? (
                           <div className="border rounded-lg p-4 bg-blue-50 mb-4 mx-auto w-full">
+                            {error && (
+                              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                                {error}
+                              </div>
+                            )}
                             <div className="space-y-3">
                               <input type="text" placeholder="Name" value={personForm.name} onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
                               <input type="email" placeholder="Email" value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
@@ -1134,6 +1135,20 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                               <div className="flex gap-2">
                                 <label className="flex items-center text-sm"><input type="checkbox" checked={personForm.isPrimary} onChange={e => setpersonForm(f => ({ ...f, isPrimary: e.target.checked }))} /> Primary</label>
+                              </div>
+                              <div className="flex gap-2">
+                                <label className="flex items-center text-sm">
+                                  <input type="checkbox" checked={personForm.roles.includes(PersonRole.OWNER)} onChange={e => handlePersonRoleChange(PersonRole.OWNER, e.target.checked)} />
+                                  <span className="ml-2">Owner</span>
+                                </label>
+                                <label className="flex items-center text-sm">
+                                  <input type="checkbox" checked={personForm.roles.includes(PersonRole.ADMIN)} onChange={e => handlePersonRoleChange(PersonRole.ADMIN, e.target.checked)} />
+                                  <span className="ml-2">Admin</span>
+                                </label>
+                                <label className="flex items-center text-sm">
+                                  <input type="checkbox" checked={personForm.roles.includes(PersonRole.BILLING)} onChange={e => handlePersonRoleChange(PersonRole.BILLING, e.target.checked)} />
+                                  <span className="ml-2">Billing</span>
+                                </label>
                               </div>
                               <div className="flex gap-2">
                                 <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => submitPerson()}>Save</button>
@@ -1165,6 +1180,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                 {/* Inline add contact form */}
                 {showAddPerson && !editingPerson && (
                   <div className="border rounded-lg p-4 bg-blue-50 mb-4 mx-auto max-w-xl">
+                    {error && (
+                      <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {error}
+                      </div>
+                    )}
                     <div className="space-y-3">
                       <input type="text" placeholder="Name" value={personForm.name} onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
                       <input type="email" placeholder="Email" value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
@@ -1172,6 +1192,20 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                       <div className="flex gap-2">
                         <label className="flex items-center text-sm"><input type="checkbox" checked={personForm.isPrimary} onChange={e => setpersonForm(f => ({ ...f, isPrimary: e.target.checked }))} /><span className="ml-2">Primary</span></label>
+                      </div>
+                      <div className="flex gap-2">
+                        <label className="flex items-center text-sm">
+                          <input type="checkbox" checked={personForm.roles.includes(PersonRole.OWNER)} onChange={e => handlePersonRoleChange(PersonRole.OWNER, e.target.checked)} />
+                          <span className="ml-2">Owner</span>
+                        </label>
+                        <label className="flex items-center text-sm">
+                          <input type="checkbox" checked={personForm.roles.includes(PersonRole.ADMIN)} onChange={e => handlePersonRoleChange(PersonRole.ADMIN, e.target.checked)} />
+                          <span className="ml-2">Admin</span>
+                        </label>
+                        <label className="flex items-center text-sm">
+                          <input type="checkbox" checked={personForm.roles.includes(PersonRole.BILLING)} onChange={e => handlePersonRoleChange(PersonRole.BILLING, e.target.checked)} />
+                          <span className="ml-2">Billing</span>
+                        </label>
                       </div>
                       <div className="flex gap-2">
                         <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => submitPerson()}>Save</button>
