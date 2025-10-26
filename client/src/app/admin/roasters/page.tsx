@@ -1190,24 +1190,40 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       <input type="email" placeholder="Email" value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                       <input type="text" placeholder="Mobile" value={personForm.mobile} onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                       <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" />
-                      <div className="flex gap-2">
-                        <label className="flex items-center text-sm"><input type="checkbox" checked={personForm.isPrimary} onChange={e => setpersonForm(f => ({ ...f, isPrimary: e.target.checked }))} /><span className="ml-2">Primary</span></label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <button
+                          type="button"
+                          className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                          onClick={() => setpersonForm(f => ({ ...f, isPrimary: !f.isPrimary }))}
+                        >
+                          Primary
+                        </button>
                       </div>
-                      <div className="flex gap-2">
-                        <label className="flex items-center text-sm">
-                          <input type="checkbox" checked={personForm.roles.includes(PersonRole.OWNER)} onChange={e => handlePersonRoleChange(PersonRole.OWNER, e.target.checked)} />
-                          <span className="ml-2">Owner</span>
-                        </label>
-                        <label className="flex items-center text-sm">
-                          <input type="checkbox" checked={personForm.roles.includes(PersonRole.ADMIN)} onChange={e => handlePersonRoleChange(PersonRole.ADMIN, e.target.checked)} />
-                          <span className="ml-2">Admin</span>
-                        </label>
-                        <label className="flex items-center text-sm">
-                          <input type="checkbox" checked={personForm.roles.includes(PersonRole.BILLING)} onChange={e => handlePersonRoleChange(PersonRole.BILLING, e.target.checked)} />
-                          <span className="ml-2">Billing</span>
-                        </label>
+                      <label className="block text-sm font-medium mb-1 mt-2">Roles</label>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        <button
+                          type="button"
+                          className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.OWNER) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                          onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.OWNER) ? f.roles.filter(r => r !== PersonRole.OWNER) : [...f.roles, PersonRole.OWNER] }))}
+                        >
+                          Owner
+                        </button>
+                        <button
+                          type="button"
+                          className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.ADMIN) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                          onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.ADMIN) ? f.roles.filter(r => r !== PersonRole.ADMIN) : [...f.roles, PersonRole.ADMIN] }))}
+                        >
+                          Admin
+                        </button>
+                        <button
+                          type="button"
+                          className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.BILLING) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                          onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.BILLING) ? f.roles.filter(r => r !== PersonRole.BILLING) : [...f.roles, PersonRole.BILLING] }))}
+                        >
+                          Billing
+                        </button>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 mt-4 justify-end">
                         <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => submitPerson()}>Save</button>
                         <button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" onClick={resetPersonForm}>Cancel</button>
                       </div>

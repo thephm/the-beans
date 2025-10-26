@@ -1,21 +1,29 @@
+"use client";
 // People admin page for managing roaster contacts (light CRM)
 import React from 'react';
-import { getServerSession } from 'next-auth';
-import { requireAdmin } from '../../lib/auth';
-import PeopleTable from '../../../components/PeopleTable';
-import { useTranslation } from '../../../contexts/LanguageContext';
+import PeopleTable from '@/components/PeopleTable';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
-export default async function PeopleAdminPage() {
-  // Server-side admin check (pseudo, replace with your actual logic)
-  const session = await getServerSession();
-  requireAdmin(session);
-
-  const { t } = useTranslation();
-
+export default function PeopleAdminPage() {
+  const { user } = useAuth();
+  const { currentLanguage } = useLanguage();
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">People</h1>
+        </div>
+        <div className="text-red-600">Admin access required.</div>
+      </div>
+    );
+  }
   return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">{t('admin.people.title', 'People')}</h1>
+    <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">People</h1>
+      </div>
       <PeopleTable />
-    </main>
+    </div>
   );
 }

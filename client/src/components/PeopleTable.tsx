@@ -1,5 +1,7 @@
 
+"use client";
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '../lib/api';
 import { RoasterPerson, PersonRole, Roaster } from '../types';
 
@@ -37,6 +39,7 @@ function EditableCell({ value, onChange, type = 'text', options, ...props }: any
 }
 
 export default function PeopleTable() {
+  const router = useRouter();
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [roasters, setRoasters] = useState<Roaster[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -52,19 +55,28 @@ export default function PeopleTable() {
   async function fetchData() {
     setLoading(true);
     try {
-      const peopleRes = await apiClient.getPeople();
-      setPeople(peopleRes.people || peopleRes.data || []);
       const roastersRes = await apiClient.getRoasters();
-      setRoasters(roastersRes.roasters || roastersRes.data || []);
+      // roastersRes is { roasters: Roaster[], pagination: ... }
+      const roastersData = (roastersRes as any).roasters || [];
+      setRoasters(roastersData);
+      const firstRoasterId = roastersData[0]?.id;
+      if (firstRoasterId) {
+        const peopleRes = await apiClient.getPeopleForRoaster(firstRoasterId);
+        const peopleData = (peopleRes as import('../types').ApiResponse<import('../types').RoasterPerson[]>);
+  // ...existing code...
+        setPeople(peopleData.data || []);
+      } else {
+        setPeople([]);
+      }
     } catch (e: any) {
       setError(e.message || 'Failed to load data');
+  // ...existing code...
     }
     setLoading(false);
   }
 
   function startEdit(person: RoasterPerson) {
-    setEditingId(person.id);
-    setEditData({ ...person });
+  router.push(`/admin/people/edit?id=${person.id}`);
   }
 
   function cancelEdit() {
@@ -102,101 +114,74 @@ export default function PeopleTable() {
   }
 
   function startAdd() {
-    setAdding(true);
-    setEditingId('new');
-    setEditData({
-      name: '',
-      email: '',
-      mobile: '',
-      bio: '',
-      roles: ['owner'],
-      roasterId: roasters[0]?.id || '',
-      isActive: true,
-      isPrimary: false,
-    });
+    if (!roasters.length) {
+      setError('No roasters available. Cannot add person.');
+      return;
+    }
+    router.push('/admin/people/edit?id=new');
   }
 
   // Responsive: stack on mobile, table on desktop
   return (
     <div className="w-full max-w-full overflow-x-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">People</h2>
-        <button onClick={startAdd} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Person</button>
+      <div className="flex justify-end items-center mb-4">
+        <button
+          onClick={startAdd}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          disabled={!roasters.length}
+        >
+          Add Person
+        </button>
       </div>
       {error && <div className="text-red-600 mb-2">{error}</div>}
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className="block md:table w-full">
-          <div className="hidden md:table-header-group">
-            <div className="table-row">
-              <div className="table-cell font-bold p-2">Name</div>
-              <div className="table-cell font-bold p-2">Email</div>
-              <div className="table-cell font-bold p-2">Mobile</div>
-              <div className="table-cell font-bold p-2">Bio</div>
-              <div className="table-cell font-bold p-2">Roles</div>
-              <div className="table-cell font-bold p-2">Roaster</div>
-              <div className="table-cell font-bold p-2">Active</div>
-              <div className="table-cell font-bold p-2">Primary</div>
-              <div className="table-cell font-bold p-2">Actions</div>
-            </div>
-          </div>
-          <div className="md:table-row-group">
+        <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Name</th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Email</th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Mobile</th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Roles</th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Roaster</th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Created</th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Primary</th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
             {(adding ? [{ id: 'new', ...editData }] : []).concat(
               people.filter(p => !adding || p.id !== 'new')
             ).map((person: any) => (
-              <div key={person.id} className="block md:table-row border-b md:border-0 mb-4 md:mb-0 bg-white md:bg-transparent rounded md:rounded-none shadow md:shadow-none p-2 md:p-0">
-                {editingId === person.id ? (
-                  <>
-                    <div className="md:table-cell p-2">
-                      <EditableCell value={editData.name} onChange={v => handleEditChange('name', v)} />
-                    </div>
-                    <div className="md:table-cell p-2">
-                      <EditableCell value={editData.email} onChange={v => handleEditChange('email', v)} type="email" />
-                    </div>
-                    <div className="md:table-cell p-2">
-                      <EditableCell value={editData.mobile} onChange={v => handleEditChange('mobile', v)} />
-                    </div>
-                    <div className="md:table-cell p-2">
-                      <EditableCell value={editData.bio} onChange={v => handleEditChange('bio', v)} />
-                    </div>
-                    <div className="md:table-cell p-2">
-                      <EditableCell value={editData.roles} onChange={v => handleEditChange('roles', v)} type="multiselect" options={ROLE_OPTIONS} />
-                    </div>
-                    <div className="md:table-cell p-2">
-                      <EditableCell value={editData.roasterId} onChange={v => handleEditChange('roasterId', v)} type="select" options={roasters.map(r => ({ value: r.id, label: r.name }))} />
-                    </div>
-                    <div className="md:table-cell p-2">
-                      <input type="checkbox" checked={!!editData.isActive} onChange={e => handleEditChange('isActive', e.target.checked)} />
-                    </div>
-                    <div className="md:table-cell p-2">
-                      <input type="checkbox" checked={!!editData.isPrimary} onChange={e => handleEditChange('isPrimary', e.target.checked)} />
-                    </div>
-                    <div className="md:table-cell p-2 flex gap-2">
-                      <button onClick={saveEdit} className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">Save</button>
-                      <button onClick={cancelEdit} className="bg-gray-300 text-gray-800 px-2 py-1 rounded hover:bg-gray-400">Cancel</button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="md:table-cell p-2"><span className="font-medium">{person.name}</span></div>
-                    <div className="md:table-cell p-2">{person.email}</div>
-                    <div className="md:table-cell p-2">{person.mobile}</div>
-                    <div className="md:table-cell p-2">{person.bio}</div>
-                    <div className="md:table-cell p-2">{(person.roles || []).join(', ')}</div>
-                    <div className="md:table-cell p-2">{roasters.find(r => r.id === person.roasterId)?.name || ''}</div>
-                    <div className="md:table-cell p-2">{person.isActive ? 'Yes' : 'No'}</div>
-                    <div className="md:table-cell p-2">{person.isPrimary ? 'Yes' : 'No'}</div>
-                    <div className="md:table-cell p-2 flex gap-2">
-                      <button onClick={() => startEdit(person)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Edit</button>
-                      <button onClick={() => handleDelete(person.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
-                    </div>
-                  </>
-                )}
-              </div>
+              (
+                <tr key={person.id} className="border-b">
+                  <td className="px-4 py-2 font-medium">{person.name}</td>
+                  <td className="px-4 py-2">{person.email}</td>
+                  <td className="px-4 py-2">{person.mobile}</td>
+                  <td className="px-4 py-2">
+                    {(person.roles || []).map(role => (
+                      <span key={role} className={`inline-flex px-2 py-1 text-xs font-medium rounded-full mr-1 ${
+                        role === 'owner' ? 'bg-purple-100 text-purple-800' :
+                        role === 'admin' ? 'bg-gray-100 text-gray-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {role}
+                      </span>
+                    ))}
+                  </td>
+                  <td className="px-4 py-2">{roasters.find(r => r.id === person.roasterId)?.name || ''}</td>
+                  <td className="px-4 py-2">{person.createdAt ? new Date(person.createdAt).toISOString().slice(0, 10) : ''}</td>
+                  <td className="px-4 py-2">{person.isPrimary ? 'Yes' : 'No'}</td>
+                  <td className="px-4 py-2 flex gap-2">
+                    <button onClick={() => startEdit(person)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Edit</button>
+                    <button onClick={() => handleDelete(person.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+                  </td>
+                </tr>
+              )
             ))}
-          </div>
-        </div>
+          </tbody>
+        </table>
       )}
     </div>
   );
