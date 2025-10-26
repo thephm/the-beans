@@ -126,10 +126,10 @@ router.get('/:roasterId', [
       permissions: getPersonPermissions(person.roles)
     }));
 
-    res.json({
-      people: peopleWithPermissions,
-      count: people.length
-    });
+      res.json({
+        data: peopleWithPermissions,
+        count: people.length
+      });
 
   } catch (error) {
     console.error('Get people error:', error);

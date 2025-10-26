@@ -98,9 +98,13 @@ class ApiClient {
       headers,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+    if (response.status === 401) {
+      // Unauthorized: clear token and redirect to login
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
+      throw new Error('HTTP 401: Unauthorized');
     }
 
     return response.json();

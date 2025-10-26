@@ -139,45 +139,41 @@ const EditUserPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
-      {/* Header with Back Link */}
-      <div className="mb-6">
+    <div className="max-w-3xl mx-auto pt-24">
+      <div className="mb-8">
         <Link
           href="/admin/users"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+          className="inline-flex items-center text-blue-700 hover:text-blue-900 text-base font-semibold mb-4 gap-2"
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           {t('admin.users.backToUsers', 'Back to Users')}
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {t('admin.users.edit', 'Edit')} {user.username}
-        </h1>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="text-red-800">{t('error', 'Error')}: {error}</div>
         </div>
       )}
 
-      {/* Edit Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-4xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('admin.users.username', 'Username')}
-            </label>
-            <input
-              type="text"
-              value={editData.username || ''}
-              onChange={(e) => setEditData(prev => ({ ...prev, username: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder={t('admin.users.usernamePlaceholder', 'Enter username')}
-            />
-          </div>
+      <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
+        <h1 className="text-2xl font-bold mb-8">Edit User</h1>
+        <form onSubmit={e => { e.preventDefault(); saveEdit(); }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('admin.users.username', 'Username')}
+              </label>
+              <input
+                type="text"
+                value={editData.username || ''}
+                onChange={(e) => setEditData(prev => ({ ...prev, username: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder={t('admin.users.usernamePlaceholder', 'Enter username')}
+              />
+            </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -251,57 +247,29 @@ const EditUserPage: React.FC = () => {
               ))}
             </select>
           </div>
-        </div>
-
-        {/* User Info */}
-        {user.createdAt && (
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="text-xs text-gray-400">
-              {user.createdBy ? (
-                <>Created by <Link href={`/admin/users/${user.createdBy.id}/edit`} className="text-blue-600 hover:text-blue-800">{user.createdBy.username}</Link> on {formatDateTimeToYYYYMMDD(user.createdAt)}.</>
+          </div>
+          <div className="flex gap-4 mt-8 justify-end">
+            <button type="button" onClick={handleCancel} disabled={saving} className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">{t('admin.users.cancel', 'Cancel')}</button>
+            <button type="submit" disabled={saving} className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+              {saving ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {t('admin.users.saving', 'Saving...')}
+                </>
               ) : (
-                <>Created on {formatDateTimeToYYYYMMDD(user.createdAt)}.</>
+                t('admin.users.save', 'Save')
               )}
-              {user.updatedAt && (
-                <span>
-                  {user.updatedBy ? (
-                    <> Updated by <Link href={`/admin/users/${user.updatedBy.id}/edit`} className="text-blue-600 hover:text-blue-800">{user.updatedBy.username}</Link> on {formatDateTimeToYYYYMMDD(user.updatedAt)}.</>
-                  ) : (
-                    <> Updated on {formatDateTimeToYYYYMMDD(user.updatedAt)}.</>
-                  )}
-                </span>
-              )}
-            </div>
+            </button>
+          </div>
+        </form>
+        {(user.createdAt || user.updatedAt) && (
+          <div className="mt-6 text-sm text-gray-500 bg-gray-50 rounded p-3">
+            {user.createdAt && <span>Created on {formatDateTimeToYYYYMMDD(user.createdAt)}.</span>} {user.updatedAt && <span>Updated on {formatDateTimeToYYYYMMDD(user.updatedAt)}.</span>}
           </div>
         )}
-
-        {/* Action Buttons */}
-        <div className="flex flex-row justify-end gap-3 mt-8">
-          <button
-            onClick={handleCancel}
-            disabled={saving}
-            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex-1 min-w-0 max-w-[120px]"
-          >
-            {t('admin.users.cancel', 'Cancel')}
-          </button>
-          <button
-            onClick={saveEdit}
-            disabled={saving}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center flex-1 min-w-0 max-w-[120px]"
-          >
-            {saving ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {t('admin.users.saving', 'Saving...')}
-              </>
-            ) : (
-              t('admin.users.save', 'Save')
-            )}
-          </button>
-        </div>
       </div>
     </div>
   );
