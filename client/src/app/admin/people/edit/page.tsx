@@ -53,7 +53,7 @@ export default function EditPersonPage() {
             email: "",
             mobile: "",
             roles: ["owner"],
-            roasterId: roastersData[0]?.id,
+            roasterId: "",
             isPrimary: false,
           });
         }
@@ -141,7 +141,8 @@ export default function EditPersonPage() {
             <div>
               <label className="block text-sm font-medium mb-1">Roaster</label>
               <select className="w-full border rounded px-3 py-2" value={editData.roasterId || ""} onChange={e => handleEditChange("roasterId", e.target.value)}>
-                {roasters.map(r => (
+                <option value="">Select a roaster</option>
+                {[...roasters].sort((a, b) => a.name.trim().toLowerCase().localeCompare(b.name.trim().toLowerCase())).map(r => (
                   <option key={r.id} value={r.id}>{r.name}</option>
                 ))}
               </select>
