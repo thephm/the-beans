@@ -3,6 +3,7 @@ import { body, param, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { requireAuth } from '../middleware/requireAuth';
 import { AuthenticatedRequest } from '../types';
+import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -154,7 +155,13 @@ router.post('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { roasterId, name, email, mobile, bio, roles, isPrimary } = req.body;
+  const roasterId = req.body.roasterId;
+  const name = req.body.name;
+  const email = req.body.email;
+  const mobile = req.body.mobile;
+  const bio = req.body.bio;
+  const roles = req.body.roles;
+  const isPrimary = req.body.isPrimary;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -229,6 +236,18 @@ router.post('/', [
       permissions: getPersonPermissions(person.roles)
     };
 
+    // Audit log: CREATE person
+    await createAuditLog({
+      action: 'CREATE',
+      entityType: 'person',
+      entityId: person.id,
+      entityName: person.name,
+      userId,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      newValues: person,
+    });
+
     res.status(201).json({
       message: 'person created successfully',
       person: personWithPermissions
@@ -258,8 +277,14 @@ router.put('/:id', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { id } = req.params;
-    const { name, email, mobile, bio, roles, isPrimary, isActive } = req.body;
+  const id = req.params.id;
+  const name = req.body.name;
+  const email = req.body.email;
+  const mobile = req.body.mobile;
+  const bio = req.body.bio;
+  const roles = req.body.roles;
+  const isPrimary = req.body.isPrimary;
+  const isActive = req.body.isActive;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -355,6 +380,19 @@ router.put('/:id', [
       permissions: getPersonPermissions(updatedperson.roles)
     };
 
+    // Audit log: UPDATE person
+    await createAuditLog({
+      action: 'UPDATE',
+      entityType: 'person',
+      entityId: updatedperson.id,
+      entityName: updatedperson.name,
+      userId,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      oldValues: existingperson,
+      newValues: updatedperson,
+    });
+
     res.json({
       message: 'person updated successfully',
       person: personWithPermissions
@@ -376,7 +414,7 @@ router.delete('/:id', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { id } = req.params;
+  const id = req.params.id;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -418,6 +456,18 @@ router.delete('/:id', [
     // Delete the person
     await prisma.roasterPerson.delete({
       where: { id }
+    });
+
+    // Audit log: DELETE person
+    await createAuditLog({
+      action: 'DELETE',
+      entityType: 'person',
+      entityId: existingperson.id,
+      entityName: existingperson.name,
+      userId,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      oldValues: existingperson,
     });
 
     res.json({

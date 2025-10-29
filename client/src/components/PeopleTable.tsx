@@ -1,23 +1,151 @@
-
 "use client";
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiClient } from '../lib/api';
-import { RoasterPerson, PersonRole, Roaster } from '../types';
+import { RoasterPerson, Roaster } from '../types';
+import { useTranslation } from 'react-i18next';
 
-const ROLE_OPTIONS = [
-  { value: 'owner', label: 'Owner' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'billing', label: 'Billing' },
-];
 
+export default function PeopleTable() {
+  const { t } = useTranslation();
+  const [people, setPeople] = useState<RoasterPerson[]>([]);
+  const [roasters, setRoasters] = useState<Roaster[]>([]);
+  const [selectedRoasterId, setSelectedRoasterId] = useState<string>('all');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [allPeopleCount, setAllPeopleCount] = useState<number>(0);
+
+  useEffect(() => {
+    async function fetchRoasters() {
+      setLoading(true);
+      try {
+        const roastersData = await apiClient.getRoasters();
+        setRoasters((roastersData && Array.isArray((roastersData as any).roasters)) ? (roastersData as any).roasters : []);
+      } catch (err) {
+        setRoasters([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchRoasters();
+  }, []);
+
+  useEffect(() => {
+    async function fetchPeople() {
+      setLoading(true);
+      try {
+        if (selectedRoasterId === 'all') {
+          // Fetch people for all roasters and combine
+          const allPeople: RoasterPerson[] = [];
+          for (const roaster of Array.isArray(roasters) ? roasters : []) {
+            try {
+              const result = await apiClient.getPeopleForRoaster(roaster.id);
+              if (result && Array.isArray((result as any).data)) {
+                allPeople.push(...(result as any).data);
+              } else if (Array.isArray(result)) {
+                allPeople.push(...result);
+              }
+            } catch (err) {
+              // Ignore errors for individual roasters
+            }
+          }
+          setPeople(allPeople);
+          setAllPeopleCount(allPeople.length);
+        } else {
+          const result = await apiClient.getPeopleForRoaster(selectedRoasterId);
+          if (result && Array.isArray((result as any).data)) {
+            setPeople((result as any).data);
+            setAllPeopleCount((result as any).count || (result as any).data.length);
+          } else if (Array.isArray(result)) {
+            setPeople(result);
+            setAllPeopleCount(result.length);
+          } else {
+            setPeople([]);
+            setAllPeopleCount(0);
+          }
+        }
+      } catch (err) {
+        setPeople([]);
+        setAllPeopleCount(0);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPeople();
+  }, [selectedRoasterId, roasters]);
+
+  const handleRoasterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRoasterId(e.target.value);
+  };
+
+  const handleAddPerson = () => {
+    // Implement add person logic (e.g., open modal)
+    alert('Add person functionality not implemented yet.');
+  };
+
+  const filteredPeople = people; // Add filtering logic if needed
+
+  return (
+    <div className="mt-8 w-full flex flex-col items-center">
+      <div className="w-full max-w-6xl">
+        <div className="flex items-center mb-4">
+          <label htmlFor="roaster-select" className="mr-2 font-medium">Roaster:</label>
+          <select
+            id="roaster-select"
+            value={selectedRoasterId}
+            onChange={handleRoasterChange}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">All roasters</option>
+            {roasters.map(roaster => (
+              <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
+            ))}
+          </select>
+          <span className="ml-6 text-gray-500 text-sm">
+            {filteredPeople.length} of {allPeopleCount} people
+          </span>
+          <button
+            className="ml-auto bg-purple-600 text-white px-5 py-2 rounded shadow hover:bg-purple-700"
+            onClick={handleAddPerson}
+          >
+            {t('admin.people.add', 'Add Person')}
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full bg-white border rounded-lg shadow">
+            <thead>
+              <tr>
+                <th className="px-8 py-3 text-left font-semibold">Name</th>
+                <th className="px-8 py-3 text-left font-semibold">Email</th>
+                <th className="px-8 py-3 text-left font-semibold">Mobile</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPeople.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="px-8 py-4 text-center text-gray-500">No people found.</td>
+                        </tr>
+                      ) : (
+                        filteredPeople.map(person => (
+                          <tr key={person.id}>
+                            <td className="px-8 py-2 border-b">{person.name}</td>
+                            <td className="px-8 py-2 border-b">{person.email}</td>
+                            <td className="px-8 py-2 border-b">{person.mobile}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          );
+}
+
+// EditableCell utility (if needed elsewhere)
 function EditableCell({ value, onChange, type = 'text', options, ...props }: any) {
   if (type === 'select') {
-    // If options are roasters, sort alphabetically by label
     let sortedOptions = options;
     if (Array.isArray(options) && options.length && options[0].label && options[0].value) {
       sortedOptions = [...options].sort((a, b) => {
-        // Ignore case and whitespace for sorting
         return a.label.trim().toLowerCase().localeCompare(b.label.trim().toLowerCase());
       });
     }
@@ -43,222 +171,5 @@ function EditableCell({ value, onChange, type = 'text', options, ...props }: any
   }
   return (
     <input className="border rounded px-2 py-1 w-full" value={value} onChange={e => onChange(e.target.value)} {...props} />
-  );
-}
-
-export default function PeopleTable() {
-  const router = useRouter();
-  const [people, setPeople] = useState<RoasterPerson[]>([]);
-  const [roasters, setRoasters] = useState<Roaster[]>([]);
-  const sortedRoasters = [...roasters].sort((a, b) => a.name.trim().toLowerCase().localeCompare(b.name.trim().toLowerCase()));
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editData, setEditData] = useState<any>({});
-  const [adding, setAdding] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    setLoading(true);
-    try {
-  const roastersRes = await apiClient.getRoasters();
-  // roastersRes is { roasters: Roaster[], pagination: ... }
-  const roastersData = ((roastersRes as any).roasters || []).slice();
-  roastersData.sort((a, b) => a.name.localeCompare(b.name));
-  setRoasters(roastersData);
-      const firstRoasterId = roastersData[0]?.id;
-      if (firstRoasterId) {
-        const peopleRes = await apiClient.getPeopleForRoaster(firstRoasterId);
-        const peopleData = (peopleRes as import('../types').ApiResponse<import('../types').RoasterPerson[]>);
-  // ...existing code...
-        setPeople(peopleData.data || []);
-      } else {
-        setPeople([]);
-      }
-    } catch (e: any) {
-      setError(e.message || 'Failed to load data');
-  // ...existing code...
-    }
-    setLoading(false);
-  }
-
-  function startEdit(person: RoasterPerson) {
-  router.push(`/admin/people/edit?id=${person.id}`);
-  }
-
-  function cancelEdit() {
-    setEditingId(null);
-    setEditData({});
-    setAdding(false);
-  }
-
-  function handleEditChange(field: string, value: any) {
-    setEditData((prev: any) => ({ ...prev, [field]: value }));
-  }
-
-  async function saveEdit() {
-    try {
-      if (adding) {
-        await apiClient.createPerson(editData);
-      } else {
-        await apiClient.updatePerson(editingId!, editData);
-      }
-      await fetchData();
-      cancelEdit();
-    } catch (e: any) {
-      setError(e.message || 'Save failed');
-    }
-  }
-
-  async function handleDelete(id: string) {
-    if (!window.confirm('Delete this person?')) return;
-    try {
-      await apiClient.deletePerson(id);
-      await fetchData();
-    } catch (e: any) {
-      setError(e.message || 'Delete failed');
-    }
-  }
-
-  function startAdd() {
-    if (!roasters.length) {
-      setError('No roasters available. Cannot add person.');
-      return;
-    }
-    router.push('/admin/people/edit?id=new');
-  }
-
-  // Responsive: cards on mobile, table on desktop
-  return (
-    <div className="w-full max-w-full overflow-x-auto">
-      <div className="flex justify-end items-center mb-4">
-        <button
-          onClick={startAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          disabled={!roasters.length}
-        >
-          Add Person
-        </button>
-      </div>
-      {error && <div className="text-red-600 mb-2">{error}</div>}
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          {/* Mobile Card View */}
-          <div className="md:hidden space-y-4">
-            {(adding ? [{ id: 'new', ...editData }] : []).concat(
-              people.filter(p => !adding || p.id !== 'new')
-            ).map((person: any) => (
-              <div key={person.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                {/* Header */}
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <span className="text-lg font-semibold text-blue-600 text-left">
-                      {person.name}
-                    </span>
-                    <div className="flex items-center space-x-2 mt-1">
-                      {(person.roles || []).map(role => (
-                        <span key={role} className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          role === 'owner' ? 'bg-purple-100 text-purple-800' :
-                          role === 'admin' ? 'bg-gray-100 text-gray-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}>
-                          {role}
-                        </span>
-                      ))}
-                      {person.isPrimary && (
-                        <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Primary</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {/* Email & Mobile */}
-                <div className="mb-2 text-sm text-gray-600">
-                  <span className="mr-2">📧</span>
-                  <a href={`mailto:${person.email}`} className="text-blue-600 hover:text-blue-800">
-                    {person.email}
-                  </a>
-                </div>
-                <div className="mb-2 text-sm text-gray-600">
-                  <span className="mr-2">📱</span>
-                  {person.mobile}
-                </div>
-                {/* Roaster & Created */}
-                <div className="mb-2 text-sm text-gray-600">
-                  <span className="mr-2">🏢</span>
-                  {roasters.find(r => r.id === person.roasterId)?.name || ''}
-                </div>
-                <div className="mb-2 text-sm text-gray-600">
-                {/* Dates styled like Users mobile card */}
-                <div className="mb-3 text-xs text-gray-500 space-y-1">
-                  {person.createdAt && (
-                    <div>Created: {new Date(person.createdAt).toISOString().slice(0, 10)}</div>
-                  )}
-                  {person.updatedAt && (
-                    <div>Modified: {new Date(person.updatedAt).toISOString().slice(0, 10)}</div>
-                  )}
-                </div>
-                </div>
-                {/* Actions */}
-                <div className="flex gap-2 mt-2">
-                  <button onClick={() => startEdit(person)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Edit</button>
-                  <button onClick={() => handleDelete(person.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Desktop Table View */}
-          <table className="hidden md:table w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Name</th>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Email</th>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Mobile</th>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Roles</th>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Roaster</th>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Created</th>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Primary</th>
-                <th className="py-3 px-4 border-b text-left font-medium text-gray-900">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(adding ? [{ id: 'new', ...editData }] : []).concat(
-                people.filter(p => !adding || p.id !== 'new')
-              ).map((person: any) => (
-                (
-                  <tr key={person.id} className="border-b">
-                    <td className="px-4 py-2 font-medium">{person.name}</td>
-                    <td className="px-4 py-2">{person.email}</td>
-                    <td className="px-4 py-2">{person.mobile}</td>
-                    <td className="px-4 py-2">
-                      {(person.roles || []).map(role => (
-                        <span key={role} className={`inline-flex px-2 py-1 text-xs font-medium rounded-full mr-1 ${
-                          role === 'owner' ? 'bg-purple-100 text-purple-800' :
-                          role === 'admin' ? 'bg-gray-100 text-gray-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}>
-                          {role}
-                        </span>
-                      ))}
-                    </td>
-                    <td className="px-4 py-2">{roasters.find(r => r.id === person.roasterId)?.name || ''}</td>
-                    <td className="px-4 py-2">{person.createdAt ? new Date(person.createdAt).toISOString().slice(0, 10) : ''}</td>
-                    <td className="px-4 py-2">{person.isPrimary ? 'Yes' : 'No'}</td>
-                    <td className="px-4 py-2 flex gap-2">
-                      <button onClick={() => startEdit(person)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Edit</button>
-                      <button onClick={() => handleDelete(person.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
-                    </td>
-                  </tr>
-                )
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-    </div>
   );
 }

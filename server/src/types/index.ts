@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 
 export interface AuthenticatedRequest extends Request {
   user?: { id: string };
+  body: any;
+  params: any;
 }
 
 export type AuthMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => void;
