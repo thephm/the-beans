@@ -11,7 +11,8 @@ export default function PeopleTable() {
   const [roasters, setRoasters] = useState<Roaster[]>([]);
   const [selectedRoasterId, setSelectedRoasterId] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
-  const [allPeopleCount, setAllPeopleCount] = useState<number>(0);
+  const [allPeopleCount, setAllPeopleCount] = useState<number>(0); // filtered count
+  const [totalAcrossAllRoasters, setTotalAcrossAllRoasters] = useState<number>(0); // always total
 
   useEffect(() => {
     async function fetchRoasters() {
@@ -32,6 +33,26 @@ export default function PeopleTable() {
     async function fetchPeople() {
       setLoading(true);
       try {
+        // Always calculate total across all roasters
+        let totalAll = 0;
+        for (const roaster of Array.isArray(roasters) ? roasters : []) {
+          try {
+            const result = await apiClient.getPeopleForRoaster(roaster.id);
+            let count = 0;
+            if (result && typeof result === 'object' && 'count' in result) {
+              count = Number((result as any).count);
+            } else if (Array.isArray(result)) {
+              count = result.length;
+            } else if (result && Array.isArray((result as any).data)) {
+              count = (result as any).count || (result as any).data.length;
+            }
+            totalAll += count;
+          } catch (err) {
+            // Ignore errors for individual roasters
+          }
+        }
+        setTotalAcrossAllRoasters(totalAll);
+
         if (selectedRoasterId === 'all') {
           // Fetch people for all roasters and combine
           const allPeople: RoasterPerson[] = [];
@@ -53,7 +74,7 @@ export default function PeopleTable() {
           const result = await apiClient.getPeopleForRoaster(selectedRoasterId);
           if (result && Array.isArray((result as any).data)) {
             setPeople((result as any).data);
-            setAllPeopleCount((result as any).count || (result as any).data.length);
+            setAllPeopleCount((result as any).data.length);
           } else if (Array.isArray(result)) {
             setPeople(result);
             setAllPeopleCount(result.length);
@@ -65,6 +86,7 @@ export default function PeopleTable() {
       } catch (err) {
         setPeople([]);
         setAllPeopleCount(0);
+        setTotalAcrossAllRoasters(0);
       } finally {
         setLoading(false);
       }
@@ -100,7 +122,7 @@ export default function PeopleTable() {
             ))}
           </select>
           <span className="ml-6 text-gray-500 text-sm">
-            {filteredPeople.length} of {allPeopleCount} people
+            {filteredPeople.length} of {totalAcrossAllRoasters} people
           </span>
           <button
             className="ml-auto bg-purple-600 text-white px-5 py-2 rounded shadow hover:bg-purple-700"
