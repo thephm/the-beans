@@ -24,7 +24,8 @@
   "author": "thephm",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.9.2",
+    "@types/nodemailer": "^7.0.3",
     "concurrently": "^8.2.2"
   },
   "dependencies": {
