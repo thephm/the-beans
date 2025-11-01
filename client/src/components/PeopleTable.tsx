@@ -155,7 +155,18 @@ export default function PeopleTable() {
                         </div>
                       )}
                     </td>
-                    <td className="px-8 py-2 border-b">{person.email}</td>
+                    <td className="px-8 py-2 border-b">
+                      {person.email ? (
+                        <a
+                          href={`mailto:${person.email}`}
+                          className="text-blue-700 hover:text-blue-900 underline cursor-pointer"
+                        >
+                          {person.email}
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
                     <td className="px-8 py-2 border-b">{person.mobile}</td>
                   </tr>
                 ))
