@@ -10,6 +10,7 @@ export interface User {
   latitude?: number;
   longitude?: number;
   language?: string;
+  lastLogin?: string;
   createdAt: string;
   updatedAt?: string;
   role?: string;

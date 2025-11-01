@@ -16,6 +16,7 @@ interface User {
   lastName?: string;
   language?: string;
   role?: string;
+  lastLogin?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -168,6 +169,9 @@ const AdminUsersPage: React.FC = () => {
 
             {/* Dates */}
             <div className="mb-3 text-xs text-gray-500 space-y-1">
+              {user.lastLogin && (
+                <div>Last Login: {formatDateToYYYYMMDD(user.lastLogin)}</div>
+              )}
               {user.createdAt && (
                 <div>Created: {formatDateToYYYYMMDD(user.createdAt)}</div>
               )}
@@ -181,22 +185,25 @@ const AdminUsersPage: React.FC = () => {
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
           <thead className="bg-gray-50">
             <tr>
-              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900 w-1/5">
                 {t('admin.users.username', 'Username')}
               </th>
-              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900 w-1/4">
                 {t('admin.users.email', 'Email')}
               </th>
-              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900 w-1/6">
                 {t('admin.users.role', 'Role')}
               </th>
-              <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
+              <th className="py-3 px-4 border-b text-center font-medium text-gray-900 w-1/12">
                 {t('admin.users.language', 'Language')}
               </th>
-              <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
+              <th className="py-3 px-4 border-b text-center font-medium text-gray-900 w-1/5">
+                {t('admin.users.lastLogin', 'Last Login')}
+              </th>
+              <th className="py-3 px-4 border-b text-center font-medium text-gray-900 w-1/5">
                 {t('admin.users.created', 'Created')}
               </th>
             </tr>
@@ -233,6 +240,9 @@ const AdminUsersPage: React.FC = () => {
                       {user.language.toUpperCase()}
                     </span>
                   )}
+                </td>
+                <td className="py-3 px-4 text-center text-sm text-gray-600">
+                  {user.lastLogin ? formatDateToYYYYMMDD(user.lastLogin) : '-'}
                 </td>
                 <td className="py-3 px-4 text-center text-sm text-gray-600">
                   {user.createdAt ? formatDateToYYYYMMDD(user.createdAt) : ''}

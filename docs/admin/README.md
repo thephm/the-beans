@@ -6,6 +6,7 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 
 ### User Management
 - View all registered users
+- View user last login timestamps
 - Edit user roles (admin/user) and language preferences
 - Delete users
 
