@@ -87951,7 +87951,7 @@ I'll inspect the client API file and the server entry (and client config) to fin
 
 I'll create a short todo list for this debugging session and mark the inspection step in-progress.
 
-Created 5 todos
+✔ Created 5 todos
 
 Quick progress update: I inspected the client API and server entry files to find the base URL and CORS settings; next I'll check how the server is started (npm scripts / Docker) so I can give exact commands to start/inspect it. I'll read package.json.
 
@@ -88151,3 +88151,124 @@ Great! I've successfully fixed the issue where "No people found" was shown immed
 5. **Restarted Container**: Restarted the client container to apply the changes.
 
 Now users will see "Loading..." while the data is being fetched, and only see "No people found" after the loading is complete and there are actually no results. This provides a much better user experience and prevents the disconcerting flash of "No people found" during data loading.
+
+## 603rd try
+
+*(worked! checked in)*
+
+## Add Role column to people list #158
+
+https://github.com/thephm/the-beans/issues/158
+
+> Add Role column to people list Like we have in users
+
+I'll help you add a Role column to the people list. Let me first examine the current people list implementation and compare it with the users list to understand the structure. 
+
+✔ Searched text for `PeopleTable|people.*list|users.*table`, 20 results
+
+✔ Read `client/src/components/PeopleTable.tsx`
+
+✔ Searched text for `UsersTable|admin.*users`, 20 results
+
+Let me check the users admin page to see how the Role column is implemented there: 
+
+✔ Searched for files matching `**/admin/users/page.tsx`, 2 matches
+
+✔ Read `client/src/app/admin/users/page.tsx`
+
+✔ Read `client/src/types/index.ts`
+
+Perfect! Now I can see the structure. The users admin page has a Role column showing admin/user badges. I need to add a similar column to the PeopleTable component. Looking at the `RoasterPerson` interface, I see it has a `roles` array of type `PersonRole[]` (which includes "owner", "admin", "billing"). Let me add a Role column to the people table: 
+
+Perfect! Now I need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+`PeopleTable.tsx +24 -2`
+
+Perfect! I've successfully added a Role column to the people list. Here's what I did:
+
+## Changes Made:
+
+1. **Added Role column header** between "Roaster" and "Email" columns with center alignment
+2. **Added role badges display** showing all roles assigned to each person with color coding:
+   - **Owner**: Purple badge (bg-purple-100 text-purple-800)
+   - **Admin**: Blue badge (bg-blue-100 text-blue-800)
+   - **Billing**: Green badge (bg-green-100 text-green-800)
+3. **Updated colspan values** from 4 to 5 for loading and empty state rows
+4. **Multiple roles support**: The UI displays all roles as separate badges with flex wrapping
+
+The role badges follow the same visual pattern as the Users admin page, making the interface consistent across admin panels. The client container has been restarted, so you can now view the Role column at `http://localhost:3000/admin/people`. 🎉
+
+## 604th try
+
+*(I see the badges)*
+
+> left justify the role heading title in users list
+
+I'll left-justify the Role heading in the users list to match the other column headers.
+
+✔ Read `page.tsx`, lines 231 to 251
+
+`page.tsx +1 -1`
+
+Now I need to also left-align the role cell content to match the header:
+
+✔ Read `page.tsx`, lines 280 to 310
+
+Now I need to also left-align the role cell content to match the header:
+
+✔ Read `page.tsx`, lines 280 to 310
+
+`page.tsx +1 -1`
+
+Now let me restart the client container to apply the changes:
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've left-justified the Role column heading and its cell content in the users list. The changes include:
+
+1. **Role column header**: Changed from `text-center` to `text-left`
+2. **Role cell content**: Changed from `text-center` to `text-left`
+
+The Role column now aligns consistently with the Username and Email columns (all left-aligned), while the Language, Created, and Actions columns remain center-aligned. The client container has been restarted, so the changes are now live at `http://localhost:3000/admin/users`. ✅
+
+## 605th try
+
+> didn't work
+
+I can see from your screenshot that the Role column in the People list is still center-aligned. Let me check and fix the alignment in the PeopleTable component: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 115 to 145
+
+I can see the header is `text-center`. Let me fix both the header and the cell content: 
+
+Using "Replace String in File"
+
+`PeopleTable.tsx +1 -1`
+
+Now let me fix the cell content alignment: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 160 to 200
+
+`PeopleTable.tsx +2 -2`
+
+Now let me restart the client container: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've now fixed the People list to have a left-aligned Role column. The changes include:
+
+1. **Role column header**: Changed from `text-center` to `text-left`
+2. **Role cell content**: 
+   - Removed `text-center` from the `<td>` tag
+   - Removed `justify-center` from the flex container div so badges align to the left
+
+The Role column in the People list now matches the left alignment of the other columns (Name, Roaster, Email, Mobile). The client container has been restarted, so you can refresh the page at `http://localhost:3000/admin/people` to see the left-aligned Role column. ✅
+
+## 606th try
+
+*(worked! checking in)*

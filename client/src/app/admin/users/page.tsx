@@ -254,7 +254,7 @@ const AdminUsersPage: React.FC = () => {
               <th className="py-3 px-4 border-b text-left font-medium text-gray-900">
                 {t('admin.users.email', 'Email')}
               </th>
-              <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">
                 {t('admin.users.role', 'Role')}
               </th>
               <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
@@ -287,7 +287,7 @@ const AdminUsersPage: React.FC = () => {
                     {user.email}
                   </a>
                 </td>
-                <td className="py-3 px-4 text-center">
+                <td className="py-3 px-4 text-left">
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                     user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                   }`}>

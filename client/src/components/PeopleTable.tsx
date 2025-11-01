@@ -131,6 +131,7 @@ export default function PeopleTable() {
               <tr>
                 <th className="px-8 py-3 text-left font-semibold">Name</th>
                 <th className="px-8 py-3 text-left font-semibold">Roaster</th>
+                <th className="px-8 py-3 text-left font-semibold">Role</th>
                 <th className="px-8 py-3 text-left font-semibold">Email</th>
                 <th className="px-8 py-3 text-left font-semibold">Mobile</th>
               </tr>
@@ -138,11 +139,11 @@ export default function PeopleTable() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-8 py-4 text-center text-gray-500">{t('loading', 'Loading...')}</td>
+                  <td colSpan={5} className="px-8 py-4 text-center text-gray-500">{t('loading', 'Loading...')}</td>
                 </tr>
               ) : filteredPeople.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-8 py-4 text-center text-gray-500">{t('admin.people.noPeopleFound', 'No people found.')}</td>
+                  <td colSpan={5} className="px-8 py-4 text-center text-gray-500">{t('admin.people.noPeopleFound', 'No people found.')}</td>
                 </tr>
               ) : (
                 filteredPeople.map(person => (
@@ -168,6 +169,27 @@ export default function PeopleTable() {
                         >
                           {person.roaster.name}
                         </a>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-8 py-2 border-b">
+                      {person.roles && person.roles.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {person.roles.map((role, index) => (
+                            <span
+                              key={index}
+                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                                role === 'owner' ? 'bg-purple-100 text-purple-800' :
+                                role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                                role === 'billing' ? 'bg-green-100 text-green-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {role}
+                            </span>
+                          ))}
+                        </div>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
