@@ -28,7 +28,6 @@ const AdminUsersPage: React.FC = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const fetchUsers = async () => {
@@ -69,30 +68,6 @@ const AdminUsersPage: React.FC = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
-
-
-
-  const confirmDelete = (id: string) => setDeletingId(id);
-  const cancelDelete = () => setDeletingId(null);
-  const doDelete = async (id: string) => {
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/users/${id}`, { 
-        method: 'DELETE',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to delete user');
-      }
-      setDeletingId(null);
-      fetchUsers();
-    } catch (err: any) {
-      console.error('Delete user error:', err);
-      setError(err.message || 'Unknown error');
-    }
-  };
 
   if (loading) return <div>{t('loading')}</div>;
   if (error) return <div className="text-red-600">{t('error')}: {error}</div>;
@@ -200,45 +175,6 @@ const AdminUsersPage: React.FC = () => {
                 <div>Updated: {formatDateToYYYYMMDD(user.updatedAt)}</div>
               )}
             </div>
-
-            {/* Actions */}
-            <div className="flex flex-wrap gap-2">
-              <Link
-                href={`/admin/users/${user.id}/edit`}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded inline-block text-center"
-              >
-                {t('admin.users.edit', 'Edit')}
-              </Link>
-              <button
-                onClick={() => confirmDelete(user.id)}
-                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
-              >
-                {t('admin.users.delete', 'Delete')}
-              </button>
-            </div>
-
-            {/* Delete Confirmation */}
-            {deletingId === user.id && (
-              <div className="mt-3 bg-red-50 border border-red-200 p-3 rounded">
-                <div className="text-sm text-red-800 mb-3">
-                  {t('admin.users.confirmDelete', 'Are you sure you want to delete this user?')}
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => doDelete(user.id)}
-                    className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
-                  >
-                    {t('admin.users.deleteConfirm', 'Delete')}
-                  </button>
-                  <button
-                    onClick={cancelDelete}
-                    className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded"
-                  >
-                    {t('admin.users.deleteCancel', 'Cancel')}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>
@@ -262,9 +198,6 @@ const AdminUsersPage: React.FC = () => {
               </th>
               <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
                 {t('admin.users.created', 'Created')}
-              </th>
-              <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
-                {t('admin.users.actions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -303,45 +236,6 @@ const AdminUsersPage: React.FC = () => {
                 </td>
                 <td className="py-3 px-4 text-center text-sm text-gray-600">
                   {user.createdAt ? formatDateToYYYYMMDD(user.createdAt) : ''}
-                </td>
-                <td className="py-3 px-4 text-center">
-                  <div className="flex justify-center space-x-2">
-                    <Link
-                      href={`/admin/users/${user.id}/edit`}
-                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded inline-block text-center"
-                    >
-                      {t('admin.users.edit', 'Edit')}
-                    </Link>
-                    <button
-                      onClick={() => confirmDelete(user.id)}
-                      className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
-                    >
-                      {t('admin.users.delete', 'Delete')}
-                    </button>
-                  </div>
-                  
-                  {/* Delete Confirmation */}
-                  {deletingId === user.id && (
-                    <div className="mt-2 bg-red-50 border border-red-200 p-2 rounded text-left">
-                      <div className="text-sm text-red-800 mb-2">
-                        {t('admin.users.confirmDelete', 'Are you sure you want to delete this user?')}
-                      </div>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => doDelete(user.id)}
-                          className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded"
-                        >
-                          {t('admin.users.deleteConfirm', 'Delete')}
-                        </button>
-                        <button
-                          onClick={cancelDelete}
-                          className="px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded"
-                        >
-                          {t('admin.users.deleteCancel', 'Cancel')}
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}
