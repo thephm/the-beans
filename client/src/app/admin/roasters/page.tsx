@@ -1582,7 +1582,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
               {/* Add New URL Image */}
               <div className="mb-4">
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="text"
                     placeholder="Add image URL (e.g., https://unsplash.com/photos/coffee-abc123def or direct URL)"
@@ -1612,7 +1612,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         input.value = '';
                       }
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap sm:w-auto w-full"
                   >
                     Add
                   </button>

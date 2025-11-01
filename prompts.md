@@ -88272,3 +88272,65 @@ The Role column in the People list now matches the left alignment of the other c
 ## 606th try
 
 *(worked! checking in)*
+
+> The add button for imageUrl goes over the border see screenshot, this is on mobile
+
+https://github.com/thephm/the-beans/issues/141
+
+I can see the issue in the screenshot - the "Add" button for the image URL input is overlapping with the border/edge of the container on mobile. Let me find and fix the ImageUpload component to ensure proper spacing and responsive layout. 
+
+✔ Read `client/src/components/ImageUpload.tsx`
+
+I need to look at where the image URL input field is being used. The screenshot shows "Add image URL" with an input field and an "Add" button. This doesn't seem to be in the ImageUpload component I just reviewed. Let me search for where this URL input might be implemented. 
+
+✔ Searched text for `Add image URL|imageUrl|image URL` (`**/client/src/**/*.{tsx,ts}`), 20 results
+
+Let me check the admin roasters page since that's likely where the "Add image URL" functionality is: 
+
+✔ Searched text for `Add image URL|URL.*input|imageUrlInput` (`**/client/src/app/admin/roasters/page.tsx`), 3 results
+
+Found it! Let me read the relevant section of the admin roasters page around line 1588: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1570 to 1620
+
+Perfect! I found the issue. The "Add" button is in a flex container (`flex gap-3`) but on mobile screens, the button isn't wrapping properly and is extending beyond the viewport. I need to make this responsive. Let me fix this by adjusting the layout to be more mobile-friendly: 
+
+`page.tsx +2 -2`
+
+The TypeScript errors are expected since the dependencies aren't installed in the editor context, but the code is correct. Now let me restart the client container so the changes take effect: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the mobile layout issue for the "Add image URL" input field. Here's what I changed:
+
+## Changes Made
+
+In page.tsx, I updated the container div for the image URL input:
+
+**Before:**
+```tsx
+<div className="flex gap-3">
+```
+
+**After:**
+```tsx
+<div className="flex flex-col sm:flex-row gap-3">
+```
+
+And added responsive classes to the "Add" button:
+```tsx
+className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap sm:w-auto w-full"
+```
+
+## What This Does
+
+- **Mobile (< 640px)**: The input and button stack vertically (`flex-col`), with the button taking full width (`w-full`) so it doesn't overflow
+- **Desktop (≥ 640px)**: The input and button appear side-by-side (`sm:flex-row`), with the button sizing automatically (`sm:w-auto`)
+- **`whitespace-nowrap`**: Prevents the "Add" text from wrapping
+
+The client container has been restarted. Try accessing the page on mobile now - the "Add" button should no longer overlap the border and will appear below the input field on small screens.
+
+## try
+
+*(can't verify on mobile locally -- well, I'm lazy -- so promoting)*
+
