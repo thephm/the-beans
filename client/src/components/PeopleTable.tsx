@@ -124,8 +124,10 @@ export default function PeopleTable() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center mb-4">
-        <label htmlFor="roaster-select" className="mr-2 font-medium">Roaster:</label>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 mb-4">
+        {/* Roaster dropdown */}
+        <div className="flex items-center">
+          <label htmlFor="roaster-select" className="mr-2 font-medium">Roaster:</label>
           <select
             id="roaster-select"
             value={selectedRoasterId}
@@ -137,16 +139,21 @@ export default function PeopleTable() {
               <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
             ))}
           </select>
-          <span className="ml-6 text-gray-500 text-sm">
-            {filteredPeople.length} of {totalAcrossAllRoasters} people
-          </span>
-          <button
-            className="ml-auto bg-purple-600 text-white px-5 py-2 rounded shadow hover:bg-purple-700"
-            onClick={() => window.location.href = '/admin/people/add'}
-          >
-            {t('admin.people.add', 'Add Person')}
-          </button>
         </div>
+        
+        {/* Person count */}
+        <span className="text-gray-500 text-sm sm:ml-6">
+          {filteredPeople.length} of {totalAcrossAllRoasters} people
+        </span>
+        
+        {/* Add Person button */}
+        <button
+          className="sm:ml-auto bg-purple-600 text-white px-5 py-2 rounded shadow hover:bg-purple-700 w-full sm:w-auto"
+          onClick={() => window.location.href = '/admin/people/add'}
+        >
+          {t('admin.people.add', 'Add Person')}
+        </button>
+      </div>
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-4">
@@ -229,50 +236,6 @@ export default function PeopleTable() {
                     <div className="flex items-center text-sm text-gray-600">
                       <span className="mr-2">📱</span>
                       <span>{person.mobile}</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <a
-                    href={`/admin/people/edit/${person.id}`}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded inline-block text-center"
-                  >
-                    {t('admin.people.edit', 'Edit')}
-                  </a>
-                  <button
-                    onClick={() => confirmDelete(person.id)}
-                    className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
-                  >
-                    {t('admin.people.delete', 'Delete')}
-                  </button>
-                </div>
-
-                {/* Delete Confirmation */}
-                {deletingId === person.id && (
-                  <div className="mt-3 bg-red-50 border border-red-200 p-3 rounded">
-                    <div className="text-sm text-red-800 mb-3">
-                      {t('admin.people.confirmDelete', 'Are you sure you want to delete this person?')}
-                    </div>
-                    {deleteError && (
-                      <div className="mb-3 p-2 bg-red-100 border border-red-300 rounded text-sm text-red-800">
-                        {deleteError}
-                      </div>
-                    )}
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => doDelete(person.id)}
-                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
-                      >
-                        {t('admin.people.deleteConfirm', 'Delete')}
-                      </button>
-                      <button
-                        onClick={cancelDelete}
-                        className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded"
-                      >
-                        {t('admin.people.deleteCancel', 'Cancel')}
-                      </button>
                     </div>
                   </div>
                 )}
