@@ -58,57 +58,93 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
   };
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 gap-6 mb-8">
-        <div>
-          <input type="text" placeholder="Name" value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
-        </div>
-        <div>
-          <input type="text" placeholder="Title" value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-        </div>
-        <div>
-          <input type="email" placeholder="Email" value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-        </div>
-        <div>
-          <input type="text" placeholder="Mobile" value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-        </div>
-        <div>
-          <textarea placeholder="Bio" value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-        </div>
-        <div className="flex flex-col sm:flex-row items-end gap-2 w-full">
-          <div className="flex-1">
-            <label className="block mb-1 font-medium">Roaster</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
-              <option value="">Select a roaster</option>
-              {safeRoasters.map(roaster => (
-                <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-              ))}
-            </select>
+      <div className="space-y-6 mb-8">
+        {/* Name and Title - side by side on medium+ screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Name
+            </label>
+            <input type="text" placeholder="Name" value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
           </div>
-          <div className="flex-1 flex sm:justify-end items-end mt-2 sm:mt-0 justify-start">
-            <button
-              type="button"
-              className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-              onClick={() => handleChange('isPrimary', !form.isPrimary)}
-              style={{marginBottom: '2px'}}
-            >
-              Primary
-            </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Title
+            </label>
+            <input type="text" placeholder="Title" value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
         </div>
-        <div className="flex gap-2 flex-wrap mt-2 items-center">
-          <span className="font-medium mr-2">Role:</span>
-          {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING].map(role => (
-            <button
-              key={role}
-              type="button"
-              className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.roles.includes(role) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-              onClick={() => handleRoleToggle(role)}
-            >
-              {role.charAt(0).toUpperCase() + role.slice(1)}
-            </button>
-          ))}
+
+        {/* Email and Mobile - side by side on medium+ screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input type="email" placeholder="Email" value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Mobile
+            </label>
+            <input type="text" placeholder="Mobile" value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
         </div>
-        {/* Primary button moved next to Roaster select above */}
+
+        {/* Bio - full width */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Bio
+          </label>
+          <textarea rows={4} placeholder="Bio" value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+
+        {/* Roaster, Primary, and Role - grouped in a frame */}
+        <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+          <div className="space-y-4">
+            {/* Roaster and Primary */}
+            <div className="flex flex-col sm:flex-row items-end gap-4">
+              <div className="flex-1 w-full">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Roaster</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
+                  <option value="">Select a roaster</option>
+                  {safeRoasters.map(roaster => (
+                    <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full sm:w-auto">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Primary Contact</label>
+                <button
+                  type="button"
+                  className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                  onClick={() => handleChange('isPrimary', !form.isPrimary)}
+                >
+                  {form.isPrimary ? 'Yes' : 'No'}
+                </button>
+              </div>
+            </div>
+
+            {/* Role */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Role
+              </label>
+              <div className="flex gap-2 flex-wrap items-center">
+                {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING].map(role => (
+                  <button
+                    key={role}
+                    type="button"
+                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.roles.includes(role) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                    onClick={() => handleRoleToggle(role)}
+                  >
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="flex gap-4 mt-8 justify-between items-center">
         <div>
