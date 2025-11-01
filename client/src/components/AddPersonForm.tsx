@@ -16,6 +16,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, mode = 'add'
   const router = useRouter();
   const [form, setForm] = useState({
     name: initialPerson?.name || '',
+    title: initialPerson?.title || '',
     email: initialPerson?.email || '',
     mobile: initialPerson?.mobile || '',
     bio: initialPerson?.bio || '',
@@ -28,6 +29,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, mode = 'add'
     if (initialPerson) {
       setForm({
         name: initialPerson.name || '',
+        title: initialPerson.title || '',
         email: initialPerson.email || '',
         mobile: initialPerson.mobile || '',
         bio: initialPerson.bio || '',
@@ -58,6 +60,9 @@ export default function AddPersonForm({ roasters, onSave, onCancel, mode = 'add'
       <div className="grid grid-cols-1 gap-6 mb-8">
         <div>
           <input type="text" placeholder="Name" value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+        </div>
+        <div>
+          <input type="text" placeholder="Title" value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
         </div>
         <div>
           <input type="email" placeholder="Email" value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />

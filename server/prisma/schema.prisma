@@ -126,6 +126,7 @@ model RoasterPerson {
   
   // Contact information
   name      String
+  title     String?  // Job title/position
   email     String?  // Optional - may not be a registered user
   mobile    String?
   bio       String?

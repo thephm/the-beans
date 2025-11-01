@@ -195,6 +195,7 @@ router.post('/', [
 
   const roasterId = req.body.roasterId;
   const name = req.body.name;
+  const title = req.body.title;
   const email = req.body.email;
   const mobile = req.body.mobile;
   const bio = req.body.bio;
@@ -249,6 +250,7 @@ router.post('/', [
         roasterId,
         userId: linkedUserId,
         name,
+        title,
         email,
         mobile,
         bio,
@@ -317,6 +319,7 @@ router.put('/:id', [
 
   const id = req.params.id;
   const name = req.body.name;
+  const title = req.body.title;
   const email = req.body.email;
   const mobile = req.body.mobile;
   const bio = req.body.bio;
@@ -393,6 +396,7 @@ router.put('/:id', [
       where: { id },
       data: {
         ...(name !== undefined && { name }),
+        ...(title !== undefined && { title }),
         ...(email !== undefined && { email }),
         ...(mobile !== undefined && { mobile }),
         ...(bio !== undefined && { bio }),

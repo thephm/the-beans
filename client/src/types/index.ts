@@ -252,6 +252,7 @@ export interface RoasterPerson {
   id: string;
   roasterId: string;
   name: string;
+  title?: string;
   email?: string;
   mobile?: string;
   bio?: string;

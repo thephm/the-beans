@@ -87206,3 +87206,102 @@ I updated the `calculateChanges` function to:
 Now when you edit a person and don't change a field that's already `null` (like the `userId` field in your screenshot), it won't show up in the audit log as a change. The audit log will only show fields that actually changed with different values.
 
 Try editing a person again and you should see that unchanged `null` fields no longer appear in the audit log! 🎉
+
+## 595th try
+
+*(fixed!)*
+
+> Please add a title for Person in the add/edit person form as well as the API and database. can put it under their name in the form
+
+I'll add a `title` field for Person in the database, API, and form. Let me start by checking the current schema and then make the necessary changes. 
+
+✔ Read `server/prisma/schema.prisma`, lines 1 to 150
+
+✔ Read `server/prisma/schema.prisma`, lines 150 to 180
+
+Now let me add the `title` field to the RoasterPerson model in the schema: 
+
+Now let me create a migration for this schema change: 
+
+Ran terminal command: docker-compose exec server npx prisma migrate dev --name add_title_to_roaster_person
+
+Great! Now let me update the TypeScript types: 
+
+✔ Read `client/src/types/index.ts`, lines 1 to 50
+
+✔ Searched text for `interface RoasterPerson|export type RoasterPerson` (`**/client/src/types/index.ts`), 1 result
+
+✔ Read `client/src/types/index.ts`, lines 251 to 280
+
+Now let me update the AddPersonForm component to include the title field: 
+
+✔ Read `client/src/components/AddPersonForm.tsx`, lines 1 to 100
+
+Now let me add the title input field in the form, right after the name field: 
+
+Now let me update the backend API to handle the title field. Let me check the people routes: 
+
+✔ Searched text for `create\(|update\(` (`**/server/src/routes/people.ts`), 2 results
+
+✔ Read `server/src/routes/people.ts`, lines 240 to 280
+
+✔ Read `server/src/routes/people.ts`, lines 200 to 240
+
+✔ Read `server/src/routes/people.ts`, lines 190 to 200
+
+Now let me update the PUT (update) route: 
+
+✔ Read `server/src/routes/people.ts`, lines 360 to 420
+
+✔ Read `server/src/routes/people.ts`, lines 310 to 360
+
+Now let me update the PeopleTable component to display the title field: 
+
+✔ Read `client/src/components/PeopleTable.ts`, lines 1 to 100
+
+Searched text for `<th|<td` (`**/client/src/components/PeopleTable.tsx`), 8 results
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 125 to 160
+
+Let me update the table to show the title under the name: 
+
+`PeopleTable.tsx +5 -0`
+
+Now let me restart both containers to apply all the changes: 
+
+✔ `docker-compose restart server`
+
+✔ `docker-compose restart client`
+
+Perfect! I've successfully added the `title` field for Person across the entire stack. Here's what was implemented:
+
+## Changes Made
+
+### 1. **Database Schema** (schema.prisma)
+- Added `title String?` field to the `RoasterPerson` model
+- Created and applied a database migration: `20251101105618_add_title_to_roaster_person`
+
+### 2. **TypeScript Types** (index.ts)
+- Updated `RoasterPerson` interface to include `title?: string`
+
+### 3. **Frontend Form** (AddPersonForm.tsx)
+- Added `title` to the form state
+- Added a new input field for "Title" positioned right under the "Name" field
+- Updated the `useEffect` to handle the title when editing an existing person
+
+### 4. **Backend API** (people.ts)
+- Updated POST (create) route to accept and save `title`
+- Updated PUT (update) route to accept and update `title`
+
+### 5. **People Table** (PeopleTable.tsx)
+- Updated the display to show the title under the person's name in gray text
+- Title only appears if it's set (not blank)
+
+## Testing
+You can now:
+1. Visit the admin people page at `http://localhost:3000/admin/people`
+2. Edit an existing person and add a title (e.g., "CEO", "Roastmaster", "Operations Manager")
+3. The title will appear beneath their name in the people table
+4. When creating a new person, you can add a title in the form
+
+The title field is optional, so existing people without titles will continue to work normally.

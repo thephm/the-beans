@@ -149,6 +149,11 @@ export default function PeopleTable() {
                       >
                         {person.name}
                       </a>
+                      {person.title && (
+                        <div className="text-sm text-gray-600 mt-1">
+                          {person.title}
+                        </div>
+                      )}
                     </td>
                     <td className="px-8 py-2 border-b">{person.email}</td>
                     <td className="px-8 py-2 border-b">{person.mobile}</td>
