@@ -436,7 +436,8 @@
       "delete": "Delete",
       "confirmDelete": "Are you sure you want to delete this person?",
       "deleteConfirm": "Delete",
-      "deleteCancel": "Cancel"
+      "deleteCancel": "Cancel",
+      "search": "Search by name, email, roaster, title, or role..."
     },
     "roasters": {
       "addTitle": "Add Roaster",
