@@ -37,6 +37,14 @@ const AdminRoastersPage: React.FC = () => {
     isPrimary: false
   });
 
+  // Check for edit query parameter on mount
+  useEffect(() => {
+    const editId = searchParams?.get('edit');
+    if (editId && roasters.length > 0) {
+      setEditingId(editId);
+    }
+  }, [searchParams, roasters]);
+
   const fetchRoasters = async () => {
     setLoading(true);
     setError(null);
