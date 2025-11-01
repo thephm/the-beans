@@ -425,6 +425,12 @@
         "oldValue": "Old Value",
         "newValue": "New Value"
       }
+    },
+    "people": {
+      "title": "People",
+      "add": "Add Person",
+      "addTitle": "Add Person",
+      "noPeopleFound": "No people found."
     }
   },
   "adminForms": {
