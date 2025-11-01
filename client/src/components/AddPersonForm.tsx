@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PersonRole } from '../types';
 import { Roaster } from '../types';
+
 
 interface AddPersonFormProps {
   roasters: Roaster[];
   onSave: (person: any) => void;
   onCancel: () => void;
+  mode?: 'add' | 'edit';
+  initialPerson?: Partial<any>;
 }
 
-export default function AddPersonForm({ roasters, onSave, onCancel }: AddPersonFormProps) {
+export default function AddPersonForm({ roasters, onSave, onCancel, mode = 'add', initialPerson }: AddPersonFormProps) {
   const router = useRouter();
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    mobile: '',
-    bio: '',
-    roles: [] as PersonRole[],
-    roasterId: '',
-    isPrimary: false,
+    name: initialPerson?.name || '',
+    email: initialPerson?.email || '',
+    mobile: initialPerson?.mobile || '',
+    bio: initialPerson?.bio || '',
+    roles: initialPerson?.roles || [] as PersonRole[],
+    roasterId: initialPerson?.roasterId || '',
+    isPrimary: initialPerson?.isPrimary || false,
   });
+
+  useEffect(() => {
+    if (initialPerson) {
+      setForm({
+        name: initialPerson.name || '',
+        email: initialPerson.email || '',
+        mobile: initialPerson.mobile || '',
+        bio: initialPerson.bio || '',
+        roles: initialPerson.roles || [] as PersonRole[],
+        roasterId: initialPerson.roasterId || '',
+        isPrimary: initialPerson.isPrimary || false,
+      });
+    }
+  }, [initialPerson]);
   const safeRoasters = Array.isArray(roasters) ? roasters : [];
   const handleChange = (field: string, value: any) => {
     setForm(f => ({ ...f, [field]: value }));
