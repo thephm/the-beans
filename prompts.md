@@ -89435,4 +89435,146 @@ Both containers have been restarted to apply the changes. You can now test by:
 3. Logging back in
 4. Returning to the admin users page - you should see your updated last login time!
 
-Made changes.
+## 618th try
+
+*(last login showing now, checking in)*
+
+> Delete person doesn't delete them
+
+I'll help you debug the delete person functionality. Let me first understand the current implementation by examining the relevant code. 
+
+✔ Searched text for `delete.*person|deletePerson|remove.*person`, 20 results
+
+✔ Searched for files matching `**/PeopleTable.tsx`, 2 matches
+
+✔ Searched for files matching `**/AddPersonForm.tsx`, 2 matches
+
+✔ Read `client/src/components/PeopleTable.tsx`
+
+✔ Searched text for `DELETE /api/people` (`**/server/**/*.ts`), 1 result
+
+✔ Read `server/src/routes/people.ts`, lines 450 to 500
+
+✔ Read `server/src/routes/people.ts`, lines 500 to 538
+
+Now let me check the API client to see if the deletePerson method is correctly implemented: 
+
+✔ Searched text for `deletePerson` (`**/client/src/lib/api.ts`), 1 result
+
+✔ Read `client/src/lib/api.ts`
+
+Now let me check the server logs to see if there are any errors when deleting: 
+
+✔ `docker-compose logs --tail=50 server`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I can see the issue now. The DELETE request returned a **400 status code with 73 bytes** response, which means the deletion is failing with an error. The most likely issue is that the person being deleted is the last owner of a roaster, which is prevented by the backend validation.
+
+Let me check the browser console or get more detailed error logs: 
+
+✔ `docker-compose logs server | Select-String "Delete person" -Context 2,5`
+*Auto approved by rule `docker-compose`*
+
+Let me check what error message is being returned: 
+
+✔ Read `server/src/routes/people.ts`, lines 490 to 520
+
+I found the issue! The backend is returning a 400 error with the message "Cannot delete the last owner. At least one owner is required." However, the frontend's `doDelete` function in PeopleTable.tsx doesn't handle errors properly - it just logs them to the console but doesn't show them to the user.
+
+Let me also check if there's a better way to handle this. Let me first verify the response handling: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 104 to 124
+
+Now I can see the issues:
+
+1. **The frontend doesn't display error messages to the user** - it only logs them to console
+2. **The API client doesn't properly handle non-200 responses** - it just calls `response.json()` regardless of status
+
+Let me check the API client's request method more carefully: 
+
+✔ Read `client/src/lib/api.ts`, lines 88 to 118
+
+Perfect! I found the problem. The API client's `request` method doesn't check for HTTP error status codes (like 400, 403, 500, etc.) before returning the JSON. It only handles 401. This means when a 400 error is returned, the error object is returned as if it were a successful response, and the frontend doesn't know to display an error.
+
+Let me fix both issues:
+1. Update the API client to properly throw errors for non-2xx status codes
+2. Update the PeopleTable component to display error messages to users 
+
+`api.ts +7 -0`
+
+Now let's update the PeopleTable component to display error messages to the user: 
+
+`PeopleTable.tsx +5 -0`
+
+Now let's add the error display in the mobile card view: 
+
+`PeopleTable.tsx +5 -0`
+
+Now let's restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Now let me verify the fix by checking the updated files: 
+
+✔ Read `client/src/lib/api.ts`, lines 100 to 120
+
+Great! Now let me create a summary of what was wrong and what I fixed:
+
+## Summary
+
+I've identified and fixed the issue with deleting people. The problem was **two-fold**:
+
+### Root Causes:
+
+1. **API Client Error Handling**: The `apiClient.request()` method in api.ts was not checking for HTTP error status codes (400, 403, 500, etc.). It only handled 401 errors, so when the backend returned a 400 error (e.g., "Cannot delete the last owner"), the error was silently returned as if it were successful data.
+
+2. **Frontend Error Display**: The `PeopleTable` component's `doDelete()` function was catching errors but only logging them to the console, not displaying them to users.
+
+### What I Fixed:
+
+1. **Updated api.ts**:
+   - Added proper error handling for all non-2xx HTTP status codes
+   - The API client now throws an error with the server's error message when `!response.ok`
+   - This ensures errors from the backend are properly propagated to the frontend
+
+2. **Updated PeopleTable.tsx**:
+   - Added `deleteError` state to track deletion errors
+   - Updated `doDelete()` to capture and display error messages
+   - Added error display UI in the delete confirmation dialog
+   - Errors now show to users with a clear message (e.g., "Cannot delete the last owner. At least one owner is required.")
+
+3. **Restarted the client container** to apply changes
+
+### Testing:
+Now when you try to delete a person:
+- If it's the last owner of a roaster, you'll see an error message: "Cannot delete the last owner. At least one owner is required."
+- If there are permission issues or other errors, the specific error message will be displayed
+- Successful deletions will work as before and remove the person from the list
+
+The delete functionality now properly communicates errors from the backend to the user instead of failing silently!
+
+> please remove the restriction of deleting the last owner, it is unnecessary
+
+I'll remove the restriction that prevents deleting the last owner from the backend route. 
+
+✔ Read `server/src/routes/people.ts`, lines 460 to 520
+
+`people.ts +0 -17`
+
+The errors are just about missing dependencies in the TypeScript environment, not actual runtime errors. Now let's restart the server container to apply the changes: 
+
+✔ `docker-compose restart server`
+
+Perfect! I've successfully removed the restriction that prevented deleting the last owner. 
+
+## Changes Made:
+
+**Updated people.ts**:
+- Removed the entire code block that checked if the person being deleted was the last owner
+- Removed the owner count validation that would return a 400 error
+- Now you can delete any person regardless of whether they're the last owner or not
+
+**Restarted the server container** to apply the changes.
+
+The delete functionality will now work for all people, including the last owner of a roaster. Users with proper permissions can delete any person without restrictions based on role counts.

@@ -111,6 +111,13 @@ class ApiClient {
       throw new Error('HTTP 401: Unauthorized');
     }
 
+    // Handle other error status codes
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'An error occurred' }));
+      const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+      throw new Error(errorMessage);
+    }
+
     return response.json();
   }
 
