@@ -14,6 +14,7 @@ const EditPersonPage: React.FC = () => {
   const [person, setPerson] = useState<RoasterPerson | null>(null);
   const [roasters, setRoasters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -74,6 +75,23 @@ const EditPersonPage: React.FC = () => {
     window.location.href = "/admin/people";
   };
 
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await apiClient.deletePerson(personId);
+      window.location.href = "/admin/people";
+    } catch (error) {
+      alert("Failed to delete person. Please try again.");
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
+
   if (loading) return <div>{t("Loading...")}</div>;
   if (!person) return <div>{t("Person not found.")}</div>;
 
@@ -90,12 +108,34 @@ const EditPersonPage: React.FC = () => {
       </div>
       <div className="w-full max-w-2xl bg-white rounded-lg shadow p-8">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">{t("Edit Person")}</h1>
+        {showDeleteConfirm && (
+          <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded">
+            <div className="text-sm text-red-800 mb-3">
+              {t('admin.people.confirmDelete', 'Are you sure you want to delete this person?')}
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+              >
+                {t('admin.people.deleteConfirm', 'Delete')}
+              </button>
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded"
+              >
+                {t('admin.people.deleteCancel', 'Cancel')}
+              </button>
+            </div>
+          </div>
+        )}
         <AddPersonForm
           mode="edit"
           initialPerson={person}
           roasters={roasters}
           onSave={handleSave}
           onCancel={handleCancel}
+          onDelete={handleDelete}
         />
       </div>
     </div>

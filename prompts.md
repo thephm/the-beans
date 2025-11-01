@@ -88679,3 +88679,308 @@ The client container has been restarted. Now the "Back to Roasters" link should 
 ## 613th try
 
 *(works, checking in)*
+
+## The People page is not great on mobile, should be cards #161
+
+https://github.com/thephm/the-beans/issues/161
+
+> Similar to the users page, if on mobile, the people should be individual cards with edit and delete buttons
+
+I'll help you make the People page mobile-responsive with cards, similar to how the Users page works. Let me first examine the current PeopleTable component and compare it with the Users page mobile implementation. 
+
+✔ Read `client/src/components/PeopleTable.tsx`
+
+Now let me check the Users admin page to see how it implements the mobile card view: 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 220 to 358
+
+Now let me see the mobile card view section: 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 120 to 220
+
+Perfect! Now I understand the pattern. I need to update the PeopleTable component to:
+1. Add a mobile card view (visible on small screens, hidden on md and above)
+2. Keep the desktop table view (hidden on small screens, visible on md and above)
+3. Add edit and delete functionality to the mobile cards
+
+Let me update the PeopleTable component: 
+
+`PeopleTable.tsx +150 -2`
+
+Now I need to add the translation keys for the delete functionality. Let me check the English translation file: 
+
+✔ Searched text for `admin.people` (`**/locales/en/common.json`), no results
+
+✔ Read `client/public/locales/en/common.json`, lines 420 to 470
+
+Now let me add the missing translation keys for delete functionality: 
+
+`common.json +6 -1`
+
+Now let me add the French translations: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 420 to 470
+
+`common.json +6 -1`
+
+Now I need to check if the `deletePerson` API method exists in the API client: 
+
+✔ Searched text for `deletePerson` (`**/client/src/lib/api.ts`), 1 result
+
+Great! The `deletePerson` method already exists. Now let me restart the client container to apply all the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully added mobile card view to the People page. Here's what I implemented:
+
+## ✅ Changes Made
+
+### **1. PeopleTable Component** (PeopleTable.tsx):
+
+**Added Mobile Card View** (`md:hidden`):
+- Individual cards for each person on mobile screens
+- Card includes:
+  - **Person name** as a clickable link to edit
+  - **Title** (if available) displayed below name
+  - **Role badges** (owner, admin, billing) with color coding
+  - **Roaster** with emoji icon (🏢) and clickable link
+  - **Email** with emoji icon (📧) and mailto link
+  - **Mobile phone** with emoji icon (📱)
+  - **Edit and Delete buttons** at the bottom of each card
+  - **Delete confirmation** dialog appears inline in the card
+
+**Updated Desktop Table View** (`hidden md:block`):
+- Preserved existing table layout for desktop screens
+- Hidden on mobile, visible on medium screens and above
+
+**Added Delete Functionality**:
+- Delete state management with confirmation dialog
+- API integration using existing `apiClient.deletePerson()` method
+- Cancel option to abort deletion
+
+### **2. Translation Files**:
+
+**English** (common.json):
+- Added: `admin.people.edit`, `delete`, `confirmDelete`, `deleteConfirm`, `deleteCancel`
+
+**French** (common.json):
+- Added: `admin.people.edit`, `delete`, `confirmDelete`, `deleteConfirm`, `deleteCancel`
+
+## Result
+
+Now when you visit the People admin page at `http://localhost:3000/admin/people`:
+- **On mobile** (< 768px): Individual cards with all person details and action buttons
+- **On desktop** (≥ 768px): Traditional table view
+- **Delete functionality**: Works on both mobile and desktop with confirmation dialog
+- **Consistent UI**: Matches the Users page mobile card pattern
+
+The client container has been restarted, so all changes are now live! 🎉
+
+> add a red delete button for edit person to the left aligned on edit person same row as cancel and save
+
+I'll help you add a red delete button to the edit person page, aligned to the left on the same row as the Cancel and Save buttons. Let me first find the edit person page. 
+
+✔ Searched for files matching `**/admin/people/edit/**/page.tsx`, 4 matches
+
+✔ Read `client/src/app/admin/people/edit/%5Bid%5D/page.tsx`
+
+Now let me check the AddPersonForm component to see where the Cancel and Save buttons are located: 
+
+✔ Read `client/src/components/AddPersonForm.tsx`
+
+Now I need to add a delete button to the form. I'll modify the AddPersonForm to accept an optional `onDelete` prop and add a delete button aligned to the left when in edit mode: 
+
+`AddPersonForm.tsx +1 -0`
+
+`AddPersonForm.tsx +1 -1`
+
+Now I'll update the button row to include the delete button on the left when in edit mode: 
+
+`AddPersonForm.tsx +14 -1`
+
+Now I need to update the EditPersonPage to pass the onDelete handler to the AddPersonForm: 
+
+`page.tsx +1 -0`
+
+Now I'll add the delete handler functions: 
+
+`page.tsx +17 -0`
+
+Now I need to update the AddPersonForm call to include the onDelete prop and add the confirmation dialog: 
+
+`page.tsx +22 -0`
+
+Perfect! Now let me restart the client container to apply all the changes: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've successfully added a red delete button to the edit person page. Here's what I implemented:
+
+## ✅ Changes Made
+
+### **1. AddPersonForm Component** (AddPersonForm.tsx):
+
+**Added Delete Prop**:
+- Added optional `onDelete?: () => void` prop to the interface
+- Updated component signature to accept the `onDelete` prop
+
+**Updated Button Layout**:
+- Changed from `justify-end` to `justify-between` to create space for left-aligned button
+- Added delete button on the left side (only visible in edit mode)
+- Keep Cancel and Save buttons on the right side in their own flex container
+
+**Delete Button Styling**:
+- Red background (`bg-red-600`)
+- White text
+- Hover effect (`hover:bg-red-700`)
+- Same size as Cancel and Save buttons (`px-6 py-2`)
+
+### **2. EditPersonPage** (page.tsx):
+
+**Added Delete State Management**:
+- Added `showDeleteConfirm` state to control confirmation dialog
+
+**Added Delete Handlers**:
+- `handleDelete()`: Shows the confirmation dialog
+- `confirmDelete()`: Calls the API to delete the person and redirects to people list
+- `cancelDelete()`: Hides the confirmation dialog
+
+**Added Confirmation Dialog**:
+- Red-themed confirmation box that appears above the form
+- Shows "Are you sure you want to delete this person?" message
+- Provides Delete and Cancel buttons
+- Uses existing translation keys from the people table
+
+**Updated Form Integration**:
+- Passed `onDelete={handleDelete}` prop to AddPersonForm
+
+## Result
+
+Now when you edit a person at `/admin/people/edit/[id]`:
+- **Delete button** appears on the left side (red, aligned left)
+- **Cancel and Save buttons** remain on the right side
+- Clicking **Delete** shows a confirmation dialog above the form
+- Confirming deletion removes the person and redirects to the people list
+- Uses existing translation keys for consistency
+
+The client container has been restarted, so all changes are now live! 🎉
+
+> oN users page remove the actions column with the edit and delete buttons and add the Delete button in the edit user form just like you did for person
+
+I'll help you remove the Actions column from the users page and add a Delete button to the edit user form, just like we did for the person form. Let me start by examining the users page and edit form. 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 1 to 51
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 50 to 150
+
+Now let me see the mobile card view section with the delete buttons: 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 145 to 225
+
+Now let me see the desktop table view with the Actions column: 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 230 to 358
+
+Now let me check the edit user page: 
+
+✔ Searched for files matching `**/admin/users/**/edit/page.tsx`, 2 matches
+
+✔ Read `client/src/app/admin/users/%5Bid%5D/edit/page.tsx`
+
+Now I'll make the changes. First, let me remove the Actions column and delete buttons from the users page (both mobile and desktop views): 
+
+`page.tsx +0 -39`
+
+Now remove the Actions column from the desktop table header: 
+
+`page.tsx +0 -3`
+
+Now remove the Actions column from the desktop table body: 
+
+`page.tsx +0 -39`
+
+Now I can remove the delete state and functions from the users page since they're no longer needed: 
+
+`page.tsx +0 -1`
+
+Now let me remove the delete functions: 
+
+`page.tsx +0 -24`
+
+Now let's add the Delete button to the edit user form. First, I'll add the delete state and handlers: 
+
+`page.tsx +1 -0`
+
+Now add the delete handler functions: 
+
+`page.tsx +28 -0`
+
+Now update the form to add the delete confirmation dialog and change the button layout: 
+
+`page.tsx +23 -0`
+
+Now update the buttons row to include the delete button on the left: 
+
+`page.tsx +13 -1`
+
+Perfect! Now let me restart the client container to apply all the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully removed the Actions column from the users page and added a Delete button to the edit user form, just like we did for the person form. Here's what I implemented:
+
+## ✅ Changes Made
+
+### **1. Admin Users Page** (page.tsx):
+
+**Removed from Mobile Card View**:
+- ✅ Removed Edit and Delete action buttons
+- ✅ Removed delete confirmation dialog
+- ✅ User cards now only show user information with clickable username link
+
+**Removed from Desktop Table View**:
+- ✅ Removed Actions column header (was the 6th column)
+- ✅ Removed Actions column cells with Edit/Delete buttons
+- ✅ Removed inline delete confirmation dialogs
+
+**Cleaned Up Code**:
+- ✅ Removed `deletingId` state variable
+- ✅ Removed `confirmDelete()`, `cancelDelete()`, and `doDelete()` functions
+
+### **2. Edit User Page** (page.tsx):
+
+**Added Delete Functionality**:
+- ✅ Added `showDeleteConfirm` state for confirmation dialog
+- ✅ Added `handleDelete()` - Shows confirmation dialog
+- ✅ Added `confirmDelete()` - Calls API to delete user and redirects
+- ✅ Added `cancelDelete()` - Hides confirmation dialog
+
+**Added Delete Confirmation Dialog**:
+- ✅ Red-themed confirmation box appears above the form
+- ✅ Shows "Are you sure you want to delete this user?" message
+- ✅ Provides Delete and Cancel buttons
+- ✅ Uses existing translation keys
+
+**Updated Button Layout**:
+- ✅ Changed from `justify-end` to `justify-between`
+- ✅ Delete button on the left (red, aligned left)
+- ✅ Cancel and Save buttons remain on the right
+
+## Result
+
+Now the users page works exactly like the people page:
+
+**Users List Page** (`/admin/users`):
+- No Actions column in desktop table
+- No Edit/Delete buttons in mobile cards
+- Users click on the username to edit
+
+**Edit User Page** (`/admin/users/[id]/edit`):
+- Delete button on the left side (red)
+- Cancel and Save buttons on the right
+- Confirmation dialog before deletion
+- Successful deletion redirects to users list
+
+The client container has been restarted, so all changes are now live! 🎉

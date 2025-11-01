@@ -430,7 +430,12 @@
       "title": "People",
       "add": "Add Person",
       "addTitle": "Add Person",
-      "noPeopleFound": "No people found."
+      "noPeopleFound": "No people found.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this person?",
+      "deleteConfirm": "Delete",
+      "deleteCancel": "Cancel"
     },
     "roasters": {
       "addTitle": "Add Roaster",

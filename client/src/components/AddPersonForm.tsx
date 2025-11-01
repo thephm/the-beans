@@ -8,11 +8,12 @@ interface AddPersonFormProps {
   roasters: Roaster[];
   onSave: (person: any) => void;
   onCancel: () => void;
+  onDelete?: () => void;
   mode?: 'add' | 'edit';
   initialPerson?: Partial<any>;
 }
 
-export default function AddPersonForm({ roasters, onSave, onCancel, mode = 'add', initialPerson }: AddPersonFormProps) {
+export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mode = 'add', initialPerson }: AddPersonFormProps) {
   const router = useRouter();
   const [form, setForm] = useState({
     name: initialPerson?.name || '',
@@ -109,9 +110,22 @@ export default function AddPersonForm({ roasters, onSave, onCancel, mode = 'add'
         </div>
         {/* Primary button moved next to Roaster select above */}
       </div>
-      <div className="flex gap-4 mt-8 justify-end">
-        <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>Cancel</button>
-        <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save</button>
+      <div className="flex gap-4 mt-8 justify-between items-center">
+        <div>
+          {mode === 'edit' && onDelete && (
+            <button 
+              type="button" 
+              className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700"
+              onClick={onDelete}
+            >
+              Delete
+            </button>
+          )}
+        </div>
+        <div className="flex gap-4">
+          <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>Cancel</button>
+          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save</button>
+        </div>
       </div>
     </form>
   );

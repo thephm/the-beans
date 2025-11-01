@@ -429,7 +429,12 @@
       "title": "Personnes",
       "add": "Ajouter une Personne",
       "addTitle": "Ajouter une Personne",
-      "noPeopleFound": "Aucune personne trouvée."
+      "noPeopleFound": "Aucune personne trouvée.",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette personne ?",
+      "deleteConfirm": "Supprimer",
+      "deleteCancel": "Annuler"
     },
     "roasters": {
       "addTitle": "Ajouter un Torréfacteur",

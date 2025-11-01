@@ -97,6 +97,25 @@ export default function PeopleTable() {
     setSelectedRoasterId(e.target.value);
   } 
   const filteredPeople = people; // Add filtering logic if needed
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const confirmDelete = (id: string) => {
+    setDeletingId(id);
+  };
+
+  const cancelDelete = () => {
+    setDeletingId(null);
+  };
+
+  const doDelete = async (id: string) => {
+    try {
+      await apiClient.deletePerson(id);
+      setPeople(people.filter(p => p.id !== id));
+      setDeletingId(null);
+    } catch (error) {
+      console.error('Error deleting person:', error);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -123,8 +142,137 @@ export default function PeopleTable() {
             {t('admin.people.add', 'Add Person')}
           </button>
         </div>
-        {/* AddPersonForm removed, now handled in separate page */}
-        <div className="overflow-x-auto">
+
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-4">
+          {loading ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm text-center text-gray-500">
+              {t('loading', 'Loading...')}
+            </div>
+          ) : filteredPeople.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm text-center text-gray-500">
+              {t('admin.people.noPeopleFound', 'No people found.')}
+            </div>
+          ) : (
+            filteredPeople.map(person => (
+              <div key={person.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                {/* Person Header */}
+                <div className="mb-3">
+                  <a
+                    href={`/admin/people/edit/${person.id}`}
+                    className="text-lg font-semibold text-blue-600 hover:text-blue-800"
+                  >
+                    {person.name}
+                  </a>
+                  {person.title && (
+                    <div className="text-sm text-gray-600 mt-1">
+                      {person.title}
+                    </div>
+                  )}
+                  {person.roles && person.roles.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {person.roles.map((role, index) => (
+                        <span
+                          key={index}
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            role === 'owner' ? 'bg-purple-100 text-purple-800' :
+                            role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                            role === 'billing' ? 'bg-green-100 text-green-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Roaster */}
+                {person.roaster && (
+                  <div className="mb-3">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="mr-2">🏢</span>
+                      <a
+                        href={`/admin/roasters/edit/${person.roaster.id}`}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {person.roaster.name}
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Email */}
+                {person.email && (
+                  <div className="mb-3">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="mr-2">📧</span>
+                      <a
+                        href={`mailto:${person.email}`}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {person.email}
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile */}
+                {person.mobile && (
+                  <div className="mb-3">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="mr-2">📱</span>
+                      <span>{person.mobile}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <a
+                    href={`/admin/people/edit/${person.id}`}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded inline-block text-center"
+                  >
+                    {t('admin.people.edit', 'Edit')}
+                  </a>
+                  <button
+                    onClick={() => confirmDelete(person.id)}
+                    className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+                  >
+                    {t('admin.people.delete', 'Delete')}
+                  </button>
+                </div>
+
+                {/* Delete Confirmation */}
+                {deletingId === person.id && (
+                  <div className="mt-3 bg-red-50 border border-red-200 p-3 rounded">
+                    <div className="text-sm text-red-800 mb-3">
+                      {t('admin.people.confirmDelete', 'Are you sure you want to delete this person?')}
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => doDelete(person.id)}
+                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+                      >
+                        {t('admin.people.deleteConfirm', 'Delete')}
+                      </button>
+                      <button
+                        onClick={cancelDelete}
+                        className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded"
+                      >
+                        {t('admin.people.deleteCancel', 'Cancel')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full bg-white border rounded-lg shadow">
             <thead>
               <tr>
