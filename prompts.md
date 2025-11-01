@@ -87148,3 +87148,61 @@ Perfect! I've cleaned up all the debug console messages from:
 - people.ts - Removed console.log statements for Prisma query results and person not found messages
 
 The application will now run cleanly without cluttering the browser console or server logs with debug messages. Error handling is still in place where needed, just without the console output.
+
+## 594th try
+
+*(working! checked in)*
+
+## Audit log shows change but there's no difference #153
+
+https://github.com/thephm/the-beans/issues/153
+
+I'll investigate why the audit log is showing a change but displaying identical values for "User" field (both showing "null"). Let me check the audit logging implementation. 
+
+✔ Searched text for `audit|logAction|AuditLog` (`**/server/src/**/*.ts`), 20 results
+
+✔ Read `server/src/routes/people.ts#150-150), lines 150 to 250
+
+✔ Searched text for `auditBefore|auditAfter|audit` (`**/server/src/routes/people.ts`), 8 results
+
+✔ Read `server/src/routes/people.ts`, lines 1 to 50
+
+✔ Read `server/src/routes/people.ts`, lines 350 to 450
+
+Now let me check the audit service to understand how it handles field changes: 
+
+✔ Read `server/src/lib/auditService.ts`, lines 1 to 200
+
+I found the issue! The problem is in the `calculateChanges` function. When comparing values, it's not handling `null` values properly. In your screenshot, both the old and new values show `"null"` (the string representation), but they should both be `null` (the actual null value). The function needs to normalize null values before comparison.
+
+Let me check the exact comparison logic more carefully: 
+
+✔ Read `server/src/lib/auditService.ts`, lines 67 to 110
+
+The issue is that the `calculateChanges` function is detecting `null !== null` as a change because one of them might be `undefined` or they're being compared incorrectly. Let me fix this by normalizing the comparison to handle `null` and `undefined` values properly: 
+
+`auditService.ts +25 -10`
+
+Now let's restart the server to apply this fix: 
+
+✔ `docker-compose restart server`
+
+Perfect! I've fixed the audit logging issue. Here's what was wrong and what I changed:
+
+## The Problem
+
+The audit log was showing changes for fields where both the old and new values were `null`. This happened because the `calculateChanges` function in auditService.ts was comparing `null` and `undefined` as different values, and not properly handling cases where both values are effectively "empty".
+
+## The Solution
+
+I updated the `calculateChanges` function to:
+
+1. **Normalize null/undefined values**: Added a helper function that treats both `null` and `undefined` as `null` for comparison purposes.
+
+2. **Skip null-to-null changes**: If both the old and new values are `null` (or `undefined`), the change is completely skipped and won't appear in the audit log.
+
+3. **Only track meaningful deletions**: When a field is removed, it only logs as a change if the old value was not `null` (i.e., something was actually removed).
+
+Now when you edit a person and don't change a field that's already `null` (like the `userId` field in your screenshot), it won't show up in the audit log as a change. The audit log will only show fields that actually changed with different values.
+
+Try editing a person again and you should see that unchanged `null` fields no longer appear in the audit log! 🎉
