@@ -72,27 +72,39 @@ function calculateChanges(oldValues: Record<string, any>, newValues: Record<stri
   // Skip these fields from change tracking
   const skipFields = ['id', 'createdAt', 'updatedAt', 'createdById', 'updatedById'];
 
+  // Helper to normalize null/undefined values for comparison
+  const normalizeValue = (value: any) => {
+    return value === undefined || value === null ? null : value;
+  };
+
   // Check for modified fields
   for (const [key, newValue] of Object.entries(newValues)) {
     if (skipFields.includes(key)) continue;
     
     const oldValue = oldValues[key];
+    const normalizedOld = normalizeValue(oldValue);
+    const normalizedNew = normalizeValue(newValue);
+    
+    // Skip if both values are null/undefined
+    if (normalizedOld === null && normalizedNew === null) {
+      continue;
+    }
     
     // Handle arrays specially
-    if (Array.isArray(oldValue) && Array.isArray(newValue)) {
-      if (JSON.stringify(oldValue.sort()) !== JSON.stringify(newValue.sort())) {
-        changes[key] = { old: oldValue, new: newValue };
+    if (Array.isArray(normalizedOld) && Array.isArray(normalizedNew)) {
+      if (JSON.stringify(normalizedOld.sort()) !== JSON.stringify(normalizedNew.sort())) {
+        changes[key] = { old: normalizedOld, new: normalizedNew };
       }
     }
     // Handle objects/JSON specially  
-    else if (typeof oldValue === 'object' && typeof newValue === 'object' && oldValue !== null && newValue !== null) {
-      if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
-        changes[key] = { old: oldValue, new: newValue };
+    else if (typeof normalizedOld === 'object' && typeof normalizedNew === 'object' && normalizedOld !== null && normalizedNew !== null) {
+      if (JSON.stringify(normalizedOld) !== JSON.stringify(normalizedNew)) {
+        changes[key] = { old: normalizedOld, new: normalizedNew };
       }
     }
     // Handle primitive values
-    else if (oldValue !== newValue) {
-      changes[key] = { old: oldValue, new: newValue };
+    else if (normalizedOld !== normalizedNew) {
+      changes[key] = { old: normalizedOld, new: normalizedNew };
     }
   }
 
@@ -100,8 +112,11 @@ function calculateChanges(oldValues: Record<string, any>, newValues: Record<stri
   for (const [key, oldValue] of Object.entries(oldValues)) {
     if (skipFields.includes(key)) continue;
     
-    if (!(key in newValues)) {
-      changes[key] = { old: oldValue, new: null };
+    const normalizedOld = normalizeValue(oldValue);
+    
+    // Only track deletion if old value was not null
+    if (!(key in newValues) && normalizedOld !== null) {
+      changes[key] = { old: normalizedOld, new: null };
     }
   }
 
