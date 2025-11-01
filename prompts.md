@@ -88494,3 +88494,188 @@ A screenshot would be very helpful to see exactly what you're experiencing!
 ## 610th try
 
 *(looks much better, checking in)*
+
+## Admin Roasters page should have the roaster name as a hyperlink #160
+
+https://github.com/thephm/the-beans/issues/160
+
+> Admin Roasters page should have the roaster name as a hyperlink. The name of the roaster should be a hyperlink to edit it and can remove the edit button
+
+I'll help you make the roaster name a hyperlink in the Admin Roasters page and remove the separate edit button. Let me first examine the current structure of the admin roasters page. 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 100 to 150
+
+Perfect! I can see the issue. On line 115, the roaster name is displayed as plain text, and there's a separate "Edit" button on lines 123-127. I'll make the roaster name a clickable link that triggers the edit action and remove the separate edit button. 
+
+`page.tsx +8 -7`
+
+Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully updated the Admin Roasters page. Here's what I changed:
+
+## ✅ Changes Made
+
+**Admin Roasters Page** (page.tsx):
+
+1. **Made roaster name a clickable link**:
+   - Wrapped the roaster name in a `<button>` element with blue text and underline on hover
+   - The button triggers the same `setEditingId(roaster.id)` action as the old Edit button
+   - Styled to look like a hyperlink (`text-blue-600 hover:underline`)
+
+2. **Removed the separate Edit button**:
+   - Deleted the standalone "Edit" button from the Actions column
+   - Kept only the "Delete" button in the Actions column
+   - Removed the `mr-2` margin that was separating Edit and Delete
+
+## Result
+
+Now when you visit the Admin Roasters page at `http://localhost:3000/admin/roasters`:
+- The roaster name appears as a blue, underlined link
+- Clicking the roaster name opens the edit form for that roaster
+- The Actions column now only contains the "Delete" button
+- The UI is cleaner and more intuitive
+
+The client container has been restarted, so the changes are now live! 🎉
+
+## 611th try
+
+*(worked!)*
+
+> make the "← Roasters" the same as "< Back to Users" by changing the arrow to the chevron and adding "Back to"
+
+I'll help you make the "← Roasters" link consistent with "< Back to Users" by changing it to "< Back to Roasters". Let me first find where this link is located. 
+
+✔ Searched text for `← Roasters|Back to Users` (`**/client/src/**/*.{tsx,ts}`), 4 results
+
+✔ Searched text for `← Roasters` (`**/client/src/**/*.tsx`), no results
+
+Let me search for "Roasters" with a back button or link: 
+
+✔ Searched text for `Back to.*Roasters|Roasters.*back|&larr;` (`**/client/src/app/admin/roasters/**/*.tsx`), no results
+
+Let me check the roaster edit page structure: 
+
+✔ Searched for files matching `**/admin/roasters/edit/**/page.tsx`, 2 matches
+
+✔ Read `client/src/app/admin/roasters/edit/%5Bid%5D/page.tsx`
+
+I see - this page redirects. Let me check the main roasters admin page where the actual editing happens: 
+
+✔ Searched text for `Roasters.*Link|href.*roasters|Back|&larr;|←` (`**/client/src/app/admin/roasters/page.tsx`), 8 results
+
+Perfect! Found it on line 802. Let me read that section: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 795 to 810
+
+Now let me check how the "Back to Users" link looks in the users edit page: 
+
+✔ Read `client/src/app/admin/users/%5Bid%5D/edit/page.tsx`, lines 103 to 118
+
+Perfect! Now I can see the pattern. The "Back to Users" uses:
+- A chevron SVG icon (`<path ... d="M15 19l-7-7 7-7" />`)
+- "Back to" prefix before the section name
+- Uses a Link component with inline-flex and items-center
+
+Let me update the roasters page to match this pattern: 
+
+`page.tsx +5 -2`
+
+Now let me add the translation key to the English translation file: 
+
+✔ Searched text for `"roasters":` (`**/client/public/locales/en/common.json`), 4 results
+
+✔ Read `client/public/locales/en/common.json`, lines 435 to 455
+
+Let me find where to add the "backToRoasters" key. Let me search for "admin.roasters" section: 
+
+✔ Searched text for `"admin": {` (`**/client/public/locales/en/common.json`), 1 result
+
+✔ Read `client/public/locales/en/common.json`, lines 349 to 429
+
+Now I need to add a "roasters" section under "admin". Let me continue reading to see if there's already one: 
+
+✔ Read `client/public/locales/en/common.json`, lines 425 to 440
+
+Perfect! I need to add a "roasters" section after "people" and before the closing brace of "admin". Let me add it: 
+
+`common.json +4 -0`
+
+Now let me add the same to the French translation file: 
+
+✔ Searched text for `"people": {` (`**/client/public/locales/fr/common.json`), 1 result
+
+✔ Read `client/public/locales/fr/common.json`, lines 428 to 438
+
+`common.json +4 -0`
+
+Perfect! Now let me restart the client container to apply all the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully updated the "← Roasters" link to match the "< Back to Users" pattern. Here's what I changed:
+
+## ✅ Changes Made
+
+**1. Admin Roasters Page** (page.tsx):
+   - **Changed the arrow**: From `←` (left arrow) to a chevron SVG icon (`<svg>` with path)
+   - **Added "Back to" prefix**: Changed from just "Roasters" to "Back to Roasters"
+   - **Updated styling**: Added `inline-flex items-center` to align the icon and text properly
+   - **Removed underline**: Changed from `hover:underline` to just `hover:text-blue-800` to match the Users pattern
+
+**2. Translation Files**:
+   - **English** (common.json): Added `admin.roasters.backToRoasters: "Back to Roasters"`
+   - **French** (common.json): Added `admin.roasters.backToRoasters: "Retour aux Torréfacteurs"`
+
+## Result
+
+Now when you edit a roaster on the Admin Roasters page, the breadcrumb navigation will show:
+- **< Back to Roasters** (with a left-pointing chevron icon)
+- Consistent styling with the "< Back to Users" link
+- Proper internationalization support (English/French)
+
+The client container has been restarted, so the changes are now live! 🎉
+
+## 612th try
+
+> check the font weight as the back to users looks heavier, maybe bolded?
+
+I'll check the font weight differences between "Back to Users" and "Back to Roasters" to see if there's a weight mismatch. 
+
+✔ Read `client/src/app/admin/users/%5Bid%5D/edit/page.tsx`, lines 103 to 118
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 795 to 810
+
+Good catch! I can see the difference now. The "Back to Users" uses a `<Link>` component which may have default styling, while "Back to Roasters" uses a `<button>`. However, looking at the CSS classes, they're identical except the roasters version has `transition-colors` added but both should have the same font weight by default.
+
+Let me check if there's a difference in how Link vs button renders, or if there's any global styling. Let me also look at the Users page more carefully - it might have additional styling: 
+
+✔ Searched text for `font-` (`**/client/src/app/admin/users/[id]/edit/page.tsx`), no results
+
+✔ Searched text for `button|a\s*{|link` (`**/client/src/app/globals.css`), 3 results
+
+The issue might be that `<Link>` components in Next.js can have different default styling than `<button>` elements. Let me add `font-medium` to the roasters button to make it match the typical link weight: 
+
+`page.tsx +1 -1`
+
+Now let me restart the client container to apply the change: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've added `font-medium` to the "Back to Roasters" button to match the font weight of the "Back to Users" link. 
+
+## ✅ Change Made
+
+**Admin Roasters Page** (page.tsx):
+- Added `font-medium` class to the back button
+- This gives it the same font weight (500) that Next.js Link components typically have
+
+The client container has been restarted. Now the "Back to Roasters" link should have the same heavier/bolder appearance as "Back to Users"! 🎉
+
+## 613th try
+
+*(works, checking in)*

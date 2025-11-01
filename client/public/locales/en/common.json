@@ -431,6 +431,10 @@
       "add": "Add Person",
       "addTitle": "Add Person",
       "noPeopleFound": "No people found."
+    },
+    "roasters": {
+      "addTitle": "Add Roaster",
+      "backToRoasters": "Back to Roasters"
     }
   },
   "adminForms": {

@@ -112,19 +112,20 @@ const AdminRoastersPage: React.FC = () => {
               <tbody>
                 {roasters.map((roaster) => (
                   <tr key={roaster.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-2 font-medium">{roaster.name}</td>
+                    <td className="px-4 py-2 font-medium">
+                      <button
+                        className="text-blue-600 hover:underline text-left"
+                        onClick={() => setEditingId(roaster.id)}
+                      >
+                        {roaster.name}
+                      </button>
+                    </td>
                     <td className="px-4 py-2">{roaster.city || '-'}</td>
                     <td className="px-4 py-2">{roaster.country || '-'}</td>
                     <td className="px-4 py-2">{roaster.verified ? '✔️' : ''}</td>
                     <td className="px-4 py-2">{roaster.featured ? '⭐' : ''}</td>
                     <td className="px-4 py-2">{roaster.rating || '-'}</td>
                     <td className="px-4 py-2 text-center">
-                      <button
-                        className="text-blue-600 hover:underline mr-2"
-                        onClick={() => setEditingId(roaster.id)}
-                      >
-                        {t('adminForms.roasters.edit', 'Edit')}
-                      </button>
                       <button
                         className="text-red-600 hover:underline"
                         onClick={() => setDeletingId(roaster.id)}
@@ -796,9 +797,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         <nav className="mb-4">
           <button
             onClick={onCancel}
-            className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium"
           >
-            ← {t('adminSection.roasters', 'Roasters')}
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            {t('admin.roasters.backToRoasters', 'Back to Roasters')}
           </button>
         </nav>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">

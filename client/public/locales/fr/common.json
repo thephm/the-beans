@@ -430,6 +430,10 @@
       "add": "Ajouter une Personne",
       "addTitle": "Ajouter une Personne",
       "noPeopleFound": "Aucune personne trouvée."
+    },
+    "roasters": {
+      "addTitle": "Ajouter un Torréfacteur",
+      "backToRoasters": "Retour aux Torréfacteurs"
     }
   },
   "adminForms": {
