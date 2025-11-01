@@ -277,6 +277,12 @@ router.post('/login', [
       });
     }
 
+    // Update lastLogin timestamp
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLogin: new Date() }
+    });
+
     // Generate JWT token
     const token = jwt.sign(
       { userId: user.id },
@@ -285,7 +291,7 @@ router.post('/login', [
     );
 
     // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = updatedUser;
 
     res.json({
       message: 'Login successful',

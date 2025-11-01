@@ -10,9 +10,10 @@ Authentication is implemented using JWT tokens and secure password hashing. The 
 - **Framework:** Node.js, Express, Prisma ORM
 - **Password Hashing:** bcrypt (12 rounds)
 - **Token:** JWT (7-day expiry, signed with server secret)
+- **Login Tracking:** Updates user's `lastLogin` timestamp on successful authentication
 - **Endpoints:**
 	- `POST /api/auth/register` — Register new user
-	- `POST /api/auth/login` — Login and receive JWT
+	- `POST /api/auth/login` — Login and receive JWT (updates lastLogin timestamp)
 	- `GET /api/auth/me` — Get current user info (requires Bearer token)
 - **Validation:** express-validator for all inputs
 - **Error Handling:** Returns 400/401/409 for invalid input, credentials, or duplicate users

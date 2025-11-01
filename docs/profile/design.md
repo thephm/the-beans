@@ -28,6 +28,7 @@ model User {
 	lastName  String?
 	avatar    String?
 	language  String   @default("en") @db.VarChar(5)
+	lastLogin DateTime?
 	...
 }
 ```

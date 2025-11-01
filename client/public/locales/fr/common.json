@@ -355,6 +355,7 @@
       "lastName": "Nom de famille",
       "role": "Rôle",
       "language": "Langue",
+      "lastLogin": "Dernière connexion",
       "created": "Créé",
       "updated": "Mis à jour",
       "createdAt": "Créé",

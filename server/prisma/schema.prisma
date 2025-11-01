@@ -33,6 +33,7 @@ model User {
   longitude Float?
   language  String   @default("en") @db.VarChar(5)
   role      String   @default("user") @db.VarChar(16) // 'user' or 'admin'
+  lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   settings   Json?
