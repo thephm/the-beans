@@ -424,6 +424,12 @@
         "oldValue": "Ancienne valeur",
         "newValue": "Nouvelle valeur"
       }
+    },
+    "people": {
+      "title": "Personnes",
+      "add": "Ajouter une Personne",
+      "addTitle": "Ajouter une Personne",
+      "noPeopleFound": "Aucune personne trouvée."
     }
   },
   "adminForms": {

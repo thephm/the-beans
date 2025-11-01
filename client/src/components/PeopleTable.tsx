@@ -136,9 +136,13 @@ export default function PeopleTable() {
               </tr>
             </thead>
             <tbody>
-              {filteredPeople.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-8 py-4 text-center text-gray-500">No people found.</td>
+                  <td colSpan={4} className="px-8 py-4 text-center text-gray-500">{t('loading', 'Loading...')}</td>
+                </tr>
+              ) : filteredPeople.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-8 py-4 text-center text-gray-500">{t('admin.people.noPeopleFound', 'No people found.')}</td>
                 </tr>
               ) : (
                 filteredPeople.map(person => (
