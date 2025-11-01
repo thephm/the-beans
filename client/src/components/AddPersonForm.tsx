@@ -60,7 +60,8 @@ export default function AddPersonForm({ roasters, onSave, onCancel }: AddPersonF
             ))}
           </select>
         </div>
-        <div className="flex gap-2 flex-wrap mt-2">
+        <div className="flex gap-2 flex-wrap mt-2 items-center">
+          <span className="font-medium mr-2">Role:</span>
           {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING].map(role => (
             <button
               key={role}
@@ -71,6 +72,8 @@ export default function AddPersonForm({ roasters, onSave, onCancel }: AddPersonF
               {role.charAt(0).toUpperCase() + role.slice(1)}
             </button>
           ))}
+        </div>
+        <div className="flex mt-2">
           <button
             type="button"
             className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
