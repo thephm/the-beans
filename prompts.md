@@ -89565,6 +89565,7 @@ I'll remove the restriction that prevents deleting the last owner from the backe
 The errors are just about missing dependencies in the TypeScript environment, not actual runtime errors. Now let's restart the server container to apply the changes: 
 
 ✔ `docker-compose restart server`
+*Auto approved by rule docker-compose*
 
 Perfect! I've successfully removed the restriction that prevented deleting the last owner. 
 
@@ -89578,3 +89579,82 @@ Perfect! I've successfully removed the restriction that prevented deleting the l
 **Restarted the server container** to apply the changes.
 
 The delete functionality will now work for all people, including the last owner of a roaster. Users with proper permissions can delete any person without restrictions based on role counts.
+
+## On mobile the person count and add person not visible #163
+
+https://github.com/thephm/the-beans/issues/163
+
+> On mobile the person count and add person not visible should be stacked, see attachment
+
+I'll help you fix the mobile layout for the person count and add person button. Let me first examine the current admin people page to understand the structure. 
+
+✔ Searched for files matching `**/admin/**/people/page.tsx`, 2 matches
+
+✔ Read `client/src/app/admin/people/page.tsx`
+
+Now let me check the PeopleTable component where the person count and add person button are likely located: 
+
+✔ Read `client/src/components/PeopleTable.tsx`
+
+I can see the issue. The header section with the roaster dropdown, person count, and "Add Person" button is currently using a flex layout that doesn't stack on mobile. Looking at the attachment, the person count text is cut off on mobile. I need to make this section stack vertically on mobile screens.
+
+Let me fix the layout to make it responsive: 
+
+`PeopleTable.tsx +10 -3`
+
+Perfect! I've updated the layout to be mobile-responsive. Here's what I changed:
+
+**Changes made:**
+1. **Flex direction**: Changed from `flex items-center` to `flex flex-col sm:flex-row sm:items-center` - this makes the container stack vertically on mobile and horizontal on larger screens
+2. **Gap spacing**: Added `gap-3 sm:gap-0` for consistent spacing between stacked elements on mobile
+3. **Grouped elements**: Wrapped the label and select in a div to keep them together
+4. **Person count**: Made it a separate element that will stack, with conditional left margin only on larger screens (`sm:ml-6`)
+5. **Add Person button**: Added `w-full sm:w-auto` so it takes full width on mobile but auto width on larger screens, with `sm:ml-auto` to push it right on desktop
+
+Now you need to restart the Docker client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule docker-compose*
+
+Perfect! The client container has been restarted. The changes are now live. 
+
+On mobile devices, the People page header will now stack vertically:
+1. **Roaster dropdown** (first row)
+2. **Person count** (second row)  
+3. **Add Person button** (third row, full width)
+
+On tablets and larger screens (sm breakpoint and up), it will display horizontally as before with the button aligned to the right.
+
+The layout should now match what you're expecting based on the attachment you provided!
+
+## 619th try
+
+> works! please remove the Edit and Delete buttons on the mobile people list, they are now inside the edit person form
+
+I'll remove the Edit and Delete buttons from the mobile card view in the PeopleTable component. 
+
+`PeopleTable.tsx +0 -44`
+
+Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've removed the Edit and Delete buttons (along with the delete confirmation dialog) from the mobile card view. Now on mobile, users will need to tap on the person's name to navigate to the edit form where they can perform edit and delete actions.
+
+The mobile cards now only show:
+- Person name (clickable link to edit page)
+- Title (if present)
+- Role badges
+- Roaster (with link)
+- Email (with mailto link)
+- Mobile number
+
+This creates a cleaner mobile experience and keeps the action buttons in the edit form where they belong!
+
+## 620th try
+
+*(looks great, checking in!)*
