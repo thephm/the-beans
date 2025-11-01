@@ -490,23 +490,6 @@ router.delete('/:id', [
       return res.status(403).json({ error: 'Permission denied. Only owners and admins can manage people.' });
     }
 
-    // Prevent deleting the last owner
-    if (existingperson.roles.includes(PersonRole.OWNER)) {
-      const ownerCount = await prisma.roasterPerson.count({
-        where: {
-          roasterId: existingperson.roasterId,
-          isActive: true,
-          roles: {
-            has: PersonRole.OWNER
-          }
-        }
-      });
-
-      if (ownerCount <= 1) {
-        return res.status(400).json({ error: 'Cannot delete the last owner. At least one owner is required.' });
-      }
-    }
-
     // Delete the person
     await prisma.roasterPerson.delete({
       where: { id }

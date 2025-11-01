@@ -98,22 +98,27 @@ export default function PeopleTable() {
   } 
   const filteredPeople = people; // Add filtering logic if needed
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const confirmDelete = (id: string) => {
     setDeletingId(id);
+    setDeleteError(null);
   };
 
   const cancelDelete = () => {
     setDeletingId(null);
+    setDeleteError(null);
   };
 
   const doDelete = async (id: string) => {
     try {
+      setDeleteError(null);
       await apiClient.deletePerson(id);
       setPeople(people.filter(p => p.id !== id));
       setDeletingId(null);
     } catch (error) {
       console.error('Error deleting person:', error);
+      setDeleteError(error instanceof Error ? error.message : 'Failed to delete person');
     }
   };
 
@@ -250,6 +255,11 @@ export default function PeopleTable() {
                     <div className="text-sm text-red-800 mb-3">
                       {t('admin.people.confirmDelete', 'Are you sure you want to delete this person?')}
                     </div>
+                    {deleteError && (
+                      <div className="mb-3 p-2 bg-red-100 border border-red-300 rounded text-sm text-red-800">
+                        {deleteError}
+                      </div>
+                    )}
                     <div className="flex space-x-2">
                       <button
                         onClick={() => doDelete(person.id)}
