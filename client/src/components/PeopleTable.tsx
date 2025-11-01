@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import AddPersonForm from './AddPersonForm';
 import { apiClient } from '../lib/api';
 import { RoasterPerson, Roaster } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -20,11 +21,9 @@ export default function PeopleTable() {
       try {
         const roastersData = await apiClient.getRoasters();
         setRoasters((roastersData && Array.isArray((roastersData as any).roasters)) ? (roastersData as any).roasters : []);
-      } catch (err) {
-        setRoasters([]);
       } finally {
         setLoading(false);
-      }
+    }
     }
     fetchRoasters();
   }, []);
@@ -96,13 +95,7 @@ export default function PeopleTable() {
 
   const handleRoasterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedRoasterId(e.target.value);
-  };
-
-  const handleAddPerson = () => {
-    // Implement add person logic (e.g., open modal)
-    alert('Add person functionality not implemented yet.');
-  };
-
+  } 
   const filteredPeople = people; // Add filtering logic if needed
 
   return (
@@ -126,11 +119,12 @@ export default function PeopleTable() {
           </span>
           <button
             className="ml-auto bg-purple-600 text-white px-5 py-2 rounded shadow hover:bg-purple-700"
-            onClick={handleAddPerson}
+            onClick={() => window.location.href = '/admin/people/add'}
           >
             {t('admin.people.add', 'Add Person')}
           </button>
         </div>
+        {/* AddPersonForm removed, now handled in separate page */}
         <div className="overflow-x-auto">
           <table className="w-full bg-white border rounded-lg shadow">
             <thead>
@@ -138,32 +132,32 @@ export default function PeopleTable() {
                 <th className="px-8 py-3 text-left font-semibold">Name</th>
                 <th className="px-8 py-3 text-left font-semibold">Email</th>
                 <th className="px-8 py-3 text-left font-semibold">Mobile</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredPeople.length === 0 ? (
-                        <tr>
-                          <td colSpan={3} className="px-8 py-4 text-center text-gray-500">No people found.</td>
-                        </tr>
-                      ) : (
-                        filteredPeople.map(person => (
-                          <tr key={person.id}>
-                            <td className="px-8 py-2 border-b">{person.name}</td>
-                            <td className="px-8 py-2 border-b">{person.email}</td>
-                            <td className="px-8 py-2 border-b">{person.mobile}</td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          );
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPeople.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-8 py-4 text-center text-gray-500">No people found.</td>
+                </tr>
+              ) : (
+                filteredPeople.map(person => (
+                  <tr key={person.id}>
+                    <td className="px-8 py-2 border-b">{person.name}</td>
+                    <td className="px-8 py-2 border-b">{person.email}</td>
+                    <td className="px-8 py-2 border-b">{person.mobile}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // EditableCell utility (if needed elsewhere)
-function EditableCell({ value, onChange, type = 'text', options, ...props }: any) {
+export function EditableCell({ value, onChange, type = 'text', options, ...props }: any) {
   if (type === 'select') {
     let sortedOptions = options;
     if (Array.isArray(options) && options.length && options[0].label && options[0].value) {
@@ -180,18 +174,20 @@ function EditableCell({ value, onChange, type = 'text', options, ...props }: any
     );
   }
   if (type === 'multiselect') {
-    return (
-      <select multiple className="border rounded px-2 py-1" value={value} onChange={e => {
-        const selected = Array.from(e.target.selectedOptions, (o: any) => o.value);
-        onChange(selected);
-      }} {...props}>
-        {options.map((opt: any) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
-    );
+    // Placeholder for multiselect implementation
+    return <span>Multiselect not implemented</span>;
   }
+  // Default to text input
   return (
-    <input className="border rounded px-2 py-1 w-full" value={value} onChange={e => onChange(e.target.value)} {...props} />
+    <input
+      className="border rounded px-2 py-1"
+      type={type}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      {...props}
+    />
   );
 }
+
+
+
