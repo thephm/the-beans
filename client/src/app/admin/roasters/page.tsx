@@ -106,7 +106,6 @@ const AdminRoastersPage: React.FC = () => {
                   <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.verified', 'Verified')}</th>
                   <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.featured', 'Featured')}</th>
                   <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.rating', 'Rating')}</th>
-                  <th className="px-4 py-2 border-b text-center">{t('adminForms.roasters.actions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -125,14 +124,6 @@ const AdminRoastersPage: React.FC = () => {
                     <td className="px-4 py-2">{roaster.verified ? '✔️' : ''}</td>
                     <td className="px-4 py-2">{roaster.featured ? '⭐' : ''}</td>
                     <td className="px-4 py-2">{roaster.rating || '-'}</td>
-                    <td className="px-4 py-2 text-center">
-                      <button
-                        className="text-red-600 hover:underline"
-                        onClick={() => setDeletingId(roaster.id)}
-                      >
-                        {t('adminForms.roasters.delete', 'Delete')}
-                      </button>
-                    </td>
                   </tr>
                 ))}
               </tbody>
