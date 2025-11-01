@@ -93,6 +93,12 @@ router.get('/:id', [
     const person = await prisma.roasterPerson.findUnique({
       where: { id },
       include: {
+        roaster: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
         user: {
           select: {
             id: true,
@@ -145,6 +151,12 @@ router.get('/roaster/:roasterId', [
         isActive: true
       },
       include: {
+        roaster: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
         user: {
           select: {
             id: true,

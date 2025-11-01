@@ -130,6 +130,7 @@ export default function PeopleTable() {
             <thead>
               <tr>
                 <th className="px-8 py-3 text-left font-semibold">Name</th>
+                <th className="px-8 py-3 text-left font-semibold">Roaster</th>
                 <th className="px-8 py-3 text-left font-semibold">Email</th>
                 <th className="px-8 py-3 text-left font-semibold">Mobile</th>
               </tr>
@@ -137,7 +138,7 @@ export default function PeopleTable() {
             <tbody>
               {filteredPeople.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-8 py-4 text-center text-gray-500">No people found.</td>
+                  <td colSpan={4} className="px-8 py-4 text-center text-gray-500">No people found.</td>
                 </tr>
               ) : (
                 filteredPeople.map(person => (
@@ -153,6 +154,18 @@ export default function PeopleTable() {
                         <div className="text-sm text-gray-600 mt-1">
                           {person.title}
                         </div>
+                      )}
+                    </td>
+                    <td className="px-8 py-2 border-b">
+                      {person.roaster ? (
+                        <a
+                          href={`/admin/roasters/edit/${person.roaster.id}`}
+                          className="text-blue-700 hover:text-blue-900 underline cursor-pointer"
+                        >
+                          {person.roaster.name}
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">-</span>
                       )}
                     </td>
                     <td className="px-8 py-2 border-b">

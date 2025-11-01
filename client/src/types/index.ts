@@ -251,6 +251,10 @@ export enum PersonRole {
 export interface RoasterPerson {
   id: string;
   roasterId: string;
+  roaster?: {
+    id: string;
+    name: string;
+  };
   name: string;
   title?: string;
   email?: string;
