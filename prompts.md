@@ -89791,3 +89791,46 @@ The form now has a much cleaner, more professional appearance with better use of
 ## 623rd try
 
 *(looks great, checking in!)*
+
+> remove Actions column from admin roasters
+
+I'll help you remove the Actions column from the admin roasters page. Let me first examine the current implementation to understand the structure. 
+
+✔ Searched for files matching `**/admin/roasters/**/page.tsx`, 4 matches
+
+✔ Searched text for `Actions.*roasters|roasters.*Actions` (`**/client/src/app/admin/**/*.tsx`), 1 result
+
+✔ Read `client/src/app/admin/roasters/page.tsx`
+
+Now I can see the structure. I need to remove the Actions column header and the corresponding table cell from the admin roasters page. Let me make these changes: 
+
+`page.tsx +0 -1`
+`page.tsx +0 -8`
+
+Perfect! I've successfully removed the Actions column from the admin roasters page. The changes include:
+
+1. **Removed the Actions header** (`<th>` element) from the table header
+2. **Removed the Actions cell** (`<td>` element) with the Delete button from each table row
+
+Now users will click on the roaster name to edit it (which was already the primary way to access the edit form), and the Delete functionality that was in the Actions column has been removed from the list view.
+
+According to the project instructions, you'll need to restart the Docker client container for the changes to take effect:
+
+```powershell
+docker-compose restart client
+```
+
+> please do that
+
+I'll restart the Docker client container for you now so the changes take effect. 
+
+Ran terminal command: docker-compose restart client
+
+Perfect! The client container has been restarted successfully. The changes are now live - the Actions column has been removed from the admin roasters table at `http://localhost:3000/admin/roasters`. 
+
+Users can still:
+- Click on any roaster name to edit it
+- Add new roasters using the "Add Roaster" button
+- View all roaster information in the table (name, city, country, verified status, featured status, and rating)
+
+The Delete button that was previously in the Actions column has been removed from the list view.
