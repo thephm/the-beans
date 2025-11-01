@@ -14,6 +14,8 @@ export default function PeopleTable() {
   const [loading, setLoading] = useState<boolean>(true);
   const [allPeopleCount, setAllPeopleCount] = useState<number>(0); // filtered count
   const [totalAcrossAllRoasters, setTotalAcrossAllRoasters] = useState<number>(0); // always total
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filteredPeople, setFilteredPeople] = useState<RoasterPerson[]>([]);
 
   useEffect(() => {
     async function fetchRoasters() {
@@ -95,8 +97,24 @@ export default function PeopleTable() {
 
   const handleRoasterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedRoasterId(e.target.value);
-  } 
-  const filteredPeople = people; // Add filtering logic if needed
+  }
+
+  // Filter people based on search term
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredPeople(people);
+    } else {
+      const filtered = people.filter(person =>
+        person.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.roaster?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.roles?.some(role => role.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredPeople(filtered);
+    }
+  }, [searchTerm, people]);
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -124,6 +142,22 @@ export default function PeopleTable() {
 
   return (
     <div className="w-full">
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder={t('admin.people.search', 'Search by name, email, roaster, title, or role...')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 mb-4">
         {/* Roaster dropdown */}
         <div className="flex items-center">
@@ -143,7 +177,10 @@ export default function PeopleTable() {
         
         {/* Person count */}
         <span className="text-gray-500 text-sm sm:ml-6">
-          {filteredPeople.length} of {totalAcrossAllRoasters} people
+          {filteredPeople.length === people.length 
+            ? `${filteredPeople.length} of ${totalAcrossAllRoasters} people`
+            : `${filteredPeople.length} of ${people.length} people (${totalAcrossAllRoasters} total)`
+          }
         </span>
         
         {/* Add Person button */}

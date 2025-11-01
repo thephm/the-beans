@@ -435,7 +435,8 @@
       "delete": "Supprimer",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette personne ?",
       "deleteConfirm": "Supprimer",
-      "deleteCancel": "Annuler"
+      "deleteCancel": "Annuler",
+      "search": "Rechercher par nom, e-mail, torréfacteur, titre ou rôle..."
     },
     "roasters": {
       "addTitle": "Ajouter un Torréfacteur",
