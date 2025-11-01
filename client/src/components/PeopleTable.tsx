@@ -142,7 +142,14 @@ export default function PeopleTable() {
               ) : (
                 filteredPeople.map(person => (
                   <tr key={person.id}>
-                    <td className="px-8 py-2 border-b">{person.name}</td>
+                    <td className="px-8 py-2 border-b">
+                      <a
+                        href={`/admin/people/edit/${person.id}`}
+                        className="text-blue-700 hover:text-blue-900 underline cursor-pointer"
+                      >
+                        {person.name}
+                      </a>
+                    </td>
                     <td className="px-8 py-2 border-b">{person.email}</td>
                     <td className="px-8 py-2 border-b">{person.mobile}</td>
                   </tr>

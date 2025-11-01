@@ -179,6 +179,17 @@ export interface Notification {
   user?: User;
 }
 
+// API response for getRoasters
+export interface RoastersResponse {
+  roasters: Roaster[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
 export interface ApiResponse<T> {
   data?: T;
   message?: string;

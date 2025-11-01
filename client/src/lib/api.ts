@@ -40,7 +40,11 @@ class ApiClient {
   }
 
   async getPeopleForRoaster(roasterId: string) {
-    return this.request(`/people/${roasterId}`);
+    return this.request(`/people/roaster/${roasterId}`);
+  }
+
+  async getPerson(id: string) {
+    return this.request(`/people/${id}`);
   }
 
   async createPerson(personData: any) {

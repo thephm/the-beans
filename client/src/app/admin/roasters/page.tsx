@@ -613,7 +613,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     try {
       const token = localStorage.getItem('token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/people/${roaster.id}`, {
+      const response = await fetch(`${apiUrl}/api/people/roaster/${roaster.id}`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
       
@@ -622,7 +622,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         setPeople(data.people || []);
       }
     } catch (error) {
-      console.error('Error fetching people:', error);
+      // Silently handle error
     }
   };
 
@@ -679,10 +679,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       
       const method = editingPerson ? 'PUT' : 'POST';
       
-      const payload = {
-        ...personForm,
-        roasterId: roaster?.id || 'temp' // Will be set after roaster creation
-      };
+      const payload = editingPerson
+        ? { ...personForm }
+        : { ...personForm, roasterId: roaster?.id || 'temp' };
 
       const response = await fetch(url, {
         method,
@@ -712,7 +711,6 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         throw new Error(errorData.error || 'Failed to save person');
       }
     } catch (error) {
-      console.error('Error saving person:', error);
       setError(error instanceof Error ? error.message : 'Failed to save person');
     }
   };
@@ -736,16 +734,38 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         throw new Error(errorData.error || 'Failed to delete person');
       }
     } catch (error) {
-      console.error('Error deleting person:', error);
       setError('Failed to delete person');
     }
   };
 
   // Fetch people when editing existing roaster
   React.useEffect(() => {
-    if (roaster?.id) {
-      fetchPeople();
-    }
+    let isMounted = true;
+    
+    const loadPeople = async () => {
+      if (!roaster?.id || !isMounted) return;
+      
+      try {
+        const token = localStorage.getItem('token');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const response = await fetch(`${apiUrl}/api/people/roaster/${roaster.id}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        });
+        
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setPeople(data.people || []);
+        }
+      } catch (error) {
+        // Silently handle error
+      }
+    };
+    
+    loadPeople();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [roaster?.id]);
 
   const getRoleBadgeColor = (role: PersonRole) => {

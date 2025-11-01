@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import AddPersonForm from "@/components/AddPersonForm";
 import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api";
-import { Roaster } from "@/types";
+import { Roaster, RoastersResponse } from "@/types";
 
 
 const AddPersonPage: React.FC = () => {
@@ -15,8 +15,8 @@ const AddPersonPage: React.FC = () => {
   useEffect(() => {
     const fetchRoasters = async () => {
       try {
-          const data = await apiClient.getRoasters();
-          setRoasters(Array.isArray(data?.roasters) ? data.roasters : []);
+        const data = await apiClient.getRoasters() as RoastersResponse;
+        setRoasters(Array.isArray(data?.roasters) ? data.roasters : []);
       } catch (err) {
         setRoasters([]);
       }

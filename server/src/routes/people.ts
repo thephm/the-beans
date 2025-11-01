@@ -79,8 +79,46 @@ async function canManagePeople(userId: string, roasterId: string): Promise<boole
   }
 }
 
-// GET /api/people/:roasterId - Get all people for a roaster
-router.get('/:roasterId', [
+// GET /api/people/:id - Get a single person by ID
+router.get('/:id', [
+  param('id').isString().notEmpty().withMessage('Person ID is required')
+], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { id } = req.params;
+    // Find person by ID
+    const person = await prisma.roasterPerson.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true
+          }
+        }
+      }
+    });
+    if (!person) {
+      return res.status(404).json({ error: 'Person not found' });
+    }
+    // Attach permissions
+    const personWithPermissions = {
+      ...person,
+      permissions: getPersonPermissions(person.roles)
+    };
+    res.json({ person: personWithPermissions });
+  } catch (error) {
+    console.error('Get person by ID error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/people/roaster/:roasterId - Get all people for a roaster
+router.get('/roaster/:roasterId', [
   param('roasterId').isString().notEmpty().withMessage('Roaster ID is required')
 ], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
