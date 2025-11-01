@@ -85100,6 +85100,8 @@ The file `AddPersonForm.tsx` could not be found. Please verify the filename and 
 
 ✔ Read `client/src/components/AddPersonForm.tsx`, lines 61 to 90
 
+`AddPersonForm.tsx +4 -1`
+
 The AddPersonForm has been updated:
 - The "Role:" label now appears before the Owner, Admin, and Billing buttons.
 - The Primary button is moved to a separate line below the role buttons.
@@ -85111,3 +85113,81 @@ You will need to restart the frontend container for these changes to take effect
 ✔ `Restart frontend container for PeopleTable fix` task finished
 
 Yes, the frontend container has been restarted. Your changes to the AddPersonForm are now live.
+
+## 573rd try
+
+*(checked in because looking better)*
+
+> Lets make the Roaster menu narrower and put Primary button to the right of it on the same line to shorten the height of the add person form
+
+`AddPersonForm.tsx +13 -11`
+
+✔ `Restart frontend container for PeopleTable fix` task finished
+
+The Roaster select menu is now narrower, and the Primary button appears to its right on the same line, reducing the form height. The frontend container has been restarted, so your changes are live. Please check the UI and let me know if you need further adjustments.
+
+## 573rd try
+
+> you made the roaster menu too narrow, make it wider and right align the primary button on the same line
+
+`AddPersonForm.tsx +5 -3`
+
+✔ `Restart frontend container for PeopleTable fix` task finished
+
+The Roaster select menu is now wider, and the Primary button is right-aligned on the same line. The frontend container has been restarted, so your changes are live. Please check the UI and let me know if you need further tweaks.
+
+> even wider please
+
+`AddPersonForm.tsx +2 -2`
+
+✔ `Restart frontend container for PeopleTable fix` task finished
+
+*Auto approved for this profile (Edit)*
+
+The Roaster select menu is now even wider, with the Primary button still right-aligned on the same line. The frontend container has been restarted and your changes are live. Please check the UI and let me know if you need further adjustments.
+
+## 574th try
+
+> Please make the roaster menu this wide
+
+`AddPersonForm.tsx +2 -2`
+
+✔ `Restart frontend container for PeopleTable fix` task finished
+
+*Auto approved for this profile (Edit)*
+
+The Roaster select menu now fills the available space before the Primary button, matching the width shown in your screenshot. The frontend container has been restarted and your changes are live. Please check the UI and let me know if you need any further adjustments.
+
+## 575th try
+
+> the primary button should stack if the browser resized. right now it's stuck on the same line
+
+`AddPersonForm.tsx +2 -2`
+
+`Restart frontend container for PeopleTable fix` task finished
+
+*Auto approved for this profile (Edit)*
+
+The Primary button will now stack below the Roaster select menu on smaller screens, making the layout responsive. The frontend container has been restarted and your changes are live. Please check the UI and let me know if you need further adjustments.
+
+## 576th try
+
+> that worked thanks but now when resized both the roaster menu and primary button are right aligned but shouldn't be
+
+`AddPersonForm.tsx +1 -1`
+
+`Restart frontend container for PeopleTable fix` task finished
+
+*Auto approved for this profile (Edit)*
+
+The Roaster select menu and Primary button will now be left-aligned when stacked on small screens. The frontend container has been restarted and your changes are live. Please check the UI and let me know if you need any further adjustments.
+
+## 577th try
+
+> still right aligned and shouldn't be
+
+`AddPersonForm.tsx +1 -1`
+
+`Restart frontend container for PeopleTable fix` task finished
+
+Both the Roaster select menu and Primary button will now be left-aligned when stacked on small screens. The frontend container has been restarted and your changes are live. Please check the UI and let me know if you need any further adjustments.
