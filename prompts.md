@@ -84994,3 +84994,98 @@ The frontend container has been restarted. The latest fix for the Add Person for
 
 ## 569th try
 
+*(checked in because it functioned)*
+
+> Im attaching two screenshots, Edit User which looks great and add person which doesn't. Add Person has Add Person twice and there's no seperation from navbar and form like in edit user
+
+Here’s what needs to be fixed for the Add Person page to match the Edit User page’s style:
+
+1. Remove the duplicate “Add Person” heading at the top.
+2. Add vertical spacing between the navbar and the form container.
+3. Center the form and use a card-style container with padding, rounded corners, and a subtle shadow (like Edit User).
+4. Ensure the form fields and labels use consistent spacing and font sizes.
+
+Would you like me to update the Add Person page to match the Edit User layout and styling? If so, I’ll make the changes in the relevant file (likely AddPersonForm.tsx or the corresponding page in app).
+
+> yes
+
+✔ Searched for files matching `**/AddPersonForm.tsx`, 2 matches
+
+✔ Read `client/src/components/AddPersonForm.tsx`, lines 1 to 40
+
+✔ Read `client/src/components/AddPersonForm.tsx`, lines 41 to 93
+
+`AddPersonForm.tsx +4 -2`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The Add Person page has been updated to match the Edit User layout:
+
+- The duplicate heading is removed.
+- The form is now centered in a card-style container with padding, rounded corners, and a shadow.
+- There is proper vertical spacing between the navbar and the form.
+
+The frontend container has been restarted, so you can refresh the app to see the new design. Let me know if you need further tweaks!
+
+## 570th try
+
+> Please remove these two containers
+
+✔ Searched for files matching `**/add|person|AddPerson`, no matches
+
+✔ Searched for files matching `**/add-person|AddPerson|addperson|Addperson`, no matches
+
+✔ Searched for files matching `**/add|person|AddPerson|AddPersonForm`, no matches
+
+✔ Searched text for `Add Person` (`**/client/src/app/**`), 2 results
+
+✔ Read `client/src/app/admin/people/add/page.tsx`
+
+✔ Read `client/src/components/AddPersonForm.tsx`, lines 1 to 20
+
+✔ Read `client/src/components/AddPersonForm.tsx`, lines 21 to 60
+
+`AddPersonForm.tsx +0 -5`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The duplicate "Add Person" containers and heading have been removed from the Add Person page. The form is now rendered only inside the parent card container, matching the Edit User page layout.
+
+The frontend container has been restarted. Please refresh the app to confirm the fix. Let me know if you need any further adjustments!
+
+## 571st try
+
+> add space between the nav bar and the top of the add person form, see attachment
+
+✔ Read `client/src/app/admin/people/add/page.tsx`
+
+`page.tsx +2 -2`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Extra space has been added between the navbar and the top of the Add Person form. The frontend container has been restarted—refresh the page to see the improved spacing.
+
+Let me know if you need further adjustments!
+
+## 572nd try
+
+> almost there, needs more space and a link Back to People with an arrow to the left of it just like back to users
+
+✔ Read `client/src/app/admin/people/edit/page.tsx`, lines 1 to 50
+
+✔ Read `client/src/app/admin/people/edit/page.tsx`, lines 51 to 110
+
+`page.tsx +11 -2`
+
+`docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The Add Person page now has:
+
+- More space between the navbar and the form.
+- A "Back to People" link with a left arrow above the form, matching the Edit User page style.
+
+The frontend container has been restarted. Please refresh the page to see the changes. Let me know if you need any further tweaks!

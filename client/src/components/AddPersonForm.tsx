@@ -37,56 +37,53 @@ export default function AddPersonForm({ roasters, onSave, onCancel }: AddPersonF
     onSave(form);
   };
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow p-8 mt-20 sm:mt-28 mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold mb-8">Add Person</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 gap-6 mb-8">
-          <div>
-            <input type="text" placeholder="Name" value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
-          </div>
-          <div>
-            <input type="email" placeholder="Email" value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <input type="text" placeholder="Mobile" value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <textarea placeholder="Bio" value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Roaster</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
-              <option value="">Select a roaster</option>
-              {safeRoasters.map(roaster => (
-                <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex gap-2 flex-wrap mt-2">
-            {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING].map(role => (
-              <button
-                key={role}
-                type="button"
-                className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.roles.includes(role) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                onClick={() => handleRoleToggle(role)}
-              >
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </button>
+    <form onSubmit={handleSubmit}>
+      <div className="grid grid-cols-1 gap-6 mb-8">
+        <div>
+          <input type="text" placeholder="Name" value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+        </div>
+        <div>
+          <input type="email" placeholder="Email" value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div>
+          <input type="text" placeholder="Mobile" value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div>
+          <textarea placeholder="Bio" value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div>
+          <label className="block mb-1 font-medium">Roaster</label>
+          <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
+            <option value="">Select a roaster</option>
+            {safeRoasters.map(roaster => (
+              <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
             ))}
+          </select>
+        </div>
+        <div className="flex gap-2 flex-wrap mt-2">
+          {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING].map(role => (
             <button
+              key={role}
               type="button"
-              className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-              onClick={() => handleChange('isPrimary', !form.isPrimary)}
+              className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.roles.includes(role) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+              onClick={() => handleRoleToggle(role)}
             >
-              Primary
+              {role.charAt(0).toUpperCase() + role.slice(1)}
             </button>
-          </div>
+          ))}
+          <button
+            type="button"
+            className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+            onClick={() => handleChange('isPrimary', !form.isPrimary)}
+          >
+            Primary
+          </button>
         </div>
-        <div className="flex gap-4 mt-8 justify-end">
-          <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>Cancel</button>
-          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save</button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div className="flex gap-4 mt-8 justify-end">
+        <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>Cancel</button>
+        <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save</button>
+      </div>
+    </form>
   );
 }
