@@ -10,20 +10,24 @@ export default function PeopleAdminPage() {
   const { currentLanguage } = useLanguage();
   if (!user || user.role !== 'admin') {
     return (
-      <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">People</h1>
+      <div className="container mx-auto pt-20 sm:pt-28 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">People</h1>
+          </div>
+          <div className="text-red-600">Admin access required.</div>
         </div>
-        <div className="text-red-600">Admin access required.</div>
       </div>
     );
   }
   return (
-    <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">People</h1>
+    <div className="container mx-auto pt-20 sm:pt-28 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">People</h1>
+        </div>
+        <PeopleTable />
       </div>
-      <PeopleTable />
     </div>
   );
 }

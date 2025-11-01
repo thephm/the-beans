@@ -99,10 +99,9 @@ export default function PeopleTable() {
   const filteredPeople = people; // Add filtering logic if needed
 
   return (
-    <div className="mt-8 w-full flex flex-col items-center">
-      <div className="w-full max-w-6xl">
-        <div className="flex items-center mb-4">
-          <label htmlFor="roaster-select" className="mr-2 font-medium">Roaster:</label>
+    <div className="w-full">
+      <div className="flex items-center mb-4">
+        <label htmlFor="roaster-select" className="mr-2 font-medium">Roaster:</label>
           <select
             id="roaster-select"
             value={selectedRoasterId}
@@ -213,7 +212,6 @@ export default function PeopleTable() {
             </tbody>
           </table>
         </div>
-      </div>
     </div>
   );
 }
