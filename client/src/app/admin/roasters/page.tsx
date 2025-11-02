@@ -644,7 +644,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             country: data.country || '',
             latitude: data.latitude || '',
             longitude: data.longitude || '',
-            specialties: data.specialties?.join(', ') || '',
+            specialtyIds: data.specialties?.map(s => s.id) || [],
             verified: data.verified || false,
             featured: data.featured || false,
             rating: data.rating || 0,
