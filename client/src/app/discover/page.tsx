@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { SearchSection } from '@/components/SearchSection'
 import RoasterImage from '@/components/RoasterImage'
 import { apiClient } from '@/lib/api'
@@ -35,6 +36,7 @@ interface Roaster {
 export default function DiscoverPage() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
+  const { showRatings } = useFeatureFlags()
   const searchParams = useSearchParams()
   const router = useRouter()
   const [roasters, setRoasters] = useState<Roaster[]>([])
@@ -224,10 +226,12 @@ export default function DiscoverPage() {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{roaster.name}</h3>
-                      <div className="flex items-center">
-                        <Star sx={{ fontSize: 20, color: '#fbbf24' }} />
-                        <span className="text-gray-600 ml-1">{roaster.rating}</span>
-                      </div>
+                      {showRatings && (
+                        <div className="flex items-center">
+                          <Star sx={{ fontSize: 20, color: '#fbbf24' }} />
+                          <span className="text-gray-600 ml-1">{roaster.rating}</span>
+                        </div>
+                      )}
                     </div>
                     {(roaster.city || roaster.state) && (
                       <p className="text-gray-600 mb-2 flex items-center">

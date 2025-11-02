@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import RoasterImage from '@/components/RoasterImage'
@@ -23,6 +24,7 @@ export default function FavoritesPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { user, loading } = useAuth()
+  const { showRatings } = useFeatureFlags()
   const [favoriteRoasters, setFavoriteRoasters] = useState<Roaster[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [favorites, setFavorites] = useState<{[key: string]: boolean}>({})
@@ -193,10 +195,12 @@ export default function FavoritesPage() {
                               ) : null}
                             </div>
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <Star sx={{ fontSize: 16, color: '#fbbf24' }} />
-                            <span className="text-sm font-medium text-gray-700">{roaster.rating}</span>
-                          </div>
+                          {showRatings && (
+                            <div className="flex items-center space-x-1">
+                              <Star sx={{ fontSize: 16, color: '#fbbf24' }} />
+                              <span className="text-sm font-medium text-gray-700">{roaster.rating}</span>
+                            </div>
+                          )}
                         </div>
 
                         {roaster.description && (
