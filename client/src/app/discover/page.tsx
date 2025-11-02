@@ -9,6 +9,7 @@ import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import { SearchSection } from '@/components/SearchSection'
 import RoasterImage from '@/components/RoasterImage'
 import { apiClient } from '@/lib/api'
+import { Roaster } from '@/types'
 import { 
   Coffee, 
   LocationOn, 
@@ -16,22 +17,6 @@ import {
   FavoriteBorder,
   Star
 } from '@mui/icons-material'
-
-interface Roaster {
-  id: string
-  name: string
-  description: string
-  address: string
-  city: string
-  state: string
-  specialties: string[]
-  rating: number
-  distance: number
-  imageUrl: string
-  latitude?: number
-  longitude?: number
-  verified: boolean
-}
 
 export default function DiscoverPage() {
   const { t, i18n } = useTranslation()
