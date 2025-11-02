@@ -91839,6 +91839,7 @@ I need to add the missing properties to the Roaster interface:
 Perfect! Now let me restart the client container to apply these changes: 
 
 ✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
 
 Perfect! Now the carousel should work with the roasters that have multiple images. Here's what I fixed:
 
@@ -91879,3 +91880,244 @@ Refresh the page and navigate to any of these roasters - you should now see the 
 ## 690th try
 
 *(works beautifully)*
+
+## Hide star rating and reviews for now #175
+
+https://github.com/thephm/the-beans/issues/175
+
+> Hide star rating and reviews across all pages, see attachments 
+
+I'll help you hide the star rating and reviews across all pages. Let me first examine the attachments to understand where these ratings appear, then search for all instances in the codebase. 
+
+✔ Searched text for `rating|review|star` (`**/client/src/**/*.tsx`), 20 results
+
+✔ Searched text for `⭐|★` (`**/client/src/**/*.tsx`), 3 results
+
+Now let me read the specific files where ratings and reviews are displayed: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 280 to 310
+
+✔ Read `client/src/app/discover/page.tsx`
+
+✔ Read `client/src/app/favorites/page.tsx`
+
+Now let me check the admin roasters page: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 115 to 195
+
+Now let me create a todo list and hide the rating and review elements across all pages: 
+
+Created 5 todos
+
+✔ Starting (1/5) *Hide rating in roaster detail page*
+
+`page.tsx +0 -9`
+
+✔ Starting (2/5) *Hide rating in discover page cards*
+
+`page.tsx +0 -4`
+
+✔ Starting (3/5) *Hide rating in favorites page cards*
+
+Let me read more context from the favorites page: 
+
+✔ Read `client/src/app/favorites/page.tsx`, lines 160 to 210
+
+`page.tsx +0 -4`
+
+The TypeScript errors are expected since modules are installed in Docker. Now let me also remove the unused Star import: 
+
+`page.tsx +1 -1`
+
+✔ Starting (4/5) *Hide rating in admin roasters page*
+
+`page.tsx +0 -18`
+
+I made an error - I removed too much content. Let me fix this: 
+
+`page.tsx +8 -0`
+
+Now let me remove the rating column from the table: 
+
+`page.tsx +0 -1`
+`page.tsx +0 -1`
+
+✔ Starting (5/5) *Restart client container*
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+✔ Completed (5/5) *Restart client container*
+
+Perfect! I've successfully hidden the star ratings and reviews across all pages in the application. Here's what was changed:
+
+## ✅ Changes Complete
+
+### **Files Modified:**
+
+1. **page.tsx** - Roaster detail page
+   - Removed the "Rating & Reviews" section that displayed the star icon, rating number, and review count
+
+2. **page.tsx** - Discover page roaster cards
+   - Removed the star rating display from each roaster card in the grid
+
+3. **page.tsx** - Favorites page roaster cards
+   - Removed the star rating display from each favorite roaster card
+   - Removed the unused `Star` import
+
+4. **page.tsx** - Admin roasters management page
+   - Removed the rating display from mobile card view
+   - Removed the "Rating" column from the desktop table view
+
+### **Container Restart:**
+- Client container successfully restarted and running on `http://localhost:3000`
+
+All star ratings and review counts are now hidden across the entire application. The roaster cards now focus on the roaster name, location, description, and specialties without any rating information displayed.
+
+> did you make it configurable or you just removed it
+
+I just removed it completely - I did not make it configurable. The star ratings and review counts are now permanently hidden from all pages.
+
+If you'd like me to make it **configurable** instead (e.g., via an admin setting, environment variable, or feature flag), I can implement that. This would allow you to:
+
+1. **Toggle ratings on/off** via admin dashboard settings
+2. **Use an environment variable** (e.g., `NEXT_PUBLIC_SHOW_RATINGS=false`)
+3. **Add a feature flag** in the database or config file
+
+Would you like me to implement a configurable solution instead?
+
+> Yes, feel free to revert back to latest commit and do it again
+
+I'll revert the changes and implement a configurable solution using an environment variable. Let me start by reverting the files back to the latest commit. 
+
+Created 8 todos
+
+✔ `git status --short`
+
+Starting (1/8) *Revert changes to modified files*
+
+✔ `git checkout HEAD -- client/src/app/admin/roasters/page.tsx client/src/app/discover/page.tsx client/src/app/favorites/page.tsx "client/src/app/roasters/[id]/page.tsx"`
+
+`git status --short`
+
+Perfect! Files are reverted. Now let me implement the configurable solution: 
+
+✔ Starting (2/8) *Add environment variable configuration*
+
+✔ Read `docker-compose.yml`
+
+✔ `docker-compose.yml +1 -0`
+
+Searched for files matching `**/client/.env*`, 2 matches
+
+✔ Read `client/.env.example`
+
+`.env.example +3 -0`
+
+Now let me check if there's a .env.local file: 
+
+✔ `Test-Path "client\.env.local"`
+
+✔ Read `client/.env.local`
+
+`.env.local +3 -0`
+
+✔ Starting (3/8) *Create useFeatureFlags hook*
+
+✔ Created `client/src/hooks/useFeatureFlags.ts`
+
+✔ Starting (4/8) *Update roaster detail page*
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 1 to 31
+
+`page.tsx +1 -0`
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 100 to 120
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 220 to 250
+
+Let me find where the RoasterDetail component is defined and add the hook: 
+
+✔ Searched text for `export default function` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 54 to 84
+
+`page.tsx +1 -0`
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 283 to 303
+
+`page.tsx +2 -0`
+
+✔ Starting (5/8) *Update discover page*
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 21
+
+`page.tsx +1 -0`
+
+✔ Read `client/src/app/discover/page.tsx`, lines 33 to 53
+
+`page.tsx +1 -0`
+
+✔ Read `client/src/app/discover/page.tsx`, lines 230 to 260
+
+Continue to iterate?
+
+Copilot has been working on this problem for a while. It can continue to iterate, or you can send a new message to refine your prompt. Configure max requests.
+
+Perfect! I've successfully implemented a **configurable solution** for hiding star ratings and reviews. Here's what was done:
+
+## ✅ Complete Implementation Summary
+
+### **1. Environment Variable Configuration**
+Added `NEXT_PUBLIC_SHOW_RATINGS=false` to:
+- ✅ docker-compose.yml (environment section for client service)
+- ✅ .env.local (for local development)
+- ✅ .env.example (documentation for other developers)
+
+### **2. Custom Hook Created**
+- ✅ useFeatureFlags.ts - Centralized feature flag management
+  - Returns `showRatings` boolean based on environment variable
+  - Easily extensible for future feature flags
+
+### **3. Conditional Rendering Across All Pages**
+Updated 4 pages to conditionally show/hide ratings:
+
+- ✅ **Roaster Detail Page** (page.tsx)
+  - Rating & review count section wrapped in `{showRatings && ...}`
+
+- ✅ **Discover Page** (page.tsx)
+  - Star rating in roaster cards conditionally rendered
+
+- ✅ **Favorites Page** (page.tsx)
+  - Star rating in favorite roaster cards conditionally rendered
+
+- ✅ **Admin Roasters Page** (page.tsx)
+  - Rating display in mobile cards conditionally rendered
+  - Rating column in desktop table conditionally rendered
+
+### **4. Container Rebuilt & Running**
+- ✅ Client container rebuilt with new environment variable
+- ✅ Server also restarted as part of the build process
+
+## 🎛️ How to Toggle the Feature
+
+**To SHOW ratings** (re-enable):
+1. Change `NEXT_PUBLIC_SHOW_RATINGS=false` to `NEXT_PUBLIC_SHOW_RATINGS=true` in:
+   - docker-compose.yml
+   - .env.local
+2. Restart: `docker-compose restart client`
+
+**To HIDE ratings** (current state):
+- Already configured! Ratings are currently hidden.
+
+## 📁 Files Modified
+1. docker-compose.yml
+2. .env.local
+3. .env.example
+4. useFeatureFlags.ts (NEW)
+5. page.tsx
+6. page.tsx
+7. page.tsx
+8. page.tsx
+
+The ratings are now **hidden** but **easily configurable** via a single environment variable! 🎉

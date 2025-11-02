@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '@/types';
 import SimpleImageUpload from '@/components/SimpleImageUpload';
 
@@ -12,6 +13,7 @@ const AdminRoastersPage: React.FC = () => {
     fetchRoasters();
   }, []);
   const { t } = useTranslation();
+  const { showRatings } = useFeatureFlags();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [roasters, setRoasters] = useState<Roaster[]>([]);
@@ -138,7 +140,7 @@ const AdminRoastersPage: React.FC = () => {
                   </div>
 
                   {/* Rating */}
-                  {roaster.rating && (
+                  {showRatings && roaster.rating && (
                     <div className="mb-3">
                       <div className="flex items-center text-sm text-gray-600">
                         <span className="mr-2">⭐</span>
@@ -160,7 +162,7 @@ const AdminRoastersPage: React.FC = () => {
                     <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.country', 'Country')}</th>
                     <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.verified', 'Verified')}</th>
                     <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.featured', 'Featured')}</th>
-                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.rating', 'Rating')}</th>
+                    {showRatings && <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.rating', 'Rating')}</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -178,7 +180,7 @@ const AdminRoastersPage: React.FC = () => {
                       <td className="px-4 py-2">{roaster.country || '-'}</td>
                       <td className="px-4 py-2">{roaster.verified ? '✔️' : ''}</td>
                       <td className="px-4 py-2">{roaster.featured ? '⭐' : ''}</td>
-                      <td className="px-4 py-2">{roaster.rating || '-'}</td>
+                      {showRatings && <td className="px-4 py-2">{roaster.rating || '-'}</td>}
                     </tr>
                   ))}
                 </tbody>

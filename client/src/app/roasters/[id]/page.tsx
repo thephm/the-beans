@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import RoasterImage from '@/components/RoasterImage'
 import ImageCarousel from '@/components/ImageCarousel'
 import { apiClient } from '@/lib/api'
@@ -55,6 +56,7 @@ interface Roaster {
 export default function RoasterDetail() {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { showRatings } = useFeatureFlags()
   const params = useParams()
   const router = useRouter()
   const [roaster, setRoaster] = useState<Roaster | null>(null)
@@ -283,13 +285,15 @@ export default function RoasterDetail() {
               {/* Main Info */}
               <div className="lg:col-span-2">
                 {/* Rating & Reviews */}
-                <div className="flex items-center mb-6">
-                  <div className="flex items-center mr-6">
-                    <Star sx={{ fontSize: 32, color: '#fbbf24' }} />
-                    <span className="text-2xl font-bold text-gray-900 ml-2">{roaster.rating}</span>
-                    <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
+                {showRatings && (
+                  <div className="flex items-center mb-6">
+                    <div className="flex items-center mr-6">
+                      <Star sx={{ fontSize: 32, color: '#fbbf24' }} />
+                      <span className="text-2xl font-bold text-gray-900 ml-2">{roaster.rating}</span>
+                      <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Description */}
                 <div className="mb-8">
