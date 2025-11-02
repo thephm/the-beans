@@ -91,14 +91,6 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
           </div>
         </div>
 
-        {/* Bio - full width */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bio
-          </label>
-          <textarea rows={4} placeholder="Bio" value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-        </div>
-
         {/* Roaster, Primary, and Role - grouped in a frame */}
         <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
           <div className="space-y-4">
@@ -144,6 +136,14 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Bio - full width, moved below roaster section */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Bio
+          </label>
+          <textarea rows={4} placeholder="Bio" value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
         </div>
       </div>
       <div className="flex gap-4 mt-8 justify-between items-center">

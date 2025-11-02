@@ -91232,3 +91232,43 @@ The build should now pass on Render. You can push this change and trigger a new 
 
 https://github.com/thephm/the-beans/issues/174
 
+> Edit person has too many buttons in the same place, let's swap the bio, move it down under the roaster section, see attachment
+
+I'll help you reorganize the Edit Person form by moving the Bio field down below the Roaster section to improve the layout. Let me first locate the relevant file. 
+
+✔ Searched text for `Edit Person`, 20 results
+
+✔ Searched for files matching `**/admin/**/people/**/*.tsx`, 8 matches
+
+✔ Read `client/src/app/admin/people/edit/%5Bid%5D/page.tsx`
+
+Now let me check the AddPersonForm component to see the current layout: 
+
+✔ Read `client/src/components/AddPersonForm.tsx`
+
+Perfect! I can see the issue. The Bio field is currently placed before the Roaster section, which creates a cramped layout with too many form elements at the top. I'll move the Bio field down to be after the Roaster section as shown in the attachment. 
+
+`AddPersonForm.tsx +0 -8`
+
+Now I'll add the Bio field back after the Roaster section closes: 
+
+`AddPersonForm.tsx +8 -0`
+
+Perfect! Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Done! I've reorganized the Edit Person form by moving the Bio field down below the Roaster section. The new layout is:
+
+1. **Name** and **Title** (side by side)
+2. **Email** and **Mobile** (side by side)
+3. **Roaster section** (in a gray frame with Roaster dropdown, Primary Contact toggle, and Role pills)
+4. **Bio** (full width textarea below the roaster section)
+5. **Action buttons** at the bottom (Delete, Cancel, Save)
+
+This reduces the visual clutter at the top of the form and creates better spacing between the form sections. The client container has been restarted—please refresh the page to see the improved layout!
+
+## 683rd try
+
+*(looks much better, committing)*
