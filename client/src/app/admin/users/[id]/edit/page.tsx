@@ -313,7 +313,7 @@ const EditUserPage: React.FC = () => {
             </div>
             <div className="flex gap-4">
               <button type="button" onClick={handleCancel} disabled={saving} className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">{t('admin.users.cancel', 'Cancel')}</button>
-              <button type="submit" disabled={saving} className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+              <button type="submit" disabled={saving} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
                 {saving ? (
                   <>
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

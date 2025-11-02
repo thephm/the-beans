@@ -1174,7 +1174,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                                 </label>
                               </div>
                               <div className="flex gap-2">
-                                <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => submitPerson()}>Save</button>
+                                <button type="button" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>Save</button>
                                 <button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" onClick={resetPersonForm}>Cancel</button>
                               </div>
                             </div>
@@ -1247,7 +1247,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         </button>
                       </div>
                       <div className="flex gap-2 mt-4 justify-end">
-                        <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={() => submitPerson()}>Save</button>
+                        <button type="button" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>Save</button>
                         <button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" onClick={resetPersonForm}>Cancel</button>
                       </div>
                     </div>
@@ -1633,7 +1633,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading 
                 ? t('adminForms.roasters.saving', 'Saving...') 

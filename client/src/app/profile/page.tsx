@@ -93,9 +93,9 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className="pt-4">
-                <button className="bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
-                  {t('profile.saveChanges')}
+              <div className="pt-4 flex justify-end">
+                <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+                  {t('common.save', 'Save')}
                 </button>
               </div>
             </div>

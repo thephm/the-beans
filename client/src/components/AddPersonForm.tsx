@@ -160,7 +160,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
         </div>
         <div className="flex gap-4">
           <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>Cancel</button>
-          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save</button>
+          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Save</button>
         </div>
       </div>
     </form>
