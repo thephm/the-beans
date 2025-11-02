@@ -96,39 +96,95 @@ const AdminRoastersPage: React.FC = () => {
         {roasters.length === 0 ? (
           <div className="text-gray-500 text-center py-12">{t('admin.roasters.noRoasters', 'No roasters found.')}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.name', 'Name')}</th>
-                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.city', 'City')}</th>
-                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.country', 'Country')}</th>
-                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.verified', 'Verified')}</th>
-                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.featured', 'Featured')}</th>
-                  <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.rating', 'Rating')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {roasters.map((roaster) => (
-                  <tr key={roaster.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-2 font-medium">
-                      <button
-                        className="text-blue-600 hover:underline text-left"
-                        onClick={() => setEditingId(roaster.id)}
-                      >
-                        {roaster.name}
-                      </button>
-                    </td>
-                    <td className="px-4 py-2">{roaster.city || '-'}</td>
-                    <td className="px-4 py-2">{roaster.country || '-'}</td>
-                    <td className="px-4 py-2">{roaster.verified ? '✔️' : ''}</td>
-                    <td className="px-4 py-2">{roaster.featured ? '⭐' : ''}</td>
-                    <td className="px-4 py-2">{roaster.rating || '-'}</td>
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {roasters.map((roaster) => (
+                <div key={roaster.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  {/* Roaster Header */}
+                  <div className="mb-3">
+                    <button
+                      className="text-lg font-semibold text-blue-600 hover:text-blue-800 text-left"
+                      onClick={() => setEditingId(roaster.id)}
+                    >
+                      {roaster.name}
+                    </button>
+                    
+                    {/* Status Badges */}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {roaster.verified && (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                          <span className="mr-1">✔️</span>
+                          {t('adminForms.roasters.verified', 'Verified')}
+                        </span>
+                      )}
+                      {roaster.featured && (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                          <span className="mr-1">⭐</span>
+                          {t('adminForms.roasters.featured', 'Featured')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="mb-3">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="mr-2">📍</span>
+                      <span>
+                        {[roaster.city, roaster.country].filter(Boolean).join(', ') || '-'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Rating */}
+                  {roaster.rating && (
+                    <div className="mb-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <span className="mr-2">⭐</span>
+                        <span>{roaster.rating}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.name', 'Name')}</th>
+                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.city', 'City')}</th>
+                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.country', 'Country')}</th>
+                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.verified', 'Verified')}</th>
+                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.featured', 'Featured')}</th>
+                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.rating', 'Rating')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {roasters.map((roaster) => (
+                    <tr key={roaster.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-2 font-medium">
+                        <button
+                          className="text-blue-600 hover:underline text-left"
+                          onClick={() => setEditingId(roaster.id)}
+                        >
+                          {roaster.name}
+                        </button>
+                      </td>
+                      <td className="px-4 py-2">{roaster.city || '-'}</td>
+                      <td className="px-4 py-2">{roaster.country || '-'}</td>
+                      <td className="px-4 py-2">{roaster.verified ? '✔️' : ''}</td>
+                      <td className="px-4 py-2">{roaster.featured ? '⭐' : ''}</td>
+                      <td className="px-4 py-2">{roaster.rating || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
