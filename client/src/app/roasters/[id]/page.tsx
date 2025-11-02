@@ -269,7 +269,7 @@ export default function RoasterDetail() {
             </div>
             <button
               onClick={toggleFavorite}
-              className={`absolute top-6 right-6 p-3 rounded-full z-20 pointer-events-auto ${
+              className={`absolute bottom-6 right-6 p-3 rounded-full z-20 pointer-events-auto ${
                 isFavorite 
                   ? 'bg-red-500 text-white' 
                   : 'bg-white text-red-500 hover:bg-red-50'

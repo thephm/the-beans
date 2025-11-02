@@ -92121,3 +92121,49 @@ Updated 4 pages to conditionally show/hide ratings:
 8. page.tsx
 
 The ratings are now **hidden** but **easily configurable** via a single environment variable! 🎉
+
+## 691st try
+
+*(worked, ratings now configurable and hidden, checking in)*
+
+## Weird thing hiding behind the red heart on roaster details page #177
+
+https://github.com/thephm/the-beans/issues/177
+
+> See attachment. Weird thing hiding behind the red heart on roaster details page. Have a feeling it's related to the carousel that was added, move the heart to the bottom right
+
+I'll investigate the roaster details page to find the issue with the heart icon and the carousel, then move the heart to the bottom right. 
+
+✔ Searched for files matching `**/roasters/**/page.tsx`, 8 matches
+
+✔ Searched text for `ImageCarousel|heart|favorite` (`**/client/src/app/roasters/**/*.tsx`), 20 results
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`
+
+Now I can see the issue. The heart (favorite) button is positioned at `top-6 right-6` with `absolute` positioning on line 271. Looking at the attachment, there appears to be something (likely carousel navigation buttons) overlapping with it. Let me check the ImageCarousel component to understand its structure better. 
+
+✔ Read `client/src/components/ImageCarousel.tsx`
+
+Perfect! I can see the issue now. The ImageCarousel has an image counter at `top-4 right-4` with `z-[15]`, and the favorite heart button on the roaster detail page is also at `top-6 right-6` with `z-20`. They're overlapping. 
+
+Looking at the attachment, the weird element behind the heart is the image counter. I'll move the heart button to the bottom right as requested. I'll position it at `bottom-6 right-6` to keep it consistent with the spacing. 
+
+`page.tsx +1 -1`
+
+Now I need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully moved the heart (favorite) button from the top-right to the bottom-right of the image carousel. The issue was that the heart button at `top-6 right-6` was overlapping with the image counter from the carousel (which shows "1 / 3" or similar) that's positioned at `top-4 right-4`.
+
+**Changes made:**
+- Moved the favorite heart button from `top-6 right-6` to `bottom-6 right-6`
+- This keeps it visible and accessible without overlapping the carousel's image counter
+- Restarted the client container for changes to take effect
+
+The heart button will now appear in the bottom-right corner of the roaster detail page's hero image, avoiding any overlap with the carousel navigation elements.
+
+## 692nd try
+
+*(fixed, heart is down and can now see the image counter top-right)*
