@@ -351,7 +351,7 @@ export default function AuditLogsPage() {
                         <div className="text-sm font-medium text-gray-900">
                           {log.user ? (
                             <Link 
-                              href={`/admin/users/${log.userId}/edit`} 
+                              href={`/admin/users/${log.user.id}/edit`} 
                               className="text-blue-600 hover:text-blue-800"
                             >
                               {log.user.username}
