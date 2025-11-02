@@ -113,6 +113,13 @@ export function Navbar() {
                       {t('adminSection.roasters', 'Roasters')}
                     </Link>
                     <Link 
+                      href="/admin/specialties" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.specialties.title', 'Specialties')}
+                    </Link>
+                    <Link 
                       href="/admin/audit-logs" 
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
@@ -205,6 +212,13 @@ export function Navbar() {
                     >
                       {t('adminSection.people', 'People')}
                     </Link>
+                  <Link 
+                    href="/admin/specialties" 
+                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('admin.specialties.title', 'Specialties')}
+                  </Link>
                   <Link 
                     href="/admin/audit-logs" 
                     className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
