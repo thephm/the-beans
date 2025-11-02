@@ -113,7 +113,121 @@ async function main() {
   }
   console.log('✅ Created/ensured admin user:', adminUser.email);
 
-  // Create test roasters
+  // Seed specialties with translations FIRST (before roasters)
+  console.log('☕ Seeding specialties...');
+  
+  const specialtiesData = [
+    {
+      en: { name: "Direct Trade", description: "Coffee sourced directly from farmers with transparent pricing and relationships." },
+      fr: { name: "Commerce Direct", description: "Café acheté directement auprès des agriculteurs avec des prix et des relations transparents." }
+    },
+    {
+      en: { name: "Organic", description: "Coffee grown without synthetic fertilizers or pesticides, certified organic." },
+      fr: { name: "Biologique", description: "Café cultivé sans engrais ni pesticides synthétiques, certifié biologique." }
+    },
+    {
+      en: { name: "Light Roast", description: "Coffee roasted to a lighter color to highlight origin characteristics and acidity." },
+      fr: { name: "Torréfaction Claire", description: "Café torréfié à une couleur plus claire pour mettre en valeur les caractéristiques d'origine et l'acidité." }
+    },
+    {
+      en: { name: "Dark Roast", description: "Coffee roasted longer for a bolder, richer flavor with chocolatey or smoky notes." },
+      fr: { name: "Torréfaction Foncée", description: "Café torréfié plus longtemps pour une saveur plus audacieuse et riche avec des notes chocolatées ou fumées." }
+    },
+    {
+      en: { name: "Single Origin", description: "Coffee sourced from a single farm, region, or country, showcasing unique flavors." },
+      fr: { name: "Origine Unique", description: "Café provenant d'une seule ferme, région ou pays, présentant des saveurs uniques." }
+    },
+    {
+      en: { name: "Microlots", description: "Small, carefully curated lots of coffee with distinctive flavors and limited availability." },
+      fr: { name: "Microlots", description: "Petits lots de café soigneusement sélectionnés avec des saveurs distinctives et une disponibilité limitée." }
+    },
+    {
+      en: { name: "Experimental", description: "Coffee roasted or processed with innovative or unconventional methods." },
+      fr: { name: "Expérimental", description: "Café torréfié ou traité avec des méthodes innovantes ou non conventionnelles." }
+    },
+    {
+      en: { name: "Natural", description: "Coffee dried with the cherry intact, producing fruity and complex flavor profiles." },
+      fr: { name: "Nature", description: "Café séché avec la cerise intacte, produisant des profils de saveur fruités et complexes." }
+    },
+    {
+      en: { name: "Washed", description: "Coffee processed by removing the cherry before drying, highlighting clarity and acidity." },
+      fr: { name: "Lavé", description: "Café traité en enlevant la cerise avant le séchage, mettant en valeur la clarté et l'acidité." }
+    },
+    {
+      en: { name: "Espresso", description: "Coffee specifically roasted and blended to perform well as espresso." },
+      fr: { name: "Espresso", description: "Café spécialement torréfié et mélangé pour bien fonctionner en espresso." }
+    },
+    {
+      en: { name: "Omni Roast", description: "Coffee roasted to perform well across multiple brewing methods, from filter to espresso." },
+      fr: { name: "Torréfaction Omni", description: "Café torréfié pour bien fonctionner avec plusieurs méthodes d'infusion, du filtre à l'espresso." }
+    },
+    {
+      en: { name: "Awards", description: "Coffee that has received recognized awards or high scores in competitions." },
+      fr: { name: "Récompenses", description: "Café qui a reçu des prix reconnus ou des scores élevés dans des compétitions." }
+    },
+    {
+      en: { name: "Subscription", description: "Coffee available via recurring subscription services for regular delivery." },
+      fr: { name: "Abonnement", description: "Café disponible via des services d'abonnement récurrents pour une livraison régulière." }
+    },
+    {
+      en: { name: "Carbon Neutral", description: "Coffee produced with practices that minimize or offset carbon emissions." },
+      fr: { name: "Neutre en Carbone", description: "Café produit avec des pratiques qui minimisent ou compensent les émissions de carbone." }
+    },
+    {
+      en: { name: "Decaf", description: "Coffee with most caffeine removed while preserving flavor." },
+      fr: { name: "Décaféiné", description: "Café avec la plupart de la caféine enlevée tout en préservant la saveur." }
+    }
+  ];
+
+  const createdSpecialties: Record<string, any> = {};
+  for (const specialtyData of specialtiesData) {
+    // Try to find existing specialty by English translation name
+    let specialty = await prisma.specialty.findFirst({
+      where: {
+        translations: {
+          some: {
+            language: 'en',
+            name: specialtyData.en.name
+          }
+        }
+      },
+      include: {
+        translations: true
+      }
+    });
+
+    // Create if doesn't exist
+    if (!specialty) {
+      specialty = await prisma.specialty.create({
+        data: {
+          deprecated: false,
+          translations: {
+            create: [
+              {
+                language: 'en',
+                name: specialtyData.en.name,
+                description: specialtyData.en.description
+              },
+              {
+                language: 'fr',
+                name: specialtyData.fr.name,
+                description: specialtyData.fr.description
+              }
+            ]
+          }
+        },
+        include: {
+          translations: true
+        }
+      });
+    }
+    
+    createdSpecialties[specialtyData.en.name] = specialty;
+  }
+
+  console.log('✅ Seeded specialties successfully!');
+
+  // Create test roasters (without specialties array)
   const roaster1 = await prisma.roaster.upsert({
     where: { name: 'Blue Bottle Coffee' },
     update: {},
@@ -131,7 +245,6 @@ async function main() {
       latitude: 37.8044,
       longitude: -122.2711,
       hours: '{"monday": "6:00-18:00", "tuesday": "6:00-18:00", "wednesday": "6:00-18:00", "thursday": "6:00-18:00", "friday": "6:00-18:00", "saturday": "7:00-18:00", "sunday": "7:00-18:00"}',
-      specialties: ['Single Origin', 'Pour Over', 'Cold Brew'],
       images: ['https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop'],
       verified: true,
       featured: true,
@@ -158,7 +271,6 @@ async function main() {
       latitude: 45.5152,
       longitude: -122.6784,
       hours: '{"monday": "6:30-19:00", "tuesday": "6:30-19:00", "wednesday": "6:30-19:00", "thursday": "6:30-19:00", "friday": "6:30-19:00", "saturday": "7:00-19:00", "sunday": "7:00-19:00"}',
-      specialties: ['Direct Trade', 'Espresso', 'Single Origin'],
       images: ['https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&h=600&fit=crop'],
       verified: true,
       featured: true,
@@ -185,7 +297,6 @@ async function main() {
       latitude: 41.9441,
       longitude: -87.6448,
       hours: '{"monday": "6:00-20:00", "tuesday": "6:00-20:00", "wednesday": "6:00-20:00", "thursday": "6:00-20:00", "friday": "6:00-20:00", "saturday": "7:00-20:00", "sunday": "7:00-20:00"}',
-      specialties: ['Education', 'Cupping', 'Single Origin'],
       images: ['https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop'],
       verified: true,
       featured: true,
@@ -196,6 +307,92 @@ async function main() {
   });
 
   console.log('✅ Created roasters:', [roaster1.name, roaster2.name, roaster3.name]);
+
+  // Link roasters to specialties via RoasterSpecialty relation
+  console.log('🔗 Linking roasters to specialties...');
+  
+  // Blue Bottle: Single Origin
+  if (createdSpecialties['Single Origin']) {
+    await prisma.roasterSpecialty.upsert({
+      where: {
+        roasterId_specialtyId: {
+          roasterId: roaster1.id,
+          specialtyId: createdSpecialties['Single Origin'].id
+        }
+      },
+      update: {},
+      create: {
+        roasterId: roaster1.id,
+        specialtyId: createdSpecialties['Single Origin'].id
+      }
+    });
+  }
+
+  // Stumptown: Direct Trade, Espresso, Single Origin
+  if (createdSpecialties['Direct Trade']) {
+    await prisma.roasterSpecialty.upsert({
+      where: {
+        roasterId_specialtyId: {
+          roasterId: roaster2.id,
+          specialtyId: createdSpecialties['Direct Trade'].id
+        }
+      },
+      update: {},
+      create: {
+        roasterId: roaster2.id,
+        specialtyId: createdSpecialties['Direct Trade'].id
+      }
+    });
+  }
+  if (createdSpecialties['Espresso']) {
+    await prisma.roasterSpecialty.upsert({
+      where: {
+        roasterId_specialtyId: {
+          roasterId: roaster2.id,
+          specialtyId: createdSpecialties['Espresso'].id
+        }
+      },
+      update: {},
+      create: {
+        roasterId: roaster2.id,
+        specialtyId: createdSpecialties['Espresso'].id
+      }
+    });
+  }
+  if (createdSpecialties['Single Origin']) {
+    await prisma.roasterSpecialty.upsert({
+      where: {
+        roasterId_specialtyId: {
+          roasterId: roaster2.id,
+          specialtyId: createdSpecialties['Single Origin'].id
+        }
+      },
+      update: {},
+      create: {
+        roasterId: roaster2.id,
+        specialtyId: createdSpecialties['Single Origin'].id
+      }
+    });
+  }
+
+  // Intelligentsia: Single Origin
+  if (createdSpecialties['Single Origin']) {
+    await prisma.roasterSpecialty.upsert({
+      where: {
+        roasterId_specialtyId: {
+          roasterId: roaster3.id,
+          specialtyId: createdSpecialties['Single Origin'].id
+        }
+      },
+      update: {},
+      create: {
+        roasterId: roaster3.id,
+        specialtyId: createdSpecialties['Single Origin'].id
+      }
+    });
+  }
+
+  console.log('✅ Linked roasters to specialties!');
 
   // Seed regions and countries
   console.log('📍 Seeding coffee origin regions and countries...');
@@ -291,96 +488,6 @@ async function main() {
   }
 
   console.log('✅ Seeded regions and countries successfully!');
-
-  // Seed specialties with translations
-  console.log('☕ Seeding specialties...');
-  
-  const specialtiesData = [
-    {
-      en: { name: "Direct Trade", description: "Coffee sourced directly from farmers with transparent pricing and relationships." },
-      fr: { name: "Commerce Direct", description: "Café acheté directement auprès des agriculteurs avec des prix et des relations transparents." }
-    },
-    {
-      en: { name: "Organic", description: "Coffee grown without synthetic fertilizers or pesticides, certified organic." },
-      fr: { name: "Biologique", description: "Café cultivé sans engrais ni pesticides synthétiques, certifié biologique." }
-    },
-    {
-      en: { name: "Light Roast", description: "Coffee roasted to a lighter color to highlight origin characteristics and acidity." },
-      fr: { name: "Torréfaction Claire", description: "Café torréfié à une couleur plus claire pour mettre en valeur les caractéristiques d'origine et l'acidité." }
-    },
-    {
-      en: { name: "Dark Roast", description: "Coffee roasted longer for a bolder, richer flavor with chocolatey or smoky notes." },
-      fr: { name: "Torréfaction Foncée", description: "Café torréfié plus longtemps pour une saveur plus audacieuse et riche avec des notes chocolatées ou fumées." }
-    },
-    {
-      en: { name: "Single Origin", description: "Coffee sourced from a single farm, region, or country, showcasing unique flavors." },
-      fr: { name: "Origine Unique", description: "Café provenant d'une seule ferme, région ou pays, présentant des saveurs uniques." }
-    },
-    {
-      en: { name: "Microlots", description: "Small, carefully curated lots of coffee with distinctive flavors and limited availability." },
-      fr: { name: "Microlots", description: "Petits lots de café soigneusement sélectionnés avec des saveurs distinctives et une disponibilité limitée." }
-    },
-    {
-      en: { name: "Experimental", description: "Coffee roasted or processed with innovative or unconventional methods." },
-      fr: { name: "Expérimental", description: "Café torréfié ou traité avec des méthodes innovantes ou non conventionnelles." }
-    },
-    {
-      en: { name: "Natural", description: "Coffee dried with the cherry intact, producing fruity and complex flavor profiles." },
-      fr: { name: "Nature", description: "Café séché avec la cerise intacte, produisant des profils de saveur fruités et complexes." }
-    },
-    {
-      en: { name: "Washed", description: "Coffee processed by removing the cherry before drying, highlighting clarity and acidity." },
-      fr: { name: "Lavé", description: "Café traité en enlevant la cerise avant le séchage, mettant en valeur la clarté et l'acidité." }
-    },
-    {
-      en: { name: "Espresso", description: "Coffee specifically roasted and blended to perform well as espresso." },
-      fr: { name: "Espresso", description: "Café spécialement torréfié et mélangé pour bien fonctionner en espresso." }
-    },
-    {
-      en: { name: "Omni Roast", description: "Coffee roasted to perform well across multiple brewing methods, from filter to espresso." },
-      fr: { name: "Torréfaction Omni", description: "Café torréfié pour bien fonctionner avec plusieurs méthodes d'infusion, du filtre à l'espresso." }
-    },
-    {
-      en: { name: "Awards", description: "Coffee that has received recognized awards or high scores in competitions." },
-      fr: { name: "Récompenses", description: "Café qui a reçu des prix reconnus ou des scores élevés dans des compétitions." }
-    },
-    {
-      en: { name: "Subscription", description: "Coffee available via recurring subscription services for regular delivery." },
-      fr: { name: "Abonnement", description: "Café disponible via des services d'abonnement récurrents pour une livraison régulière." }
-    },
-    {
-      en: { name: "Carbon Neutral", description: "Coffee produced with practices that minimize or offset carbon emissions." },
-      fr: { name: "Neutre en Carbone", description: "Café produit avec des pratiques qui minimisent ou compensent les émissions de carbone." }
-    },
-    {
-      en: { name: "Decaf", description: "Coffee with most caffeine removed while preserving flavor." },
-      fr: { name: "Décaféiné", description: "Café avec la plupart de la caféine enlevée tout en préservant la saveur." }
-    }
-  ];
-
-  for (const specialtyData of specialtiesData) {
-    const specialty = await prisma.specialty.create({
-      data: {
-        deprecated: false,
-        translations: {
-          create: [
-            {
-              language: 'en',
-              name: specialtyData.en.name,
-              description: specialtyData.en.description
-            },
-            {
-              language: 'fr',
-              name: specialtyData.fr.name,
-              description: specialtyData.fr.description
-            }
-          ]
-        }
-      }
-    });
-  }
-
-  console.log('✅ Seeded specialties successfully!');
   console.log('🎉 Database seeding completed successfully!');
 }
 

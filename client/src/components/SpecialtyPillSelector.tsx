@@ -38,8 +38,11 @@ export default function SpecialtyPillSelector({
       }
 
       const data = await response.json();
+      // API returns array directly, not wrapped in { specialties: [...] }
       // Filter out deprecated specialties for new selections
-      const activeSpecialties = data.specialties.filter((s: Specialty) => !s.deprecated);
+      const activeSpecialties = Array.isArray(data) 
+        ? data.filter((s: Specialty) => !s.deprecated)
+        : [];
       setSpecialties(activeSpecialties);
     } catch (err: any) {
       setError(err.message || 'Failed to load specialties');

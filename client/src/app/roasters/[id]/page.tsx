@@ -28,6 +28,12 @@ interface RoasterImageData {
   isPrimary?: boolean
 }
 
+interface Specialty {
+  id: string
+  name: string
+  deprecated?: boolean
+}
+
 interface Roaster {
   id: string
   name: string
@@ -41,7 +47,7 @@ interface Roaster {
   email?: string
   rating: number
   reviewCount: number
-  specialties: string[]
+  specialties: string[] | Specialty[]
   hours?: {
     [key: string]: string | { open: string; close: string }
   }
@@ -103,7 +109,10 @@ export default function RoasterDetail() {
   };
 
   // Helper function to translate specialty names
-  const translateSpecialty = (specialty: string): string => {
+  const translateSpecialty = (specialty: string | Specialty): string => {
+    // Extract specialty name if it's an object
+    const specialtyName = typeof specialty === 'string' ? specialty : specialty.name
+    
     const specialtyMap: { [key: string]: string } = {
       'Cold Brew': 'specialties.coldBrew',
       'Single Origin': 'specialties.singleOrigin',
@@ -120,7 +129,12 @@ export default function RoasterDetail() {
       'Education': 'specialties.education',
       'Cupping': 'specialties.cupping'
     }
-    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty
+    return specialtyMap[specialtyName] ? t(specialtyMap[specialtyName]) : specialtyName
+  }
+
+  // Helper function to get specialty key for filtering
+  const getSpecialtyKey = (specialty: string | Specialty): string => {
+    return typeof specialty === 'string' ? specialty : specialty.name
   }
 
   useEffect(() => {
@@ -311,10 +325,10 @@ export default function RoasterDetail() {
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.specialties')}</h3>
                   <div className="flex flex-wrap gap-3">
-                    {roaster.specialties.map((specialty) => (
+                    {roaster.specialties.map((specialty, index) => (
                       <Link
-                        key={specialty}
-                        href={`/discover?specialty=${encodeURIComponent(specialty)}`}
+                        key={typeof specialty === 'string' ? specialty : specialty.id || index}
+                        href={`/discover?specialty=${encodeURIComponent(getSpecialtyKey(specialty))}`}
                         className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                       >
                         {translateSpecialty(specialty)}
