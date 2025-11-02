@@ -152,6 +152,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   useEffect(() => {
     fetchCountries();
   }, []);
+  // Note: People are fetched by the loadPeople useEffect below (line ~760)
   const [formData, setFormData] = useState({
     name: roaster?.name || '',
     description: roaster?.description || '',
@@ -619,7 +620,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       
       if (response.ok) {
         const data = await response.json();
-        setPeople(data.people || []);
+        // API returns {data: [...], count: ...}
+        const peopleArray = data.data || data.people || data || [];
+        setPeople(peopleArray);
       }
     } catch (error) {
       // Silently handle error
@@ -754,7 +757,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         
         if (response.ok && isMounted) {
           const data = await response.json();
-          setPeople(data.people || []);
+          // API returns {data: [...], count: ...}
+          const peopleArray = data.data || data.people || data || [];
+          setPeople(peopleArray);
         }
       } catch (error) {
         // Silently handle error
@@ -1182,7 +1187,14 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         ) : (
                           <div className="border rounded-lg p-4 bg-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between mx-auto w-full">
                             <div>
-                              <div className="font-semibold text-gray-900">{person.name}</div>
+                              <div className="font-semibold text-gray-900">
+                                <a 
+                                  href={`/admin/people/edit/${person.id}`}
+                                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                                >
+                                  {person.name}
+                                </a>
+                              </div>
                               {person.email && <div className="text-sm text-gray-700">{person.email}</div>}
                               {person.mobile && <div className="text-sm text-gray-700">{person.mobile}</div>}
                               {person.bio && <div className="text-xs text-gray-500 mt-1">{person.bio}</div>}
