@@ -52,6 +52,7 @@ export interface Roaster {
   country: string;
   latitude?: number;
   longitude?: number;
+  distance?: number; // Distance from user location (populated by backend when location query is used)
   images: string[];
   imageUrl?: string; // Added for API compatibility
   hours?: Record<string, any>;
