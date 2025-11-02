@@ -111,6 +111,7 @@ model Roaster {
   beans    Bean[]
   roasterImages RoasterImage[]
   sourceCountries RoasterSourceCountry[]
+  roasterSpecialties RoasterSpecialty[]
   
   // Audit relationships
   createdBy User? @relation("RoasterCreatedBy", fields: [createdById], references: [id])
@@ -319,6 +320,49 @@ model RoasterSourceCountry {
 
   @@unique([roasterId, countryId]) // Prevent duplicate country associations per roaster
   @@map("roaster_source_countries")
+}
+
+model Specialty {
+  id          String   @id @default(cuid())
+  deprecated  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  translations SpecialtyTranslation[]
+  roasters     RoasterSpecialty[]
+
+  @@map("specialties")
+}
+
+model SpecialtyTranslation {
+  id          String   @id @default(cuid())
+  specialtyId String
+  language    String   @db.VarChar(5) // en, fr, etc.
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  specialty   Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+
+  @@unique([specialtyId, language])
+  @@map("specialty_translations")
+}
+
+model RoasterSpecialty {
+  id          String   @id @default(cuid())
+  roasterId   String
+  specialtyId String
+  createdAt   DateTime @default(now())
+
+  // Relationships
+  roaster     Roaster   @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+  specialty   Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+
+  @@unique([roasterId, specialtyId])
+  @@map("roaster_specialties")
 }
 
 model AuditLog {

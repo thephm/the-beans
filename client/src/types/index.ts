@@ -289,3 +289,32 @@ export interface AuditLogStats {
   entityTypeStats: Array<{ entityType: string; count: number }>;
   topUsers: Array<{ user: User; count: number }>;
 }
+
+export interface SpecialtyTranslation {
+  id: string;
+  specialtyId: string;
+  language: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Specialty {
+  id: string;
+  deprecated: boolean;
+  roasterCount: number;
+  translations: Record<string, { name: string; description: string }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SpecialtyListItem {
+  id: string;
+  name: string;
+  description: string;
+  deprecated: boolean;
+  roasterCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
