@@ -159,7 +159,7 @@ export default function EditPersonPage() {
           </div>
           <div className="flex gap-4 mt-8 justify-end">
             <button type="button" onClick={cancelEdit} className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">Cancel</button>
-            <button type="submit" disabled={saving} className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">{saving ? "Saving..." : "Save"}</button>
+            <button type="submit" disabled={saving} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">{saving ? "Saving..." : "Save"}</button>
           </div>
         </form>
         {(editData.createdAt || editData.updatedAt) && (
