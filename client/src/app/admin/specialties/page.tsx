@@ -37,15 +37,21 @@ const AdminSpecialtiesPage: React.FC = () => {
 
   // Filter specialties based on search term
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredSpecialties(specialties);
-    } else {
-      const filtered = specialties.filter(specialty => 
+    let filtered = specialties;
+    
+    if (searchTerm.trim()) {
+      filtered = specialties.filter(specialty => 
         specialty.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         specialty.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredSpecialties(filtered);
     }
+    
+    // Sort alphabetically by name
+    const sorted = [...filtered].sort((a, b) => 
+      (a.name || '').localeCompare(b.name || '')
+    );
+    
+    setFilteredSpecialties(sorted);
   }, [searchTerm, specialties]);
 
   useEffect(() => {
@@ -109,6 +115,9 @@ const AdminSpecialtiesPage: React.FC = () => {
                 >
                   {specialty.name}
                 </Link>
+                {specialty.description && (
+                  <p className="text-sm text-gray-600 mt-1">{specialty.description}</p>
+                )}
                 <div className="flex items-center gap-2 mt-2">
                   <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                     {specialty.roasterCount} {t('admin.specialties.roasterCount', '# Roasters')}
@@ -133,6 +142,9 @@ const AdminSpecialtiesPage: React.FC = () => {
               <th className="py-3 px-4 border-b text-left font-medium text-gray-900">
                 {t('admin.specialties.name', 'Specialty')}
               </th>
+              <th className="py-3 px-4 border-b text-left font-medium text-gray-900">
+                {t('admin.specialties.description', 'Description')}
+              </th>
               <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
                 {t('admin.specialties.roasterCount', '# Roasters')}
               </th>
@@ -151,6 +163,9 @@ const AdminSpecialtiesPage: React.FC = () => {
                   >
                     {specialty.name}
                   </Link>
+                </td>
+                <td className="py-3 px-4 text-sm text-gray-600">
+                  {specialty.description || '-'}
                 </td>
                 <td className="py-3 px-4 text-center text-sm text-gray-600">
                   {specialty.roasterCount}

@@ -185,11 +185,11 @@ export default function FavoritesPage() {
                               {roaster.specialties && roaster.specialties.length > 0 ? (
                                 roaster.specialties.map((spec) => (
                                   <Link
-                                    key={spec}
-                                    href={`/discover?specialty=${encodeURIComponent(spec)}`}
+                                    key={spec.id}
+                                    href={`/discover?specialty=${encodeURIComponent(spec.name)}`}
                                     className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200 hover:bg-primary-100 transition-colors"
                                   >
-                                    {translateSpecialty(spec)}
+                                    {spec.name}
                                   </Link>
                                 ))
                               ) : null}

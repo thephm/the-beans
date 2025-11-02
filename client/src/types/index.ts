@@ -56,7 +56,7 @@ export interface Roaster {
   imageUrl?: string; // Added for API compatibility
   hours?: Record<string, any>;
   onlineOnly?: boolean; // True if roaster operates online only (no physical location)
-  specialties: string[];
+  specialties: { id: string; name: string; deprecated?: boolean }[];
   
   // People system
   people?: RoasterPerson[];

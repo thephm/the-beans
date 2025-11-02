@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '@/types';
 import SimpleImageUpload from '@/components/SimpleImageUpload';
+import SpecialtyPillSelector from '@/components/SpecialtyPillSelector';
 
 
 const AdminRoastersPage: React.FC = () => {
@@ -224,7 +225,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     country: roaster?.country || '',
     latitude: roaster?.latitude || '',
     longitude: roaster?.longitude || '',
-    specialties: roaster?.specialties?.join(', ') || '',
+    specialtyIds: roaster?.specialties?.map(s => s.id) || [],
     verified: roaster?.verified || false,
     featured: roaster?.featured || false,
     rating: roaster?.rating || 0,
@@ -257,7 +258,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               country: data.country || '',
               latitude: data.latitude || '',
               longitude: data.longitude || '',
-              specialties: data.specialties?.join(', ') || '',
+              specialtyIds: data.specialties?.map((s: any) => s.id) || [],
               verified: data.verified || false,
               featured: data.featured || false,
               rating: data.rating || 0,
@@ -576,7 +577,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         latitude: formData.latitude ? parseFloat(String(formData.latitude)) : undefined,
         longitude: formData.longitude ? parseFloat(String(formData.longitude)) : undefined,
         rating: parseFloat(String(formData.rating)) || 0,
-        specialties: formData.specialties.split(',').map(s => s.trim()).filter(Boolean),
+        specialtyIds: formData.specialtyIds, // Send specialty IDs array directly
       };
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -1356,17 +1357,13 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             {specialtiesExpanded && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('adminForms.roasters.specialties', 'Specialties')} 
-                    <span className="text-sm text-gray-500 ml-1">({t('adminForms.roasters.specialtiesHint', 'comma separated')})</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('adminForms.roasters.specialties', 'Specialties')}
                   </label>
-                  <input
-                    type="text"
-                    name="specialties"
-                    value={formData.specialties}
-                    onChange={handleInputChange}
-                    placeholder="espresso, pour over, cold brew"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  <SpecialtyPillSelector
+                    selectedSpecialtyIds={formData.specialtyIds}
+                    onChange={(specialtyIds) => setFormData({ ...formData, specialtyIds })}
+                    language={typeof window !== 'undefined' ? localStorage.getItem('language') || 'en' : 'en'}
                   />
                 </div>
               </>

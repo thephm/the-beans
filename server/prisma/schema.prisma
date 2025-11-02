@@ -90,7 +90,6 @@ model Roaster {
   
   // Contact fields now managed via RoasterPerson (People/CRM)
   onlineOnly  Boolean  @default(false) // True if roaster operates online only (no physical location)
-  specialties String[] // Array of specialties like "Espresso", "Single Origin", etc.
   verified    Boolean  @default(false)
   featured    Boolean  @default(false)
   rating      Float    @default(0)

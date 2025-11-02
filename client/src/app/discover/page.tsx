@@ -243,16 +243,16 @@ export default function DiscoverPage() {
                     <div className="flex flex-wrap gap-2 mb-4">
                       {roaster.specialties.map((specialty) => (
                         <button
-                          key={specialty}
+                          key={specialty.id}
                           onClick={() => {
                             setFilters(prev => ({
                               ...prev,
-                              search: translateSpecialty(specialty)
+                              search: specialty.name
                             }))
                           }}
                           className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
                         >
-                          {translateSpecialty(specialty)}
+                          {specialty.name}
                         </button>
                       ))}
                     </div>

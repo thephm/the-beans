@@ -151,6 +151,21 @@ router.get('/', [
             rating: true,
           },
         },
+        roasterSpecialties: {
+          include: {
+            specialty: {
+              include: {
+                translations: true
+              }
+            }
+          }
+        },
+        roasterImages: {
+          orderBy: [
+            { isPrimary: 'desc' },
+            { uploadedAt: 'asc' }
+          ]
+        }
       },
       orderBy: [
         { featured: 'desc' },
@@ -163,8 +178,9 @@ router.get('/', [
     if (searchQuery) {
       const qLower = searchQuery.trim().toLowerCase();
       roasters = roasters.filter(roaster =>
-        (Array.isArray(roaster.specialties) &&
-          (roaster.specialties as string[]).some((s: string) => s.toLowerCase() === qLower))
+        (roaster.roasterSpecialties && roaster.roasterSpecialties.some((rs: any) => 
+          rs.specialty.translations.some((t: any) => t.name.toLowerCase() === qLower || t.name.toLowerCase().includes(qLower))
+        ))
         || roaster.name.toLowerCase().includes(qLower)
         || (roaster.description && roaster.description.toLowerCase().includes(qLower))
         || (roaster.city && roaster.city.toLowerCase().includes(qLower))
@@ -188,10 +204,30 @@ router.get('/', [
     }
 
     // Add imageUrl field for frontend compatibility
-    const roastersWithImageUrl = roasters.map((roaster: any) => ({
-      ...roaster,
-      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
-    }));
+    const roastersWithImageUrl = roasters.map((roaster: any) => {
+      // Use the primary image from roasterImages if available, fall back to old images array
+      let imageUrl = null;
+      if (roaster.roasterImages && roaster.roasterImages.length > 0) {
+        imageUrl = roaster.roasterImages[0].url;
+      } else if (roaster.images && roaster.images.length > 0) {
+        imageUrl = roaster.images[0];
+      } else {
+        imageUrl = 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop';
+      }
+
+      // Transform roasterSpecialties to simple specialty array for frontend
+      const specialties = roaster.roasterSpecialties?.map((rs: any) => ({
+        id: rs.specialty.id,
+        name: rs.specialty.translations[0]?.name || 'Unknown',
+        deprecated: rs.specialty.deprecated
+      })) || [];
+
+      return {
+        ...roaster,
+        imageUrl,
+        specialties
+      };
+    });
 
     res.json({
       roasters: roastersWithImageUrl,
@@ -314,6 +350,21 @@ router.get('/roasters', [
             rating: true,
           },
         },
+        roasterSpecialties: {
+          include: {
+            specialty: {
+              include: {
+                translations: true
+              }
+            }
+          }
+        },
+        roasterImages: {
+          orderBy: [
+            { isPrimary: 'desc' },
+            { uploadedAt: 'asc' }
+          ]
+        }
       },
       orderBy,
     });
@@ -321,8 +372,9 @@ router.get('/roasters', [
     if (q && typeof q === 'string') {
       const qLower = q.trim().toLowerCase();
       roasters = roasters.filter(roaster =>
-        (Array.isArray(roaster.specialties) &&
-          (roaster.specialties as string[]).some((s: string) => s.toLowerCase().includes(qLower)))
+        (roaster.roasterSpecialties && roaster.roasterSpecialties.some((rs: any) => 
+          rs.specialty.translations.some((t: any) => t.name.toLowerCase().includes(qLower))
+        ))
         || (roaster.name && roaster.name.toLowerCase().includes(qLower))
         || (roaster.description && roaster.description.toLowerCase().includes(qLower))
         || (roaster.city && roaster.city.toLowerCase().includes(qLower))
@@ -350,10 +402,30 @@ router.get('/roasters', [
     }
 
     // Add imageUrl field for frontend compatibility
-    const roastersWithImageUrl = roasters.map((roaster: any) => ({
-      ...roaster,
-      imageUrl: roaster.images && roaster.images.length > 0 ? roaster.images[0] : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
-    }));
+    const roastersWithImageUrl = roasters.map((roaster: any) => {
+      // Use the primary image from roasterImages if available, fall back to old images array
+      let imageUrl = null;
+      if (roaster.roasterImages && roaster.roasterImages.length > 0) {
+        imageUrl = roaster.roasterImages[0].url;
+      } else if (roaster.images && roaster.images.length > 0) {
+        imageUrl = roaster.images[0];
+      } else {
+        imageUrl = 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop';
+      }
+
+      // Transform roasterSpecialties to simple specialty array for frontend
+      const specialties = roaster.roasterSpecialties?.map((rs: any) => ({
+        id: rs.specialty.id,
+        name: rs.specialty.translations[0]?.name || 'Unknown',
+        deprecated: rs.specialty.deprecated
+      })) || [];
+
+      return {
+        ...roaster,
+        imageUrl,
+        specialties
+      };
+    });
 
     res.json({
       roasters: roastersWithImageUrl,
