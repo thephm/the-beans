@@ -91402,3 +91402,80 @@ The client container has been restarted. Refresh the People admin page and the r
 ## 685th try
 
 *(sorted now)*
+
+## Labels in edit roaster are U.S. centric and this app was built "in Canada" :) #125
+
+https://github.com/thephm/the-beans/issues/125
+
+> State and Zip labels should be "Province / State" and "Postal / ZIP Code"
+
+I'll help you update those labels to be more inclusive for Canadian and international users. Let me first find the edit roaster form to see the current labels. 
+
+✔ Searched text for `State|Zip|ZIP` (`**/client/src/app/admin/**/*.tsx`), 20 results
+
+✔ Searched for files matching `**/admin/roasters/**/page.tsx`, 4 matches
+
+Let me check both the main roasters admin page and the edit page: 
+
+✔ Searched text for `(State|Zip Code|ZIP Code)` (`**/client/src/app/admin/roasters/**/*.tsx`), 20 results
+
+Let me read the actual form labels in the roasters admin page: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 400 to 550
+
+Let me search for the actual label text in the JSX: 
+
+✔ Searched text for `State:` (`**/client/src/app/admin/roasters/page.tsx`), 3 results
+
+✔ Searched text for `Zip Code:` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+Let me search for where the form labels are rendered in the JSX: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 800 to 950
+
+Let me continue reading to find the State and Zip Code labels: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 950 to 1100
+
+Perfect! I found the labels. Now I need to update them in the translation files and the component. Let me check the translation files: 
+
+✔ Read `client/public/locales/en/common.json`
+
+Now I can see the structure. I need to update:
+1. The translation key `adminForms.roasters.state` from "State" to "Province / State"
+2. The translation key for zip code (I can see it uses `admin.roasters.zipCode`, but also has `adminForms.roasters.zipCode`) to "Postal / ZIP Code"
+
+Let me check the French translation file too: 
+
+✔ Searched text for `state` (`**/client/public/locales/fr/common.json`), 1 result
+
+Good! The French already has a better label. Let me read the relevant sections of both translation files and update them: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 450 to 500
+
+Perfect! I can see that the French translation already has better labels:
+- "state": "État/Province" 
+- "zipCode": "Code postal"
+
+Now I'll update the English translation file to match this more inclusive approach: 
+
+`common.json +2 -2`
+
+Perfect! Now I need to restart the Docker client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Excellent! I've successfully updated the labels to be more inclusive for Canadian and international users. Here's what was changed:
+
+**Changes made:**
+1. **"State"** → **"Province / State"**
+2. **"Zip Code"** → **"Postal / ZIP Code"**
+
+These labels will now appear in the edit roaster form in the admin section, making it clear that the fields accommodate both Canadian (Province/Postal Code) and U.S. (State/ZIP Code) address formats.
+
+The French translation already had the more inclusive "État/Province" and "Code postal" labels, so it didn't need updating. The client container has been restarted, so the changes should now be visible when you access the admin roaster edit form! 🇨🇦
+
+## 686th try
+
+*(labels corrected, checking in)*
