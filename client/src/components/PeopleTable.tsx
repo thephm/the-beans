@@ -22,7 +22,12 @@ export default function PeopleTable() {
       setLoading(true);
       try {
         const roastersData = await apiClient.getRoasters();
-        setRoasters((roastersData && Array.isArray((roastersData as any).roasters)) ? (roastersData as any).roasters : []);
+        const roastersList = (roastersData && Array.isArray((roastersData as any).roasters)) ? (roastersData as any).roasters : [];
+        // Sort roasters alphabetically by name
+        const sortedRoasters = roastersList.sort((a: Roaster, b: Roaster) => 
+          a.name.localeCompare(b.name)
+        );
+        setRoasters(sortedRoasters);
       } finally {
         setLoading(false);
     }
