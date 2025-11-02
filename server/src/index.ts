@@ -146,5 +146,6 @@ app.use('*', (req: Request, res: Response) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  // Server started
+  console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
+  console.log(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
 });

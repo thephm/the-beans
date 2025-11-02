@@ -314,6 +314,7 @@ router.post('/', [
 // PUT /api/people/:id - Update a person
 router.put('/:id', [
   param('id').isString().notEmpty().withMessage('person ID is required'),
+  body('roasterId').optional().isString().notEmpty().withMessage('Roaster ID must be a valid string'),
   body('name').optional().isString().isLength({ min: 1, max: 100 }).withMessage('Name must be 1-100 characters'),
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
@@ -330,6 +331,7 @@ router.put('/:id', [
     }
 
   const id = req.params.id;
+  const roasterId = req.body.roasterId;
   const name = req.body.name;
   const title = req.body.title;
   const email = req.body.email;
@@ -359,6 +361,27 @@ router.put('/:id', [
       return res.status(403).json({ error: 'Permission denied. Only owners and admins can manage people.' });
     }
 
+    // If roasterId is being changed, validate and check permissions
+    let newRoasterId = existingperson.roasterId;
+    if (roasterId !== undefined && roasterId !== existingperson.roasterId) {
+      // Check if new roaster exists
+      const newRoaster = await prisma.roaster.findUnique({
+        where: { id: roasterId }
+      });
+
+      if (!newRoaster) {
+        return res.status(404).json({ error: 'New roaster not found' });
+      }
+
+      // Check if user can manage people for the new roaster
+      const canManageNewRoaster = await canManagePeople(userId, roasterId);
+      if (!canManageNewRoaster) {
+        return res.status(403).json({ error: 'Permission denied. You cannot move people to a roaster you do not manage.' });
+      }
+
+      newRoasterId = roasterId;
+    }
+
     // Prevent removing the last owner
     if (roles && !roles.includes(PersonRole.OWNER) && existingperson.roles.includes(PersonRole.OWNER)) {
       const ownerCount = await prisma.roasterPerson.count({
@@ -380,7 +403,7 @@ router.put('/:id', [
     if (isPrimary === true) {
       await prisma.roasterPerson.updateMany({
         where: {
-          roasterId: existingperson.roasterId,
+          roasterId: newRoasterId,
           isPrimary: true,
           id: { not: id }
         },
@@ -407,6 +430,7 @@ router.put('/:id', [
     const updatedperson = await prisma.roasterPerson.update({
       where: { id },
       data: {
+        ...(roasterId !== undefined && { roasterId: newRoasterId }),
         ...(name !== undefined && { name }),
         ...(title !== undefined && { title }),
         ...(email !== undefined && { email }),
@@ -419,6 +443,12 @@ router.put('/:id', [
         updatedAt: new Date()
       },
       include: {
+        roaster: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
         user: {
           select: {
             id: true,
