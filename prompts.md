@@ -90311,3 +90311,63 @@ Try refreshing your browser page now - it should work!
 ## 627th try
 
 *(changing roaster in a person works now! checking in)*
+
+> please make the header row background for people page and roasters page the same as users
+
+I'll help you make the header row background consistent across the people, roasters, and users pages. Let me first check the current styling of these pages. 
+
+✔ Searched for files matching `**/admin/**/page.tsx`, 18 matches
+
+✔ Searched text for `header|thead|bg-gray|bg-slate` (`**/client/src/app/admin/**/page.tsx`), 20 results
+
+Let me read the specific sections of each admin page to see the header styling: 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 95 to 115
+
+✔ Read `client/src/app/admin/people/page.tsx`, lines 34 to 34
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 95 to 115
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 120 to 150
+
+✔ Read `client/src/app/admin/people/page.tsx`, lines 34 to 34
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 180 to 210
+
+✔ Searched text for `thead|bg-` (`**/client/src/app/admin/people/page.tsx`), no results
+
+✔ Read `client/src/app/admin/people/page.tsx`
+
+Now let me check the PeopleTable component to see the header styling: 
+
+✔ Searched text for `thead|bg-` (`**/client/src/components/PeopleTable.tsx`), 16 results
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 90 to 140
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 282 to 302
+
+Perfect! Now I can see the differences:
+
+1. **Users page** (line 189): `<thead className="bg-gray-50">` 
+2. **People page** (line 287 in PeopleTable.tsx): `<thead>` (no background class)
+3. **Roasters page** (line 101): `<thead>` (no background class)
+
+I need to add `className="bg-gray-50"` to the `<thead>` elements in both the People and Roasters pages. 
+
+`PeopleTable.tsx +1 -1`
+`page.tsx +1 -1`
+
+Perfect! I've successfully updated both the People and Roasters pages to have the same gray header background (`bg-gray-50`) as the Users page. 
+
+Now, according to the project instructions, you'll need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Great! I've successfully made the header row backgrounds consistent across all three admin pages:
+
+✅ **People page** - Added `bg-gray-50` class to `<thead>` in PeopleTable.tsx
+✅ **Roasters page** - Added `bg-gray-50` class to `<thead>` in page.tsx  
+✅ **Users page** - Already had `bg-gray-50` class (no changes needed)
+
+The client container has been restarted, so the changes should now be visible. All three admin table pages will now have a consistent light gray header background.

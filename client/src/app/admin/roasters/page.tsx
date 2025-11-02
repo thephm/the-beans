@@ -98,7 +98,7 @@ const AdminRoastersPage: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-              <thead>
+              <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.name', 'Name')}</th>
                   <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.city', 'City')}</th>
