@@ -15,7 +15,7 @@ interface Roaster {
   name: string
   location: string
   rating: number
-  specialties?: string[]
+  specialties?: Array<{ id: string; name: string }>
   imageUrl?: string
   description?: string
 }
