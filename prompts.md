@@ -93566,3 +93566,224 @@ Perfect! The issue has been fixed. The problem was that the API now returns spec
 5. **Updated the specialty map rendering** to use a proper unique key (id or index) and call the helper functions
 
 The client container has been restarted, and the roaster details page should now display correctly without the "Objects are not valid as a React child" error.
+
+## 700th try
+
+*(specialites seem to work well, checking in and let's see if Render deploy works)*
+
+> Seeing this in the docker logs and shouldn't
+
+```shell
+Roaster UPDATE - audit setup: {
+  userId: 'cmf03uy10000040hm78x1644y',
+  hasAuditData: true,
+  hasOldValues: true
+}
+Creating roaster UPDATE audit log manually: {
+  action: 'UPDATE',
+  entityId: 'cmfs1w26g0001ua27odl9tzak',
+  userId: 'cmf03uy10000040hm78x1644y'
+}
+```
+
+I'll investigate why the audit logging is falling back to manual creation instead of using the automatic audit middleware. Let me check the relevant code. 
+
+✔ Searched text for `audit setup|Creating roaster UPDATE audit log manually` (`**/server/src/routes/**/*.ts`), 7 results
+
+✔ Searched for files matching `**/audit*.ts`, 6 matches
+
+✔ Read `server/src/routes/roasters.ts`, lines 860 to 1060
+
+✔ Read `server/src/middleware/auditMiddleware.ts`
+
+✔ Read `server/src/lib/auditService.ts`
+
+I can see the issue. The roaster UPDATE route is manually creating audit logs instead of using the `auditAfter()` middleware properly. The problem is:
+
+1. **Manual audit log creation** (lines 1020-1037) is creating logs with `setTimeout` 
+2. **auditAfter() middleware** is also registered (line 1045) and should handle this automatically
+3. This results in **duplicate work** and the console warning messages you're seeing
+
+The manual code should be removed since `auditAfter()` is already configured and will handle it. Let me fix this: 
+
+`roasters.ts +1 -23`
+
+Now let me check if there are similar manual audit log creations in other routes that should also be removed: 
+
+✔ Searched text for `setTimeout\(\(\) => createAuditLog` (`**/server/src/routes/*.ts`), 5 results
+
+Let me check all these locations to see if they also need to be cleaned up: 
+
+✔ Read `server/src/routes/roasters.ts`, lines 630 to 730
+
+✔ Read `server/src/routes/roasters.ts`, lines 1070 to 1170
+
+✔ Read `server/src/routes/auth.ts`, lines 180 to 230
+
+Now let me check the CREATE operation around line 730-770: 
+
+✔ Read `server/src/routes/roasters.ts`, lines 730 to 810
+
+Now let me check if these routes have `auditAfter()` middleware registered: 
+
+✔ Searched text for `auditBefore\('roaster', '(CREATE|DELETE)'\).*auditAfter\(\)` (`**/server/src/routes/roasters.ts`), no results
+
+✔ Searched text for `}, auditAfter())` (`**/server/src/routes/roasters.ts`), 14 results
+
+Good! All these routes have `auditAfter()` middleware, so the manual audit log creation is redundant. Let me remove them all: 
+
+`roasters.ts +1 -24`
+`roasters.ts +1 -22`
+
+Now let me check if the auth.ts route also has `auditAfter()` middleware: 
+
+✔ Searched text for `auditAfter()` (`**/server/src/routes/auth.ts`), 1 result
+
+✔ Read `server/src/routes/auth.ts`, lines 130 to 180
+
+✔ Searched text for `router.post('/register'` (`**/server/src/routes/auth.ts`), 1 result
+
+✔ Read `server/src/routes/auth.ts`, lines 101 to 121
+
+The auth route doesn't have `auditAfter()` middleware! That's why it needs manual audit log creation. Let me check what the end of that route handler looks like: 
+
+✔ Read `server/src/routes/auth.ts`, lines 200 to 240
+
+I see - the auth route doesn't have middleware chaining like the roaster routes. The auth route is correctly creating audit logs manually because it doesn't use the `auditAfter()` middleware. That's fine.
+
+Now let me also remove the debug console.log statements from the roasters.ts that are no longer needed: 
+
+`roasters.ts +0 -2`
+`roasters.ts +0 -2`
+`roasters.ts +0 -2`
+
+Good! Now let me restart the server container to apply these changes: 
+
+✔ `docker-compose restart server`
+*Auto approved by rule `docker-compose`*
+
+✔ `docker logs the-beans-server-1 --tail 30`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I can see the audit log is working correctly now - "Audit log created: UPDATE roaster..." without the debug messages. Let me create a summary of what was fixed:
+
+## Summary
+
+I've removed **redundant manual audit log creation** from the roaster routes. The issue was:
+
+### Problem
+The roaster CREATE, UPDATE, and DELETE routes were:
+1. Using the `auditAfter()` middleware (correct)
+2. **Also** manually creating audit logs with `setTimeout(() => createAuditLog(...), 0)` (redundant)
+
+This resulted in duplicate work and confusing debug messages like:
+```
+Roaster UPDATE - audit setup: { userId: '...', hasAuditData: true, hasOldValues: true }
+Creating roaster UPDATE audit log manually: { action: 'UPDATE', entityId: '...', userId: '...' }
+```
+
+### Solution
+Removed the manual audit log creation code from:
+- **Roaster CREATE** route (line ~750)
+- **Roaster UPDATE** route (line ~1020)  
+- **Roaster DELETE** route (line ~1090)
+
+Also removed debug `console.log` statements that were cluttering the logs.
+
+### Result
+The `auditAfter()` middleware now handles all audit logging automatically. Audit logs are still created correctly, but without redundancy:
+```
+Audit log created: UPDATE roaster cmfs1w26g0001ua27odl9tzak by user cmf03uy10000040hm78x1644y
+```
+
+The auth.ts route correctly keeps its manual audit log creation since it doesn't use the middleware pattern.
+
+## 701st try
+
+> Render the-beans-frontend deploy failed: 
+
+```shell
+2025-11-02T18:10:15.632827399Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-02T18:10:15.636000824Z ==> Downloading cache...
+2025-11-02T18:10:16.603653766Z ==> Checking out commit 963d36a66a40714fa0e53b4276ba959cdfe0e6ef in branch main
+2025-11-02T18:10:33.01222968Z ==> Transferred 367MB in 2s. Extraction took 13s.
+2025-11-02T18:20:48.351266821Z ==> Using Node.js version 22.16.0 (default)
+2025-11-02T18:20:48.379694925Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-02T18:20:48.520646998Z ==> Running build command 'npm install && npm run build'...
+2025-11-02T18:21:11.273467049Z 
+2025-11-02T18:21:11.273493721Z up to date, audited 251 packages in 22s
+2025-11-02T18:21:11.273510241Z 
+2025-11-02T18:21:11.273571264Z 54 packages are looking for funding
+2025-11-02T18:21:11.273578395Z   run `npm fund` for details
+2025-11-02T18:21:11.275174643Z 
+2025-11-02T18:21:11.275189334Z found 0 vulnerabilities
+2025-11-02T18:21:12.331448518Z 
+2025-11-02T18:21:12.331471089Z > the-beans-client@0.1.0 build
+2025-11-02T18:21:12.331475799Z > next build
+2025-11-02T18:21:12.33147932Z 
+2025-11-02T18:21:14.718229571Z   ▲ Next.js 14.2.32
+2025-11-02T18:21:14.718430101Z 
+2025-11-02T18:21:14.733732431Z    Creating an optimized production build ...
+2025-11-02T18:21:15.449236692Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T18:21:39.274058578Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T18:21:40.809434967Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T18:21:47.718000143Z  ✓ Compiled successfully
+2025-11-02T18:21:47.719221663Z    Linting and checking validity of types ...
+2025-11-02T18:21:58.401276884Z Failed to compile.
+2025-11-02T18:21:58.401297525Z 
+2025-11-02T18:21:58.401574959Z ./src/app/admin/roasters/page.tsx:647:13
+2025-11-02T18:21:58.4015917Z Type error: Object literal may only specify known properties, and 'specialties' does not exist in type 'SetStateAction<{ name: string; description: string; email: string; phone: string; website: string; address: string; city: string; state: string; zipCode: string; country: string; latitude: string | number; longitude: string | number; ... 10 more ...; ownerMobile: string; }>'.
+2025-11-02T18:21:58.40159834Z 
+2025-11-02T18:21:58.40160464Z   645 |             latitude: data.latitude || '',
+2025-11-02T18:21:58.40160922Z   646 |             longitude: data.longitude || '',
+2025-11-02T18:21:58.401614261Z > 647 |             specialties: data.specialties?.join(', ') || '',
+2025-11-02T18:21:58.401619101Z       |             ^
+2025-11-02T18:21:58.401623221Z   648 |             verified: data.verified || false,
+2025-11-02T18:21:58.401627572Z   649 |             featured: data.featured || false,
+2025-11-02T18:21:58.401631822Z   650 |             rating: data.rating || 0,
+2025-11-02T18:21:58.458245367Z Next.js build worker exited with code: 1 and signal: null
+2025-11-02T18:21:58.530042086Z ==> Build failed 😞
+2025-11-02T18:21:58.530058537Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+I can see the TypeScript error in the admin roasters page. The issue is that `specialties` is not defined in the form state type. Let me check the current state and fix it. 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 101
+
+Let me look at the form state definition and the line where the error occurs: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 130 to 230
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 640 to 690
+
+Now I can see the issue. On line 647, there's an attempt to set `specialties` in the form data, but the form state definition (around line 200) uses `specialtyIds` instead of `specialties`. Let me check the exact form data structure: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 195 to 225
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 225 to 255
+
+Perfect! I can see the issue clearly. The form state uses `specialtyIds` (line 228), but the code on line 647 is trying to set `specialties`. I need to fix line 647 to use `specialtyIds` instead. Let me view the exact context around line 647: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 635 to 655
+
+Now I can see the problem. Line 647 should use `specialtyIds` and map the specialties to their IDs, not join them as a string. Let me fix this: 
+
+`page.tsx +1 -1`
+
+Perfect! I've fixed the TypeScript error. The issue was that line 647 was trying to set a `specialties` property (as a string) when the form state expects `specialtyIds` (as an array of specialty IDs).
+
+The fix changes:
+```typescript
+specialties: data.specialties?.join(', ') || '',
+```
+
+To:
+```typescript
+specialtyIds: data.specialties?.map(s => s.id) || [],
+```
+
+This matches the form data structure defined at line 228 and properly extracts the specialty IDs from the roaster data. You can now commit and push this change to trigger a new Render deployment.
+
+## 702nd try
+
+*(seems to be working, let's see if it deploys to Render ok)*

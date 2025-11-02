@@ -632,8 +632,6 @@ router.post('/', [
   // Removed legacy ownerName, ownerBio, ownerMobile validation
 ], requireAuth, auditBefore('roaster', 'CREATE'), async (req: any, res: any) => {
   try {
-    console.log('Roaster creation - audit setup:', { userId: req.userId, hasAuditData: !!req.auditData });
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -741,31 +739,8 @@ router.post('/', [
       }
     }
 
-    // Store entity for audit logging
+    // Store entity for audit logging - auditAfter() middleware will handle the rest
     res.locals.auditEntity = roaster;
-    console.log('Roaster creation - stored entity for audit:', { roasterId: roaster.id, hasAuditEntity: !!res.locals.auditEntity });
-
-    // Create audit log manually to ensure it works
-    if (req.auditData && req.userId) {
-      const auditLogData = {
-        action: req.auditData.action,
-        entityType: req.auditData.entityType,
-        entityId: roaster.id,
-        entityName: getEntityName(req.auditData.entityType, roaster),
-        userId: req.userId,
-        ipAddress: getClientIP(req),
-        userAgent: getUserAgent(req),
-        oldValues: req.auditData.oldValues,
-        newValues: roaster
-      };
-      
-      console.log('Creating roaster audit log manually:', { action: auditLogData.action, entityId: auditLogData.entityId, userId: auditLogData.userId });
-      
-      // Create audit log asynchronously (don't block the response)
-      setTimeout(() => createAuditLog(auditLogData), 0);
-    } else {
-      console.log('Roaster audit log NOT created - missing requirements:', { hasAuditData: !!req.auditData, hasUserId: !!req.userId });
-    }
 
     res.status(201).json({
       message: 'Roaster created successfully',
@@ -862,8 +837,6 @@ router.put('/:id', [
   // Removed legacy ownerName, ownerBio, ownerMobile validation
 ], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
-    console.log('Roaster UPDATE - audit setup:', { userId: req.userId, hasAuditData: !!req.auditData, hasOldValues: !!req.auditData?.oldValues });
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -1010,30 +983,8 @@ router.put('/:id', [
       }
     }
 
-    // Store entity for audit logging
+    // Store entity for audit logging - auditAfter() middleware will handle the rest
     res.locals.auditEntity = roaster;
-
-    // Create audit log manually to ensure it works
-    if (req.auditData && req.userId) {
-      const auditLogData = {
-        action: req.auditData.action,
-        entityType: req.auditData.entityType,
-        entityId: roaster.id,
-        entityName: getEntityName(req.auditData.entityType, roaster),
-        userId: req.userId,
-        ipAddress: getClientIP(req),
-        userAgent: getUserAgent(req),
-        oldValues: req.auditData.oldValues,
-        newValues: roaster
-      };
-      
-      console.log('Creating roaster UPDATE audit log manually:', { action: auditLogData.action, entityId: auditLogData.entityId, userId: auditLogData.userId });
-      
-      // Create audit log asynchronously (don't block the response)
-      setTimeout(() => createAuditLog(auditLogData), 0);
-    } else {
-      console.log('Roaster UPDATE audit log NOT created - missing requirements:', { hasAuditData: !!req.auditData, hasUserId: !!req.userId });
-    }
 
     res.json({
       message: 'Roaster updated successfully',
@@ -1074,8 +1025,6 @@ router.delete('/:id', [
   param('id').isString(),
 ], requireAuth, auditBefore('roaster', 'DELETE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
-    console.log('Roaster DELETE - audit setup:', { userId: req.userId, hasAuditData: !!req.auditData, hasOldValues: !!req.auditData?.oldValues });
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -1101,28 +1050,7 @@ router.delete('/:id', [
       where: { id }
     });
 
-    // Create audit log manually to ensure it works (for DELETE operations)
-    if (req.auditData && req.userId) {
-      const auditLogData = {
-        action: req.auditData.action,
-        entityType: req.auditData.entityType,
-        entityId: id,
-        entityName: getEntityName(req.auditData.entityType, deletedEntity),
-        userId: req.userId,
-        ipAddress: getClientIP(req),
-        userAgent: getUserAgent(req),
-        oldValues: req.auditData.oldValues,
-        newValues: undefined // For deletes, newValues should be undefined
-      };
-      
-      console.log('Creating roaster DELETE audit log manually:', { action: auditLogData.action, entityId: auditLogData.entityId, userId: auditLogData.userId });
-      
-      // Create audit log asynchronously (don't block the response)
-      setTimeout(() => createAuditLog(auditLogData), 0);
-    } else {
-      console.log('Roaster DELETE audit log NOT created - missing requirements:', { hasAuditData: !!req.auditData, hasUserId: !!req.userId });
-    }
-
+    // auditAfter() middleware will handle audit logging
     res.json({
       message: 'Roaster deleted successfully',
     });
