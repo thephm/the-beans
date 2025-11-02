@@ -238,7 +238,18 @@ router.get('/', [
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
-        { specialties: { has: search } },
+        { roasterSpecialties: { 
+            some: { 
+              specialty: { 
+                translations: { 
+                  some: { 
+                    name: { contains: search, mode: 'insensitive' } 
+                  } 
+                } 
+              } 
+            } 
+          } 
+        },
       ];
     }
     
@@ -251,7 +262,17 @@ router.get('/', [
     }
     
     if (specialty) {
-      where.specialties = { has: specialty };
+      where.roasterSpecialties = {
+        some: {
+          specialty: {
+            translations: {
+              some: {
+                name: { equals: specialty, mode: 'insensitive' }
+              }
+            }
+          }
+        }
+      };
     }
 
     // Get roasters
@@ -292,6 +313,19 @@ router.get('/', [
             { uploadedAt: 'asc' }
           ]
         },
+        roasterSpecialties: {
+          include: {
+            specialty: {
+              include: {
+                translations: {
+                  where: {
+                    language: req.query.lang || 'en'
+                  }
+                }
+              }
+            }
+          }
+        },
         _count: {
           select: {
             reviews: true,
@@ -322,7 +356,7 @@ router.get('/', [
     const total = await prisma.roaster.count({ where });
     const pages = Math.ceil(total / limit);
 
-    // Add imageUrl field for frontend compatibility
+    // Add imageUrl and specialties fields for frontend compatibility
     const roastersWithImageUrl = filteredRoasters.map((roaster: any) => {
       // Use the primary image from roasterImages if available, fall back to old images array
       let imageUrl = null;
@@ -334,9 +368,17 @@ router.get('/', [
         imageUrl = roaster.images[0];
       }
 
+      // Transform roasterSpecialties to simple specialty objects
+      const specialties = roaster.roasterSpecialties?.map((rs: any) => ({
+        id: rs.specialty.id,
+        name: rs.specialty.translations[0]?.name || 'Unknown',
+        deprecated: rs.specialty.deprecated
+      })) || [];
+
       const result = {
         ...roaster,
         imageUrl,
+        specialties,
       };
       
       // Round rating to 1 decimal place
@@ -413,6 +455,19 @@ router.get('/:id', [
             { uploadedAt: 'asc' }
           ]
         },
+        roasterSpecialties: {
+          include: {
+            specialty: {
+              include: {
+                translations: {
+                  where: {
+                    language: req.query.lang || 'en'
+                  }
+                }
+              }
+            }
+          }
+        },
         reviews: {
           include: {
             user: {
@@ -472,7 +527,7 @@ router.get('/:id', [
       isFavorited = !!favorite;
     }
 
-    // Add imageUrl field for frontend compatibility (filename only)
+    // Add imageUrl and specialties fields for frontend compatibility
     // Use the primary image from roasterImages if available, fall back to old images array
     let imageUrl = null;
     if (roaster.roasterImages && roaster.roasterImages.length > 0) {
@@ -483,9 +538,17 @@ router.get('/:id', [
       imageUrl = roaster.images[0];
     }
 
+    // Transform roasterSpecialties to simple specialty objects
+    const specialties = roaster.roasterSpecialties?.map((rs: any) => ({
+      id: rs.specialty.id,
+      name: rs.specialty.translations[0]?.name || 'Unknown',
+      deprecated: rs.specialty.deprecated
+    })) || [];
+
     const roasterWithImageUrl = {
       ...roaster,
       imageUrl,
+      specialties,
       isFavorited,
     };
 
@@ -557,7 +620,7 @@ router.post('/', [
   body('zipCode').optional().isLength({ max: 20 }).withMessage('Zip code must be less than 20 characters'),
   body('latitude').optional().isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
   body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
-  body('specialties').optional().isArray().withMessage('Specialties must be an array'),
+  body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
   // New nested owner contact validation
   body('ownerContact.email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   body('ownerContact.name').optional().isLength({ max: 100 }).withMessage('Owner name must be less than 100 characters'),
@@ -597,9 +660,10 @@ router.post('/', [
       ownerId: ownerId,
     };
     
-    // Remove ownerEmail from data as it's not part of the schema
+    // Remove fields that aren't part of the Roaster schema
     delete roasterData.ownerEmail;
-
+    delete roasterData.specialtyIds; // Will be handled separately
+    
     const roaster = await prisma.roaster.create({
       data: {
         ...roasterData,
@@ -614,9 +678,29 @@ router.post('/', [
             lastName: true,
             email: true,
           }
+        },
+        roasterSpecialties: {
+          include: {
+            specialty: {
+              include: {
+                translations: true
+              }
+            }
+          }
         }
       }
     });
+
+    // Create specialty relationships if provided
+    if (req.body.specialtyIds && Array.isArray(req.body.specialtyIds) && req.body.specialtyIds.length > 0) {
+      await prisma.roasterSpecialty.createMany({
+        data: req.body.specialtyIds.map((specialtyId: string) => ({
+          roasterId: roaster.id,
+          specialtyId: specialtyId,
+        })),
+        skipDuplicates: true,
+      });
+    }
 
     // Process any image URLs in the images array - upload them to Cloudinary
     if (roasterData.images && Array.isArray(roasterData.images) && roasterData.images.length > 0) {
@@ -770,7 +854,7 @@ router.put('/:id', [
   body('country').optional().isLength({ max: 100 }).withMessage('Country must be less than 100 characters'),
   body('latitude').optional().isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
   body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
-  body('specialties').optional().isArray().withMessage('Specialties must be an array'),
+  body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
   body('verified').optional().isBoolean().withMessage('Verified must be true or false'),
   body('featured').optional().isBoolean().withMessage('Featured must be true or false'),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
@@ -801,6 +885,10 @@ router.put('/:id', [
   delete updateData.ownerName;
   delete updateData.ownerBio;
   delete updateData.ownerMobile;
+  
+  // Handle specialty IDs separately
+  const specialtyIds = updateData.specialtyIds;
+  delete updateData.specialtyIds;
 
     // Handle ownerEmail if provided
     if (updateData.ownerEmail !== undefined) {
@@ -846,9 +934,37 @@ router.put('/:id', [
             lastName: true,
             email: true,
           }
+        },
+        roasterSpecialties: {
+          include: {
+            specialty: {
+              include: {
+                translations: true
+              }
+            }
+          }
         }
       }
     });
+
+    // Update specialty relationships if provided
+    if (specialtyIds !== undefined) {
+      // Delete existing specialty relationships
+      await prisma.roasterSpecialty.deleteMany({
+        where: { roasterId: id }
+      });
+      
+      // Create new relationships
+      if (Array.isArray(specialtyIds) && specialtyIds.length > 0) {
+        await prisma.roasterSpecialty.createMany({
+          data: specialtyIds.map((specialtyId: string) => ({
+            roasterId: id,
+            specialtyId: specialtyId,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
 
     // Process any image URLs in the images array - upload them to Cloudinary
     if (updateData.images && Array.isArray(updateData.images) && updateData.images.length > 0) {
