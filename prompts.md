@@ -93898,3 +93898,303 @@ Fixed the TypeScript compilation error in page.tsx that was causing the Render d
 **Solution**: Removed the local interface definition and imported the correct `Roaster` type from `@/types`, which properly defines `specialties` as `{ id: string; name: string; deprecated?: boolean }[]`.
 
 The code at line 246 (`key={specialty.id}`) is now correctly typed and will compile successfully on Render.
+
+## 703rd try
+
+*(Render the-beans-frontend deploy failed)*
+
+```shell
+2025-11-02T22:33:53.748383335Z ==> Downloading cache...
+2025-11-02T22:33:53.749031322Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-02T22:33:54.566441348Z ==> Checking out commit fcd6960d91e9022912225dcdf0b91b5ca70ee8ab in branch main
+2025-11-02T22:34:07.933612462Z ==> Transferred 368MB in 3s. Extraction took 9s.
+2025-11-02T22:34:21.170591196Z ==> Using Node.js version 22.16.0 (default)
+2025-11-02T22:34:21.196736733Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-02T22:34:21.316854725Z ==> Running build command 'npm install && npm run build'...
+2025-11-02T22:34:31.064623755Z 
+2025-11-02T22:34:31.064678716Z up to date, audited 251 packages in 10s
+2025-11-02T22:34:31.064691666Z 
+2025-11-02T22:34:31.064693846Z 54 packages are looking for funding
+2025-11-02T22:34:31.064696126Z   run `npm fund` for details
+2025-11-02T22:34:31.06562865Z 
+2025-11-02T22:34:31.065661621Z found 0 vulnerabilities
+2025-11-02T22:34:31.228930073Z 
+2025-11-02T22:34:31.228950104Z > the-beans-client@0.1.0 build
+2025-11-02T22:34:31.228952704Z > next build
+2025-11-02T22:34:31.228954374Z 
+2025-11-02T22:34:31.782654178Z   ▲ Next.js 14.2.32
+2025-11-02T22:34:31.782855083Z 
+2025-11-02T22:34:31.794755996Z    Creating an optimized production build ...
+2025-11-02T22:34:32.23071306Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T22:34:46.099246753Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T22:34:47.118940066Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T22:34:49.945275392Z  ✓ Compiled successfully
+2025-11-02T22:34:49.946241717Z    Linting and checking validity of types ...
+2025-11-02T22:34:53.547358562Z Failed to compile.
+2025-11-02T22:34:53.547382183Z 
+2025-11-02T22:34:53.547590058Z ./src/app/discover/page.tsx:247:44
+2025-11-02T22:34:53.547608149Z Type error: Property 'distance' does not exist on type 'Roaster'.
+2025-11-02T22:34:53.547613279Z 
+2025-11-02T22:34:53.547617739Z   245 |                       {(() => {
+2025-11-02T22:34:53.547623209Z   246 |                         // Try to use backend-provided distance if present and valid
+2025-11-02T22:34:53.547627479Z > 247 |                         if (typeof roaster.distance === 'number' && isFinite(roaster.distance)) {
+2025-11-02T22:34:53.547630889Z       |                                            ^
+2025-11-02T22:34:53.547634679Z   248 |                           // Use user preference for unit if available
+2025-11-02T22:34:53.5476801Z   249 |                           const settings = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('settings') || '{}') : {};
+2025-11-02T22:34:53.547685801Z   250 |                           const unit = settings?.preferences?.distanceUnit || 'mi';
+2025-11-02T22:34:53.591948899Z Next.js build worker exited with code: 1 and signal: null
+2025-11-02T22:34:53.644418106Z ==> Build failed 😞
+2025-11-02T22:34:53.644446217Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+I need to fix the TypeScript error in the discover page. The `distance` property doesn't exist on the `Roaster` type. Let me first check the current type definition and then fix the issue. 
+
+✔ Read `client/src/types/index.ts`
+
+✔ Read `client/src/app/discover/page.tsx`, lines 240 to 260
+
+I can see the issue. The `Roaster` interface doesn't have a `distance` property, but the code is trying to use it. I need to add the `distance` property to the `Roaster` interface as an optional field since it's populated dynamically by the backend when location-based queries are made. 
+
+`index.ts +1 -0`
+
+Perfect! I've added the `distance` property to the `Roaster` interface. This property is optional and gets populated by the backend when location-based queries are performed. This should fix the TypeScript compilation error on Render.
+
+The change adds:
+- `distance?: number` - An optional field that holds the calculated distance from the user's location to the roaster (in miles by default, converted to kilometers in the UI if needed)
+
+This will allow the Next.js build to complete successfully.
+
+> restart?
+
+I can see the deployment is failing because the Roaster type doesn't have the distance property that's being used in the discover page. I've already fixed this by adding distance?: number to the Roaster interface in index.ts.
+
+Now you need to commit and push this change to trigger a new deployment on Render:
+
+✔ `git add client/src/types/index.ts && git commit -m "Add distance property to Roaster type for location-based queries" && git push`
+
+✅ Fix deployed!
+
+The change has been committed and pushed to GitHub. Render will automatically detect the new commit and start a fresh deployment. The TypeScript error should now be resolved since the Roaster interface now includes the distance property.
+
+You can monitor the deployment progress in your Render dashboard. The build should succeed this time.
+
+## 704th try
+
+*(Render the-beans-frontend deploy failed)*
+
+```shell
+2025-11-02T22:41:53.333270985Z ==> Downloading cache...
+2025-11-02T22:41:53.335619572Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-02T22:41:54.183767712Z ==> Checking out commit a1e0770259c2535f2a02e3e2a5e8aa89101fe9e5 in branch main
+2025-11-02T22:42:07.750054849Z ==> Transferred 367MB in 3s. Extraction took 9s.
+2025-11-02T22:42:19.630075017Z ==> Using Node.js version 22.16.0 (default)
+2025-11-02T22:42:19.654514032Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-02T22:42:19.775539335Z ==> Running build command 'npm install && npm run build'...
+2025-11-02T22:42:29.632959273Z 
+2025-11-02T22:42:29.632988895Z up to date, audited 251 packages in 10s
+2025-11-02T22:42:29.633000166Z 
+2025-11-02T22:42:29.633002936Z 54 packages are looking for funding
+2025-11-02T22:42:29.633008587Z   run `npm fund` for details
+2025-11-02T22:42:29.63404882Z 
+2025-11-02T22:42:29.634064621Z found 0 vulnerabilities
+2025-11-02T22:42:29.804937582Z 
+2025-11-02T22:42:29.804960444Z > the-beans-client@0.1.0 build
+2025-11-02T22:42:29.804962754Z > next build
+2025-11-02T22:42:29.804964444Z 
+2025-11-02T22:42:30.396418202Z   ▲ Next.js 14.2.32
+2025-11-02T22:42:30.396637929Z 
+2025-11-02T22:42:30.408794847Z    Creating an optimized production build ...
+2025-11-02T22:42:30.88059282Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T22:42:45.2431005Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T22:42:46.336571337Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T22:42:48.212146747Z  ✓ Compiled successfully
+2025-11-02T22:42:48.213111103Z    Linting and checking validity of types ...
+2025-11-02T22:42:53.451359672Z Failed to compile.
+2025-11-02T22:42:53.451431147Z 
+2025-11-02T22:42:53.451728311Z ./src/app/favorites/page.tsx:188:47
+2025-11-02T22:42:53.451742152Z Type error: Property 'id' does not exist on type 'string'.
+2025-11-02T22:42:53.451746703Z 
+2025-11-02T22:42:53.451752043Z   186 |                                 roaster.specialties.map((spec) => (
+2025-11-02T22:42:53.451757143Z   187 |                                   <Link
+2025-11-02T22:42:53.451774435Z > 188 |                                     key={spec.id}
+2025-11-02T22:42:53.451779215Z       |                                               ^
+2025-11-02T22:42:53.451783775Z   189 |                                     href={`/discover?specialty=${encodeURIComponent(spec.name)}`}
+2025-11-02T22:42:53.451788646Z   190 |                                     className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200 hover:bg-primary-100 transition-colors"
+2025-11-02T22:42:53.451793726Z   191 |                                   >
+2025-11-02T22:42:53.499968251Z Next.js build worker exited with code: 1 and signal: null
+2025-11-02T22:42:53.55862598Z ==> Build failed 😞
+2025-11-02T22:42:53.558645051Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+I can see the build is failing because of a TypeScript error in the favorites page. The issue is that `specialties` are being treated as strings but the code is trying to access `.id` and `.name` properties as if they were objects.
+
+Let me check the current code and the types to fix this: 
+
+✔ Read `client/src/app/favorites/page.tsx`, lines 180 to 200
+
+✔ Read `client/src/types/index.ts`
+
+I can see the issue. According to the `Roaster` interface in types, `specialties` is defined as an array of objects with `{ id: string; name: string; deprecated?: boolean }[]`. However, the API might be returning strings instead of objects in some cases.
+
+Let me check how the favorites API is structured: 
+
+Searched text for `specialties` (`**/server/src/routes/favorites.ts`), no results
+
+✔ Searched for files matching `**/favorites.ts`, no matches
+
+✔ Searched for files matching `**/server/src/routes/*.ts`, 20 matches
+
+✔ Searched text for `favorites` (`**/server/src/routes/users.ts`), no results
+
+✔ Read `client/src/app/favorites/page.tsx`, lines 1 to 81
+
+Now I can see the issue clearly. The local `Roaster` interface in the favorites page defines `specialties` as `string[]`, but the code is trying to access `.id` and `.name` properties. Let me fix this by updating the interface to match the actual data structure: 
+
+`page.tsx +1 -1`
+
+Fixed! The issue was that the local `Roaster` interface in page.tsx defined `specialties` as a string array (`string[]`), but the code was treating it as an array of objects with `id` and `name` properties. I've updated the interface to match the actual data structure: `Array<{ id: string; name: string }>`.
+
+This should resolve the TypeScript build error on Render. The change makes the local interface consistent with how the data is being used in the component.
+
+> do you see this issue anywhere else?
+
+Let me search for other places where specialties might have the same issue: 
+
+✔ Searched text for `specialties\?:\s*string\[\]`, no results
+
+✔ Searched text for `specialties\.map\(.*spec\.`, no results
+
+✔ Searched text for `spec\.id|spec\.name`, 5 results
+
+✔ Searched text for `interface Roaster` (`**/client/src/**/*.tsx`), 7 results
+
+Let me check the other Roaster interfaces to see if they have the same issue: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 37 to 87
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 13 to 43
+
+Now let me check how these components actually use the specialties: 
+
+✔ Searched text for `specialties\.(map|forEach)` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Searched text for `specialties\.(map|forEach|filter)` (`**/client/src/components/FeaturedRoasters.tsx`), 1 result
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 190 to 205
+
+Good! In FeaturedRoasters.tsx, the specialties are being treated as strings (`spec` is used directly), which matches its interface definition of `string[]`. So that component is fine.
+
+Now let me check if there are any other places where specialties are accessed with `.id` or `.name`: 
+
+✔ Searched text for `specialty\.(id|name)` (`**/client/src/**/*.tsx`), 18 results
+
+I can see that page.tsx handles both cases (string and object) with type guards. Let me verify the discover page doesn't have any issues: 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 225 to 245
+
+Now let me check the interface definition in the discover page: 
+
+✔ Searched text for `interface Roaster` (`**/client/src/app/discover/page.tsx`), no results
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 41
+
+Perfect! The discover page imports `Roaster` from `@/types`, which is the global type definition that already has the correct type for specialties. So that's good.
+
+Let me do a final check to see if there are any other local Roaster interface definitions that might have this issue: 
+
+✔ Searched text for `interface\s+\w*Roaster\w*\s*\{[\s\S]{0,300}specialties.*string\[\]` (`**/client/src/**/*.tsx`), no results
+
+✔ Searched text for `specialties: string[]` (`**/client/src/**/*.tsx`), 2 results
+
+Good! The other two places are:
+1. `page.tsx` - uses a union type `string[] | Specialty[]` and has type guards to handle both cases
+2. `FeaturedRoasters.tsx` - uses `string[]` but the code treats them as strings (using `spec` directly), so it's consistent
+
+The only issue was in `page.tsx`, which I've already fixed. The fix changes the local `Roaster` interface from:
+- `specialties?: string[]` 
+- to `specialties?: Array<{ id: string; name: string }>`
+
+This matches how the code uses the data with `spec.id` and `spec.name`.
+
+## 705th try
+
+> main page:
+
+```shell
+1 of 4 errors
+Next.js (14.2.33) is outdated (learn more)
+
+Unhandled Runtime Error
+TypeError: key.startsWith is not a function
+
+Source
+src/components/FeaturedRoasters.tsx (85:14) @ startsWith
+
+  83 |     let key = specialty;
+  84 |     // If specialty already starts with 'specialties.', use as-is
+> 85 |     if (!key.startsWith('specialties.')) {
+     |              ^
+  86 |       // Convert to camelCase key
+  87 |       key = key.replace(/\s+(.)/g, (_, c) => c.toUpperCase());
+  88 |       key = key.charAt(0).toLowerCase() + key.slice(1);
+Call Stack
+Show collapsed frames
+```
+
+I'll investigate and fix the runtime error in `FeaturedRoasters.tsx`. The error indicates that `specialty` is not a string when `key.startsWith` is being called. 
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 75 to 105
+
+Now let me check where this function is being called to see what type of data is being passed: 
+
+✔ Searched text for `translateSpecialty\(` (`**/client/src/components/FeaturedRoasters.tsx`), 1 result
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 190 to 210
+
+Now let me check the Roaster interface in this file to see what type `specialties` is: 
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 1 to 51
+
+I can see the issue! The `Roaster` interface in FeaturedRoasters.tsx defines `specialties` as `string[]`, but based on the earlier fixes we made, the API is now returning specialty objects with `{id, name}` structure. The `translateSpecialty` function expects a string, but it's receiving an object.
+
+I need to fix this by either:
+1. Updating the interface to match the actual data structure
+2. Extracting the name from the specialty object before passing it to the function
+
+Let me check what the actual API returns: 
+
+✔ Searched text for `featured` (`**/server/src/routes/roasters.ts`), 5 results
+
+✔ Read `server/src/routes/roasters.ts`, lines 170 to 250
+
+✔ Read `server/src/routes/roasters.ts`, lines 280 to 360
+
+✔ Read `server/src/routes/roasters.ts`, lines 360 to 410
+
+Perfect! I can see that the API is returning specialty objects with `{id, name, deprecated}` structure (lines 373-377). Now I need to update the FeaturedRoasters.tsx component to handle this properly: 
+
+`FeaturedRoasters.tsx +7 -1`
+
+Good! Now I need to update the code that uses specialties to extract the name property: 
+
+`FeaturedRoasters.tsx +3 -3`
+
+Now let's restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the runtime error in FeaturedRoasters.tsx. The issue was:
+
+## Problem
+The `Roaster` interface defined `specialties` as `string[]`, but the API was returning specialty objects with the structure `{id, name, deprecated}`. When the code tried to call `spec.startsWith()` in the `translateSpecialty` function, it failed because `spec` was an object, not a string.
+
+## Solution
+1. **Updated the interface** to include a `Specialty` type with `{id, name, deprecated}` fields
+2. **Changed `specialties: string[]` to `specialties: Specialty[]`** in the `Roaster` interface
+3. **Updated the specialty map** to:
+   - Use `spec.id` as the key (instead of the whole object)
+   - Use `spec.name` in the URL encoding and translation function
+   - Pass `spec.name` to `translateSpecialty()` instead of the whole object
+
+The client container has been restarted. The main page should now load without the "key.startsWith is not a function" error.

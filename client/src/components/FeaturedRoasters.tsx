@@ -10,13 +10,19 @@ import RoasterImage from './RoasterImage'
 import { apiClient } from '@/lib/api'
 import { Star, LocationOn, Favorite, FavoriteBorder } from '@mui/icons-material'
 
+interface Specialty {
+  id: string
+  name: string
+  deprecated?: boolean
+}
+
 interface Roaster {
   id: string
   name: string
   city: string
   state: string
   rating: number
-  specialties: string[]
+  specialties: Specialty[]
   description: string
   imageUrl: string
   latitude?: number
@@ -192,11 +198,11 @@ export function FeaturedRoasters() {
                   {roaster.specialties && roaster.specialties.length > 0 ? (
                     roaster.specialties.map((spec) => (
                       <Link
-                        key={spec}
-                        href={`/discover?specialty=${encodeURIComponent(spec)}`}
+                        key={spec.id}
+                        href={`/discover?specialty=${encodeURIComponent(spec.name)}`}
                         className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200 hover:bg-primary-100 transition-colors"
                       >
-                        {translateSpecialty(spec)}
+                        {translateSpecialty(spec.name)}
                       </Link>
                     ))
                   ) : (
