@@ -284,7 +284,7 @@ export default function PeopleTable() {
         {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full bg-white border rounded-lg shadow">
-            <thead>
+            <thead className="bg-gray-50">
               <tr>
                 <th className="px-8 py-3 text-left font-semibold">Name</th>
                 <th className="px-8 py-3 text-left font-semibold">Roaster</th>
