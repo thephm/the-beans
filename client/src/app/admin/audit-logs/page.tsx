@@ -151,7 +151,9 @@ export default function AuditLogsPage() {
       case 'roaster':
         return `/roasters/${log.entityId}`;
       case 'user':
-        return `/admin/users`;
+        return `/admin/users/${log.entityId}/edit`;
+      case 'person':
+        return `/admin/people/edit/${log.entityId}`;
       default:
         return '#';
     }
@@ -257,6 +259,7 @@ export default function AuditLogsPage() {
               <option value="review">Review</option>
               <option value="bean">Bean</option>
               <option value="user">User</option>
+              <option value="person">Person</option>
             </select>
           </div>
           <div>
@@ -348,7 +351,7 @@ export default function AuditLogsPage() {
                         <div className="text-sm font-medium text-gray-900">
                           {log.user ? (
                             <Link 
-                              href={`/admin/users`} 
+                              href={`/admin/users/${log.userId}/edit`} 
                               className="text-blue-600 hover:text-blue-800"
                             >
                               {log.user.username}
@@ -442,7 +445,7 @@ export default function AuditLogsPage() {
                 <span className="text-xs text-gray-500 font-medium">User:</span>
                 {log.user ? (
                   <Link 
-                    href={`/admin/users`} 
+                    href={`/admin/users/${log.userId}/edit`} 
                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                   >
                     {log.user.username}
