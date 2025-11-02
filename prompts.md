@@ -91353,3 +91353,52 @@ The client container has been restarted. You can now view the admin roasters pag
 ## 684th try
 
 *(looks great on mobile! checking in)*
+
+## Roasters filter on People page not sorted alphabetically #165
+
+https://github.com/thephm/the-beans/issues/165
+
+I can see from the attachment that the roasters filter dropdown on the People page shows roasters in an unsorted order (Blue Bottle Coffee, Detour Coffee, Vintage Coffee Roasters, Stumptown Coffee Roasters, Intelligentsia Coffee). They should be sorted alphabetically.
+
+Let me find and fix the People page where this roaster filter is implemented: 
+
+✔ Read `client/src/app/admin/people/page.tsx`
+
+Now let me check the PeopleTable component where the roaster filter is implemented: 
+
+✔ Searched text for `roasters.*select|select.*roaster|All roasters` (`**/client/src/components/PeopleTable.tsx`), 10 results
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 160 to 190
+
+Now let me check where the roasters data is fetched and see if it's being sorted: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 1 to 51
+
+Perfect! I can see the issue. The roasters are fetched at line 23-26 and set directly without sorting. I need to sort them alphabetically by name. Let me fix this: 
+
+`PeopleTable.tsx +6 -1`
+
+The TypeScript errors shown are pre-existing module resolution issues. Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! ✅ Fixed! The roasters in the filter dropdown on the People admin page will now be sorted alphabetically.
+
+## What Changed:
+
+In PeopleTable.tsx, the `fetchRoasters` function now sorts the roasters alphabetically by name before setting the state:
+
+```typescript
+const sortedRoasters = roastersList.sort((a: Roaster, b: Roaster) => 
+  a.name.localeCompare(b.name)
+);
+```
+
+Using `localeCompare()` ensures proper alphabetical sorting that handles edge cases like accented characters correctly.
+
+The client container has been restarted. Refresh the People admin page and the roaster filter dropdown should now show the roasters in alphabetical order! 📋
+
+## 685th try
+
+*(sorted now)*
