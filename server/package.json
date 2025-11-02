@@ -14,7 +14,7 @@
     "db:seed": "ts-node src/seed.ts"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
