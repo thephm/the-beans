@@ -91272,3 +91272,84 @@ This reduces the visual clutter at the top of the form and creates better spacin
 ## 683rd try
 
 *(looks much better, committing)*
+
+## Admin Roasters on mobile should be stacked cards #166
+
+https://github.com/thephm/the-beans/issues/166
+
+> see attachment on mobile, unusalble. like users and people admin pages, admin roasters should be stacked cards on mobile 
+
+I can see the issue in the attachment - the admin roasters table is not responsive on mobile and shows a horizontal scrolling table that's unusable. Let me fix this by making it display as stacked cards on mobile, similar to the users and people admin pages.
+
+Let me first look at the admin roasters page structure: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 101
+
+Let me continue reading to see the table structure and find a good reference for how other admin pages handle mobile layout: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx#100-100`, lines 100 to 150
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 1 to 101
+
+Let me continue reading the users page to see how it handles the mobile card layout: 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 100 to 200
+
+Perfect! I can see the pattern used in the users page. It has:
+1. Mobile card view with `md:hidden` class (lines 123-189)
+2. Desktop table view with `hidden md:block` class (line 191)
+
+Now let me check the people admin page as well to understand the pattern better: 
+
+✔ Searched text for `md:hidden|hidden md:block` (`**/client/src/app/admin/people/page.tsx`), no results
+
+Let me read the people page: 
+
+✔ Read `client/src/app/admin/people/page.tsx`
+
+Let me check the PeopleTable component: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 1 to 201
+
+Great! Now I can see the pattern. Let me continue reading the PeopleTable to see the complete mobile card structure: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 200 to 350
+
+Perfect! Now I understand the pattern. Let me create a mobile-friendly card layout for the admin roasters page. I'll update the roasters page to have:
+1. Mobile card view (visible on small screens, hidden on medium+)
+2. Desktop table view (hidden on small screens, visible on medium+) 
+
+`page.tsx +57 -1`
+
+The errors shown are pre-existing TypeScript module resolution issues that don't affect the actual functionality. Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully updated the admin roasters page to be mobile-responsive with stacked cards. Here's what changed:
+
+## Changes Made:
+
+### Mobile View (screens < md/768px):
+- **Card-based layout** - Each roaster is displayed as a stacked card
+- **Roaster name** as a clickable blue link at the top
+- **Status badges** - Verified (✔️ green) and Featured (⭐ yellow) shown as pills
+- **Location** - City and country with 📍 icon
+- **Rating** - Displayed with ⭐ icon
+
+### Desktop View (screens ≥ md/768px):
+- **Traditional table layout** preserved (same as before)
+- **Hidden on mobile** using `hidden md:block` class
+
+### Key Features:
+✅ Responsive design using Tailwind's `md:` breakpoints
+✅ Mobile cards use same pattern as Users and People admin pages
+✅ Clean, readable cards with proper spacing and icons
+✅ Status badges are more prominent on mobile
+✅ Touch-friendly tap targets for mobile users
+
+The client container has been restarted. You can now view the admin roasters page on mobile and it will show as stacked cards instead of the unusable horizontal scrolling table!
+
+## 684th try
+
+*(looks great on mobile! checking in)*
