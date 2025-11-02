@@ -322,6 +322,12 @@
     "onlineOnlyDesc": "Ce torréfacteur fonctionne exclusivement en ligne sans magasin de détail physique.",
     "hoursNotAvailable": "Informations sur les heures non disponibles"
   },
+  "carousel": {
+    "image": "Image",
+    "previous": "Image précédente",
+    "next": "Image suivante",
+    "goToImage": "Aller à l'image"
+  },
   "forms": {
     "firstName": "Prénom",
     "lastName": "Nom de famille", 

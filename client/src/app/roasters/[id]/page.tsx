@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import RoasterImage from '@/components/RoasterImage'
+import ImageCarousel from '@/components/ImageCarousel'
 import { apiClient } from '@/lib/api'
 import { 
   Coffee, 
@@ -18,6 +19,13 @@ import {
   PhotoCamera,
   Star
 } from '@mui/icons-material'
+
+interface RoasterImageData {
+  id: string
+  url: string
+  description?: string
+  isPrimary?: boolean
+}
 
 interface Roaster {
   id: string
@@ -40,6 +48,8 @@ interface Roaster {
   story?: string
   founded?: string
   owner?: string | { id: string; username: string; firstName: string; lastName: string }
+  images?: string[]
+  roasterImages?: RoasterImageData[]
 }
 
 export default function RoasterDetail() {
@@ -48,6 +58,7 @@ export default function RoasterDetail() {
   const params = useParams()
   const router = useRouter()
   const [roaster, setRoaster] = useState<Roaster | null>(null)
+  const [roasterImages, setRoasterImages] = useState<RoasterImageData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isFavorite, setIsFavorite] = useState(false)
@@ -119,8 +130,26 @@ export default function RoasterDetail() {
   const fetchRoaster = async (id: string) => {
     try {
       setLoading(true)
-      const data = await apiClient.getRoaster(id as string) as Roaster
-      setRoaster(data)
+      
+      const roasterData = await apiClient.getRoaster(id as string) as Roaster
+      setRoaster(roasterData)
+      
+      // Convert the images array to the format expected by the carousel
+      // First try roasterImages (new format), fallback to images array (legacy)
+      if (roasterData.roasterImages && roasterData.roasterImages.length > 0) {
+        setRoasterImages(roasterData.roasterImages)
+      } else if (roasterData.images && roasterData.images.length > 0) {
+        // Convert legacy images array to carousel format
+        const legacyImages = roasterData.images.map((url: string, index: number) => ({
+          id: `legacy-${index}`,
+          url: url,
+          description: roasterData.name,
+          isPrimary: index === 0
+        }))
+        setRoasterImages(legacyImages)
+      } else {
+        setRoasterImages([])
+      }
       
       // Check if roaster is in favorites
       const favorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
@@ -215,20 +244,22 @@ export default function RoasterDetail() {
 
         {/* Main Content */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-6xl mx-auto">
-          {/* Hero Image */}
-          <div className="relative h-64 sm:h-80 lg:h-96">
-            <RoasterImage
-              src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=400&fit=crop&auto=format'}
-              alt={roaster.name}
-              className="w-full h-full object-cover"
-              width={800}
-              height={400}
+          {/* Hero Image Carousel */}
+          <div className="relative">
+            <ImageCarousel
+              images={roasterImages.length > 0 ? roasterImages : [{ 
+                id: 'default',
+                url: roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=400&fit=crop&auto=format',
+                description: roaster.name
+              }]}
+              altPrefix={roaster.name}
+              height="h-64 sm:h-80 lg:h-96"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-            <div className="absolute bottom-6 left-6 text-white">
-              <h1 className="text-4xl font-bold mb-2">{roaster.name}</h1>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-[5]"></div>
+            <div className="absolute bottom-6 left-6 text-white z-20 pointer-events-none">
+              <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">{roaster.name}</h1>
               {(roaster.city || roaster.state) && (
-                <p className="text-xl flex items-center">
+                <p className="text-xl flex items-center drop-shadow-lg">
                   <LocationOn sx={{ fontSize: 24, marginRight: 1 }} />
                   {[roaster.city, roaster.state].filter(Boolean).join(', ')}
                 </p>
@@ -236,7 +267,7 @@ export default function RoasterDetail() {
             </div>
             <button
               onClick={toggleFavorite}
-              className={`absolute top-6 right-6 p-3 rounded-full ${
+              className={`absolute top-6 right-6 p-3 rounded-full z-20 pointer-events-auto ${
                 isFavorite 
                   ? 'bg-red-500 text-white' 
                   : 'bg-white text-red-500 hover:bg-red-50'

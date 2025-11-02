@@ -176,6 +176,10 @@ class ApiClient {
     return this.request(`/roasters/${id}`);
   }
 
+  async getRoasterImages(id: string) {
+    return this.request(`/roasters/${id}/images`);
+  }
+
   async createRoaster(roasterData: any) {
     return this.request('/roasters', {
       method: 'POST',
