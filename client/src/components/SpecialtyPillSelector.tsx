@@ -38,10 +38,25 @@ export default function SpecialtyPillSelector({
       }
 
       const data = await response.json();
-      // API returns array directly, not wrapped in { specialties: [...] }
-      // Filter out deprecated specialties for new selections
+      // API returns array of SpecialtyListItem (flattened structure)
+      // Convert to Specialty format with translations for compatibility
       const activeSpecialties = Array.isArray(data) 
-        ? data.filter((s: Specialty) => !s.deprecated)
+        ? data
+            .filter((s: any) => !s.deprecated)
+            .map((s: any) => ({
+              id: s.id,
+              deprecated: s.deprecated,
+              roasterCount: s.roasterCount,
+              // Create translations structure from flat response
+              translations: {
+                [language]: {
+                  name: s.name || 'Unknown',
+                  description: s.description || ''
+                }
+              },
+              createdAt: s.createdAt,
+              updatedAt: s.updatedAt
+            }))
         : [];
       setSpecialties(activeSpecialties);
     } catch (err: any) {
