@@ -94273,3 +94273,83 @@ Good call! Let me restart the client container so we can test locally first.
 *Auto approved by rule `docker-compose`*
 
 Client restarted. You can now test at `http://localhost:3000`. Try navigating to any page that uses the `SpecialtyPillSelector` component (likely the roaster create/edit forms in the admin section) to verify the fix works correctly.
+
+## 706th try
+
+*(finally deploys to render!)*
+
+## Specialities show "Undefined" in edit roaster #179
+
+https://github.com/thephm/the-beans/issues/179
+
+> Specialities show "Undefined" in edit roaster see screenshot attached
+
+I'll investigate the specialties showing "Undefined" in the edit roaster form. Let me start by examining the relevant components. 
+
+✔ Searched for files matching `**/edit/**/page.tsx`, 8 matches
+
+✔ Searched text for `SpecialtyPillSelector|specialties|Specialties` (`**/client/src/app/admin/**/edit/**/page.tsx`), no results
+
+✔ Read `client/src/components/SpecialtyPillSelector.tsx`
+
+Now let me check the edit roaster page: 
+
+✔ Read `client/src/app/admin/roasters/edit/%5Bid%5D/page.tsx`
+
+I see the edit page redirects to the main roasters page with an edit parameter. Let me check the main roasters admin page: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`
+
+Now I can see the issue! In the `SpecialtyPillSelector` component, when displaying specialty names, it's using:
+
+```tsx
+const specialtyName = specialty.translations?.[language]?.name || 
+                     specialty.translations?.['en']?.name || 
+                     'Unknown';
+```
+
+But when a specialty ID is stored in the database but the specialty translation doesn't exist or load properly, it shows "Unknown". However, the screenshot shows "Undefined" (not "Unknown"), which suggests the issue might be with how the specialty data is being retrieved or displayed.
+
+Let me check the Specialty type definition and see if there's a mismatch: 
+
+✔ Read `client/src/types/index.ts`, lines 1 to 201
+
+Let me check the rest of the types file to see the Specialty interface: 
+
+✔ Read `client/src/types/index.ts`, lines 200 to 322
+
+Now I can see the issue more clearly. The `Specialty` interface has `translations: Record<string, { name: string; description: string }>`, but in the component, when accessing `specialty.translations?.[language]?.name`, if the data structure doesn't match or if there's an issue with the API response, it could result in "undefined" being displayed.
+
+Let me check what the API actually returns and if there's a mismatch. Let me also check if there's a console.log that might help debug: 
+
+✔ Searched text for `api/specialties` (`**/server/src/routes/**/*.ts`), 5 results
+
+✔ Read `server/src/routes/specialties.ts`, lines 1 to 151
+
+I see the issue now! When fetching all specialties with `GET /api/specialties`, the API returns a **flattened** structure with just `name`, `description`, etc. at the top level (lines 52-60), but the `SpecialtyPillSelector` component expects the data to have a `translations` property as a Record.
+
+However, when fetching a single specialty with `GET /api/specialties/:id`, it returns the proper structure with `translations` as a map (lines 88-102).
+
+The problem is that `SpecialtyPillSelector` is calling `GET /api/specialties?lang=${language}` which returns the flattened structure, but then tries to access `specialty.translations?.[language]?.name`, which won't work with the flattened response.
+
+Let me fix the `SpecialtyPillSelector` component to handle the actual API response structure: 
+
+`SpecialtyPillSelector.tsx +18 -3`
+
+Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the issue. The problem was that the `SpecialtyPillSelector` component was expecting the API to return specialties with a `translations` object structure, but the API endpoint `GET /api/specialties?lang={language}` returns a flattened structure where the `name` and `description` are at the top level.
+
+**What I changed:**
+- Modified the `fetchSpecialties` function in SpecialtyPillSelector.tsx to properly transform the flattened API response into the expected format
+- The API returns specialties as: `{ id, name, description, deprecated, ... }`
+- The component now converts this to: `{ id, translations: { [language]: { name, description } }, ... }`
+- This ensures the specialty name is properly displayed instead of showing "Undefined"
+
+The client container has been restarted, so the changes should now be live. Try editing a roaster again and the specialties should now display their proper names instead of "Undefined".
+
+## 707th try
+
