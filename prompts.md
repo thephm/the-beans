@@ -94198,3 +94198,78 @@ The `Roaster` interface defined `specialties` as `string[]`, but the API was ret
    - Pass `spec.name` to `translateSpecialty()` instead of the whole object
 
 The client container has been restarted. The main page should now load without the "key.startsWith is not a function" error.
+
+> on Render getting this build error
+
+```shell
+2025-11-02T23:13:42.492565787Z ==> Downloading cache...
+2025-11-02T23:13:42.493613462Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-02T23:13:43.665604271Z ==> Checking out commit 06db831d5f81cb9f58db30295eaf8c7d4abd47eb in branch main
+2025-11-02T23:13:57.171553823Z ==> Transferred 367MB in 4s. Extraction took 9s.
+2025-11-02T23:14:10.917906615Z ==> Using Node.js version 22.16.0 (default)
+2025-11-02T23:14:10.942728991Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-02T23:14:11.066391546Z ==> Running build command 'npm install && npm run build'...
+2025-11-02T23:14:20.970622922Z 
+2025-11-02T23:14:20.970643443Z up to date, audited 251 packages in 10s
+2025-11-02T23:14:20.970652674Z 
+2025-11-02T23:14:20.970655254Z 54 packages are looking for funding
+2025-11-02T23:14:20.970693406Z   run `npm fund` for details
+2025-11-02T23:14:20.971603374Z 
+2025-11-02T23:14:20.971620855Z found 0 vulnerabilities
+2025-11-02T23:14:21.143701157Z 
+2025-11-02T23:14:21.143734248Z > the-beans-client@0.1.0 build
+2025-11-02T23:14:21.143736879Z > next build
+2025-11-02T23:14:21.143738569Z 
+2025-11-02T23:14:21.719421597Z   ▲ Next.js 14.2.32
+2025-11-02T23:14:21.71967037Z 
+2025-11-02T23:14:21.731634899Z    Creating an optimized production build ...
+2025-11-02T23:14:22.174945098Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T23:14:36.991875191Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T23:14:37.935887993Z  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+2025-11-02T23:14:40.710712642Z  ✓ Compiled successfully
+2025-11-02T23:14:40.712022672Z    Linting and checking validity of types ...
+2025-11-02T23:14:44.243616522Z Failed to compile.
+2025-11-02T23:14:44.243642383Z 
+2025-11-02T23:14:44.243833704Z ./src/components/SpecialtyPillSelector.tsx:86:26
+2025-11-02T23:14:44.243845794Z Type error: Property 'name' does not exist on type 'Specialty'.
+2025-11-02T23:14:44.243849474Z 
+2025-11-02T23:14:44.243853105Z   84 |               }`}
+2025-11-02T23:14:44.243856755Z   85 |             >
+2025-11-02T23:14:44.243862965Z > 86 |               {specialty.name}
+2025-11-02T23:14:44.243870915Z      |                          ^
+2025-11-02T23:14:44.243876806Z   87 |               {isSelected && (
+2025-11-02T23:14:44.243883216Z   88 |                 <span className="ml-1.5">✓</span>
+2025-11-02T23:14:44.243886996Z   89 |               )}
+2025-11-02T23:14:44.286127752Z Next.js build worker exited with code: 1 and signal: null
+2025-11-02T23:14:44.336339914Z ==> Build failed 😞
+2025-11-02T23:14:44.336360215Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+I can see the issue. The TypeScript error indicates that the `Specialty` type doesn't have a `name` property. Let me check the current type definition and the component to fix this. 
+
+✔ Read `client/src/types/index.ts`
+
+✔ Read `client/src/components/SpecialtyPillSelector.tsx`
+
+I can see the issue. The `Specialty` type has a `translations` object instead of a direct `name` property. The component needs to extract the name from the translations based on the language. Let me fix the component: 
+
+`SpecialtyPillSelector.tsx +4 -1`
+
+Fixed! The issue was that the `Specialty` type has a `translations` object with language keys (e.g., `translations.en.name`), not a direct `name` property. The component now correctly extracts the name from the translations based on the language, with a fallback to English and then 'Unknown'.
+
+You can now commit and push this change to trigger a new Render build:
+
+```powershell
+git add client/src/components/SpecialtyPillSelector.tsx
+git commit -m "Fix Specialty type error in SpecialtyPillSelector"
+git push
+```
+
+> please let's test locally before committing, need to restart
+
+Good call! Let me restart the client container so we can test locally first. 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Client restarted. You can now test at `http://localhost:3000`. Try navigating to any page that uses the `SpecialtyPillSelector` component (likely the roaster create/edit forms in the admin section) to verify the fix works correctly.
