@@ -72,6 +72,9 @@ export default function SpecialtyPillSelector({
       <div className="flex flex-wrap gap-2">
         {specialties.map((specialty) => {
           const isSelected = selectedSpecialtyIds.includes(specialty.id);
+          const specialtyName = specialty.translations?.[language]?.name || 
+                               specialty.translations?.['en']?.name || 
+                               'Unknown';
           return (
             <button
               key={specialty.id}
@@ -83,7 +86,7 @@ export default function SpecialtyPillSelector({
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
               }`}
             >
-              {specialty.name}
+              {specialtyName}
               {isSelected && (
                 <span className="ml-1.5">✓</span>
               )}
