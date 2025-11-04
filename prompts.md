@@ -96221,3 +96221,329 @@ The First Person entries that happened at 02:46 UTC on Nov 2 should now correctl
    - Now both use **local timezone** consistently via `getFullYear()`, `getMonth()`, `getDate()`, `getHours()`, and `getMinutes()`
 
 The audit logs now display in perfect descending chronological order with dates and times correctly shown in your local Eastern Time zone. Entries are sorted newest-first and the display accurately reflects when events actually occurred in your timezone.
+
+> i edited a roaster twice, first time changing their name and the second time their description and there are no audit log entries, should be two separate ones for each change I made.
+
+I'll investigate why audit log entries aren't being created when you edit a roaster. Let me check the audit logging implementation. 
+
+✔ Searched text for `audit|auditLog` (`**/server/src/routes/**/*.ts`), 20 results
+
+✔ Read `server/prisma/schema.prisma`
+
+Now let me check the roasters route to see if audit logging is implemented for roaster updates: 
+
+Searched text for `PUT|PATCH|update|audit` (`**/server/src/routes/roasters.ts`), 20 results
+
+✔ Read `server/src/routes/roasters.ts`
+
+Perfect! I can see the issue. The roaster PUT route has audit middleware attached:
+
+```typescript
+router.put('/:id', [...], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
+  ...
+  // Store entity for audit logging - auditAfter() middleware will handle the rest
+  res.locals.auditEntity = roaster;
+  ...
+}, auditAfter());
+```
+
+Let me check the audit middleware and service to see why logs aren't being created: 
+
+✔ Read `server/src/middleware/auditMiddleware.ts`
+
+✔ Read `server/src/lib/auditService.ts`
+
+Now I can see the issue! In the `auditAfter` middleware, there's a critical check that only creates audit logs if the response status code is successful (200-299):
+
+```typescript
+// Determine if operation was successful
+const isSuccess = res.statusCode >= 200 && res.statusCode < 300;
+```
+
+But more importantly, in auditService.ts the `calculateChanges` function will **skip logging if no changes are detected**:
+
+```typescript
+const fieldChanges = calculateChanges(data.oldValues, data.newValues);
+if (Object.keys(fieldChanges).length > 0) {
+  changes = fieldChanges;
+} else {
+  // No actual changes detected, skip logging
+  return;  // <-- THIS IS THE ISSUE!
+}
+```
+
+The problem is that the route is setting `res.locals.auditEntity` to the **updated roaster**, but this roaster includes Prisma relations that weren't in the old values. This causes the change detection to think there are changes when comparing fields, but the comparison might be failing somehow.
+
+Let me check what happens during a roaster update by looking at the logs: 
+
+✔ `docker logs the-beans-server-1 --tail 50 | Select-String -Pattern "audit"`
+
+The logs don't show the "auditAfter called" or "Audit log created" messages. Let me check for more relevant logs: 
+
+✔ `docker logs the-beans-server-1 --tail 100 | Select-String -Pattern "auditAfter|Audit log"`
+
+No audit logs are showing. This means the `auditAfter` middleware is either not being called or not detecting the conditions properly. The issue is that when you update a roaster, the `auditAfter` function is comparing the old and new values, but it's including Prisma relations in the comparison.
+
+Look at the roaster update - it includes `owner`, `roasterSpecialties`, etc. in the response, but these weren't in the `oldValues` captured. This causes issues with the change detection.
+
+The fix is to ensure we're only comparing the actual roaster fields, not the relations. Let me update the roaster route to properly store only the roaster data for audit: 
+
+`roasters.ts +6 -1`
+
+Good - the edit was applied. The lint errors are pre-existing and not related to my change. Now I need to restart the server container for the change to take effect: 
+
+✔ `docker-compose restart server`
+*Auto approved by rule `docker-compose`*
+
+Now let me wait a few seconds for the server to fully start and check the logs: 
+
+✔ `Start-Sleep -Seconds 5; docker logs the-beans-server-1 --tail 30`
+
+Server is starting. Let me wait a bit more for it to fully start: 
+
+✔ `Start-Sleep -Seconds 3; docker logs the-beans-server-1 --tail 10`
+
+Perfect! The server is running. Now, the fix I applied should work, but let me also check if there might be another issue. Looking back at the code, I realize the problem might also be in how the `captureOldValues` middleware captures the old roaster. Let me verify that it's not including relations: 
+
+✔ Read `server/src/middleware/auditMiddleware.ts`, lines 28 to 48
+
+Good! Now let me check the `captureOldValues` function to see if it's only capturing the roaster fields: 
+
+✔ Read `server/src/middleware/auditMiddleware.ts`, lines 53 to 73
+
+✔ Read `server/src/middleware/auditMiddleware.ts`, lines 68 to 88
+
+Perfect! I can see that `captureOldValues` is doing a simple `findUnique` without any `include` clause, so it's only getting the raw roaster fields without relations. This is good.
+
+Now my fix should work because:
+1. `captureOldValues` gets the old roaster WITHOUT relations
+2. My fix makes sure we store the new roaster WITHOUT relations in `res.locals.auditEntity`
+3. This means the `calculateChanges` function will compare apples to apples
+
+Now please try editing a roaster again - change the name or description - and see if audit logs are created. The server has been restarted with the fix in place.
+
+## 721st try
+
+> Made changes and no audit logs for today still
+
+Let me check if audit logs are actually being created by looking at the server logs in real-time to see what's happening: 
+
+✔ `docker logs the-beans-server-1 --tail 50 | Select-String -Pattern "auditAfter|Audit log|Update roaster"`
+
+No logs found. Let me add more detailed logging to see what's happening. Let me check the recent PUT requests: 
+
+✔ `docker logs the-beans-server-1 --tail 100 | Select-String -Pattern "PUT.*roasters"`
+
+```shell
+
+172.18.0.1 - - [04/Nov/2025:01:52:49 +0000] "PUT 
+/api/roasters/cmfs1w26g0001ua27odl9tzak HTTP/1.1" 200 603 "http://localhost:3000/"   
+"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)    
+Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [04/Nov/2025:01:52:50 +0000] "PUT 
+/api/roasters/cmfs1w26g0001ua27odl9tzak/source-countries HTTP/1.1" 200 2708
+"http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [04/Nov/2025:02:03:24 +0000] "PUT 
+/api/roasters/cmfs1w26g0001ua27odl9tzak HTTP/1.1" 200 624 "http://localhost:3000/"   
+"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)    
+Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [04/Nov/2025:02:03:24 +0000] "PUT 
+/api/roasters/cmfs1w26g0001ua27odl9tzak/source-countries HTTP/1.1" 200 2708
+"http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [04/Nov/2025:02:10:10 +0000] "PUT 
+/api/roasters/cmfs1w26g0001ua27odl9tzak HTTP/1.1" 200 624 "http://localhost:3000/"   
+"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)    
+Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [04/Nov/2025:02:10:10 +0000] "PUT 
+/api/roasters/cmfs1w26g0001ua27odl9tzak/source-countries HTTP/1.1" 200 2708
+"http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+```
+
+Good! I can see the PUT requests at 02:10:10. The requests are succeeding (200 status). The issue is that the `auditAfter` middleware's console.log isn't showing up. Let me add more debugging. First, let me check if the console.log is even in the code: 
+
+✔ Searched text for `console.log` (`**/server/src/middleware/auditMiddleware.ts`), 1 result
+
+The console.log is there. But it's not appearing in the logs. This suggests that the `auditAfter()` middleware might not be getting called at all, OR the response is being sent before the middleware runs.
+
+Let me check the issue more carefully. In Express, middleware placed AFTER the route handler as a function parameter won't run if you call `res.json()` inside the handler. The `auditAfter()` is being used incorrectly!
+
+Looking at the route:
+```typescript
+router.put('/:id', [...validators], requireAuth, auditBefore(...), captureOldValues(...), async (req, res) => {
+  ...
+  res.json({ message: '...', roaster });
+}, auditAfter());
+```
+
+The problem is that `auditAfter()` is listed as a parameter AFTER the main handler function. This means it should run after the handler completes. However, the issue is that when you call `res.json()` inside the handler, Express considers the response complete and won't call the next middleware.
+
+The fix is to explicitly call `next()` after setting up the audit data, or to call `auditAfter` logic manually. Let me update the approach to manually call the audit logging: 
+
+`roasters.ts +13 -3`
+
+Good! Now I also need to remove the middleware from the route definition since we're calling it directly: 
+
+✔ Searched text for `router.put('/:id'` (`**/server/src/routes/roasters.ts`), 2 results
+
+✔ Read `server/src/routes/roasters.ts`, lines 818 to 843
+
+I can see the middleware is still there. Since we're now calling `createAuditLog` directly, we still need the `auditBefore` and `captureOldValues` middleware to set up `req.auditData.oldValues`. Let me keep those but the change I made should work. Let me restart the server: 
+
+✔ `docker-compose restart server`
+
+✔ `Start-Sleep -Seconds 5; docker logs the-beans-server-1 --tail 15`
+
+```shell
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+> the-beans-server@1.0.0 dev
+> nodemon src/index.ts
+
+[nodemon] 3.1.10
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: ts,json
+[nodemon] starting `ts-node src/index.ts`
+```
+
+✔ `Start-Sleep -Seconds 3; docker logs the-beans-server-1 --tail 5`
+
+```shell
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19) {
+  diagnosticCodes: [ 2322 ]
+}
+```
+
+There's a TypeScript error! Let me check the full error: 
+
+✔ `docker logs the-beans-server-1 --tail 50 | Select-String -Pattern "error|Error" -Context 2,2`
+
+```shell
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.22.0 -> 6.18.0                      │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+/app/node_modules/ts-node/src/index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/routes/roasters.ts(1001,7): error TS2322: Type '{ email: string | null; id: string; latitude: number | null; longitude: number | null; createdAt: Date; updatedAt: Date; createdById: string | null; updatedById: string | null; ... 16 more ...; ownerId: string | null; } | null' is not assignable to type 'Record<string, any> | undefined'.
+  Type 'null' is not assignable to type 'Record<string, any> | undefined'.
+
+    at createTSError (/app/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/app/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/app/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/app/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/app/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/app/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19) {
+  diagnosticCodes: [ 2322 ]
+}
+```
+
+The error is on line 1001 - the `roasterForAudit` can be null, but the `createAuditLog` function expects `newValues` to be `Record<string, any> | undefined`, not null. Let me fix this: 
+
+`roasters.ts +2 -0`
+
+Good! The TypeScript error should be fixed. The server should auto-restart with nodemon. Let me check: 
+
+✔ `Start-Sleep -Seconds 5; docker logs the-beans-server-1 --tail 10`
+
+```shell
+    at Object.compile (/app/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/app/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/app/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19) {
+  diagnosticCodes: [ 2322 ]
+}
+[nodemon] app crashed - waiting for file changes before starting...
+```
+
+It's still showing the old error. Nodemon might not have detected the change. Let me manually restart: 
+
+✔ `docker-compose restart server`
+
+✔ `Start-Sleep -Seconds 5; docker logs the-beans-server-1 --tail 5`
+
+```shell
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19) {
+  diagnosticCodes: [ 2322 ]
+}
+[nodemon] app crashed - waiting for file changes before starting...
+```
+
+Still the same error. The file might not have been updated in the container. Let me check if the file was properly saved and trigger a rebuild: 
+
+✔ `docker exec the-beans-server-1 cat /app/src/routes/roasters.ts | Select-String -Pattern "if \(roasterForAudit\)" -Context 2,2`
+
+```shell
+
+  
+      // Create audit log directly
+>     if (roasterForAudit) {
+        await createAuditLog({
+          action: 'UPDATE',
+```
+
+Good! The fix is in the container. But the error persists. Let me check the exact line 1001: 
+
+✔ `docker exec the-beans-server-1 sed -n '995,1010p' /app/src/routes/roasters.ts`
+
+```shell
+        entityType: 'roaster',
+        entityId: id,
+        entityName: getEntityName('roaster', roasterForAudit),
+        userId: req.userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        oldValues: req.auditData?.oldValues,
+        newValues: roasterForAudit,
+      });
+    }
+
+    res.json({
+      message: 'Roaster updated successfully',
+      roaster,
+    });
+  } catch (error: any) {
+```
+
+I see line 1003 has `newValues: roasterForAudit` which is inside the `if (roasterForAudit)` block, so it should be non-null. But TypeScript is still complaining. The issue is that TypeScript doesn't narrow the type inside the `if` block for the argument. Let me force it with a type assertion: 
+
+`roasters.ts +2 -2`
+
+✔ `Start-Sleep -Seconds 3; docker logs the-beans-server-1 --tail 5`
+
+```shell
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: ts,json
+[nodemon] starting `ts-node src/index.ts`
+✅ Server running on http://0.0.0.0:5000
+📚 API Documentation available at http://localhost:5000/api-docs
+```
+
+Perfect! The server is now running. Now please try editing a roaster again (change the name or description) and the audit logs should be created.
+
+To verify it's working, after you make a change, I can check the database or logs to confirm the audit entry was created.

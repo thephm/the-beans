@@ -983,8 +983,25 @@ router.put('/:id', [
       }
     }
 
-    // Store entity for audit logging - auditAfter() middleware will handle the rest
-    res.locals.auditEntity = roaster;
+    // Fetch the updated roaster WITHOUT relations for accurate audit comparison
+    const roasterForAudit = await prisma.roaster.findUnique({
+      where: { id }
+    });
+
+    // Create audit log directly
+    if (roasterForAudit) {
+      await createAuditLog({
+        action: 'UPDATE',
+        entityType: 'roaster',
+        entityId: id,
+        entityName: getEntityName('roaster', roasterForAudit),
+        userId: req.userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        oldValues: req.auditData?.oldValues as Record<string, any>,
+        newValues: roasterForAudit as Record<string, any>,
+      });
+    }
 
     res.json({
       message: 'Roaster updated successfully',
@@ -997,7 +1014,7 @@ router.put('/:id', [
     }
     res.status(500).json({ error: 'Internal server error' });
   }
-}, auditAfter());
+});
 
 /**
  * @swagger
