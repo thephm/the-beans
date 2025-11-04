@@ -228,6 +228,17 @@ export function getEntityName(entityType: string, entity: any): string {
       return `Favorite: ${entity.roaster?.name || 'Unknown Roaster'}`;
     case 'comment':
       return `Comment on ${entity.review?.title || 'review'}`;
+    case 'specialty':
+      // For specialty, try to get the English translation name first
+      if (entity.translations) {
+        const enTranslation = Array.isArray(entity.translations) 
+          ? entity.translations.find((t: any) => t.language === 'en')
+          : entity.translations;
+        if (enTranslation?.name) {
+          return enTranslation.name;
+        }
+      }
+      return entity.name || entity.id;
     default:
       return entity.id || 'Unknown';
   }

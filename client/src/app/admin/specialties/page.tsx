@@ -120,7 +120,7 @@ const AdminSpecialtiesPage: React.FC = () => {
                 )}
                 <div className="flex items-center gap-2 mt-2">
                   <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                    {specialty.roasterCount} {t('admin.specialties.roasterCount', '# Roasters')}
+                    {specialty.roasterCount} {t('admin.specialties.roasterCount', 'Roasters')}
                   </span>
                   {specialty.deprecated && (
                     <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
@@ -146,7 +146,7 @@ const AdminSpecialtiesPage: React.FC = () => {
                 {t('admin.specialties.description', 'Description')}
               </th>
               <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
-                {t('admin.specialties.roasterCount', '# Roasters')}
+                {t('admin.specialties.roasterCount', 'Roasters')}
               </th>
               <th className="py-3 px-4 border-b text-center font-medium text-gray-900">
                 {t('admin.specialties.deprecated', 'Deprecated')}

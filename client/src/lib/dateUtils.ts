@@ -5,7 +5,7 @@
 /**
  * Formats a date string or Date object to YYYY-MM-DD format
  * @param dateInput - Date string or Date object
- * @returns Formatted date string in YYYY-MM-DD format
+ * @returns Formatted date string in YYYY-MM-DD format (local timezone)
  */
 export const formatDateToYYYYMMDD = (dateInput: string | Date): string => {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
@@ -14,7 +14,12 @@ export const formatDateToYYYYMMDD = (dateInput: string | Date): string => {
     return '';
   }
   
-  return date.toISOString().split('T')[0];
+  // Format in local timezone instead of UTC
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
 };
 
 /**
@@ -56,7 +61,7 @@ export const formatFullDateTimeToYYYYMMDD = (dateInput: string | Date): string =
 /**
  * Formats a date string or Date object to HH:MM format (time only)
  * @param dateInput - Date string or Date object
- * @returns Formatted time string in HH:MM format
+ * @returns Formatted time string in HH:MM format (local time)
  */
 export const formatTimeToHHMM = (dateInput: string | Date): string => {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
@@ -65,5 +70,9 @@ export const formatTimeToHHMM = (dateInput: string | Date): string => {
     return '';
   }
   
-  return date.toTimeString().slice(0, 5); // HH:MM format
+  // Format time in local timezone
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  
+  return `${hours}:${minutes}`;
 };
