@@ -453,7 +453,7 @@
       "title": "Specialties",
       "name": "Specialty",
       "description": "Description",
-      "roasterCount": "# Roasters",
+      "roasterCount": "Roasters",
       "deprecated": "Deprecated",
       "yes": "Yes",
       "no": "No",

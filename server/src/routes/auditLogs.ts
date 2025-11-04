@@ -154,7 +154,10 @@ router.get('/audit-logs',
               }
             }
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: [
+            { createdAt: 'desc' },
+            { id: 'desc' }
+          ],
           skip,
           take: limit
         }),
@@ -162,6 +165,14 @@ router.get('/audit-logs',
       ]);
 
       const totalPages = Math.ceil(total / limit);
+
+      // Set cache-control headers to prevent browser caching
+      res.set({
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store'
+      });
 
       res.json({
         auditLogs,
