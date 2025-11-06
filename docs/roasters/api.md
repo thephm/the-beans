@@ -58,12 +58,11 @@ Create a new roaster (requires authentication).
 	"latitude": 0,
 	"longitude": 0,
 	"specialties": ["Espresso", ...],
-	"ownerName": "...",
-	"ownerEmail": "...",
-	"ownerBio": "...",
-	"ownerMobile": "..."
+	"ownerEmail": "..."
 }
 ```
+
+**Note:** Owner contact fields (ownerName, ownerBio, ownerMobile) are deprecated. Use the People/CRM API (`/api/people`) for managing roaster contacts. See [OWNER_CONTACT_FIELDS.md](OWNER_CONTACT_FIELDS.md) for details.
 
 **Response:**
 ```json
@@ -99,7 +98,9 @@ Delete an image (requires authentication and ownership).
 
 ## Roaster Object Fields
 
-- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `ownerName`, `ownerEmail`, `ownerBio`, `ownerMobile`, `beans`, `reviews`, `_count`
+- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `people`, `_count`
+
+**Note:** `people` field contains RoasterPerson objects (contacts/roles). Legacy owner contact fields are deprecated.
 
 
 See the Swagger (OpenAPI) documentation for full field details.
