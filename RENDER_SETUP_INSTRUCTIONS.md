@@ -62,3 +62,21 @@ The code now includes fallback logic:
 - Backend includes production frontend URL in default CORS origins
 
 But explicit environment variables are still recommended for reliability.
+
+### Contact Us Email (SMTP)
+
+To enable the Contact Us form and email notifications on Render, add these environment variables to your backend service:
+
+```
+CONTACT_US_EMAIL=your-contact-email@example.com
+SMTP_HOST=smtp.yourprovider.com
+SMTP_PORT=587
+SMTP_USER=your-smtp-username
+SMTP_PASS=your-smtp-password
+```
+- Set these in the Render dashboard under your backend service's Environment tab.
+- After saving, redeploy or restart the backend service for changes to take effect.
+
+If you use a service like Mailtrap for testing, use their SMTP credentials here.
+
+---

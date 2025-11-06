@@ -96,6 +96,32 @@ docker-compose exec server npx prisma generate
 docker-compose exec server npx prisma migrate reset
 ```
 
+## 📧 Contact Us Email Setup
+
+To enable the Contact Us form and email notifications, configure the following environment variables in `server/.env`:
+
+```
+# Contact Us email recipient
+CONTACT_US_EMAIL=your-contact-email@example.com
+
+# SMTP server settings
+SMTP_HOST=smtp.yourprovider.com
+SMTP_PORT=587
+SMTP_USER=your-smtp-username
+SMTP_PASS=your-smtp-password
+```
+
+- The `CONTACT_US_EMAIL` is the address that will receive messages from the Contact Us form.
+- The SMTP settings must match your email provider's requirements.
+- After updating `.env`, restart the server container:
+  ```bash
+  docker-compose restart server
+  ```
+
+If you need to test email delivery, use a service like [Mailtrap](https://mailtrap.io/) or your own SMTP credentials.
+
+---
+
 ##  Documentation
 
 Comprehensive documentation is maintained in the [`docs/`](./docs/) directory following docs-as-code principles.
