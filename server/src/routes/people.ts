@@ -289,6 +289,9 @@ router.post('/', [
     };
 
     // Audit log: CREATE person
+    // Extract only the actual database fields (no relations) for audit
+    const { user: _user, ...valuesForAudit } = person as any;
+    
     await createAuditLog({
       action: 'CREATE',
       entityType: 'person',
@@ -297,7 +300,7 @@ router.post('/', [
       userId,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),
-      newValues: person,
+      newValues: valuesForAudit,
     });
 
     res.status(201).json({
@@ -465,6 +468,10 @@ router.put('/:id', [
     };
 
     // Audit log: UPDATE person
+    // Extract only the actual database fields (no relations) for audit comparison
+    const { roaster: _roaster1, user: _user1, ...oldValuesForAudit } = existingperson as any;
+    const { roaster: _roaster2, user: _user2, ...newValuesForAudit } = updatedperson as any;
+    
     await createAuditLog({
       action: 'UPDATE',
       entityType: 'person',
@@ -473,8 +480,8 @@ router.put('/:id', [
       userId,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),
-      oldValues: existingperson,
-      newValues: updatedperson,
+      oldValues: oldValuesForAudit,
+      newValues: newValuesForAudit,
     });
 
     res.json({
@@ -526,6 +533,9 @@ router.delete('/:id', [
     });
 
     // Audit log: DELETE person
+    // Extract only the actual database fields (no relations) for audit
+    const { roaster: _roaster, user: _user, ...valuesForAudit } = existingperson as any;
+    
     await createAuditLog({
       action: 'DELETE',
       entityType: 'person',
@@ -534,7 +544,7 @@ router.delete('/:id', [
       userId,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),
-      oldValues: existingperson,
+      oldValues: valuesForAudit,
     });
 
     res.json({
