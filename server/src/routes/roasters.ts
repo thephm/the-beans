@@ -892,6 +892,14 @@ router.put('/:id', [
       }
     });
 
+    // Capture old specialty IDs for audit trail BEFORE updating
+    const oldSpecialtyIds = specialtyIds !== undefined ? (
+      await prisma.roasterSpecialty.findMany({
+        where: { roasterId: id },
+        select: { specialtyId: true }
+      })
+    ).map((rs: { specialtyId: string }) => rs.specialtyId).sort() : undefined;
+
     const roaster = await prisma.roaster.update({
       where: { id },
       data: {
@@ -988,8 +996,25 @@ router.put('/:id', [
       where: { id }
     });
 
+    // Capture new specialty IDs for audit trail AFTER updating
+    const newSpecialtyIds = specialtyIds !== undefined ? (
+      await prisma.roasterSpecialty.findMany({
+        where: { roasterId: id },
+        select: { specialtyId: true }
+      })
+    ).map((rs: { specialtyId: string }) => rs.specialtyId).sort() : undefined;
+
     // Create audit log directly
     if (roasterForAudit) {
+      const oldValues = req.auditData?.oldValues as Record<string, any>;
+      const newValues = roasterForAudit as Record<string, any>;
+      
+      // Add specialty changes to the values if specialties were updated
+      if (oldSpecialtyIds !== undefined && newSpecialtyIds !== undefined) {
+        oldValues.specialtyIds = oldSpecialtyIds;
+        newValues.specialtyIds = newSpecialtyIds;
+      }
+      
       await createAuditLog({
         action: 'UPDATE',
         entityType: 'roaster',
@@ -998,8 +1023,8 @@ router.put('/:id', [
         userId: req.userId,
         ipAddress: getClientIP(req),
         userAgent: getUserAgent(req),
-        oldValues: req.auditData?.oldValues as Record<string, any>,
-        newValues: roasterForAudit as Record<string, any>,
+        oldValues,
+        newValues,
       });
     }
 

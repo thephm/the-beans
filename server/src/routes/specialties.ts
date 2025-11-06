@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
 import { auditBefore, auditAfter } from '../middleware/auditMiddleware';
+import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -182,12 +183,15 @@ router.put('/:id',
       const { translations, deprecated } = req.body;
       req.userId = req.user?.id;
 
-      // Capture old values for audit
+      // Capture old values for audit (including translations)
       const oldSpecialty = await prisma.specialty.findUnique({
         where: { id },
         include: { translations: true }
       });
-      req.auditData.oldValues = oldSpecialty;
+      
+      if (!oldSpecialty) {
+        return res.status(404).json({ error: 'Specialty not found' });
+      }
 
       // Update specialty
       const updateData: any = {};
@@ -227,22 +231,33 @@ router.put('/:id',
         }
       }
 
-      // Fetch updated specialty with translations
+      // Fetch updated specialty with translations for audit comparison
       const updatedSpecialty = await prisma.specialty.findUnique({
         where: { id },
         include: { translations: true }
       });
 
-      // Store entity for audit logging
-      res.locals.auditEntity = updatedSpecialty;
+      // Create audit log directly to ensure translation changes are captured
+      if (updatedSpecialty) {
+        await createAuditLog({
+          action: 'UPDATE',
+          entityType: 'specialty',
+          entityId: id,
+          entityName: getEntityName('specialty', updatedSpecialty),
+          userId: req.userId,
+          ipAddress: getClientIP(req),
+          userAgent: getUserAgent(req),
+          oldValues: oldSpecialty as Record<string, any>,
+          newValues: updatedSpecialty as Record<string, any>,
+        });
+      }
 
       res.json(updatedSpecialty);
     } catch (error) {
       console.error('Error updating specialty:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  },
-  auditAfter()
+  }
 );
 
 // DELETE /api/specialties/:id - Delete a specialty (admin only)
