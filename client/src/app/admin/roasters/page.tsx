@@ -70,12 +70,15 @@ const AdminRoastersPage: React.FC = () => {
   const onFormSuccess = () => {
     setEditingId(null);
     setShowAddForm(false);
+    // Always navigate to the Roasters list after save/delete
+    router.push('/admin/roasters');
     fetchRoasters();
   };
 
   const onFormCancel = () => {
     setEditingId(null);
     setShowAddForm(false);
+    router.push('/admin/roasters');
   };
 
   if (editingId || showAddForm) {
