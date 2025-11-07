@@ -675,6 +675,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             featured: data.featured || false,
             rating: data.rating || 0,
             onlineOnly: data.onlineOnly || false,
+            showHours: typeof data.showHours === 'boolean' ? data.showHours : true,
             hours: convertHoursFormat(data.hours),
             images: data.images || [],
           });

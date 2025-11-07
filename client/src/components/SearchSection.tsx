@@ -28,6 +28,87 @@ export function SearchSection({
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
   const [localLocation, setLocalLocation] = useState(location)
   const [popularSearches, setPopularSearches] = useState<string[]>([])
+  const [detectingLocation, setDetectingLocation] = useState(false)
+  
+  // Reverse geocode coordinates to get city name
+  const reverseGeocode = async (lat: number, lng: number) => {
+    try {
+      // Using OpenStreetMap Nominatim API for reverse geocoding (free, no API key needed)
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`,
+        {
+          headers: {
+            'User-Agent': 'TheBeans Coffee App' // Required by Nominatim
+          }
+        }
+      )
+      
+      if (response.data && response.data.address) {
+        const address = response.data.address
+        // Try to get city from various fields (different regions use different names)
+        const city = address.city || 
+                    address.town || 
+                    address.village || 
+                    address.municipality ||
+                    address.county
+        
+        if (city) {
+          return city
+        }
+      }
+    } catch (error) {
+      console.error('Reverse geocoding failed:', error)
+    }
+    return null
+  }
+
+  // Detect user's location and fill in the closest city
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      alert(t('search.geolocationNotSupported') || 'Geolocation is not supported by your browser')
+      return
+    }
+
+    setDetectingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords
+        const cityName = await reverseGeocode(latitude, longitude)
+        
+        if (cityName) {
+          handleLocationChange(cityName)
+        } else {
+          alert(t('search.couldNotDetectCity') || 'Could not detect your city. Please enter it manually.')
+        }
+        setDetectingLocation(false)
+      },
+      (error) => {
+        console.error('Geolocation error:', error)
+        let errorMessage = t('search.locationDetectionFailed') || 'Failed to detect your location.'
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = t('search.locationPermissionDenied') || 'Location permission denied. Please enable location access.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = t('search.locationUnavailable') || 'Location information unavailable.'
+            break
+          case error.TIMEOUT:
+            errorMessage = t('search.locationTimeout') || 'Location detection timed out.'
+            break
+        }
+        
+        alert(errorMessage)
+        setDetectingLocation(false)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    )
+  }
+
   // Fetch popular searches from backend
   const fetchPopularSearches = async () => {
     try {
@@ -160,15 +241,29 @@ export function SearchSection({
               <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
                 {t('search.locationLabel')}
               </label>
-              <input
-                type="text"
-                id="location"
-                value={localLocation}
-                onChange={(e) => handleLocationChange(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={t('search.locationPlaceholder')}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  id="location"
+                  value={localLocation}
+                  onChange={(e) => handleLocationChange(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={t('search.locationPlaceholder')}
+                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900"
+                />
+                <button
+                  onClick={detectLocation}
+                  disabled={detectingLocation}
+                  className="px-4 py-3 bg-gradient-to-r from-lavender-500 to-orchid-500 text-white rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  title={t('search.detectLocationTooltip') || 'Use my location'}
+                >
+                  {detectingLocation ? (
+                    <span className="inline-block animate-spin">⟳</span>
+                  ) : (
+                    '📍'
+                  )}
+                </button>
+              </div>
             </div>
             
             <div className="md:col-span-1 flex items-end">

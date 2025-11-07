@@ -71,7 +71,14 @@
   "locationPlaceholder": "Entrer l'emplacement",
   "searchButton": "Rechercher",
   "popularSearches": "Recherches populaires",
-  "noPopularSearches": "Aucune recherche populaire pour l'instant. Commencez à chercher pour voir les tendances !"
+  "noPopularSearches": "Aucune recherche populaire pour l'instant. Commencez à chercher pour voir les tendances !",
+  "detectLocationTooltip": "Utiliser ma position",
+  "geolocationNotSupported": "La géolocalisation n'est pas prise en charge par votre navigateur",
+  "couldNotDetectCity": "Impossible de détecter votre ville. Veuillez la saisir manuellement.",
+  "locationDetectionFailed": "Échec de la détection de votre position.",
+  "locationPermissionDenied": "Permission de localisation refusée. Veuillez activer l'accès à la localisation.",
+  "locationUnavailable": "Informations de localisation non disponibles.",
+  "locationTimeout": "Délai de détection de la localisation dépassé."
   },
   "specialties": {
     "espresso": "Espresso",
