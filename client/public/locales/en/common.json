@@ -60,7 +60,14 @@
   "locationPlaceholder": "Enter location",
   "searchButton": "Search",
   "popularSearches": "Popular searches",
-  "noPopularSearches": "No popular searches yet. Start searching to see trends!"
+  "noPopularSearches": "No popular searches yet. Start searching to see trends!",
+  "detectLocationTooltip": "Use my location",
+  "geolocationNotSupported": "Geolocation is not supported by your browser",
+  "couldNotDetectCity": "Could not detect your city. Please enter it manually.",
+  "locationDetectionFailed": "Failed to detect your location.",
+  "locationPermissionDenied": "Location permission denied. Please enable location access.",
+  "locationUnavailable": "Location information unavailable.",
+  "locationTimeout": "Location detection timed out."
   },
   "specialties": {
     "espresso": "Espresso",
