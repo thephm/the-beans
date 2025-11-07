@@ -56,6 +56,7 @@ export interface Roaster {
   images: string[];
   imageUrl?: string; // Added for API compatibility
   hours?: Record<string, any>;
+  showHours?: boolean; // Toggle to show/hide hours section (separate from onlineOnly)
   onlineOnly?: boolean; // True if roaster operates online only (no physical location)
   specialties: { id: string; name: string; deprecated?: boolean }[];
   

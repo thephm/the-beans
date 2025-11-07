@@ -15,14 +15,6 @@ router.post(
     body('message').notEmpty().isString(),
   ],
   async (req: express.Request, res: express.Response) => {
-    console.log('Contact form POST received:', {
-      firstName: req.body?.firstName,
-      lastName: req.body?.lastName,
-      email: req.body?.email,
-      message: req.body?.message,
-      ip: req.ip,
-      time: new Date().toISOString()
-    });
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -57,7 +49,6 @@ router.post(
       });
       // Verify SMTP connection before sending
       await transporter.verify().catch((verifyErr: any) => {
-        console.error('SMTP verification failed:', verifyErr);
         throw new Error('SMTP verification failed: ' + verifyErr.message);
       });
       await transporter.sendMail({
@@ -66,11 +57,6 @@ router.post(
         subject: 'New message for thebeans.ca',
         replyTo: email,
         text: message,
-      }).then((info: any) => {
-        console.log('Contact email sent:', info);
-      }).catch((sendErr: any) => {
-        console.error('Error sending contact email:', sendErr);
-        throw new Error('Error sending contact email: ' + sendErr.message);
       });
       return res.json({ success: true });
     } catch (err: any) {
