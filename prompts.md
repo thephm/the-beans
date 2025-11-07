@@ -99516,3 +99516,83 @@ I’ll identify the relevant form and update its default state for "show hours" 
 *Auto approved by rule `docker-compose`*
 
 "Show hours" will now default to off when adding a new roaster. The frontend container has been restarted for the change to take effect. No further action is needed.
+
+## Add action button to phone the roaster #136
+
+https://github.com/thephm/the-beans/issues/136
+
+> Add a "Call" action button beside the phone # - if it exsits - to phone the roaster from the view roaster page
+
+✔ Searched text for `phone` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Searched text for `Roaster` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Searched text for `phone` (`**/client/src/app/roasters/**`), 8 results
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 421 to 461
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 1 to 21
+
+`page.tsx +10 -0`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+A "Call" action button now appears beside the phone number on the view roaster page, allowing users to phone the roaster directly. The frontend container has been restarted and the change is live.
+
+## 766th try
+
+> When I switch to french, the button still says Call. Also the button is too wide for English, see screenshot
+
+✔ Searched text for `call` (`**/client/public/locales/fr/common.json`), no results
+
+✔ Searched text for `roasterDetail` (`**/client/public/locales/fr/common.json`), 1 result
+
+✔ Read `client/public/locales/fr/common.json`, lines 313 to 353
+
+✔ Searched text for `call` (`**/client/public/locales/en/common.json`), 1 result
+
+✔ Searched text for `roasterDetail` (`**/client/public/locales/en/common.json`), 1 result
+
+✔ Read `client/public/locales/en/common.json`, lines 314 to 354
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 421 to 461
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 1 to 41
+
+✔ Read `client/public/locales/en/common.json`, lines 354 to 394
+
+✔ Read `client/public/locales/en/common.json`, lines 294 to 334
+
+✔ Read `client/public/locales/fr/common.json`, lines 293 to 333
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 381 to 421
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 461 to 501
+
+`page.tsx +2 -2`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The "Call" button now uses the correct translation in French ("Appeler") and is more compact in English. The label is hidden on small screens for better fit. The frontend container has been restarted and the changes are live.
+
+> you fixed the french but the button is still too wide see attachment
+
+`page.tsx +4 -3`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The "Call" button is now more compact, with reduced padding, font size, and label hidden on medium and smaller screens. The frontend container has been restarted and the change is live.
+
+## 767th try
+
+> No I didn't want it shrunk, remove the icon in it and make it as high as it was but narrow
+
+`page.tsx +3 -4`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+  
+The "Call" button now has no icon, is as tall as before, and is narrower for a better fit. The frontend container has been restarted and the change is live.
