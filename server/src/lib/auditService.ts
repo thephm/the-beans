@@ -141,37 +141,24 @@ export async function createAuditLog(data: AuditLogData): Promise<void> {
       }
     }
 
-    // For CREATE actions, show new values (excluding sensitive fields)
+    // For CREATE actions, show only fields with actual values (excluding sensitive fields and blanks)
     if (data.action === 'CREATE' && data.newValues) {
       const createChanges: Record<string, any> = {};
       const sensitiveFields = ['password', 'hashedPassword', 'token', 'secret', 'createdAt', 'updatedAt'];
-      
-      // Define field order for better presentation
-      const fieldOrder = ['id', 'language', 'firstName', 'lastName', 'username', 'email'];
-      const otherFields: string[] = [];
-      
-      // First, collect all field names and separate ordered from others
-      if (data.newValues) {
-        Object.keys(data.newValues).forEach(key => {
-          if (!sensitiveFields.includes(key) && data.newValues![key] !== undefined && data.newValues![key] !== null) {
-            if (!fieldOrder.includes(key)) {
-              otherFields.push(key);
-            }
-          }
-        });
-        
-        // Add fields in the specified order, then any remaining fields
-        [...fieldOrder, ...otherFields].forEach(key => {
-          const value = data.newValues![key];
-          if (!sensitiveFields.includes(key) && value !== undefined && value !== null) {
-            createChanges[key] = {
-              old: null,
-              new: value
-            };
-          }
-        });
-      }
-      
+      // Only include fields that are not blank, undefined, or null
+      Object.entries(data.newValues).forEach(([key, value]) => {
+        if (sensitiveFields.includes(key)) return;
+        if (value === undefined || value === null) return;
+        if (typeof value === 'string' && value.trim() === '') return;
+        if (Array.isArray(value) && value.length === 0) return;
+        if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) return;
+        if (typeof value === 'boolean' && value === false) return;
+        if (typeof value === 'number' && (value === 0 || Number.isNaN(value))) return;
+        createChanges[key] = {
+          old: null,
+          new: value
+        };
+      });
       if (Object.keys(createChanges).length > 0) {
         changes = createChanges;
       }
