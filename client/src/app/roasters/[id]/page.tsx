@@ -425,12 +425,22 @@ export default function RoasterDetail() {
                         <Phone sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
                         <div>
                           <p className="font-medium text-gray-900">{t('roasterDetail.phone')}</p>
-                          <a 
-                            href={`tel:${roaster.phone}`}
-                            className="text-primary-600 hover:text-primary-700"
-                          >
-                            {roaster.phone}
-                          </a>
+                          <div className="flex items-center gap-2">
+                            <a 
+                              href={`tel:${roaster.phone}`}
+                              className="text-primary-600 hover:text-primary-700"
+                            >
+                              {roaster.phone}
+                            </a>
+                            <a
+                              href={`tel:${roaster.phone}`}
+                              className="ml-2 px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 transition flex items-center justify-center text-sm h-8 min-w-[48px] max-w-[70px]"
+                              style={{ fontWeight: 500 }}
+                              title={t('roasterDetail.callAction', 'Call')}
+                            >
+                              {t('roasterDetail.callAction', 'Call')}
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
