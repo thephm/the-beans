@@ -5,7 +5,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
-import { Search } from '@mui/icons-material'
+import { Search, MyLocation } from '@mui/icons-material'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface SearchSectionProps {
@@ -77,6 +77,10 @@ export function SearchSection({
         
         if (cityName) {
           handleLocationChange(cityName)
+          if (onSearch) {
+            onSearch(localSearchQuery, cityName)
+            setTimeout(fetchPopularSearches, 200)
+          }
         } else {
           alert(t('search.couldNotDetectCity') || 'Could not detect your city. Please enter it manually.')
         }
@@ -260,7 +264,7 @@ export function SearchSection({
                   {detectingLocation ? (
                     <span className="inline-block animate-spin">⟳</span>
                   ) : (
-                    '📍'
+                    <MyLocation style={{ fontSize: 24 }} />
                   )}
                 </button>
               </div>

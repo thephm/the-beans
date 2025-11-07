@@ -230,7 +230,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     featured: roaster?.featured || false,
     rating: roaster?.rating || 0,
     onlineOnly: roaster?.onlineOnly || false,
-    showHours: roaster?.showHours !== undefined ? roaster.showHours : true,
+      showHours: roaster?.showHours !== undefined ? roaster.showHours : false,
     hours: roaster?.hours || {
       monday: { open: '08:00', close: '18:00', closed: false },
       tuesday: { open: '08:00', close: '18:00', closed: false },
@@ -1859,7 +1859,36 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           )}
 
           {/* Form Actions */}
-          <div className="mt-8 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+          <div className="mt-8 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4 relative">
+            {roaster?.id && (
+              <button
+                type="button"
+                onClick={async () => {
+                  if (window.confirm('Are you sure you want to delete this roaster? This action cannot be undone.')) {
+                    try {
+                      const token = localStorage.getItem('token');
+                      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                      const response = await fetch(`${apiUrl}/api/roasters/${roaster.id}`, {
+                        method: 'DELETE',
+                        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                      });
+                      if (response.ok) {
+                        alert('Roaster deleted successfully.');
+                        onSuccess();
+                      } else {
+                        const errorData = await response.json();
+                        alert(errorData.error || 'Failed to delete roaster.');
+                      }
+                    } catch (err) {
+                      alert('Failed to delete roaster.');
+                    }
+                  }
+                }}
+                className="absolute left-0 bottom-0 sm:static sm:mr-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                {t('adminForms.roasters.delete', 'Delete')}
+              </button>
+            )}
             <button
               type="button"
               onClick={onCancel}

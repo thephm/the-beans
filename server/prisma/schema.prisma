@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
@@ -20,216 +17,173 @@ model Search {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  firstName String?
-  lastName  String?
-  avatar    String?
-  bio       String?
-  location  String?
-  latitude  Float?
-  longitude Float?
-  language  String   @default("en") @db.VarChar(5)
-  role      String   @default("user") @db.VarChar(16) // 'user' or 'admin'
-  lastLogin DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  settings   Json?
-  
-  // Audit fields
-  createdById String?
-  updatedById String?
-
-  // Relationships
-  roasters     Roaster[]
-  reviews      Review[]
-  favorites    Favorite[]
-  notifications Notification[]
-  comments     Comment[]
-  uploadedImages RoasterImage[]
-  personRoles RoasterPerson[] @relation("UserPersonRole")
-  createdPeople RoasterPerson[] @relation("PersonCreatedBy")
-  updatedPeople RoasterPerson[] @relation("PersonUpdatedBy")
-  
-  // Audit relationships
-  createdBy User? @relation("UserCreatedBy", fields: [createdById], references: [id])
-  updatedBy User? @relation("UserUpdatedBy", fields: [updatedById], references: [id])
-  
-  // Reverse audit relationships
-  createdUsers    User[]    @relation("UserCreatedBy")
-  updatedUsers    User[]    @relation("UserUpdatedBy")
-  createdRoasters Roaster[] @relation("RoasterCreatedBy")
-  updatedRoasters Roaster[] @relation("RoasterUpdatedBy")
-  createdReviews  Review[]  @relation("ReviewCreatedBy")
-  updatedReviews  Review[]  @relation("ReviewUpdatedBy")
-  createdBeans    Bean[]    @relation("BeanCreatedBy")
-  updatedBeans    Bean[]    @relation("BeanUpdatedBy")
+  id              String          @id @default(cuid())
+  email           String          @unique
+  username        String          @unique
+  password        String
+  firstName       String?
+  lastName        String?
+  avatar          String?
+  bio             String?
+  location        String?
+  latitude        Float?
+  longitude       Float?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  language        String          @default("en") @db.VarChar(5)
+  settings        Json?
+  role            String          @default("user") @db.VarChar(16)
+  createdById     String?
+  updatedById     String?
+  lastLogin       DateTime?
   auditLogs       AuditLog[]
+  createdBeans    Bean[]          @relation("BeanCreatedBy")
+  updatedBeans    Bean[]          @relation("BeanUpdatedBy")
+  comments        Comment[]
+  favorites       Favorite[]
+  notifications   Notification[]
+  createdReviews  Review[]        @relation("ReviewCreatedBy")
+  updatedReviews  Review[]        @relation("ReviewUpdatedBy")
+  reviews         Review[]
+  uploadedImages  RoasterImage[]
+  createdPeople   RoasterPerson[] @relation("PersonCreatedBy")
+  updatedPeople   RoasterPerson[] @relation("PersonUpdatedBy")
+  personRoles     RoasterPerson[] @relation("UserPersonRole")
+  createdRoasters Roaster[]       @relation("RoasterCreatedBy")
+  roasters        Roaster[]
+  updatedRoasters Roaster[]       @relation("RoasterUpdatedBy")
+  createdBy       User?           @relation("UserCreatedBy", fields: [createdById], references: [id])
+  createdUsers    User[]          @relation("UserCreatedBy")
+  updatedBy       User?           @relation("UserUpdatedBy", fields: [updatedById], references: [id])
+  updatedUsers    User[]          @relation("UserUpdatedBy")
 
   @@map("users")
 }
 
 model Roaster {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  email       String?
-  phone       String?
-  website     String?
-  address     String?
-  city        String?
-  state       String?
-  zipCode     String?
-  country     String   @default("US")
-  latitude    Float?
-  longitude   Float?
-  images      String[]
-  hours       Json?    // Store opening hours as JSON
-  showHours   Boolean  @default(true)  // Toggle to show/hide hours section (separate from onlineOnly)
-  
-  // Contact fields now managed via RoasterPerson (People/CRM)
-  onlineOnly  Boolean  @default(false) // True if roaster operates online only (no physical location)
-  verified    Boolean  @default(false)
-  featured    Boolean  @default(false)
-  rating      Float    @default(0)
-  reviewCount Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Audit tracking
-  createdById String?
-  updatedById String?
-
-  // Relationships
-  owner    User?    @relation(fields: [ownerId], references: [id])
-  ownerId  String?
-  people RoasterPerson[]
-  reviews  Review[]
-  favorites Favorite[]
-  beans    Bean[]
-  roasterImages RoasterImage[]
-  sourceCountries RoasterSourceCountry[]
+  id                 String                 @id @default(cuid())
+  name               String                 @unique
+  description        String?
+  email              String?
+  phone              String?
+  website            String?
+  address            String?
+  city               String?
+  state              String?
+  zipCode            String?
+  country            String                 @default("US")
+  latitude           Float?
+  longitude          Float?
+  images             String[]
+  hours              Json?
+  verified           Boolean                @default(false)
+  featured           Boolean                @default(false)
+  rating             Float                  @default(0)
+  reviewCount        Int                    @default(0)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  ownerId            String?
+  onlineOnly         Boolean                @default(false)
+  createdById        String?
+  updatedById        String?
+  showHours          Boolean                @default(true)
+  beans              Bean[]
+  favorites          Favorite[]
+  reviews            Review[]
+  roasterImages      RoasterImage[]
+  people             RoasterPerson[]
+  sourceCountries    RoasterSourceCountry[]
   roasterSpecialties RoasterSpecialty[]
-  
-  // Audit relationships
-  createdBy User? @relation("RoasterCreatedBy", fields: [createdById], references: [id])
-  updatedBy User? @relation("RoasterUpdatedBy", fields: [updatedById], references: [id])
+  createdBy          User?                  @relation("RoasterCreatedBy", fields: [createdById], references: [id])
+  owner              User?                  @relation(fields: [ownerId], references: [id])
+  updatedBy          User?                  @relation("RoasterUpdatedBy", fields: [updatedById], references: [id])
 
-  @@unique([name])
   @@map("roasters")
 }
 
 model RoasterPerson {
-  id        String   @id @default(cuid())
-  roasterId String
-  roaster   Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
-  
-  // Contact information
-  name      String
-  title     String?  // Job title/position
-  email     String?  // Optional - may not be a registered user
-  mobile    String?
-  bio       String?
-  
-  // Link to registered user (optional)
-  userId    String?
-  user      User?    @relation("UserPersonRole", fields: [userId], references: [id], onDelete: SetNull)
-  
-  // Roles (multiple roles per person)
-  roles     String[] // Array of role names: "owner", "admin", "billing"
-  
-  // Status
-  isActive  Boolean  @default(true)
-  isPrimary Boolean  @default(false) // Primary contact for the roaster
-  
-  // Audit fields
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  roasterId   String
+  name        String
+  email       String?
+  mobile      String?
+  bio         String?
+  userId      String?
+  roles       String[]
+  isActive    Boolean  @default(true)
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   createdById String?
   updatedById String?
-  
-  // Audit relationships  
-  createdBy User? @relation("PersonCreatedBy", fields: [createdById], references: [id])
-  updatedBy User? @relation("PersonUpdatedBy", fields: [updatedById], references: [id])
-  
-  @@unique([roasterId, email]) // Prevent duplicate emails per roaster
+  title       String?
+  createdBy   User?    @relation("PersonCreatedBy", fields: [createdById], references: [id])
+  roaster     Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+  updatedBy   User?    @relation("PersonUpdatedBy", fields: [updatedById], references: [id])
+  user        User?    @relation("UserPersonRole", fields: [userId], references: [id])
+
+  @@unique([roasterId, email])
   @@map("roaster_people")
 }
 
 model RoasterImage {
-  id          String   @id @default(cuid())
-  url         String   // Cloudinary URL
-  publicId    String   // Cloudinary public ID for deletion
-  filename    String?  // Original filename
-  description String?  // Alt text/description
-  isPrimary   Boolean  @default(false) // Mark one image as primary for display
-  uploadedAt  DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relationships
-  roaster     Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
-  roasterId   String
-  uploadedBy  User     @relation(fields: [uploadedById], references: [id])
+  id           String   @id @default(cuid())
+  url          String
+  publicId     String
+  filename     String?
+  description  String?
+  isPrimary    Boolean  @default(false)
+  uploadedAt   DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  roasterId    String
   uploadedById String
+  roaster      Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
 
   @@map("roaster_images")
 }
 
 model Bean {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  origin      String?  // Country/region of origin
-  process     String?  // Washed, Natural, Honey, etc.
-  roastLevel  String?  // Light, Medium, Dark
-  price       Float?
-  weight      String?  // 12oz, 1lb, etc.
-  tastingNotes String[] // Chocolate, Fruity, Nutty, etc.
-  availability Boolean @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Audit tracking
-  createdById String?
-  updatedById String?
-
-  // Relationships
-  roaster   Roaster @relation(fields: [roasterId], references: [id])
-  roasterId String
-  
-  // Audit relationships
-  createdBy User? @relation("BeanCreatedBy", fields: [createdById], references: [id])
-  updatedBy User? @relation("BeanUpdatedBy", fields: [updatedById], references: [id])
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  origin       String?
+  process      String?
+  roastLevel   String?
+  price        Float?
+  weight       String?
+  tastingNotes String[]
+  availability Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  roasterId    String
+  createdById  String?
+  updatedById  String?
+  createdBy    User?    @relation("BeanCreatedBy", fields: [createdById], references: [id])
+  roaster      Roaster  @relation(fields: [roasterId], references: [id])
+  updatedBy    User?    @relation("BeanUpdatedBy", fields: [updatedById], references: [id])
 
   @@map("beans")
 }
 
 model Review {
-  id        String   @id @default(cuid())
-  rating    Int      // 1-5 stars
-  title     String?
-  content   String?
-  images    String[]
-  helpful   Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Audit tracking
+  id          String    @id @default(cuid())
+  rating      Int
+  title       String?
+  content     String?
+  images      String[]
+  helpful     Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  roasterId   String?
   createdById String?
   updatedById String?
-
-  // Relationships
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  roaster   Roaster? @relation(fields: [roasterId], references: [id])
-  roasterId String?
-  comments  Comment[]
-  
-  // Audit relationships
-  createdBy User? @relation("ReviewCreatedBy", fields: [createdById], references: [id])
-  updatedBy User? @relation("ReviewUpdatedBy", fields: [updatedById], references: [id])
+  comments    Comment[]
+  createdBy   User?     @relation("ReviewCreatedBy", fields: [createdById], references: [id])
+  roaster     Roaster?  @relation(fields: [roasterId], references: [id])
+  updatedBy   User?     @relation("ReviewUpdatedBy", fields: [updatedById], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
   @@map("reviews")
 }
@@ -239,12 +193,10 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Relationships
-  user     User   @relation(fields: [userId], references: [id])
-  userId   String
-  review   Review @relation(fields: [reviewId], references: [id])
-  reviewId String
+  userId    String
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("comments")
 }
@@ -252,12 +204,10 @@ model Comment {
 model Favorite {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-
-  // Relationships
-  user      User    @relation(fields: [userId], references: [id])
   userId    String
-  roaster   Roaster @relation(fields: [roasterId], references: [id])
   roasterId String
+  roaster   Roaster  @relation(fields: [roasterId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, roasterId])
   @@map("favorites")
@@ -265,86 +215,74 @@ model Favorite {
 
 model Notification {
   id        String   @id @default(cuid())
-  type      String   // new_roaster, new_review, etc.
+  type      String
   title     String
   message   String
   read      Boolean  @default(false)
-  data      Json?    // Additional data for the notification
+  data      Json?
   createdAt DateTime @default(now())
-
-  // Relationships
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("notifications")
 }
 
 model Region {
   id          String    @id @default(cuid())
-  name        String    @unique // Latin America, Africa, Asia/Pacific, Caribbean
-  description String?   // Optional description of the region
+  name        String    @unique
+  description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
-  // Relationships
   countries   Country[]
-  
+
   @@map("regions")
 }
 
 model Country {
-  id          String    @id @default(cuid())
-  name        String    @unique // Brazil, Colombia, etc.
-  code        String    @unique @db.VarChar(2) // ISO 2-letter country code (BR, CO, etc.)
-  flagSvg     String?   // Scalable vector flag (SVG content or URL)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String                 @id @default(cuid())
+  name      String                 @unique
+  code      String                 @unique @db.VarChar(2)
+  flagSvg   String?
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+  regionId  String
+  region    Region                 @relation(fields: [regionId], references: [id])
+  roasters  RoasterSourceCountry[]
 
-  // Relationships
-  region      Region    @relation(fields: [regionId], references: [id])
-  regionId    String
-  roasters    RoasterSourceCountry[]
-  
   @@map("countries")
 }
 
 model RoasterSourceCountry {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-
-  // Relationships
-  roaster   Roaster @relation(fields: [roasterId], references: [id], onDelete: Cascade)
   roasterId String
-  country   Country @relation(fields: [countryId], references: [id])
   countryId String
+  country   Country  @relation(fields: [countryId], references: [id])
+  roaster   Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
 
-  @@unique([roasterId, countryId]) // Prevent duplicate country associations per roaster
+  @@unique([roasterId, countryId])
   @@map("roaster_source_countries")
 }
 
 model Specialty {
-  id          String   @id @default(cuid())
-  deprecated  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relationships
-  translations SpecialtyTranslation[]
+  id           String                 @id @default(cuid())
+  deprecated   Boolean                @default(false)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
   roasters     RoasterSpecialty[]
+  translations SpecialtyTranslation[]
 
   @@map("specialties")
 }
 
 model SpecialtyTranslation {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   specialtyId String
-  language    String   @db.VarChar(5) // en, fr, etc.
+  language    String    @db.VarChar(5)
   name        String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relationships
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   specialty   Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
 
   @@unique([specialtyId, language])
@@ -352,12 +290,10 @@ model SpecialtyTranslation {
 }
 
 model RoasterSpecialty {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   roasterId   String
   specialtyId String
-  createdAt   DateTime @default(now())
-
-  // Relationships
+  createdAt   DateTime  @default(now())
   roaster     Roaster   @relation(fields: [roasterId], references: [id], onDelete: Cascade)
   specialty   Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
 
@@ -366,21 +302,19 @@ model RoasterSpecialty {
 }
 
 model AuditLog {
-  id          String   @id @default(cuid())
-  action      String   // CREATE, UPDATE, DELETE
-  entityType  String   // roaster, review, bean, user, etc.
-  entityId    String   // ID of the affected entity
-  entityName  String?  // Display name for the entity (e.g., roaster name)
-  changes     Json?    // Field-level changes: { "field": { "old": "value", "new": "value" } }
-  ipAddress   String?  // IP address of the user
-  userAgent   String?  // Browser/client information
-  city        String?  // Geolocation city
-  country     String?  // Geolocation country
-  createdAt   DateTime @default(now())
-
-  // Relationships
-  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId String?
+  id         String   @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String
+  entityName String?
+  changes    Json?
+  ipAddress  String?
+  userAgent  String?
+  city       String?
+  country    String?
+  createdAt  DateTime @default(now())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
 
   @@index([entityType, entityId])
   @@index([userId])

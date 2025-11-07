@@ -20,21 +20,29 @@ export function auditBefore(entityType: string, action: 'CREATE' | 'UPDATE' | 'D
  */
 export function auditAfter() {
   return async (req: any, res: any, next: any) => {
-    console.log('auditAfter called:', { statusCode: res.statusCode, hasAuditData: !!req.auditData, hasUserId: !!req.userId });
-    
+    console.log('auditAfter called:', {
+      statusCode: res.statusCode,
+      hasAuditData: !!req.auditData,
+      hasUserId: !!req.userId,
+      action: req.auditData?.action,
+      entityType: req.auditData?.entityType,
+      entityId: (res.locals.auditEntity || res.locals.entity)?.id || req.params.id,
+      oldValues: req.auditData?.oldValues
+    });
+
     // Log both successful AND failed operations
     if (req.auditData && req.userId) {
       try {
         // Extract entity information from the response or request
         const entity = res.locals.auditEntity || res.locals.entity;
         const entityId = entity?.id || req.params.id;
-        
+
         // For failed operations, we might not have an entity, so use a placeholder
         const finalEntityId = entityId || 'unknown';
-        
+
         // Determine if operation was successful
         const isSuccess = res.statusCode >= 200 && res.statusCode < 300;
-        
+
         const auditLogData: AuditLogData = {
           action: req.auditData.action,
           entityType: req.auditData.entityType,
@@ -53,8 +61,14 @@ export function auditAfter() {
           }
         };
 
-        // Create audit log asynchronously (don't block the response)
-        setTimeout(() => createAuditLog(auditLogData), 0);
+        // For DELETE actions, call audit log synchronously
+        if (req.auditData.action === 'DELETE') {
+          console.log('Calling createAuditLog synchronously for DELETE:', auditLogData);
+          await createAuditLog(auditLogData);
+        } else {
+          // Create audit log asynchronously for other actions
+          setTimeout(() => createAuditLog(auditLogData), 0);
+        }
       } catch (error) {
         console.error('Audit logging error:', error);
       }
@@ -69,14 +83,13 @@ export function auditAfter() {
  */
 export function captureOldValues(prismaModel: any, idField = 'id') {
   return async (req: any, res: any, next: any) => {
-    if (req.auditData?.action === 'UPDATE') {
+    if (req.auditData?.action === 'UPDATE' || req.auditData?.action === 'DELETE') {
       try {
         const entityId = req.params[idField] || req.params.id;
         if (entityId) {
           const oldEntity = await prismaModel.findUnique({
             where: { [idField]: entityId }
           });
-          
           if (oldEntity && req.auditData) {
             req.auditData.oldValues = oldEntity;
           }

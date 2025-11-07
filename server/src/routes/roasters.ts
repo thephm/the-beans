@@ -743,8 +743,25 @@ router.post('/', [
       }
     }
 
-    // Store entity for audit logging - auditAfter() middleware will handle the rest
+    // Store entity for audit logging and call audit log synchronously
     res.locals.auditEntity = roaster;
+    try {
+      const { getClientIP, getUserAgent, getEntityName, createAuditLog } = require('../lib/auditService');
+      await createAuditLog({
+        action: 'CREATE',
+        entityType: 'roaster',
+        entityId: roaster.id,
+        entityName: getEntityName('roaster', roaster),
+        userId: req.userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        oldValues: undefined,
+        newValues: roaster
+      });
+      console.log('CREATE audit log written for roaster:', roaster.id);
+    } catch (auditErr) {
+      console.error('Failed to write CREATE audit log for roaster:', auditErr);
+    }
 
     res.status(201).json({
       message: 'Roaster created successfully',
@@ -1093,11 +1110,29 @@ router.delete('/:id', [
     const deletedEntity = req.auditData?.oldValues || { id };
     res.locals.auditEntity = deletedEntity;
 
-    await prisma.roaster.delete({
+    const deletedRoaster = await prisma.roaster.delete({
       where: { id }
     });
 
-    // auditAfter() middleware will handle audit logging
+    // Write DELETE audit log synchronously
+    try {
+      const { getClientIP, getUserAgent, getEntityName, createAuditLog } = require('../lib/auditService');
+      await createAuditLog({
+        action: 'DELETE',
+        entityType: 'roaster',
+        entityId: deletedRoaster.id,
+        entityName: getEntityName('roaster', deletedRoaster),
+        userId: req.userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        oldValues: deletedRoaster,
+        newValues: undefined
+      });
+      console.log('DELETE audit log written for roaster:', deletedRoaster.id);
+    } catch (auditErr) {
+      console.error('Failed to write DELETE audit log for roaster:', auditErr);
+    }
+
     res.json({
       message: 'Roaster deleted successfully',
     });
