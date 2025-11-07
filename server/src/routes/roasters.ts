@@ -660,6 +660,10 @@ router.post('/', [
     
     // Remove fields that aren't part of the Roaster schema
     delete roasterData.ownerEmail;
+    delete roasterData.ownerName;
+    delete roasterData.ownerBio;
+    delete roasterData.ownerMobile;
+    delete roasterData.ownerContact; // Remove nested owner contact object
     delete roasterData.specialtyIds; // Will be handled separately
     
     const roaster = await prisma.roaster.create({
@@ -858,6 +862,7 @@ router.put('/:id', [
   delete updateData.ownerName;
   delete updateData.ownerBio;
   delete updateData.ownerMobile;
+  delete updateData.ownerContact; // Remove nested owner contact object
   
   // Handle specialty IDs separately
   const specialtyIds = updateData.specialtyIds;

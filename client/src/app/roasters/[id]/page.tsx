@@ -51,6 +51,7 @@ interface Roaster {
   hours?: {
     [key: string]: string | { open: string; close: string }
   }
+  showHours?: boolean
   onlineOnly?: boolean
   story?: string
   founded?: string
@@ -338,9 +339,49 @@ export default function RoasterDetail() {
                 </div>
 
                 {/* Hours / Online Only */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.hours')}</h3>
-                  {roaster.onlineOnly ? (
+                {/* Only show Hours section if showHours is true AND not onlineOnly */}
+                {roaster.showHours !== false && !roaster.onlineOnly && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.hours')}</h3>
+                    {roaster.hours ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {(() => {
+                          const hoursData = typeof roaster.hours === 'string' 
+                            ? JSON.parse(roaster.hours) 
+                            : roaster.hours;
+                          
+                          // Define day order
+                          const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                          
+                          // Sort entries by day order
+                          const sortedEntries = Object.entries(hoursData).sort(([dayA], [dayB]) => {
+                            return dayOrder.indexOf(dayA.toLowerCase()) - dayOrder.indexOf(dayB.toLowerCase());
+                          });
+                          
+                          return sortedEntries.map(([day, hours]) => (
+                            <div key={day} className="flex items-center py-1">
+                              <span className="font-medium text-gray-700 w-24">{t(`time.${day.toLowerCase()}`)}:</span>
+                              <span className="text-gray-600 ml-2">
+                                {typeof hours === 'string' 
+                                  ? formatTime(hours)
+                                  : typeof hours === 'object' && hours !== null && 'open' in hours && 'close' in hours
+                                    ? formatTime(`${hours.open}-${hours.close}`)
+                                    : 'Hours not available'
+                                }
+                              </span>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">{t('roasterDetail.hoursNotAvailable', 'Hours information not available')}</p>
+                    )}
+                  </div>
+                )}
+                
+                {/* Online Only Badge - Show separately if onlineOnly is true */}
+                {roaster.onlineOnly && (
+                  <div className="mb-8">
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="flex items-center">
                         <Language sx={{ fontSize: 20, color: '#2563eb', marginRight: 1 }} />
@@ -350,30 +391,8 @@ export default function RoasterDetail() {
                         {t('roasterDetail.onlineOnlyDesc', 'This roaster operates exclusively online with no physical retail location.')}
                       </p>
                     </div>
-                  ) : roaster.hours ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {Object.entries(
-                        typeof roaster.hours === 'string' 
-                          ? JSON.parse(roaster.hours) 
-                          : roaster.hours
-                      ).map(([day, hours]) => (
-                        <div key={day} className="flex items-center py-1">
-                          <span className="font-medium text-gray-700 w-24">{t(`time.${day.toLowerCase()}`)}:</span>
-                          <span className="text-gray-600 ml-2">
-                            {typeof hours === 'string' 
-                              ? formatTime(hours)
-                              : typeof hours === 'object' && hours !== null && 'open' in hours && 'close' in hours
-                                ? formatTime(`${hours.open}-${hours.close}`)
-                                : 'Hours not available'
-                            }
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500">{t('roasterDetail.hoursNotAvailable', 'Hours information not available')}</p>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               {/* Sidebar */}

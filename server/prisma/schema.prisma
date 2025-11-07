@@ -87,6 +87,7 @@ model Roaster {
   longitude   Float?
   images      String[]
   hours       Json?    // Store opening hours as JSON
+  showHours   Boolean  @default(true)  // Toggle to show/hide hours section (separate from onlineOnly)
   
   // Contact fields now managed via RoasterPerson (People/CRM)
   onlineOnly  Boolean  @default(false) // True if roaster operates online only (no physical location)

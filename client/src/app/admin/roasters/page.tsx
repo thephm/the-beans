@@ -230,12 +230,17 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     featured: roaster?.featured || false,
     rating: roaster?.rating || 0,
     onlineOnly: roaster?.onlineOnly || false,
-    hours: roaster?.hours || {},
+    showHours: roaster?.showHours !== undefined ? roaster.showHours : true,
+    hours: roaster?.hours || {
+      monday: { open: '08:00', close: '18:00', closed: false },
+      tuesday: { open: '08:00', close: '18:00', closed: false },
+      wednesday: { open: '08:00', close: '18:00', closed: false },
+      thursday: { open: '08:00', close: '18:00', closed: false },
+      friday: { open: '08:00', close: '18:00', closed: false },
+      saturday: { open: '08:00', close: '18:00', closed: false },
+      sunday: { open: '08:00', close: '18:00', closed: false },
+    },
     images: roaster?.images || [],
-    ownerName: roaster?.ownerName || '',
-    ownerEmail: roaster?.ownerEmail || '',
-    ownerBio: roaster?.ownerBio || '',
-    ownerMobile: roaster?.ownerMobile || '',
   });
   useEffect(() => {
     if (roaster?.id) {
@@ -263,12 +268,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               featured: data.featured || false,
               rating: data.rating || 0,
               onlineOnly: data.onlineOnly || false,
+              showHours: data.showHours !== undefined ? data.showHours : true,
               hours: convertHoursFormat(data.hours),
               images: data.images || [],
-              ownerName: data.ownerName || '',
-              ownerEmail: data.ownerEmail || '',
-              ownerBio: data.ownerBio || '',
-              ownerMobile: data.ownerMobile || '',
             });
           }
         } catch (err) {
@@ -288,10 +290,19 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   // Handles input changes for all fields
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
-    setFormData((prev: any) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    setFormData((prev: any) => {
+      const updates: any = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      };
+      
+      // If onlineOnly is being turned on, turn off showHours
+      if (name === 'onlineOnly' && checked) {
+        updates.showHours = false;
+      }
+      
+      return updates;
+    });
   };
 
   // Handles changes for hours fields
@@ -651,11 +662,33 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             onlineOnly: data.onlineOnly || false,
             hours: convertHoursFormat(data.hours),
             images: data.images || [],
-            ownerName: data.ownerName || '',
-            ownerEmail: data.ownerEmail || '',
-            ownerBio: data.ownerBio || '',
-            ownerMobile: data.ownerMobile || '',
           });
+        }
+
+        // If this is a new roaster and contact info is filled, save the contact
+        if (!roaster?.id && personForm.name) {
+          try {
+            const personPayload = { ...personForm, roasterId: roasterId };
+            const personResponse = await fetch(`${apiUrl}/api/people`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+              },
+              body: JSON.stringify(personPayload)
+            });
+
+            if (!personResponse.ok) {
+              console.error('Failed to save contact person');
+              // Don't throw error here as the roaster was successfully saved
+            } else {
+              // Reset the person form after successful save
+              resetPersonForm();
+            }
+          } catch (err) {
+            console.error('Error saving contact person:', err);
+            // Don't throw error here as the roaster was successfully saved
+          }
         }
       }
       onSuccess();
@@ -1173,16 +1206,18 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold text-gray-800 select-none">
-                {t('adminForms.roasters.contacts', 'Contacts')}
+                {roaster?.id ? t('adminForms.roasters.contacts', 'Contacts') : t('adminForms.roasters.contact', 'Contact')}
               </h3>
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleAddPerson}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-                >
-                  {t('adminForms.roasters.addContact', 'Add Contact')}
-                </button>
+                {roaster?.id && (
+                  <button
+                    type="button"
+                    onClick={handleAddPerson}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                  >
+                    {t('adminForms.roasters.addContact', 'Add Contact')}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setContactsExpanded(!contactsExpanded)}
@@ -1269,10 +1304,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-500 mb-4">No contacts found for this roaster.</div>
+                  roaster?.id && (
+                    <div className="text-gray-500 mb-4">No contacts found for this roaster.</div>
+                  )
                 )}
-                {/* Inline add contact form */}
-                {showAddPerson && !editingPerson && (
+                {/* Inline add contact form - shown by default when adding new roaster, or when "Add Contact" clicked when editing */}
+                {(!roaster?.id || showAddPerson) && !editingPerson && (
                   <div className="border rounded-lg p-4 bg-blue-50 mb-4 mx-auto max-w-xl">
                     {error && (
                       <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -1280,10 +1317,53 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       </div>
                     )}
                     <div className="space-y-3">
-                      <input type="text" placeholder="Name" value={personForm.name} onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
-                      <input type="email" placeholder="Email" value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
-                      <input type="text" placeholder="Mobile" value={personForm.mobile} onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} className="w-full px-3 py-2 border rounded" />
-                      <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Name
+                        </label>
+                        <input 
+                          type="text" 
+                          value={personForm.name} 
+                          onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} 
+                          className="w-full px-3 py-2 border rounded" 
+                          required 
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email
+                          </label>
+                          <input 
+                            type="email" 
+                            value={personForm.email} 
+                            onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} 
+                            className="w-full px-3 py-2 border rounded" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Mobile
+                          </label>
+                          <input 
+                            type="text" 
+                            value={personForm.mobile} 
+                            onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} 
+                            className="w-full px-3 py-2 border rounded" 
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Bio
+                        </label>
+                        <textarea 
+                          value={personForm.bio} 
+                          onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} 
+                          className="w-full px-3 py-2 border rounded" 
+                          rows={3}
+                        />
+                      </div>
                       <div className="flex flex-wrap gap-2 mt-2">
                         <button
                           type="button"
@@ -1317,10 +1397,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                           Billing
                         </button>
                       </div>
-                      <div className="flex gap-2 mt-4 justify-end">
-                        <button type="button" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>Save</button>
-                        <button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" onClick={resetPersonForm}>Cancel</button>
-                      </div>
+                      {roaster?.id && (
+                        <div className="flex gap-2 mt-4 justify-end">
+                          <button type="button" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>Save</button>
+                          <button type="button" className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" onClick={resetPersonForm}>Cancel</button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1453,14 +1535,27 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     {t('adminForms.roasters.onlineOnly', 'Online Only')}
                   </label>
                 </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="showHours"
+                    checked={formData.showHours}
+                    onChange={handleInputChange}
+                    disabled={formData.onlineOnly}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <label className={`ml-2 block text-sm font-medium ${formData.onlineOnly ? 'text-gray-400' : 'text-gray-700'}`}>
+                    {t('adminForms.roasters.showHours', 'Show Hours')}
+                  </label>
+                </div>
               </div>
             </div>
             </div>
           )}
         </div>
 
-        {/* Opening Hours Section - Only show if not online only */}
-        {!formData.onlineOnly && (
+        {/* Opening Hours Section - Only show if not online only AND showHours is enabled */}
+        {!formData.onlineOnly && formData.showHours && (
             <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold text-gray-800 select-none">
