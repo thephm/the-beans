@@ -109,11 +109,6 @@ export default function SpecialtyPillSelector({
           );
         })}
       </div>
-      {selectedSpecialtyIds.length === 0 && (
-        <p className="text-sm text-gray-500 italic">
-          {t('adminForms.roasters.noSpecialtiesSelected', 'No specialties selected')}
-        </p>
-      )}
     </div>
   );
 }
