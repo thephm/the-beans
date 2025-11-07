@@ -98750,3 +98750,98 @@ Both the inline edit form and the add contact form now have consistent styling t
 ## 756th try
 
 *(edit contact now looks pretty much the same as edit person)*
+
+> Please add a collapse toggle to URL images in Edit Roaster just like the other sections, by default collapsed unless there are URL images
+
+I'll help you add a collapse toggle for URL images in the Edit Roaster section. Let me first examine the current implementation to understand the structure. 
+
+✔ Searched for files matching `**/admin/**/edit*.tsx`, no matches
+
+✔ Searched text for `Edit Roaster|EditRoaster` (`**/client/src/**/*.tsx`), 4 results
+
+✔ Read `client/src/app/admin/roasters/page.tsx`
+
+Now I can see the structure. I need to add a collapse toggle for the URL Images section similar to the other sections. Let me check if there's a state variable for URL images expansion and modify accordingly: 
+
+`page.tsx +1 -0`
+
+Now let me add a useEffect to expand the URL images section when there are URL images: 
+
+`page.tsx +7 -0`
+
+Now let me update the URL Images section to add the collapse toggle in the header: 
+
+`page.tsx +22 -1`
+
+I need to close the opening fragment properly. Let me fix the closing tags: 
+
+`page.tsx +2 -0`
+
+Now let me verify the changes by checking for any remaining errors: 
+
+✔ Checked `client/src/app/admin/roasters/page.tsx`, 4 problems found
+
+The errors are just about missing node_modules, which is expected in this Docker environment. The structural issues are resolved. Let me verify the changes look correct by reading the relevant section: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1800 to 1887
+
+Perfect! Let me verify the URL Images section header to confirm the toggle button is there: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1720 to 1770
+
+Excellent! Now let me verify the state variable declarations: 
+
+✔ Searched text for `urlImagesExpanded` (`**/client/src/app/admin/roasters/page.tsx`), 16 results
+
+Perfect! Now let me verify the useEffect that expands it when there are URL images: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 373 to 388
+
+Perfect! All changes have been successfully implemented. Let me provide a summary of what was done:
+
+## Summary
+
+I've successfully added a collapse toggle to the URL Images section in the Edit Roaster form, matching the behavior of other collapsible sections. Here are the changes made:
+
+### Changes:
+
+1. **Added state variable** (line 364):
+   - `const [urlImagesExpanded, setUrlImagesExpanded] = useState(false);`
+   - Defaults to `false` (collapsed)
+
+2. **Added auto-expand logic** (lines 378-383):
+   - Added a `useEffect` that automatically expands the section when URL images exist
+   - This ensures the section is visible when there are images to show
+
+3. **Updated section header** (lines 1730-1750):
+   - Added a toggle button with chevron icon to the section header
+   - Button matches the styling and behavior of other collapsible sections
+   - Shows count of URL images in the header: `URL Images (X)`
+
+4. **Wrapped content** (line 1753):
+   - Wrapped all URL images content in a conditional render: `{urlImagesExpanded && (...)}`
+   - This includes the image grid, add URL input, and info message
+
+### Behavior:
+- **By default**: Section is collapsed (unless there are URL images)
+- **When URL images exist**: Section automatically expands to show the images
+- **Toggle button**: Clicking the chevron icon expands/collapses the section
+- **Consistent UX**: Matches the pattern used in other sections (Basic Info, Location, Contacts, etc.)
+
+The implementation follows the same pattern as the other collapsible sections in the form, providing a consistent user experience throughout the admin interface.
+
+> I don't see it, did you restart?
+
+You're right - I need to restart the client container for the changes to take effect. Let me do that now: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The client container has been restarted. The URL Images section in Edit Roaster should now have:
+
+1. **A collapse toggle button** (chevron icon) in the section header
+2. **Default collapsed** state unless there are URL images present
+3. **Auto-expands** when editing a roaster that has URL images
+4. **Consistent behavior** with all other collapsible sections (Basic Info, Location, Contacts, Specialties, Settings, Hours, etc.)
+
+The changes are now live. Try editing a roaster and you should see the URL Images section with the collapse toggle!
