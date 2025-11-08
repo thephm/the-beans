@@ -1845,7 +1845,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         input.value = '';
                       }
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap sm:w-auto w-full"
+                    className="min-w-[110px] px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap ml-auto"
                   >
                     Add
                   </button>
@@ -1862,7 +1862,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           )}
 
           {/* Form Actions */}
-          <div className="mt-8 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4 relative">
+          <div className="mt-8 flex flex-row items-center w-full flex-wrap">
+            {/* Left: Delete button (edit only) */}
             {roaster?.id && (
               <button
                 type="button"
@@ -1887,28 +1888,31 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     }
                   }
                 }}
-                className="absolute left-0 bottom-0 sm:static sm:mr-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="min-w-[110px] px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 {t('adminForms.roasters.delete', 'Delete')}
               </button>
             )}
-            <button
-              type="button"
-              onClick={onCancel}
-              className="w-full sm:w-auto px-6 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              {t('adminForms.roasters.cancel', 'Cancel')}
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading 
-                ? t('adminForms.roasters.saving', 'Saving...') 
-                : t('adminForms.roasters.save', 'Save')
-              }
-            </button>
+            {/* Right: Cancel and Save buttons (always right aligned) */}
+            <div className={roaster?.id ? "flex flex-row gap-3 ml-auto" : "flex flex-row gap-3 justify-end w-full"}>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="min-w-[110px] px-5 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                {t('adminForms.roasters.cancel', 'Cancel')}
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="min-w-[110px] px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading 
+                  ? t('adminForms.roasters.saving', 'Saving...') 
+                  : t('adminForms.roasters.save', 'Save')
+                }
+              </button>
+            </div>
           </div>
         </form>
       </div>
