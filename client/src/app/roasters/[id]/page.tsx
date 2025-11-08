@@ -520,18 +520,6 @@ export default function RoasterDetail() {
                       </Link>
                     )}
                     
-                    <button
-                      onClick={toggleFavorite}
-                      className={`w-full py-3 px-4 rounded-lg font-medium transition-all transform hover:scale-105 flex items-center justify-center gap-2 ${
-                        isFavorite
-                          ? 'bg-red-100 text-red-700 border-2 border-red-300 hover:bg-red-200'
-                          : 'bg-white border-2 border-red-300 text-red-600 hover:bg-red-50'
-                      }`}
-                    >
-                      {isFavorite ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
-                      {isFavorite ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
-                    </button>
-                    
                     {roaster.website && (
                       <a
                         href={roaster.website}

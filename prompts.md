@@ -101791,3 +101791,46 @@ The client container has been restarted. Your roaster detail pages will now show
 ## 814th try
 
 *(it changed the button to have the URL as well, doh! checking in)*
+
+## Remove the "Remove from favorites" button in view roaster #191
+
+https://github.com/thephm/the-beans/issues/191
+
+Remove the button "Remove from Favorites" under view Roaster page because there's already a heart button on it
+
+I'll help you remove the "Remove from Favorites" button from the Roaster view page. Let me first locate the roaster detail page to see the current implementation. 
+
+✔ Searched for files matching `**/roasters/**/page.tsx`, 8 matches
+
+✔ Searched text for `Remove from Favorites`, 19 results
+
+Now let me read the roaster detail page to see the button implementation: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`
+
+I can see there are two places where favorites can be toggled:
+
+1. **Heart icon button** at the bottom-right of the hero image (around line 296)
+2. **"Add to Favorites" / "Remove from Favorites" button** in the sidebar (around line 543)
+
+I'll remove the text button in the sidebar since there's already the heart icon button on the image. Let me remove that button: 
+
+`page.tsx +0 -12`
+
+Perfect! I've removed the "Add to Favorites" / "Remove from Favorites" button from the sidebar. Now the roaster detail page only has the heart icon button in the bottom-right corner of the hero image for managing favorites.
+
+To see the changes, restart the client container:
+
+```powershell
+docker-compose restart client
+```
+
+The page will now only show the heart icon button for favoriting/unfavoriting roasters, removing the redundant text button from the sidebar.
+
+> just restart it please like you've done for months, why stop now?
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Done! The client container has been restarted. The "Remove from Favorites" button has been removed from the roaster detail page sidebar, leaving only the heart icon button for managing favorites.
+
