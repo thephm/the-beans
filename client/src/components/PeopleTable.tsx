@@ -235,7 +235,7 @@ export default function PeopleTable() {
                             'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {role}
+                          {t(`admin.people.role${role.charAt(0).toUpperCase() + role.slice(1)}`, role)}
                         </span>
                       ))}
                     </div>
@@ -348,7 +348,7 @@ export default function PeopleTable() {
                                 'bg-gray-100 text-gray-800'
                               }`}
                             >
-                              {role}
+                              {t(`admin.people.role${role.charAt(0).toUpperCase() + role.slice(1)}`, role)}
                             </span>
                           ))}
                         </div>
