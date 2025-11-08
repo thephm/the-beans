@@ -116,7 +116,22 @@ export default function DiscoverPage() {
       });
 
       const data = await apiClient.searchRoasters(searchParamsObj) as any
-      setRoasters(data.roasters || [])
+      
+      // Sort specialties alphabetically for each roaster
+      const roastersWithSortedSpecialties = (data.roasters || []).map((roaster: Roaster) => {
+        return {
+          ...roaster,
+          specialties: roaster.specialties && roaster.specialties.length > 0
+            ? [...roaster.specialties].sort((a, b) => {
+                const nameA = typeof a === 'string' ? a : (a.name || '');
+                const nameB = typeof b === 'string' ? b : (b.name || '');
+                return nameA.localeCompare(nameB);
+              })
+            : roaster.specialties
+        };
+      });
+      
+      setRoasters(roastersWithSortedSpecialties)
         
       // Trigger popular searches refetch after successful search
       if (filters.search && filters.search.trim().length > 0) {

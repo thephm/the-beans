@@ -112,7 +112,22 @@ export function FeaturedRoasters() {
   const fetchFeaturedRoasters = async () => {
     try {
       const data = await apiClient.getRoasters({ limit: 3 }) as any
-      setFeaturedRoasters(data.roasters || [])
+      
+      // Sort specialties alphabetically for each roaster
+      const roastersWithSortedSpecialties = (data.roasters || []).map((roaster: Roaster) => {
+        return {
+          ...roaster,
+          specialties: roaster.specialties && roaster.specialties.length > 0
+            ? [...roaster.specialties].sort((a, b) => {
+                const nameA = typeof a === 'string' ? a : (a.name || '');
+                const nameB = typeof b === 'string' ? b : (b.name || '');
+                return nameA.localeCompare(nameB);
+              })
+            : roaster.specialties
+        };
+      });
+      
+      setFeaturedRoasters(roastersWithSortedSpecialties)
     } catch (error) {
       console.error('Failed to fetch featured roasters:', error)
     } finally {

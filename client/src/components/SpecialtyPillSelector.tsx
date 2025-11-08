@@ -57,6 +57,11 @@ export default function SpecialtyPillSelector({
               createdAt: s.createdAt,
               updatedAt: s.updatedAt
             }))
+            .sort((a: any, b: any) => {
+              const nameA = a.translations?.[language]?.name || a.translations?.['en']?.name || 'Unknown';
+              const nameB = b.translations?.[language]?.name || b.translations?.['en']?.name || 'Unknown';
+              return nameA.localeCompare(nameB);
+            })
         : [];
       setSpecialties(activeSpecialties);
     } catch (err: any) {
