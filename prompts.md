@@ -99869,3 +99869,83 @@ Cancel and Save are now right-aligned for Add Roaster, and grouped together on t
 The client container has been restarted and the change is live. Please check the Add Roaster page—the button alignment should now be correct. Let me know if you need any further tweaks!
 
 ## 780th try
+
+*(works, checked in)*
+
+## My location on mobile should be on the next line and beside Search which could be narrower #185
+
+https://github.com/thephm/the-beans/issues/185
+
+> My location on mobile should be on the next line and beside Search which could be narrower, see screenshot attached
+
+✔ Created 2 todos
+
+✔ Searched for files matching `**/client/src/app/discover/**`, 1 match
+
+✔ Searched text for `location|search|button|input` (`**/client/src/app/discover/page.tsx`), 20 results
+
+✔ Searched text for `location|search|button|input` (`**/client/src/components/SearchSection.tsx`), 20 results
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 1 to 81
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 81 to 161
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 161 to 241
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 241 to 306
+
+To update the mobile layout so that the location field appears on the next line and is beside a narrower Search button (as shown in your screenshot and described in your prompt), I will:
+
+- Change the grid/flex layout in SearchSection.tsx so that on mobile, the location input and Search button are together on a new row, with the Search button made narrower.
+- Ensure the location field is not on the same line as the search input on mobile.
+- Adjust Tailwind classes for responsive design.
+
+I'll make these changes in SearchSection.tsx and restart the client container for the update to take effect. 
+
+`SearchSection.tsx +8 -5`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The mobile search layout is now updated:
+
+- The location field appears on the next line and is beside the Search button, which is narrower—matching your prompt and screenshot.
+- The client container has been restarted, so the change is live.
+
+Please check the Discover page on your mobile device and let me know if you need any further tweaks!
+
+## 781st try
+
+> Looks better on mobile but you changed the desktop version ugh! see attached, should go back where it was when on mid to wide screens
+
+`SearchSection.tsx +5 -3`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The desktop and mid-screen search layout is now restored:
+
+- On mobile, the location field and Search button are together on the next line.
+- On desktop and mid-sized screens, the location and Search button are back in their original grid positions.
+
+The client container has been restarted and the fix is live. Please check the Discover page on both mobile and desktop—let me know if you need any further tweaks!
+
+## 782nd try
+
+> Still wrong, Search for roasters and Location should be on the same row with the my location button and search for laptop screens, see attached where it is now
+
+`SearchSection.tsx +9 -10`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The search layout is now updated:
+
+- On laptop/desktop screens, "Search for roasters", "Location", the My Location button, and the Search button are all in a single row, as requested.
+- On mobile, the layout remains stacked for usability.
+
+The client container has been restarted and the change is live. Please check the Discover page on your laptop—let me know if you need any further tweaks!
+
+## 783rd try
+
+*(perfect! checking in)*

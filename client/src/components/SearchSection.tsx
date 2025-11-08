@@ -208,6 +208,7 @@ export function SearchSection({
   }
 
   return (
+
     <section className={`px-4 sm:px-6 lg:px-8 bg-white ${user ? 'pt-8 pb-8' : 'py-8'}`}>
       <div className="max-w-4xl mx-auto">
         <motion.div
@@ -225,9 +226,12 @@ export function SearchSection({
           viewport={{ once: true }}
           className={`bg-gradient-to-r from-lavender-50 to-orchid-50 rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-8 pb-8' : 'p-8'}`}
         >
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="md:col-span-2">
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+          {/* Search input row */}
+          {/* Responsive row: all fields/buttons in one row on md+ screens, stacked on mobile */}
+          <div className="flex flex-col md:flex-row gap-2 mt-4 items-stretch">
+            {/* Search for roasters */}
+            <div className="md:flex-1">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2 md:mb-0">
                 {t('search.searchLabel')}
               </label>
               <input
@@ -240,9 +244,9 @@ export function SearchSection({
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
             </div>
-            
-            <div className="md:col-span-2">
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+            {/* Location field */}
+            <div className="md:flex-1">
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2 md:mb-0">
                 {t('search.locationLabel')}
               </label>
               <div className="flex gap-2">
@@ -269,11 +273,11 @@ export function SearchSection({
                 </button>
               </div>
             </div>
-            
-            <div className="md:col-span-1 flex items-end">
+            {/* Search button */}
+            <div className="flex items-end md:items-end">
               <button
                 onClick={handleSearch}
-                className="w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 whitespace-nowrap flex items-center justify-center gap-2"
+                className="min-w-[110px] max-w-[140px] bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-3 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 whitespace-nowrap flex items-center justify-center gap-2"
               >
                 <Search sx={{ fontSize: 20 }} />
                 {t('search.searchButton')}
