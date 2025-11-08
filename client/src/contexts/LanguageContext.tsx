@@ -103,9 +103,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         throw new Error(`Unsupported language: ${languageCode}`)
       }
 
+      // Force language change and reload resources
       await i18n.changeLanguage(languageCode)
-      await i18n.reloadResources(); // Force reload of translations
+      await i18n.reloadResources(languageCode, 'common')
+      
+      // Force a state update to trigger re-renders
       setCurrentLanguage(language)
+      
+      // Trigger a window event that components can listen to
+      window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: languageCode } }))
 
       if (isAuthenticated && user) {
         // Update user's language preference in the database

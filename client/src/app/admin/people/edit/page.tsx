@@ -23,6 +23,7 @@ function formatDateTime(dt?: string) {
 }
 
 export default function EditPersonPage() {
+  const { t } = require('react-i18next').useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const personId = searchParams?.get("id");
@@ -101,7 +102,7 @@ export default function EditPersonPage() {
         </button>
       </div>
       <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-8">{personId === "new" ? "Add Person" : "Edit Person"}</h1>
+  <h1 className="text-2xl font-bold mb-8">{personId === "new" ? t('people.addTitle', 'Add Person') : t('people.editTitle', 'Edit Person')}</h1>
         {error && <div className="text-red-600 mb-4">{error}</div>}
         <form onSubmit={e => { e.preventDefault(); saveEdit(); }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -164,7 +165,7 @@ export default function EditPersonPage() {
         </form>
         {(editData.createdAt || editData.updatedAt) && (
           <div className="mt-6 text-sm text-gray-500 bg-gray-50 rounded p-3">
-            {editData.createdAt && <span>Created on {formatDateTime(editData.createdAt)}.</span>} {editData.updatedAt && <span>Updated on {formatDateTime(editData.updatedAt)}.</span>}
+            {editData.createdAt && <span>{t('people.createdOn', 'Created on')} {formatDateTime(editData.createdAt)}.</span>} {editData.updatedAt && <span>{t('people.updatedOn', 'Updated on')} {formatDateTime(editData.updatedAt)}.</span>}
           </div>
         )}
       </div>

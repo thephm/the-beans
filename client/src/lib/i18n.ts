@@ -12,7 +12,7 @@ i18n
   .init({
     lng: 'en', // default language
     fallbackLng: 'en',
-    debug: false,
+    debug: true, // Enable debug to see what's happening
     ns: ['common'],
     defaultNS: 'common',
     interpolation: {
@@ -24,9 +24,21 @@ i18n
     },
     react: {
       useSuspense: false,
+      bindI18n: 'languageChanged loaded',
+      bindI18nStore: 'added removed',
+      transEmptyNodeValue: '',
+      transSupportBasicHtmlNodes: true,
+      transKeepBasicHtmlNodesFor: ['br', 'strong', 'i'],
     },
     backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
+      loadPath: (typeof window !== 'undefined' ? window.location.origin : '') + '/locales/{{lng}}/{{ns}}.json',
+      allowMultiLoading: false,
+      crossDomain: false,
+      requestOptions: {
+        mode: 'cors',
+        credentials: 'same-origin',
+        cache: 'default',
+      },
     },
   });
 
