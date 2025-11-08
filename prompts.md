@@ -101936,3 +101936,60 @@ The "Visit" button now appears to the right of the website URL, matching the lay
 ## 817th try
 
 *(looks good, commit)*
+
+## Ratings shown on mobile #190
+
+https://github.com/thephm/the-beans/issues/190
+
+> Ratings are being shown on mobile. There's a feature flag to have that hidden, they don't show on desktop. See attachment 
+
+I'll help you investigate why ratings are showing on mobile when they should be hidden. Let me first check the feature flag configuration and the component that displays ratings. 
+
+✔ Searched text for `feature.*flag|FEATURE|featureFlag` (`**/client/src/**/*.{ts,tsx,js,jsx}`), 20 results
+
+✔ Searched text for `rating|averageRating` (`**/client/src/components/FeaturedRoasters.tsx`), 2 results
+
+Searched codebase for "feature flag hide ratings mobile responsive", 19 results
+
+Now let me check the FeaturedRoasters component more closely to see where the rating is displayed: 
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`
+
+I found the issue! The rating badge is displayed on lines 169-175 in the FeaturedRoasters.tsx component without checking the `showRatings` feature flag. The component needs to import and use the `useFeatureFlags` hook to respect the feature flag setting.
+
+Let me fix this: 
+
+`FeaturedRoasters.tsx +1 -0`
+`FeaturedRoasters.tsx +1 -0`
+`FeaturedRoasters.tsx +2 -0`
+
+Perfect! Now let me check if there are any environment variable settings to verify the feature flag: 
+
+✔ Searched text for `NEXT_PUBLIC_SHOW_RATINGS` (`**/.env*`), 2 results
+
+✔ Searched for files matching `**/.env*`, 4 matches
+
+Good! The feature flag is already set to `false` in the environment files. Now let's restart the client container so the changes take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The fix has been applied and the client container has been restarted. 
+
+## Summary
+
+The issue was that the **rating badge** (the white rounded pill with the star icon showing "4.5" in the screenshot) was being displayed unconditionally in the `FeaturedRoasters` component, even though:
+
+1. A feature flag `NEXT_PUBLIC_SHOW_RATINGS=false` exists to control rating visibility
+2. Other pages (like Discover, Favorites, and Roaster Detail pages) properly check this flag using `useFeatureFlags` hook
+
+**Changes made:**
+1. Added import for `useFeatureFlags` hook
+2. Added `const { showRatings } = useFeatureFlags()` to the component
+3. Wrapped the rating badge display in a conditional `{showRatings && (...)}`
+
+The rating badge will now be hidden on both mobile and desktop when `NEXT_PUBLIC_SHOW_RATINGS=false`, matching the behavior on other pages.
+
+## 818th try
+
+*(looks good)*

@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import RoasterImage from './RoasterImage'
 import { apiClient } from '@/lib/api'
 import { Star, LocationOn, Favorite, FavoriteBorder } from '@mui/icons-material'
@@ -32,6 +33,7 @@ interface Roaster {
 export function FeaturedRoasters() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
+  const { showRatings } = useFeatureFlags()
   const router = useRouter()
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
@@ -170,10 +172,12 @@ export function FeaturedRoasters() {
                   width={400}
                   height={300}
                 />
-                <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600 flex items-center gap-1">
-                  <Star sx={{ fontSize: 16 }} />
-                  {roaster.rating}
-                </div>
+                {showRatings && (
+                  <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600 flex items-center gap-1">
+                    <Star sx={{ fontSize: 16 }} />
+                    {roaster.rating}
+                  </div>
+                )}
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
