@@ -4,12 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { apiClient } from "@/lib/api";
 import { RoasterPerson, PersonRole, Roaster } from "@/types";
 
-const ROLE_OPTIONS = [
-  { value: "owner", label: "Owner" },
-  { value: "admin", label: "Admin" },
-  { value: "billing", label: "Billing" },
-];
-
 function formatDateTime(dt?: string) {
   if (!dt) return "";
   const d = new Date(dt);
@@ -98,7 +92,7 @@ export default function EditPersonPage() {
           onClick={() => router.push('/admin/people')}
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          Back to People
+          {t('common.back', 'Back')} {t('admin.people.title', 'People')}
         </button>
       </div>
       <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
@@ -107,21 +101,25 @@ export default function EditPersonPage() {
         <form onSubmit={e => { e.preventDefault(); saveEdit(); }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium mb-1">Name</label>
+              <label className="block text-sm font-medium mb-1">{t('admin.people.name', 'Name')}</label>
               <input className="w-full border rounded px-3 py-2" value={editData.name || ""} onChange={e => handleEditChange("name", e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className="block text-sm font-medium mb-1">{t('admin.people.email', 'Email')}</label>
               <input className="w-full border rounded px-3 py-2" value={editData.email || ""} onChange={e => handleEditChange("email", e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Mobile</label>
+              <label className="block text-sm font-medium mb-1">{t('admin.people.mobile', 'Mobile')}</label>
               <input className="w-full border rounded px-3 py-2" value={editData.mobile || ""} onChange={e => handleEditChange("mobile", e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Roles</label>
+              <label className="block text-sm font-medium mb-1">{t('admin.people.role', 'Roles')}</label>
               <div className="flex flex-wrap gap-2 mt-1">
-                {ROLE_OPTIONS.map(opt => {
+                {[
+                  { value: "owner", labelKey: "admin.people.roleOwner", label: "Owner" },
+                  { value: "admin", labelKey: "admin.people.roleAdmin", label: "Admin" },
+                  { value: "billing", labelKey: "admin.people.roleBilling", label: "Billing" },
+                ].map(opt => {
                   const selected = (editData.roles || []).includes(opt.value);
                   return (
                     <button
@@ -133,16 +131,16 @@ export default function EditPersonPage() {
                         handleEditChange("roles", selected ? roles.filter(r => r !== opt.value) : [...roles, opt.value]);
                       }}
                     >
-                      {opt.label}
+                      {t(opt.labelKey, opt.label)}
                     </button>
                   );
                 })}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Roaster</label>
+              <label className="block text-sm font-medium mb-1">{t('admin.people.roaster', 'Roaster')}</label>
               <select className="w-full border rounded px-3 py-2" value={editData.roasterId || ""} onChange={e => handleEditChange("roasterId", e.target.value)}>
-                <option value="">Select a roaster</option>
+                <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
                 {[...roasters].sort((a, b) => a.name.trim().toLowerCase().localeCompare(b.name.trim().toLowerCase())).map(r => (
                   <option key={r.id} value={r.id}>{r.name}</option>
                 ))}
@@ -154,13 +152,13 @@ export default function EditPersonPage() {
                 className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${editData.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                 onClick={() => handleEditChange("isPrimary", !editData.isPrimary)}
               >
-                Primary
+                {t('admin.people.primaryContact', 'Primary')}
               </button>
             </div>
           </div>
           <div className="flex gap-4 mt-8 justify-end">
-            <button type="button" onClick={cancelEdit} className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">Cancel</button>
-            <button type="submit" disabled={saving} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">{saving ? "Saving..." : "Save"}</button>
+            <button type="button" onClick={cancelEdit} className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">{t('common.cancel', 'Cancel')}</button>
+            <button type="submit" disabled={saving} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">{saving ? t('admin.users.saving', 'Saving...') : t('common.save', 'Save')}</button>
           </div>
         </form>
         {(editData.createdAt || editData.updatedAt) && (
