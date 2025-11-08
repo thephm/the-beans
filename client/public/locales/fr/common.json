@@ -523,9 +523,10 @@
       "uploadedImages": "Images Téléchargées",
       "addImages": "Ajouter des Images",
       "imageGuidelines": "Recommandé : 800×450px minimum • JPG, PNG, WebP • Max 5 Mo chacune",
-      "cancel": "Annuler",
-      "save": "Enregistrer",
-      "saving": "Enregistrement...",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "save": "Enregistrer",
+  "saving": "Enregistrement...",
       "hours": {
         "title": "Heures d'ouverture",
         "monday": "Lundi",
