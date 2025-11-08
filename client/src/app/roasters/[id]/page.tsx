@@ -492,19 +492,6 @@ export default function RoasterDetail() {
                     </div>
                   )}
 
-                  {/* Owner */}
-                  {roaster.owner && (
-                    <div className="mb-6">
-                      <p className="font-medium text-gray-900">{t('roasterDetail.owner')}</p>
-                      <p className="text-gray-600">
-                        {typeof roaster.owner === 'string' 
-                          ? roaster.owner
-                          : `${(roaster.owner as any).firstName} ${(roaster.owner as any).lastName}`
-                        }
-                      </p>
-                    </div>
-                  )}
-
                   {/* Action Buttons */}
                   <div className="space-y-3">
                     {/* Manage Images Button for admins and email match */}

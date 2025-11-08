@@ -101834,3 +101834,42 @@ The page will now only show the heart icon button for favoriting/unfavoriting ro
 
 Done! The client container has been restarted. The "Remove from Favorites" button has been removed from the roaster detail page sidebar, leaving only the heart icon button for managing favorites.
 
+## 815th try
+
+*(Remove from Favorites button is gone)*
+
+## Remove Owner from View Roaster page #193
+
+https://github.com/thephm/the-beans/issues/193
+
+I'll help you remove the "Owner" section from the View Roaster page. Let me locate and update the roaster detail page. 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 500 to 544
+
+Let me find the Owner section: 
+
+✔ Searched text for `Owner` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Searched text for `owner` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 470 to 530
+
+Perfect! I found the Owner section. Now I'll remove it: 
+
+`page.tsx +0 -13`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Done! I've removed the "Owner" section (Bernie Jansen) from the View Roaster page. The section that displayed the roaster owner's name has been removed from the sidebar, leaving only:
+
+- Address
+- Website
+- Founded
+- Action Buttons (Manage Images and Visit Website)
+
+The client container has been restarted. The Owner field will no longer be displayed on the roaster detail pages.
+
+## 816th try
+
+*(Owner is gone from Roaster page! commiting)*
