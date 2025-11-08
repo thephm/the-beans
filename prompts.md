@@ -101873,3 +101873,66 @@ The client container has been restarted. The Owner field will no longer be displ
 ## 816th try
 
 *(Owner is gone from Roaster page! commiting)*
+
+## Change the Visit Website button to be just "Visit" no icon  #192
+
+https://github.com/thephm/the-beans/issues/192
+
+> Change the Visit Website button to be just "Visit" no icon and move it to the right of Website URL like the "Call" button. See screenshot
+
+I'll help you change the "Visit Website" button to just "Visit" (no icon) and move it to the right of the Website URL, similar to how the "Call" button is positioned. Let me first examine the roaster detail page structure. 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 440 to 520
+
+Now I can see the structure. I need to:
+1. Move the "Visit" button to be inline with the Website URL (similar to the "Call" button with phone number)
+2. Remove the icon from the Visit button
+3. Change the text to just "Visit"
+4. Remove the standalone button from the Action Buttons section
+
+Let me update the Website section and remove the Visit Website button: 
+
+`page.tsx +11 -1`
+
+Now let me remove the standalone "Visit Website" button from the Action Buttons section: 
+
+`page.tsx +0 -12`
+
+Now let me check if there's a translation key for "Visit" and add it if needed: 
+
+✔ Searched text for `visitAction|visitWebsite` (`**/locales/*/common.json`), 2 results
+
+Now let me add the new "visitAction" translation keys to both language files: 
+
+✔ Read `client/public/locales/en/common.json`, lines 315 to 335
+
+`common.json +1 -0`
+
+✔ Read `client/public/locales/fr/common.json`, lines 314 to 334
+
+`common.json +1 -0`
+
+Now let me restart the client container: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Done! I've made the following changes:
+
+## Changes Made:
+
+1. **Moved the "Visit" button** to be inline with the Website URL (similar to the "Call" button layout)
+2. **Removed the icon** from the Visit button (no more Language icon)
+3. **Changed text to just "Visit"** instead of "Visit Website"
+4. **Removed the standalone** "Visit Website" button from the Action Buttons section at the bottom
+
+## Translation Keys Added:
+
+- English: `"roasterDetail.visitAction": "Visit"`
+- French: `"roasterDetail.visitAction": "Visiter"`
+
+The "Visit" button now appears to the right of the website URL, matching the layout of the "Call" button with the phone number. The button maintains the same gradient styling (purple to orchid) but is now more compact and positioned inline with the website link! 🎉
+
+## 817th try
+
+*(looks good, commit)*
