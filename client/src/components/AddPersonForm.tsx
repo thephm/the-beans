@@ -71,9 +71,9 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('admin.people.title', 'Title')}
+              {t('admin.people.jobTitle', 'Title')}
             </label>
-            <input type="text" placeholder={t('admin.people.title', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <input type="text" placeholder={t('admin.people.jobTitle', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
         </div>
 
@@ -132,7 +132,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
                     className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.roles.includes(role) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                     onClick={() => handleRoleToggle(role)}
                   >
-                    {t(`admin.people.role${role.charAt(0) + role.slice(1).toLowerCase()}`, role.charAt(0).toUpperCase() + role.slice(1))}
+                    {t(`admin.people.role${role.charAt(0).toUpperCase() + role.slice(1)}`, role.charAt(0).toUpperCase() + role.slice(1))}
                   </button>
                 ))}
               </div>

@@ -456,7 +456,19 @@
   "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette personne ?",
   "deleteConfirm": "Supprimer",
   "deleteCancel": "Annuler",
-  "search": "Rechercher par nom, e-mail, torréfacteur, titre ou rôle..."
+  "search": "Rechercher par nom, e-mail, torréfacteur, titre ou rôle...",
+  "name": "Nom",
+  "jobTitle": "Titre",
+  "email": "E-mail",
+  "mobile": "Mobile",
+  "roaster": "Torréfacteur",
+  "selectRoaster": "Sélectionner un torréfacteur",
+  "primaryContact": "Contact principal",
+  "role": "Rôle",
+  "roleOwner": "Propriétaire",
+  "roleAdmin": "Administrateur",
+  "roleBilling": "Facturation",
+  "bio": "Biographie"
     },
     "roasters": {
       "addTitle": "Ajouter un Torréfacteur",
