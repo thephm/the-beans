@@ -28,8 +28,10 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-gradient-lavender min-h-screen`}>
         <Providers>
-          <Navbar />
-          {children}
+          <div>
+            <Navbar />
+            {children}
+          </div>
         </Providers>
       </body>
     </html>

@@ -457,7 +457,19 @@
   "confirmDelete": "Are you sure you want to delete this person?",
   "deleteConfirm": "Delete",
   "deleteCancel": "Cancel",
-  "search": "Search by name, email, roaster, title, or role..."
+  "search": "Search by name, email, roaster, title, or role...",
+  "name": "Name",
+  "jobTitle": "Title",
+  "email": "Email",
+  "mobile": "Mobile",
+  "roaster": "Roaster",
+  "selectRoaster": "Select a roaster",
+  "primaryContact": "Primary Contact",
+  "role": "Role",
+  "roleOwner": "Owner",
+  "roleAdmin": "Admin",
+  "roleBilling": "Billing",
+  "bio": "Bio"
     },
     "roasters": {
       "addTitle": "Add Roaster",
