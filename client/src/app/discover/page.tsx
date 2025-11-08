@@ -213,17 +213,30 @@ export default function DiscoverPage() {
               ))
             ) : roasters.length > 0 ? (
               roasters.map((roaster) => (
-                <div key={roaster.id} className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow ${
+                <div key={roaster.id} className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col ${
                   user?.role === 'admin' && !roaster.verified ? 'border-4 border-red-500' : ''
                 }`}>
-                  <RoasterImage
-                    src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop'}
-                    alt={roaster.name}
-                    width={800}
-                    height={192}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-6">
+                  <div className="relative h-48">
+                    <RoasterImage
+                      src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop'}
+                      alt={roaster.name}
+                      width={800}
+                      height={192}
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      onClick={() => toggleFavorite(roaster.id)}
+                      className={`absolute bottom-4 right-4 p-2 rounded-full z-20 pointer-events-auto ${
+                        favorites.includes(roaster.id)
+                          ? 'bg-red-500 text-white' 
+                          : 'bg-white text-red-500 hover:bg-red-50'
+                      } shadow-lg transition-all transform hover:scale-110`}
+                      aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
+                    >
+                      {favorites.includes(roaster.id) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
+                    </button>
+                  </div>
+                  <div className="p-6 flex flex-col flex-grow">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{roaster.name}</h3>
                       {showRatings && (
@@ -256,7 +269,8 @@ export default function DiscoverPage() {
                         </button>
                       ))}
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="mt-auto">
+                    <div className="flex justify-between items-center mb-4">
                       {(() => {
                         // Try to use backend-provided distance if present and valid
                         if (typeof roaster.distance === 'number' && isFinite(roaster.distance)) {
@@ -293,7 +307,7 @@ export default function DiscoverPage() {
                         return null;
                       })()}
                     </div>
-                    <div className="flex space-x-3 mt-4">
+                    <div className="flex space-x-3">
                       <Link
                         href={`/roasters/${roaster.id}`}
                         className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg text-center font-medium hover:shadow-lg transition-all transform hover:scale-105"
@@ -308,17 +322,7 @@ export default function DiscoverPage() {
                           Edit
                         </Link>
                       )}
-                      <button
-                        onClick={() => toggleFavorite(roaster.id)}
-                        className={`px-4 py-2 border rounded-lg transition-all transform hover:scale-105 ${
-                          favorites.includes(roaster.id)
-                            ? 'bg-red-100 border-red-300 text-red-600 hover:bg-red-200'
-                            : 'border-primary-500 text-primary-600 hover:bg-primary-50'
-                        }`}
-                        aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
-                      >
-                        {favorites.includes(roaster.id) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
-                      </button>
+                    </div>
                     </div>
                   </div>
                 </div>
