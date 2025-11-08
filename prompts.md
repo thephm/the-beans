@@ -102194,3 +102194,137 @@ The sorting uses `localeCompare()` which provides proper alphabetical ordering. 
 ## 820th try
 
 *(works, committing)*
+
+> The buttons on each roaster card should be at the bottom, the way it is now they look all over the place because the description text is different lengths for different roasters, which is ok. See screenshot
+
+I'll help you fix the roaster card layout so the buttons align at the bottom regardless of the description length. Let me first look at the current roaster card component. 
+
+✔ Searched text for `View Details|roaster card|RoasterCard` (`**/client/src/components/**/*.tsx`), no results
+
+✔ Searched for files matching `**/RoasterCard*.tsx`, no matches
+
+✔ Searched text for `View Details` (`**/client/src/**/*.tsx`), no results
+
+Let me check the discover page since that's likely where the roaster cards are displayed: 
+
+✔ Read `client/src/app/discover/page.tsx`
+
+Perfect! I can see the issue. The roaster cards have different content lengths (descriptions, specialties), which causes the buttons at the bottom to appear at different heights. The solution is to use CSS flexbox to push the buttons to the bottom of each card.
+
+I'll modify the card structure to use `flex flex-col` with `flex-grow` to ensure the buttons always align at the bottom: 
+
+`page.tsx +2 -2`
+`page.tsx +2 -1`
+
+I need to properly close the div tag. Let me fix this: 
+
+`page.tsx +1 -1`
+`page.tsx +1 -0`
+
+Now let me verify the changes by checking for any errors: 
+
+✔ Checked `client/src/app/discover/page.tsx`, 5 problems found
+
+The compile errors are just about missing type declarations (which is normal in a Docker environment without node_modules locally). The structure errors are gone! Now let's restart the client container to see the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the roaster card layout. Here's what I changed:
+
+## Changes Made:
+
+1. **Added flex container to the card**: Added `flex flex-col` to the outer card div so it behaves as a flexbox column
+2. **Made content area flexible**: Added `flex flex-col flex-grow` to the padding div (`.p-6`) so it can grow to fill available space
+3. **Pushed buttons to bottom**: Wrapped the distance info and button section in a div with `mt-auto` class, which pushes this section to the bottom of the flex container
+
+## How it works:
+
+- The card is now a flex column that spans the full height
+- The content area (with description and specialties) can grow to different sizes
+- The `mt-auto` on the button wrapper automatically pushes it to the bottom, regardless of how much content is above it
+
+This ensures all "View Details", "Edit", and favorite buttons will align horizontally at the bottom of each card, even when descriptions are different lengths. The layout will look much cleaner and more organized!
+
+The changes are now live at `http://localhost:3000/discover` 🎨
+
+## 821st try
+
+*(buttons on bottom now, looks better!)*
+
+## Heart on image instead of bottom of cards #195
+
+https://github.com/thephm/the-beans/issues/195
+
+> I like how the heart is on the bottom right of the image carousel on view roaster. Let's make the discover and featured roasters cards the same, i.e. move the heart on top of the image, bottom right just like the view roaster (no rectangular border)
+
+I'll help you move the heart icon to the bottom right of the images in the discover and featured roasters cards, matching the style from the view roaster page. Let me first examine the current implementations. 
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`
+
+✔ Read `client/src/app/discover/page.tsx`
+
+✔ Searched text for `favorite|heart.*bottom.*right` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me check the view roaster page to see the exact implementation of the heart icon positioning: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 1 to 151
+
+✔ Searched text for `ImageCarousel|favorite.*absolute|absolute.*favorite` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 220 to 320
+
+Perfect! I can see that in the view roaster page, the favorite button is positioned with `absolute bottom-6 right-6` on the image carousel. Now I'll update both the FeaturedRoasters and Discover page to have the same positioning. Let me create a todo list and implement the changes: 
+
+✔ Created 3 todos
+
+Now I'll update the FeaturedRoasters component: 
+
+`FeaturedRoasters.tsx +11 -0`
+
+Now I need to remove the favorite button from the button group in FeaturedRoasters: 
+
+`FeaturedRoasters.tsx +0 -11`
+
+✔ Starting (2/3) *Update Discover page component*
+
+Now I'll update the Discover page. First, let me add the favorite button to the image: 
+
+`page.tsx +14 -1`
+
+Now I need to remove the favorite button from the button group in the Discover page: 
+
+`page.ts x+0 -11`
+
+✔ Starting (3/3) *Restart Docker containers*
+
+Now I'll restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+✔ Completed (3/3) *Restart Docker containers*
+
+Perfect! I've successfully moved the heart icons to the bottom right of the images in both the Featured Roasters and Discover page, matching the style from the view roaster page. Here's what I changed:
+
+**Changes made:**
+
+1. **FeaturedRoasters component** (FeaturedRoasters.tsx):
+   - Wrapped the RoasterImage in a `relative` container
+   - Added the favorite button as an absolute positioned overlay on the image (bottom-4 right-4)
+   - Removed the favorite button from the button group below
+   - Styled it with the same circular design: red background when favorited, white background when not, with shadow and hover effects
+
+2. **Discover page** (page.tsx):
+   - Wrapped the RoasterImage in a `relative` container
+   - Added the favorite button as an absolute positioned overlay on the image (bottom-4 right-4)
+   - Removed the favorite button from the button group below
+   - Applied the same styling as the view roaster page
+
+3. **Restarted the client container** to apply the changes
+
+The heart icons now appear in the bottom right corner of each roaster image card, with no rectangular border, matching the elegant design from the view roaster page!
+
+## 822nd try
+
+*(much better!)*

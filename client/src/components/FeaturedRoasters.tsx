@@ -193,6 +193,17 @@ export function FeaturedRoasters() {
                     {roaster.rating}
                   </div>
                 )}
+                <button
+                  onClick={() => toggleFavorite(roaster.id)}
+                  className={`absolute bottom-4 right-4 p-2 rounded-full z-20 pointer-events-auto ${
+                    favorites.includes(roaster.id)
+                      ? 'bg-red-500 text-white' 
+                      : 'bg-white text-red-500 hover:bg-red-50'
+                  } shadow-lg transition-all transform hover:scale-110`}
+                  aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
+                >
+                  {favorites.includes(roaster.id) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
+                </button>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
@@ -246,17 +257,6 @@ export function FeaturedRoasters() {
                       Edit
                     </Link>
                   )}
-                  <button
-                    className={`px-4 py-2 border-2 rounded-lg transition-colors ${
-                      favorites.includes(roaster.id)
-                        ? 'border-red-300 text-red-600 bg-red-100 hover:bg-red-200'
-                        : 'border-primary-200 text-primary-600 hover:bg-primary-50'
-                    }`}
-                    onClick={() => toggleFavorite(roaster.id)}
-                    aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
-                  >
-                    {favorites.includes(roaster.id) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
-                  </button>
                 </div>
               </div>
             </motion.div>
