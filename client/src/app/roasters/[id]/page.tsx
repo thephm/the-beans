@@ -451,16 +451,26 @@ export default function RoasterDetail() {
                     <div className="mb-4">
                       <div className="flex items-center">
                         <Language sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
-                        <div>
+                        <div className="flex-1">
                           <p className="font-medium text-gray-900">{t('roasterDetail.website')}</p>
-                          <a 
-                            href={roaster.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary-600 hover:text-primary-700"
-                          >
-                            {roaster.website.replace(/^https?:\/\//, '')}
-                          </a>
+                          <div className="flex items-center gap-2">
+                            <a 
+                              href={roaster.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary-600 hover:text-primary-700"
+                            >
+                              {roaster.website.replace(/^https?:\/\//, '')}
+                            </a>
+                            <a
+                              href={roaster.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="ml-auto bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+                            >
+                              {t('roasterDetail.visitAction', 'Visit')}
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -505,18 +515,6 @@ export default function RoasterDetail() {
                         <PhotoCamera sx={{ fontSize: 20 }} />
                         {t('roasterDetail.manageImages', 'Manage Images')}
                       </Link>
-                    )}
-                    
-                    {roaster.website && (
-                      <a
-                        href={roaster.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-3 px-4 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
-                      >
-                        {roaster.website.replace(/^https?:\/\//, '')}
-                        <Language sx={{ fontSize: 20 }} />
-                      </a>
                     )}
                   </div>
                 </div>
