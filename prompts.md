@@ -101739,3 +101739,55 @@ The button is now consistent with the other "Add" buttons on the People and Roas
 
 *(PHEW now "+ Add Specialty" is "Add", that's enough of this, committing)*
 
+## Change visit website link on View Roaster to be the actual URL #194
+
+https://github.com/thephm/the-beans/issues/194
+
+Change visit website link on View Roaster to be the actual URL. Exclude the "https://" or "http://" in the display text portion of the URL. See attachment
+
+I'll help you change the "Visit Website" link on the View Roaster page to display the actual URL without the protocol prefix. Let me first find the roaster detail/view page. 
+
+✔ Searched for files matching `**/roasters/**/page.tsx`, 8 matches
+
+✔ Searched text for `Visit Website` (`**/roasters/**/page.tsx`), no results
+
+✔ Searched text for `website` (`**/roasters/**/page.tsx`), 19 results
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 445 to 470
+
+Now let me check the mobile view section around line 535: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 530 to 550
+
+Perfect! I can see both instances where "Visit Website" is used. Now I need to change them to display the actual URL without the protocol prefix. Let me update both sections: 
+
+`page.tsx +1 -1`
+
+Now let me update the mobile view section: 
+
+`page.tsx +1 -1`
+
+Now let me restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Done! I've updated the View Roaster page to display the actual URL instead of "Visit Website". The changes:
+
+## What Changed:
+
+1. **Desktop view** (line 462): Changed from `{t('roasterDetail.visitWebsite')}` to `{roaster.website.replace(/^https?:\/\//, '')}`
+2. **Mobile view** (line 542): Same change - displays the URL without the protocol prefix
+
+## Result:
+
+- Instead of showing **"Visit Website"** or **"Visiter le site Web"**, the links now display the actual URL
+- The protocol (`https://` or `http://`) is stripped from the display text
+- For example, `https://thebeans.ca` will display as just **`thebeans.ca`**
+- The link still works correctly - the full URL with protocol is used in the `href` attribute
+
+The client container has been restarted. Your roaster detail pages will now show the actual website URL as clickable links! 🎉
+
+## 814th try
+
+*(it changed the button to have the URL as well, doh! checking in)*
