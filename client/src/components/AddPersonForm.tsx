@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { PersonRole } from '../types';
 import { Roaster } from '../types';
 
@@ -15,6 +16,7 @@ interface AddPersonFormProps {
 
 export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mode = 'add', initialPerson }: AddPersonFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     name: initialPerson?.name || '',
     title: initialPerson?.title || '',
@@ -63,15 +65,15 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name
+              {t('admin.people.name', 'Name')}
             </label>
-            <input type="text" placeholder="Name" value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+            <input type="text" placeholder={t('admin.people.name', 'Name')} value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title
+              {t('admin.people.title', 'Title')}
             </label>
-            <input type="text" placeholder="Title" value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <input type="text" placeholder={t('admin.people.title', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
         </div>
 
@@ -79,15 +81,15 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+              {t('admin.people.email', 'Email')}
             </label>
-            <input type="email" placeholder="Email" value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <input type="email" placeholder={t('admin.people.email', 'Email')} value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Mobile
+              {t('admin.people.mobile', 'Mobile')}
             </label>
-            <input type="text" placeholder="Mobile" value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <input type="text" placeholder={t('admin.people.mobile', 'Mobile')} value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
         </div>
 
@@ -97,22 +99,22 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
             {/* Roaster and Primary */}
             <div className="flex flex-col sm:flex-row items-end gap-4">
               <div className="flex-1 w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Roaster</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
                 <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
-                  <option value="">Select a roaster</option>
+                  <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
                   {safeRoasters.map(roaster => (
                     <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
                   ))}
                 </select>
               </div>
               <div className="w-full sm:w-auto">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Primary Contact</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.people.primaryContact', 'Primary Contact')}</label>
                 <button
                   type="button"
                   className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                   onClick={() => handleChange('isPrimary', !form.isPrimary)}
                 >
-                  {form.isPrimary ? 'Yes' : 'No'}
+                  {form.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
                 </button>
               </div>
             </div>
@@ -120,7 +122,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
             {/* Role */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Role
+                {t('admin.people.role', 'Role')}
               </label>
               <div className="flex gap-2 flex-wrap items-center">
                 {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING].map(role => (
@@ -130,7 +132,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
                     className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.roles.includes(role) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                     onClick={() => handleRoleToggle(role)}
                   >
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                    {t(`admin.people.role${role.charAt(0) + role.slice(1).toLowerCase()}`, role.charAt(0).toUpperCase() + role.slice(1))}
                   </button>
                 ))}
               </div>
@@ -141,9 +143,9 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
         {/* Bio - full width, moved below roaster section */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bio
+            {t('admin.people.bio', 'Bio')}
           </label>
-          <textarea rows={4} placeholder="Bio" value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          <textarea rows={4} placeholder={t('admin.people.bio', 'Bio')} value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
         </div>
       </div>
       <div className="flex gap-4 mt-8 justify-between items-center">
@@ -154,13 +156,13 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
               className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700"
               onClick={onDelete}
             >
-              Delete
+              {t('common.delete', 'Delete')}
             </button>
           )}
         </div>
         <div className="flex gap-4">
-          <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>Cancel</button>
-          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Save</button>
+          <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>{t('common.cancel', 'Cancel')}</button>
+          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">{t('common.save', 'Save')}</button>
         </div>
       </div>
     </form>

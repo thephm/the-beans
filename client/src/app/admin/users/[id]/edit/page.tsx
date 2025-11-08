@@ -188,7 +188,7 @@ const EditUserPage: React.FC = () => {
       )}
 
       <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-8">Edit User</h1>
+  <h1 className="text-2xl font-bold mb-8">{t('admin.users.editUser', 'Edit User')}</h1>
         
         {showDeleteConfirm && (
           <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded">
@@ -331,7 +331,7 @@ const EditUserPage: React.FC = () => {
         </form>
         {(user.createdAt || user.updatedAt) && (
           <div className="mt-6 text-sm text-gray-500 bg-gray-50 rounded p-3">
-            {user.createdAt && <span>Created on {formatDateTimeToYYYYMMDD(user.createdAt)}.</span>} {user.updatedAt && <span>Updated on {formatDateTimeToYYYYMMDD(user.updatedAt)}.</span>}
+              {user.createdAt && <span>{t('admin.users.createdOn', 'Created on')} {formatDateTimeToYYYYMMDD(user.createdAt)}.</span>} {user.updatedAt && <span>{t('admin.users.updatedOn', 'Updated on')} {formatDateTimeToYYYYMMDD(user.updatedAt)}.</span>}
           </div>
         )}
       </div>

@@ -166,14 +166,14 @@ export default function PeopleTable() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 mb-4">
         {/* Roaster dropdown */}
         <div className="flex items-center">
-          <label htmlFor="roaster-select" className="mr-2 font-medium">Roaster:</label>
+          <label htmlFor="roaster-select" className="mr-2 font-medium">{t('adminSection.roasters', 'Roaster')}:</label>
           <select
             id="roaster-select"
             value={selectedRoasterId}
             onChange={handleRoasterChange}
             className="border rounded px-2 py-1"
           >
-            <option value="all">All roasters</option>
+            <option value="all">{t('people.allRoasters', 'All roasters')}</option>
             {roasters.map(roaster => (
               <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
             ))}
@@ -183,8 +183,8 @@ export default function PeopleTable() {
         {/* Person count */}
         <span className="text-gray-500 text-sm sm:ml-6">
           {filteredPeople.length === people.length 
-            ? `${filteredPeople.length} of ${totalAcrossAllRoasters} people`
-            : `${filteredPeople.length} of ${people.length} people (${totalAcrossAllRoasters} total)`
+            ? `${filteredPeople.length} ${t('admin.people.of', 'of')} ${totalAcrossAllRoasters} ${t('admin.people.title', 'People')}`
+            : `${filteredPeople.length} ${t('admin.people.of', 'of')} ${people.length} ${t('admin.people.title', 'People')} (${totalAcrossAllRoasters} ${t('admin.people.total', 'total')})`
           }
         </span>
         
@@ -291,11 +291,11 @@ export default function PeopleTable() {
           <table className="w-full bg-white border rounded-lg shadow">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-8 py-3 text-left font-semibold">Name</th>
-                <th className="px-8 py-3 text-left font-semibold">Roaster</th>
-                <th className="px-8 py-3 text-left font-semibold">Role</th>
-                <th className="px-8 py-3 text-left font-semibold">Email</th>
-                <th className="px-8 py-3 text-left font-semibold">Mobile</th>
+                <th className="px-8 py-3 text-left font-semibold">{t('adminForms.roasters.name', 'Name')}</th>
+                <th className="px-8 py-3 text-left font-semibold">{t('adminSection.roasters', 'Roaster')}</th>
+                <th className="px-8 py-3 text-left font-semibold">{t('adminSection.role', 'Role')}</th>
+                <th className="px-8 py-3 text-left font-semibold">{t('adminForms.roasters.email', 'Email')}</th>
+                <th className="px-8 py-3 text-left font-semibold">{t('adminForms.roasters.phone', 'Mobile')}</th>
               </tr>
             </thead>
             <tbody>
