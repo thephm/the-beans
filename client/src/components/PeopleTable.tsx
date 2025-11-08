@@ -173,7 +173,7 @@ export default function PeopleTable() {
             onChange={handleRoasterChange}
             className="border rounded px-2 py-1"
           >
-            <option value="all">{t('people.allRoasters', 'All roasters')}</option>
+            <option value="all">{t('admin.people.allRoasters', 'All roasters')}</option>
             {roasters.map(roaster => (
               <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
             ))}
@@ -190,10 +190,10 @@ export default function PeopleTable() {
         
         {/* Add Person button */}
         <button
-          className="sm:ml-auto bg-purple-600 text-white px-5 py-2 rounded shadow hover:bg-purple-700 w-full sm:w-auto"
+          className="sm:ml-auto bg-green-600 text-white px-5 py-2 rounded shadow hover:bg-green-700 w-full sm:w-auto"
           onClick={() => window.location.href = '/admin/people/add'}
         >
-          {t('admin.people.add', 'Add Person')}
+          {t('common.add', 'Add')}
         </button>
       </div>
 

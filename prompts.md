@@ -101402,3 +101402,340 @@ Done! The role pills on the People page will now display in French when you're i
 - "billing" → "Facturation"
 
 The fix uses the same translation keys that were already working on the Edit Person page, so the translations will be consistent across both pages.
+
+## 807th try
+
+> One naggling English item, in the "Torréfacteurs:" menu in edit person page, it says "All roasters" in English when in French mode. This is a menu so I guess it will be tricky to reload when switching between languages
+
+I'll help you fix this translation issue. Let me first locate the edit person page and understand how the menu is implemented. 
+
+✔ Searched text for `Torréfacteurs:|All roasters`, 20 results
+
+✔ Searched for files matching `**/admin/*person*.tsx`, no matches
+
+✔ Searched text for `AddPersonForm|edit.*person` (`**/client/src/**/*.tsx`), 20 results
+
+✔ Read `client/src/components/AddPersonForm.tsx`
+
+Now let me check the admin people edit page: 
+
+✔ Searched for files matching `**/admin/people/edit/*page.tsx`, 2 matches
+
+✔ Read `client/src/app/admin/people/edit/page.tsx`
+
+Found it! On line 165, the roaster dropdown has hardcoded English text: "Select a roaster" and "All roasters". Let me check the translation files to see if we already have keys for these: 
+
+✔ Read `client/public/locales/en/common.json`
+
+✔ Read `client/public/locales/fr/common.json`
+
+I can see that the French translation file already has `"admin.people.selectRoaster": "Sélectionner un torréfacteur"`, but the issue is that this text is hardcoded in English in the edit person page. Let me check line 165 more carefully and fix it: 
+
+`page.tsx +2 -2`
+
+Good! Now let me also fix the other hardcoded English text in the same file - I noticed "Back to People", "Name", "Email", "Mobile", "Roles", "Primary", "Cancel", and "Save" are also hardcoded: 
+
+`page.tsx +1 -1`
+`page.tsx +4 -4`
+`page.tsx +1 -1`
+`page.tsx +2 -2`
+
+Now I need to check if the role option labels ("Owner", "Admin", "Billing") in the ROLE_OPTIONS array are also used for display. Let me look at the role options section: 
+
+✔ Read `client/src/app/admin/people/edit/page.tsx`, lines 1 to 51
+
+✔ Read `client/src/app/admin/people/edit/page.tsx`, lines 125 to 175
+
+I can see the role labels come from `opt.label` on line 138. Let me replace the ROLE_OPTIONS array to use translation keys instead: 
+
+`page.tsx +0 -6`
+
+Now I need to update the code to inline the role options with translations: 
+
+`page.tsx +6 -2`
+
+Perfect! Now let me restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Excellent! I've fixed the translation issue in the edit person page. Here's what I updated:
+
+## Changes Made to page.tsx:
+
+1. **"Select a roaster"** dropdown option → Now uses `t('admin.people.selectRoaster', 'Sélectionner un torréfacteur')`
+2. **"Roaster"** label → Now uses `t('admin.people.roaster', 'Torréfacteur')`
+3. **"Back to People"** button → Now uses `t('common.back', 'Retour')` + `t('admin.people.title', 'Personnes')`
+4. **"Name", "Email", "Mobile"** labels → Now use translation keys
+5. **"Roles"** label → Now uses `t('admin.people.role', 'Rôle')`
+6. **Role buttons** (Owner, Admin, Billing) → Now use translation keys (`admin.people.roleOwner`, etc.)
+7. **"Primary"** button → Now uses `t('admin.people.primaryContact', 'Contact principal')`
+8. **"Cancel" and "Save"** buttons → Now use translation keys
+
+The client container has been restarted. All the text in the edit person page will now properly switch between English and French when you change the language setting. The "Select a roaster" dropdown option will now show "Sélectionner un torréfacteur" in French mode. 🎉
+
+## 808th try
+
+> That didn't work, take a look at edit person because in there the roasters menu shows the french version of "All roasters" but it does not show in the People list "Torréfacteurs:" menu!
+
+I see the issue! There are TWO different "All roasters" dropdowns:
+1. One in the **Edit Person page** (which you just fixed)
+2. One in the **People list page** (which is still in English)
+
+Let me find and fix the People list page dropdown: 
+
+✔ Read `client/src/app/admin/people/page.tsx`
+
+Now let me check the PeopleTable component where the "All roasters" dropdown is: 
+
+✔ Searched text for `All roasters` (`**/client/src/components/PeopleTable.tsx`), 3 results
+
+Found it! Line 176 in PeopleTable.tsx. Let me check if the translation key exists: 
+
+✔ Searched text for `allRoasters` (`**/client/public/locales/*/common.json`), 3 results
+
+Great! The translation already exists. The issue is that it's using `t('people.allRoasters')` but the key is at `admin.people.allRoasters`. Let me check the context around line 176: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 170 to 190
+
+Perfect! Now I'll fix the translation key to use `admin.people.allRoasters`: 
+
+`PeopleTable.tsx +1 -1`
+
+Now restart the client container: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Fixed! The issue was that the PeopleTable component was using the wrong translation key path:
+- ❌ `t('people.allRoasters', 'All roasters')` 
+- ✅ `t('admin.people.allRoasters', 'All roasters')`
+
+Now the "All roasters" dropdown in the People list page will correctly show **"Tous les torréfacteurs"** in French mode, matching what you see in the Edit Person page! 🎉
+
+## 809th try
+
+*(FINALLY, the "All roasters" is French in People list)*
+
+> Change "Ajouter une Personne" button to just "Ajouter", there's likely an existing string and you can remove the "Ajouter une Personne" string if it's not used anywhere
+
+I'll help you change the "Ajouter une Personne" button to just "Ajouter". Let me first find where this button is used and check the translation files. 
+
+✔ Searched text for `Ajouter une Personne`, 9 results
+
+✔ Searched text for `admin.people.add` (`**/client/src/**/*.tsx`), 3 results
+
+Perfect! I found where it's used. Now let me check if there's already an "Add" translation in common: 
+
+✔ Searched text for `"add":` (`**/client/public/locales/*/common.json`), 5 results
+
+Now let me check if there's a generic "Add" in the common section: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 90 to 120
+
+✔ Read `client/public/locales/fr/common.json`, lines 200 to 230
+
+Great! I can see there's no generic "add" in the common section. Let me add one and then update the people section to use it. First, let me check the English version: 
+
+✔ Read `client/public/locales/en/common.json`, lines 200 to 230
+
+Perfect! Now I'll add "add": "Add" to the common section in both files, and then change the people.add to use "common.add". Let me do this: 
+
+`common.json +1 -0`
+`common.json +1 -0`
+
+Now let me update the PeopleTable component to use `common.add` instead of `admin.people.add`: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 190 to 205
+
+`PeopleTable.tsx +1 -1`
+
+Now let me remove the "add" key from admin.people section since it's no longer needed. Let me check the structure: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 445 to 465
+
+`common.json +0 -1`
+
+Now let me do the same for the English file: 
+
+✔ Read `client/public/locales/en/common.json`, lines 445 to 465
+
+`common.json +0 -1`
+
+Now let me restart the client container: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Done! Here's what I changed:
+
+1. **Added generic "Add" to common translations**:
+   - English: `"common.add": "Add"`
+   - French: `"common.add": "Ajouter"`
+
+2. **Updated PeopleTable button** to use `t('common.add', 'Add')` instead of `t('admin.people.add', 'Add Person')`
+
+3. **Removed unused translations**:
+   - Removed `"add": "Add Person"` from `admin.people` in English
+   - Removed `"add": "Ajouter une Personne"` from `admin.people` in French
+
+Now the button will show:
+- **"Add"** in English mode
+- **"Ajouter"** in French mode
+
+Much cleaner! 🎉
+
+## 810th try
+
+> nice, now make the button green please
+
+I'll help you make the "Ajouter" button green. Let me find the button in the PeopleTable component and update its styling. 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 190 to 205
+
+`PeopleTable.tsx +1 -1`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Done! I've changed the "Ajouter" button from purple to green. The changes:
+- `bg-purple-600` → `bg-green-600`
+- `hover:bg-purple-700` → `hover:bg-green-700`
+
+The button will now display with a green background and darker green on hover. 🟢
+
+## 811th try
+
+*(looks better!)*
+
+> OK now Change the "Add Roaster" button to "Add" on the admin roasters page and make it green to. Don't forget to do the French version too and remove the unused strings and code when done.
+
+I'll help you change the "Add Roaster" button to just "Add" and make it green on the admin roasters page, including the French version. Let me start by finding the button. 
+
+✔ Searched text for `Add Roaster`, 20 results
+
+✔ Searched text for `admin.roasters.addNew` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+✔ Searched text for `adminSection.roasters.addNew` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+Let me find where the button is in the roasters page: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 90 to 120
+
+Perfect! Found the button. Now let me check the translation files to see what keys exist: 
+
+✔ Searched text for `addNew` (`**/client/public/locales/*/common.json`), 2 results
+
+Now let me update the button to use `common.add` and change the color to green: 
+
+`page.tsx +2 -2`
+
+Now let me check if there are any other uses of the old translation keys that need updating: 
+
+✔ Searched text for `admin.roasters.addTitle` (`**/client/src/**/*.tsx`), 2 results
+
+Let me check that usage on line 918: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 910 to 925
+
+This is a page title, so we should keep the full "Add Roaster" text for the title. The button should just be "Add". Now let me remove the unused translation keys from both language files: 
+
+✔ Read `client/public/locales/en/common.json`, lines 585 to 615
+
+I can see that `roasters.addNew` is on line 588. Let me remove it: 
+
+`common.json +0 -1`
+
+Now let me do the same for the French file: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 585 to 615
+
+`common.json +0 -1`
+
+Now let me restart the client container: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Done! Here's what I changed:
+
+## Changes Made:
+
+1. **Updated the "Add Roaster" button** in page.tsx:
+   - Changed text from `t('admin.roasters.addTitle', 'Add Roaster')` to `t('common.add', 'Add')`
+   - Changed color from blue to green: `bg-blue-600 hover:bg-blue-700` → `bg-green-600 hover:bg-green-700`
+
+2. **Removed unused translation keys**:
+   - Removed `"roasters.addNew": "Add Roaster"` from English common.json
+   - Removed `"roasters.addNew": "Ajouter Torréfacteur"` from French common.json
+
+3. **Kept the page title** (line 918) using `admin.roasters.addTitle` since it makes sense to show the full "Add Roaster" / "Ajouter Torréfacteur" text as a page heading
+
+Now the button will show:
+- **"Add"** in English mode 🟢
+- **"Ajouter"** in French mode 🟢
+
+The button is now green and consistent with the "Ajouter" button on the People page! 🎉
+
+## 812th try
+
+*(Add Roaster button is now Add)*
+
+> Worked thanks! OK, now for Admin Specialties page, change "+ Add Specialty" to "Add" and remove the corresponding strings. Make sure to do the French version
+
+I'll help you change the "+ Add Specialty" button to just "Add" on the Admin Specialties page and update both English and French translations. 
+
+✔ Searched text for `Add Specialty`, 13 results
+
+✔ Read `client/src/app/admin/specialties/page.tsx`, lines 70 to 90
+
+Perfect! Now let me update the button to use `common.add` and remove the icon (the "+" is in the SVG): 
+
+`page.tsx +2 -5`
+
+Now let me check if there are any other uses of the translation key: 
+
+✔ Searched text for `admin.specialties.add` (`**/client/src/**/*.tsx`), 1 result
+
+Good, the add page uses `addTitle` for the page heading, which should remain as "Add Specialty". Now let me remove the unused `add` key from both translation files: 
+
+✔ Read `client/public/locales/en/common.json`, lines 480 to 500
+
+`common.json +0 -1`
+
+Now let me do the same for the French file: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 480 to 500
+
+`common.json +0 -1`
+
+Now let me restart the client container: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Done! Here's what I changed:
+
+## Changes Made:
+
+1. **Updated the Admin Specialties page** (page.tsx):
+   - Changed button text from `t('admin.specialties.add', 'Add Specialty')` to `t('common.add', 'Add')`
+   - Removed the "+" icon (SVG element)
+   - Simplified button styling (removed `inline-flex items-center gap-2`)
+
+2. **Removed unused translation keys**:
+   - Removed `"add": "Add Specialty"` from English common.json (admin.specialties section)
+   - Removed `"add": "Ajouter une Spécialité"` from French common.json (admin.specialties section)
+
+3. **Kept the page title** (`addTitle`) since it makes sense to show the full "Add Specialty" / "Ajouter une Spécialité" text as a page heading
+
+Now the button will show:
+- **"Add"** in English mode 🟢
+- **"Ajouter"** in French mode 🟢
+
+The button is now consistent with the other "Add" buttons on the People and Roasters pages! 🎉
+
+## 813th try
+
+*(PHEW now "+ Add Specialty" is "Add", that's enough of this, committing)*
+

@@ -69,12 +69,9 @@ const AdminSpecialtiesPage: React.FC = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('admin.specialties.title', 'Specialties')}</h1>
           <Link
             href="/admin/specialties/add"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            {t('admin.specialties.add', 'Add Specialty')}
+            {t('common.add', 'Add')}
           </Link>
         </div>
         
