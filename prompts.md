@@ -101993,3 +101993,204 @@ The rating badge will now be hidden on both mobile and desktop when `NEXT_PUBLIC
 ## 818th try
 
 *(looks good)*
+
+> Make the call button purple on view roaster just like the Visit button
+
+I'll help you make the call button purple on the view roaster page to match the Visit button. Let me first find the roaster detail page component. 
+
+✔ Searched text for `Visit.*button|ownerMobile` (`**/client/src/app/roasters/**/*.tsx`), no results
+
+✔ Searched for files matching `**/client/src/app/roasters/**/page.tsx`, 4 matches
+
+Read `client/src/app/roasters/%5Bid%5D/page.tsx`
+
+I found the roaster detail page. I can see the Call button uses `bg-green-600` and `hover:bg-green-700` classes, while the Visit button uses `bg-gradient-to-r from-primary-500 to-orchid-500` classes. Let me update the Call button to match the Visit button's purple gradient styling. 
+
+`page.tsx +1 -1`
+
+Perfect! I've updated the Call button to use the same purple gradient styling as the Visit button. The changes include:
+
+- Changed from `bg-green-600` to `bg-gradient-to-r from-primary-500 to-orchid-500` (matching Visit button)
+- Changed from `hover:bg-green-700` to `hover:shadow-lg` (matching Visit button)
+- Updated `rounded` to `rounded-lg` (matching Visit button)
+- Updated `transition` to `transition-all` (matching Visit button)
+
+Now both buttons will have the same consistent purple gradient appearance. Remember to restart the client container for the changes to take effect:
+
+```powershell
+docker-compose restart client
+```
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Done! The client container has been restarted. The Call button should now display with the same purple gradient styling as the Visit button.
+
+## 819th try
+
+*(looks good)*
+
+## Specialties are not alphabetically sorted #189
+
+https://github.com/thephm/the-beans/issues/189
+
+> Specialties are not alphabetically sorted In edit roaster or in user pages. See screenshot
+
+I'll investigate the specialties sorting issue shown in your screenshot. Let me check how specialties are currently being handled in both the edit roaster and user pages. 
+
+✔ Searched text for `specialties|Specialties` (`**/client/src/**/*.tsx`), 20 results
+
+✔ Searched codebase for "specialty options list component render display", 17 results
+
+Now let me check the SpecialtyPillSelector component more carefully to see where the sorting should be applied: 
+
+✔ Read `client/src/components/SpecialtyPillSelector.tsx`
+
+Now let me check if there are similar issues in the user profile page or settings page where specialties might be displayed: 
+
+✔ Searched text for `specialt` (`**/client/src/app/profile/**/*.tsx`), no results
+
+✔ Searched text for `specialt` (`**/client/src/app/settings/**/*.tsx`), no results
+
+Based on the screenshot and my investigation, I can see the issue. The specialties in the `SpecialtyPillSelector` component (used in the edit roaster page) are not being sorted alphabetically. The specialties are being displayed in the order they come from the API without any sorting applied.
+
+Let me fix this by adding alphabetical sorting after fetching the specialties: 
+
+`SpecialtyPillSelector.tsx +5 -0`
+
+Now I need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The fix has been applied. The specialties in the `SpecialtyPillSelector` component will now be displayed in alphabetical order. The sorting is done after fetching the data from the API and before displaying the pills, using the translated name for the current language (with a fallback to English if the translation is not available).
+
+The specialties will now appear sorted alphabetically in:
+- The edit roaster page
+- Any other page that uses the `SpecialtyPillSelector` component
+
+The sorting uses `localeCompare()` which provides proper alphabetical sorting that respects the current language's sorting rules.
+
+> they aren't sorted here
+
+I see - the specialties on the roaster detail page are also not sorted alphabetically. Let me check that page and fix it: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 319 to 339
+
+Now let me check where the roaster data is loaded and sort the specialties there: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 140 to 190
+
+I need to sort the specialties after fetching the roaster data. Let me update the fetchRoaster function: 
+
+`page.tsx +10 -0`
+
+Now let me check if there are specialties displayed on the discover page and FeaturedRoasters component that also need sorting: 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 200 to 230
+
+Searched text for `fetchRoasters|setRoasters` (`**/client/src/app/discover/page.tsx`), 2 results
+
+✔ Read `client/src/app/discover/page.tsx`, lines 105 to 135
+
+Now let me update the discover page to sort specialties: 
+
+`page.tsx +14 -1`
+
+Now let me check the FeaturedRoasters component: 
+
+✔ Searched text for `setRoasters|fetchRoasters` (`**/client/src/components/FeaturedRoasters.tsx`), no results
+
+✔ Searched text for `useState.*roaster` (`**/client/src/components/FeaturedRoasters.tsx`), 1 result
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 38 to 78
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 105 to 145
+
+Let me update the FeaturedRoasters component: 
+
+`FeaturedRoasters.tsx +14 -1`
+
+Now let me restart the client container to apply all the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the specialty sorting issue across all pages. The specialties will now be displayed in alphabetical order in:
+
+1. **SpecialtyPillSelector component** (used in edit roaster page) - sorts when fetching from API
+2. **Roaster detail page** (`/roasters/[id]`) - sorts after loading roaster data
+3. **Discover page** (`/discover`) - sorts after search results are fetched
+4. **Featured Roasters component** (home page) - sorts after fetching featured roasters
+
+All sorting uses `localeCompare()` to ensure proper alphabetical ordering based on the specialty name. The fix handles both string and object specialty formats to ensure compatibility.
+
+> not sorted here
+
+I can see the specialties on the Discover page cards are still not sorted. Let me check if there are other places where roasters are loaded that I missed: 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 51
+
+✔ Read `client/src/app/discover/page.tsx`, lines 132 to 162
+
+The sorting code is already in place on the discover page. Let me check if there's an initial load that bypasses this: 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 162 to 192
+
+Let me check if there's an initial useEffect that loads roasters on page load: 
+
+✔ Searched text for `useEffect.*\[\]|componentDidMount` (`**/client/src/app/discover/page.tsx`), no results
+
+Let me search for where the initial roasters are being set: 
+
+✔ Read `client/src/app/discover/page.tsx`
+
+I see the issue! On the discover page, the specialties are being displayed directly using `specialty.name` without any translation or sorting consideration. The sorting I added earlier works on the data structure, but when the data comes from the backend, it's already populated with specialty objects that have their names. Let me trace through to see if the backend is sending sorted data or if we need to display them using translated names.
+
+Looking at the code, the specialties on the discover page are displayed as:
+```tsx
+{specialty.name}
+```
+
+But on the roaster detail page and other places, we use `translateSpecialty(specialty)`. The sorting should be working, but let me verify the data structure and ensure the sorting is actually happening on the name that gets displayed. Let me check if the restart actually took effect by looking at what the actual data structure looks like: 
+
+✔ `docker logs --tail 20 the-beans-client-1`
+
+The client has recompiled. Now I realize the issue - the sorting is happening on `a.name` and `b.name`, but those are the raw database names. Since we're sorting on the English names from the database, they're getting sorted correctly in English. However, I need to trace through more carefully.
+
+Looking at the screenshot you provided, I can see:
+- Lavender Bean Co: "Direct Trade, Espresso, Experimental, Microlots"
+- Purple Mountain Coffee: "Light Roast, Récompenses, Single Origin"  
+- Stumptown Coffee: "Dark Roast, Direct Trade, Espresso, Récompenses, Single Origin"
+
+Let me check if maybe the issue is that sorting is not using localized names. But wait - the code sorts by `a.name` which should be the database name. Let me verify the actual sort is happening by adding some defensive code. Actually, looking more closely, I think the issue might be that I'm mutating the array inline which might not trigger a re-render properly, or the data might be coming in a different format.
+
+Let me update the sorting to be more defensive and ensure it creates a new array: 
+
+`page.tsx +9 -7`
+`page.tsx +3 -3`
+`page.tsx +3 -2`
+`FeaturedRoasters.tsx +9 -7`
+
+Now let me restart the client container to apply these more defensive sorting changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've updated the specialty sorting logic to be more defensive by:
+
+1. **Creating new arrays** instead of mutating existing ones (using spread operator `[...roaster.specialties]`)
+2. **Adding null/undefined guards** with `|| ''` fallback for safety
+3. **Creating new roaster objects** with spread operator to ensure React re-renders properly
+
+The specialties should now be sorted alphabetically across all pages:
+- Discover page
+- Roaster detail page  
+- Featured roasters (home page)
+- Edit roaster page (via SpecialtyPillSelector)
+
+The sorting uses `localeCompare()` which provides proper alphabetical ordering. Try refreshing the discover page now and the specialties should appear in alphabetical order.
+
+## 820th try
+
+*(works, committing)*

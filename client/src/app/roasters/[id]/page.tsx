@@ -149,6 +149,17 @@ export default function RoasterDetail() {
       setLoading(true)
       
       const roasterData = await apiClient.getRoaster(id as string) as Roaster
+      
+      // Sort specialties alphabetically
+      if (roasterData.specialties && roasterData.specialties.length > 0) {
+        const sortedSpecialties = [...roasterData.specialties].sort((a, b) => {
+          const nameA = typeof a === 'string' ? a : (a.name || '');
+          const nameB = typeof b === 'string' ? b : (b.name || '');
+          return nameA.localeCompare(nameB);
+        }) as typeof roasterData.specialties;
+        roasterData.specialties = sortedSpecialties;
+      }
+      
       setRoaster(roasterData)
       
       // Convert the images array to the format expected by the carousel
@@ -434,7 +445,7 @@ export default function RoasterDetail() {
                             </a>
                             <a
                               href={`tel:${roaster.phone}`}
-                              className="ml-2 px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 transition flex items-center justify-center text-sm h-8 min-w-[48px] max-w-[70px]"
+                              className="ml-2 px-3 py-1 rounded-lg bg-gradient-to-r from-primary-500 to-orchid-500 text-white hover:shadow-lg transition-all flex items-center justify-center text-sm h-8 min-w-[48px] max-w-[70px]"
                               style={{ fontWeight: 500 }}
                               title={t('roasterDetail.callAction', 'Call')}
                             >
