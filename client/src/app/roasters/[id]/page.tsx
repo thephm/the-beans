@@ -459,7 +459,7 @@ export default function RoasterDetail() {
                             rel="noopener noreferrer"
                             className="text-primary-600 hover:text-primary-700"
                           >
-                            {t('roasterDetail.visitWebsite')}
+                            {roaster.website.replace(/^https?:\/\//, '')}
                           </a>
                         </div>
                       </div>
@@ -539,7 +539,7 @@ export default function RoasterDetail() {
                         rel="noopener noreferrer"
                         className="block w-full bg-gradient-to-r from-primary-500 to-orchid-500 text-white text-center py-3 px-4 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
                       >
-                        {t('roasterDetail.visitWebsite')}
+                        {roaster.website.replace(/^https?:\/\//, '')}
                         <Language sx={{ fontSize: 20 }} />
                       </a>
                     )}
