@@ -569,7 +569,18 @@
         "deleteConfirm": "Supprimer",
         "deleteCancel": "Annuler",
         "search": "Rechercher par nom, e-mail, torréfacteur, titre ou rôle..."
-      }
+      },
+      "socialNetworks": "Réseaux Sociaux",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube",
+      "threads": "Threads",
+      "pinterest": "Pinterest",
+      "bluesky": "BlueSky",
+      "x": "X (Twitter)",
+      "reddit": "Reddit"
     }
   },
   "adminSection": {

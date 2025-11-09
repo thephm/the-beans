@@ -566,7 +566,18 @@
         "closed": "Closed",
         "open": "Open",
         "close": "Close"
-      }
+      },
+      "socialNetworks": "Social Networks",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube",
+      "threads": "Threads",
+      "pinterest": "Pinterest",
+      "bluesky": "BlueSky",
+      "x": "X (Twitter)",
+      "reddit": "Reddit"
     }
   },
   "adminSection": {

@@ -629,6 +629,18 @@ router.post('/', [
   
   // Legacy individual field validation (for backward compatibility)
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
+  
+  // Social network validation
+  body('instagram').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Instagram URL must be less than 200 characters'),
+  body('tiktok').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('TikTok URL must be less than 200 characters'),
+  body('facebook').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Facebook URL must be less than 200 characters'),
+  body('linkedin').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('LinkedIn URL must be less than 200 characters'),
+  body('youtube').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('YouTube URL must be less than 200 characters'),
+  body('threads').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Threads URL must be less than 200 characters'),
+  body('pinterest').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Pinterest URL must be less than 200 characters'),
+  body('bluesky').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('BlueSky URL must be less than 200 characters'),
+  body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
+  body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
 ], requireAuth, auditBefore('roaster', 'CREATE'), async (req: any, res: any) => {
   try {
@@ -855,6 +867,18 @@ router.put('/:id', [
   body('featured').optional().isBoolean().withMessage('Featured must be true or false'),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
+  
+  // Social network validation
+  body('instagram').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Instagram URL must be less than 200 characters'),
+  body('tiktok').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('TikTok URL must be less than 200 characters'),
+  body('facebook').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Facebook URL must be less than 200 characters'),
+  body('linkedin').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('LinkedIn URL must be less than 200 characters'),
+  body('youtube').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('YouTube URL must be less than 200 characters'),
+  body('threads').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Threads URL must be less than 200 characters'),
+  body('pinterest').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Pinterest URL must be less than 200 characters'),
+  body('bluesky').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('BlueSky URL must be less than 200 characters'),
+  body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
+  body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
 ], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {

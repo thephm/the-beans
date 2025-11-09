@@ -71,6 +71,19 @@ export interface Roaster {
   ownerEmail?: string;
   ownerBio?: string;
   ownerMobile?: string;
+  
+  // Social Networks
+  instagram?: string;
+  tiktok?: string;
+  facebook?: string;
+  linkedin?: string;
+  youtube?: string;
+  threads?: string;
+  pinterest?: string;
+  bluesky?: string;
+  x?: string;
+  reddit?: string;
+  
   verified: boolean;
   featured: boolean;
   rating: number;

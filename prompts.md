@@ -104557,3 +104557,232 @@ Perfect! I've successfully changed the "Add Contact" button to just "Add" and ma
 4. **Container Restarted** - The client container has been restarted to apply the changes
 
 The button in the Contacts section of the Edit Roaster page now shows "Add" in green instead of "Add Contact" in blue, matching the style shown in your screenshot attachment.
+
+## 846th try
+
+*(works)*
+
+## Add social networking sites for each roaster #138
+
+https://github.com/thephm/the-beans/issues/138
+
+> In the Add and Edit Roaster form, add a collapsible (closed by default) section called "Social Networks" and have optional fields for Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X, Reddit.
+
+I'll help you add a collapsible "Social Networks" section to the Add and Edit Roaster forms. Let me start by examining the current structure and then implement the changes. 
+
+✔ Created 7 todos
+
+✔ Searched codebase for "roaster form add edit component", 19 results
+
+✔ Searched for files matching `**/AddRoaster*.tsx`, no matches
+
+✔ Searched for files matching `**/EditRoaster*.tsx`, no matches
+
+Now let me look at the roaster form component more closely: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 900 to 1100
+
+Let me continue reading the form to see the complete structure: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1100 to 1300
+
+Let me check where the form ends and find a good place to add the Social Networks section: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1800 to 1975
+
+Now let me check the Prisma schema to understand the Roaster model: 
+
+✔ Read `server/prisma/schema.prisma`
+
+✔ Starting (2/7) *Update Prisma schema for social network fields*
+
+Now let me update the Prisma schema to add the social network fields: 
+
+`schema.prisma +10 -0`
+
+Now let me update the TypeScript types: 
+
+✔ Read `client/src/types/index.ts`
+
+`index.ts +13 -0`
+
+✔ Starting (3/7) *Create database migration*
+
+Now let me create the database migration: 
+
+✔ `docker-compose exec server npx prisma migrate dev --name add_social_networks_to_roasters`
+*Auto approved by rule `docker-compose`*
+
+Great! Now let me check the backend routes for roasters to ensure they handle the new fields: 
+
+✔ Starting (5/7) *Update backend API routes*
+
+✔ Searched for files matching `**/routes/roasters.ts`, 2 matches
+
+✔ Read `server/src/routes/roasters.ts`, lines 1 to 151
+
+Let me check the POST and PUT endpoints for roasters: 
+
+✔ Searched text for `router\.(post|put).*roasters` (`**/server/src/routes/roasters.ts`), no results
+
+✔ Searched text for `router\.post|router\.put` (`**/server/src/routes/roasters.ts`), 5 results
+
+✔ Read `server/src/routes/roasters.ts`, lines 611 to 761
+
+✔ Read `server/src/routes/roasters.ts`, lines 839 to 989
+
+The backend routes are using a dynamic approach where they accept all fields from the request body and pass them through. The validation middleware already handles optional fields, and since the new social network fields are optional strings in the Prisma schema, they should be automatically handled. However, let me add validation for the new fields to ensure proper URL formatting: 
+
+`roasters.ts +12 -0`
+
+The lint errors are pre-existing and not related to our changes. Now let's update the PUT endpoint as well: 
+
+`roasters.ts +12 -0`
+
+✔ Starting (6/7) *Update frontend form components*
+
+Now let's update the frontend form to add the collapsible Social Networks section. First, let me check the form state initialization: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 208 to 308
+
+Now I need to add the social network fields to the formData state. Let me update it: 
+
+`page.tsx +10 -0`
+
+Now let me update the useEffect that fetches the roaster data to include the social network fields: 
+
+`page.tsx +10 -0`
+
+Now let me add the state for the collapsible Social Networks section. First, let me find where other collapsible section states are defined: 
+
+✔ Searched text for `useState.*Expanded` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+✔ Searched text for `Expanded.*useState` (`**/client/src/app/admin/roasters/page.tsx`), 18 results
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 383 to 403
+
+Now let me add the social networks expanded state: 
+
+`page.tsx +1 -0`
+
+Now let me find where the Source Countries section is in the form so I can add the Social Networks section after it: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1150 to 1250
+
+Now let me find where the Source Countries section ends and add the Social Networks section right after it: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1245 to 1295
+
+Perfect! Now I'll add the Social Networks section between Source Countries and Contacts. Let me insert it: 
+
+`page.tsx +162 -0`
+
+Now I need to add the translation keys for the social networks section. Let me check the translation files: 
+
+✔ Read `client/public/locales/en/common.json`, lines 1 to 101
+
+Let me search for the adminForms section in the translation file: 
+
+✔ Searched text for `adminForms` (`**/client/public/locales/en/common.json`), 1 result
+
+✔ Read `client/public/locales/en/common.json`, lines 522 to 672
+
+Now let me add the social network translation keys to the adminForms.roasters section: 
+
+`common.json +12 -1`
+
+Now let me add the same translations to the French file: 
+
+✔ Searched text for `adminForms` (`**/client/public/locales/fr/common.json`), 1 result
+
+✔ Read `client/public/locales/fr/common.json`, lines 521 to 601
+
+Let me search for the hours section in the French file: 
+
+✔ Searched text for `Opening Hours` (`**/client/public/locales/fr/common.json`), no results
+
+✔ Searched text for `hours` (`**/client/public/locales/fr/common.json`), 3 results
+
+Let me search for where the people section ends in French to add the social networks before it: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 555 to 605
+
+`common.json +12 -1`
+
+✔ Starting (7/7) *Test the implementation*
+
+Now let's restart the Docker containers to apply all changes: 
+
+✔ `docker-compose restart server`
+*Auto approved by rule `docker-compose`*
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Now let's verify that the containers are running properly: 
+
+✔ `docker-compose ps`
+*Auto approved by rule `docker-compose`*
+
+Excellent! All containers are running. Let me check if there are any errors in the server logs: 
+
+✔ `docker-compose logs --tail=20 server`
+*Auto approved by rule `docker-compose`*
+
+Great! The server is starting up. Let me check the client logs as well: 
+
+✔ `docker-compose logs --tail=20 client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Both containers are running successfully. Now let me check if there are any compilation errors by looking at the recent server logs: 
+
+✔ `Start-Sleep -Seconds 5; docker-compose logs --tail=30 server | Select-String -Pattern "error|Error|ERROR" -Context 2`
+
+Good! No errors found in the server logs. Let me check the server is fully running: 
+
+Continue to iterate?
+
+Copilot has been working on this problem for a while. It can continue to iterate, or you can send a new message to refine your prompt. Configure max requests.
+
+✔ `docker-compose logs --tail=10 server`
+*Auto approved by rule `docker-compose`*
+
+Excellent! The server is running. Now let me update the todo list and provide a summary: 
+
+✔ Completed (7/7) *Test the implementation*
+
+Perfect! I've successfully implemented the Social Networks section in the Add and Edit Roaster forms. Here's what was completed:
+
+## ✅ Implementation Summary
+
+### **Database & Backend Changes:**
+1. **Prisma Schema** - Added 10 optional social network fields to the Roaster model:
+   - `instagram`, `tiktok`, `facebook`, `linkedin`, `youtube`
+   - `threads`, `pinterest`, `bluesky`, `x`, `reddit`
+
+2. **Database Migration** - Created and applied migration `20251109215706_add_social_networks_to_roasters`
+
+3. **API Validation** - Added validation rules to both POST and PUT roaster endpoints to ensure URLs are under 200 characters
+
+### **Frontend Changes:**
+4. **TypeScript Types** - Updated the `Roaster` interface in index.ts with all social network fields
+
+5. **Form State** - Updated `formData` state to include and properly initialize all 10 social network fields
+
+6. **UI Components** - Added a collapsible "Social Networks" section:
+   - **Closed by default** (as requested)
+   - Positioned between "Source Countries" and "Contacts" sections
+   - 2-column grid layout for clean organization
+   - All fields are optional with helpful placeholders
+
+7. **Translations** - Added translation keys in both English and French for:
+   - Section title: "Social Networks" / "Réseaux Sociaux"
+   - All 10 platform labels
+
+### **Testing:**
+8. **Docker Containers** - Restarted both client and server containers
+9. **Verification** - Confirmed no errors in server or client logs
+
+The Social Networks section is now live and ready to use! When you visit `/admin/roasters` and add or edit a roaster, you'll see the new collapsible section with all 10 social network fields. The section starts collapsed and expands when clicked.
+
+## 847th try

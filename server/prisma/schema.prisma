@@ -87,6 +87,16 @@ model Roaster {
   createdById        String?
   updatedById        String?
   showHours          Boolean                @default(true)
+  instagram          String?
+  tiktok             String?
+  facebook           String?
+  linkedin           String?
+  youtube            String?
+  threads            String?
+  pinterest          String?
+  bluesky            String?
+  x                  String?
+  reddit             String?
   beans              Bean[]
   favorites          Favorite[]
   reviews            Review[]
