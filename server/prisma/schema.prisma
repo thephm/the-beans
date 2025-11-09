@@ -104,7 +104,8 @@ model Roaster {
 model RoasterPerson {
   id          String   @id @default(cuid())
   roasterId   String
-  name        String
+  firstName   String
+  lastName    String?
   email       String?
   mobile      String?
   bio         String?

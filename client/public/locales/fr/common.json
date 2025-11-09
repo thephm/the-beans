@@ -462,6 +462,8 @@
   "deleteCancel": "Annuler",
   "search": "Rechercher par nom, e-mail, torréfacteur, titre ou rôle...",
   "name": "Nom",
+  "firstName": "Prénom",
+  "lastName": "Nom de famille",
   "jobTitle": "Titre",
   "email": "E-mail",
   "mobile": "Mobile",

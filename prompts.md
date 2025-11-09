@@ -85840,7 +85840,7 @@ Would you like me to show you the exact SQL command to check for this person in 
 
 ✔ Read `server/src/routes/people.ts`, lines 75 to 119
 
-Ran terminal command: docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT * FROM roasterperson WHERE id = 'cmguy1etg000113vi6nkbc2fw';"
+`docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT * FROM roasterperson WHERE id = 'cmguy1etg000113vi6nkbc2fw';"
 
 The error message from the database query is:
 
@@ -87867,7 +87867,7 @@ The containers are not currently running. Let me start them first and then fix t
 
 Perfect! Now that the containers are running, let me fix the collation version mismatch: 
 
-Ran terminal command: docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "ALTER DATABASE the_beans_db REFRESH COLLATION VERSION;"
+`docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "ALTER DATABASE the_beans_db REFRESH COLLATION VERSION;"
 
 Excellent! The collation version has been successfully updated. I can see the notice "changing version from 2.36 to 2.41" which confirms the fix worked. However, the warning mentioned that we should also rebuild objects that use the default collation. Let me run a command to reindex the database to ensure all objects are properly updated: 
 
@@ -89824,7 +89824,7 @@ docker-compose restart client
 
 I'll restart the Docker client container for you now so the changes take effect. 
 
-Ran terminal command: docker-compose restart client
+`docker-compose restart client
 
 Perfect! The client container has been restarted successfully. The changes are now live - the Actions column has been removed from the admin roasters table at `http://localhost:3000/admin/roasters`. 
 
@@ -94881,7 +94881,7 @@ This is backwards! 22:46 (10:46 PM) should come BEFORE 12:56 (12:56 PM) in desce
 
 ✔ Created `check_specific_entries.sql`
 
-Ran terminal command: Get-Content check_specific_entries.sql | docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db
+`Get-Content check_specific_entries.sql | docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db
 
 Aha! Now I see it! The UTC times are:
 - **Lavender Bean Co.**: 17:56 UTC → converts to **12:56 PM EST** (UTC-5)
@@ -95080,7 +95080,7 @@ Let me verify the exact UTC timestamps for these specific entries:
 
 ✔ Created `debug_times.sql`
 
-Ran terminal command: Get-Content debug_times.sql | docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db
+`Get-Content debug_times.sql | docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db
 
 AH HA! Now I see the REAL problem! Look at the EST times:
 - **Lavender Bean Co.**: UTC 17:56 → EST **22:56** (NOT 12:56!)
@@ -95931,7 +95931,7 @@ But wait - there's something I need to check. Let me look at the actual timestam
 
 Created `check_22_46_entry.sql`
 
-Ran terminal command: Get-Content check_22_46_entry.sql | docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db
+`Get-Content check_22_46_entry.sql | docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db
 
 PERFECT! Now I can see the **actual truth**! The server logs show:
 
@@ -97221,7 +97221,7 @@ If no roasters are loading, possible causes:
 
 Next, I will check if there are any verified roasters in the database. 
 
-Ran terminal command: docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT id, name, verified FROM roasters LIMIT 10;"
+`docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT id, name, verified FROM roasters LIMIT 10;"
 
 There are verified roasters in the database (the `verified` column is `t` for several entries). This means the backend should be returning roasters for non-admin users.
 
@@ -97374,7 +97374,7 @@ Contact form request logging is now enabled and the backend server has been rest
 
 > sent
 
-Ran terminal command: docker logs the-beans-server-1 --tail 100 | Select-String -Pattern "Contact form POST received|nodemailer|contact|error|SMTP|sendMail" -Context 0,10
+`docker logs the-beans-server-1 --tail 100 | Select-String -Pattern "Contact form POST received|nodemailer|contact|error|SMTP|sendMail" -Context 0,10
 
 No relevant log output was found for the contact form submission or email delivery in the last 100 lines. This means:
 
@@ -100578,7 +100578,7 @@ The backend loader is failing because it can't construct a proper URL from the r
 
 Good! Now let me check the logs again to see if the translation files are loading correctly: 
 
-Ran terminal command: Start-Sleep -Seconds 3; docker-compose logs client --tail=50 | Select-String -Pattern "loading|loaded|failed|error" -CaseSensitive:$false | Select-Object -Last 15
+`Start-Sleep -Seconds 3; docker-compose logs client --tail=50 | Select-String -Pattern "loading|loaded|failed|error" -CaseSensitive:$false | Select-Object -Last 15
 
 The client container has been restarted with the corrected backend path. The key fix was changing the `loadPath` from a relative path (`/locales/{{lng}}/{{ns}}.json`) to an absolute URL that includes the origin.
 
@@ -103265,3 +103265,850 @@ Try editing the roaster now - Dark Roast should appear with a red background and
 ## 835th try
 
 *(Works and better than I expected, it colors the deprecated one red with a warning sign ❤️)*
+
+## Seperate Name for Contact #199
+
+https://github.com/thephm/the-beans/issues/199
+
+> Currently the contact name is a single field and I need it to have first name and last name side by side (unless on mobile where they should be stacked)
+> 
+> This is in two places, Add/Edit People and Add/Edit contact in Roaster form. For the People list you can put "First Name Last Name" in the Name column separated by a space
+
+I'll help you split the contact name field into first name and last name fields. Let me first understand the current structure and then make the necessary changes. 
+
+✔ Created 8 todos
+
+Let me start by examining the current schema and forms: 
+
+✔ Read `server/prisma/schema.prisma`, lines 1 to 151
+
+✔ Searched text for `model Person|ownerName` (`**/server/prisma/schema.prisma`), no results
+
+✔ Searched for files matching `**/AddPersonForm.tsx`, 2 matches
+
+✔ Read `server/prisma/schema.prisma`, lines 98 to 128
+
+✔ Read `client/src/components/AddPersonForm.tsx`
+
+Now let me check the roaster form where owner contact fields are: 
+
+✔ Searched text for `ownerName|Owner Name|owner contact` (`**/admin/roasters/page.tsx`), no results
+
+Let me search for owner fields in the roaster form: 
+
+✔ Read `docs/roasters/OWNER_CONTACT_FIELDS.md`, lines 1 to 101
+
+✔ Searched text for `owner.*String` (`**/server/prisma/schema.prisma`), 1 result
+
+Great! I can see that the Roaster model already uses the RoasterPerson system. Now let me start implementing the changes: 
+
+✔ Starting (1/8) *Update database schema for Person model*
+
+`schema.prisma +2 -1`
+
+✔ Starting (2/8) *Update Add/Edit People form*
+
+`AddPersonForm.tsx +4 -2`
+
+Now update the form fields to have firstName and lastName side by side: 
+
+`AddPersonForm.tsx +13 -5`
+
+Now let me update the translation files: 
+
+✔ Read `client/public/locales/en/common.json`, lines 368 to 418
+
+✔ Searched text for `"people":` (`**/client/public/locales/en/common.json`), 2 results
+
+✔ Read `client/public/locales/en/common.json`, lines 451 to 531
+
+`common.json +2 -0`
+
+Now update the French translations: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 451 to 531
+
+`common.json +2 -0`
+
+Now let me update the backend API routes: 
+
+✔ Starting (5/8) *Update backend API routes*
+
+✔ Searched for files matching `**/routes/people.ts`, 2 matches
+
+✔ Read `server/src/routes/people.ts`
+
+Now I need to update the API routes to handle firstName and lastName instead of name: 
+
+`people.ts +4 -2`
+`people.ts +2 -1`
+`people.ts +1 -1`
+`people.ts +4 -2`
+`people.ts +2 -1`
+`people.ts +1 -1`
+`people.ts +1 -1`
+
+Now let me update the frontend types: 
+
+✔ Starting (7/8) *Update People list display*
+
+✔ Searched text for `RoasterPerson|interface.*Person` (`**/client/src/types/index.ts`), 3 results
+
+✔ Read `client/src/types/index.ts`, lines 254 to 294
+
+Continue to iterate?
+
+Copilot has been working on this problem for a while. It can continue to iterate, or you can send a new message to refine your prompt. Configure max requests.
+
+`index.ts +2 -1`
+
+Now let me find and update the People list page to display "First Name Last Name": 
+
+✔ Searched for files matching `**/admin/people/page.tsx`, 2 matches
+
+✔ Searched text for `person\.name|Name.*column` (`**/client/src/app/admin/people/page.tsx`), no results
+
+✔ Read `client/src/app/admin/people/page.tsx)
+
+✔ Searched for files matching `**/PeopleTable.tsx`, 2 matches
+
+✔ Read `client/src/components/PeopleTable.tsx`
+
+Now I need to update the PeopleTable to display "First Name Last Name" and search by both fields: 
+
+`PeopleTable.tsx +7 -2`
+`PeopleTable.tsx +1 -1`
+`PeopleTable.tsx +1 -1`
+
+Now let me create and run the database migration: 
+
+✔ Starting (6/8) *Create database migration*
+
+✔ `docker-compose exec server npx prisma migrate dev --name split_person_name_to_first_last`
+
+I need to create a custom migration that handles the existing data. Let me create the migration manually: 
+
+✔ `docker-compose exec server npx prisma migrate dev --create-only --name split_person_name_to_first_last`
+
+Now let me find and edit this migration file: 
+
+✔ Searched for files matching `**/20251109*split_person_name*.sql`, no matches
+
+✔ `docker-compose exec server ls -la prisma/migrations/`
+
+✔ Read `server/prisma/migrations/20251109145038_split_person_name_to_first_last/migration.sql`
+
+Now I'll edit this migration to handle the existing data properly: 
+
+`migration.sql +26 -4`
+
+Now let's apply the migration: 
+
+✔ `docker-compose exec server npx prisma migrate dev`
+*Auto approved by rule `docker-compose`*
+
+Excellent! Now let's restart the containers to apply all changes: 
+
+✔ Completed (6/8) *Create database migration*
+
+✔ `docker-compose restart server client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Now let me verify the migration worked by checking the database: 
+
+✔ `docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT id, \"firstName\", \"lastName\", email, \"roasterId\" FROM roaster_people LIMIT 5;"`
+
+✔ `docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c 'SELECT id, "firstName", "lastName", email, "roasterId" FROM roaster_people LIMIT 5;'`
+
+Let me try a different approach with a SQL file: 
+
+Created `check_people.sql`
+
+✔ `Get-Content check_people.sql | docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db`
+
+Excellent! The migration worked perfectly! The names were split correctly (e.g., "Big Man Billy" → firstName: "Big", lastName: "Man Billy"). 
+
+Now let me check if there are any issues with the current code and verify everything works. Let me also check if there's an edit page for people: 
+
+✔ Searched for files matching `**/admin/people/edit/**/page.tsx`, 4 matches
+
+✔ Read `client/src/app/admin/people/edit/%5Bid%5D/page.tsx`
+
+Great! Now let me check the add person page as well: 
+
+✔ Searched for files matching `**/admin/people/add/page.tsx`, 2 matches
+
+✔ Read `client/src/app/admin/people/add/page.tsx`
+
+Perfect! The People management is complete. Now I need to check if there's a contact form in the roaster admin page. Since you mentioned "Add/Edit contact in Roaster form", let me search for that: 
+
+✔ Searched text for `contact|owner.*name|Person` (`**/admin/roasters/page.tsx`), 20 results
+
+It looks like the roasters page uses the People management system (RoasterPerson). Let me check if there's an inline person form in the roasters page: 
+
+✔ Searched text for `personForm.*name|setpersonForm.*name` (`**/admin/roasters/page.tsx`), 7 results
+
+Found it! There's an inline person form in the roasters admin page. Let me read that section and update it: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 34 to 84
+
+I can see the `personForm` state has a `name` field. Let me find where it's initialized and update it to use firstName and lastName: 
+
+There are multiple instances. Let me be more specific by including more context: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 30 to 40
+
+Let me use grep to see all occurrences: 
+
+✔ Searched text for `person management state` (`**/admin/roasters/page.tsx`), 2 results
+
+There are two instances - one at line 30 and one at line 342. Let me read both and update them separately: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 25 to 45
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 337 to 357
+
+Now I'll update both with unique context: 
+
+`page.tsx +2 -1`
+
+Good! Now let me update the second instance and then fix all the other references to `name`: 
+
+`page.tsx +2 -1`
+
+Now let me find and fix all the references to `person.name` and `personForm.name`: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 760 to 780
+
+`page.tsx +2 -1`
+
+Now let me find where the person form fields are rendered in the UI: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1270 to 1320
+
+Perfect! Now I'll update this section to have firstName and lastName side by side: 
+
+`page.tsx +10 -2`
+
+Now let me find where the person is displayed in the table/list and update those to show "First Name Last Name": 
+
+✔ Searched text for `person\.name|{person\.name}` (`**/admin/roasters/page.tsx`), no results
+
+Continue to iterate?
+
+Copilot has been working on this problem for a while. It can continue to iterate, or you can send a new message to refine your prompt. Configure max requests.
+
+✔ Searched text for `\{p\.name\}|people\.map` (`**/admin/roasters/page.tsx`), 2 results
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1263 to 1313
+
+Let me continue reading to find where the person name is displayed: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1350 to 1400
+
+Found it! Now let me update the display where it shows `{person.name}` and also update the second form (for adding new contacts): 
+
+`page.tsx +1 -1`
+
+Now update the second form (for adding new contacts): 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1378 to 1428
+
+`page.tsx +17 -3`
+
+Now let me find where the person form is reset and update it: 
+
+✔ Searched text for `setpersonForm.*name.*''|personForm.*name` (`**/admin/roasters/page.tsx`), 20 results
+
+Let me check line 690 where there's a validation check: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 685 to 695
+
+`page.tsx +17 -3`
+
+Now let me find where the personForm is reset and update the types: 
+
+Using "Replace String in File"
+
+✔ Read `client/src/types/index.ts`, lines 254 to 284
+
+Great! The types are already updated. Now let me restart the containers and test: 
+
+✔ Completed (3/8) *Update Add/Edit contact in Roaster form*
+
+✔ `docker-compose restart server client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! Let me now create a summary of all the changes made:
+
+## Summary
+
+I've successfully split the contact name field into firstName and lastName fields in both the People management system and the Roaster contact forms. Here's what was completed:
+
+### ✅ Database Changes
+1. **Updated Prisma schema**: Split `name` field into `firstName` (required) and `lastName` (optional) in the `RoasterPerson` model
+2. **Created and ran migration**: Custom migration that safely splits existing names (e.g., "Big Man Billy" → firstName: "Big", lastName: "Man Billy")
+3. **Verified migration**: Confirmed 3 existing person records were migrated correctly
+
+### ✅ Backend API Changes  
+1. **Updated `/api/people` routes**: Modified validation and data handling for firstName/lastName
+2. **Updated audit logging**: Changed to display "firstName lastName" in audit logs
+
+### ✅ Frontend Changes
+
+**1. People Management (Add/Edit People Forms)**
+- Split name field into **First Name** and **Last Name** side by side on desktop
+- Fields stack vertically on mobile (responsive grid)
+- Updated AddPersonForm.tsx component
+- Updated People list display to show "First Name Last Name" in the Name column
+
+**2. Roaster Contact Forms (inline forms in Admin Roasters page)**
+- Split name field into **First Name** and **Last Name** side by side on desktop  
+- Fields stack vertically on mobile (responsive grid)
+- Updated both the edit person form and add person form
+- Updated person display cards to show "First Name Last Name"
+
+**3. Translations**
+- Added `firstName` and `lastName` keys to English translations
+- Added `firstName` (Prénom) and `lastName` (Nom de famille) to French translations
+
+**4. TypeScript Types**
+- Updated `RoasterPerson` interface to use `firstName` and `lastName`
+
+### 🎯 Key Features
+- **Responsive design**: Fields are side by side on desktop/tablet, stacked on mobile
+- **Backward compatible**: Existing data was safely migrated
+- **Consistent**: Same behavior in both People management and Roaster contact forms
+- **Internationalized**: Supports both English and French
+
+All containers have been restarted and the changes are now live! 🎉
+
+## 836th try
+
+> When saving new contact in edit roaster get "Internal Server Errror" and the following in the console: 
+ 
+```shell
+react-dom.development.js:38560 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+app-index.js:33 Warning: Cannot update a component (`Router`) while rendering a different component (`EditRoasterPage`). To locate the bad setState() call inside `EditRoasterPage`, follow the stack trace as described in https://reactjs.org/link/setstate-in-render
+    at EditRoasterPage (webpack-internal:///(app-pages-browser)/./src/app/admin/roasters/edit/[id]/page.tsx:17:78)
+    at ClientPageRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/client-page.js:14:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:76:9)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundaryHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:113:9)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at div
+    at LanguageProvider (webpack-internal:///(app-pages-browser)/./src/contexts/LanguageContext.tsx:36:11)
+    at AuthProvider (webpack-internal:///(app-pages-browser)/./src/contexts/AuthContext.tsx:16:11)
+    at QueryClientProvider (webpack-internal:///(app-pages-browser)/./node_modules/@tanstack/react-query/build/lib/QueryClientProvider.mjs:41:11)
+    at Providers (webpack-internal:///(app-pages-browser)/./src/app/providers.tsx:21:11)
+    at body
+    at html
+    at RootLayout (Server)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:76:9)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at DevRootNotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/dev-root-not-found-boundary.js:33:11)
+    at ReactDevOverlay (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/ReactDevOverlay.js:87:9)
+    at HotReload (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:321:11)
+    at Router (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/app-router.js:207:11)
+    at ErrorBoundaryHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:113:9)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at AppRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/app-router.js:585:13)
+    at ServerRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:112:27)
+    at Root (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:117:11)
+window.console.error @ app-index.js:33
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+app-index.js:33 Warning: A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+    at input
+    at div
+    at div
+    at div
+    at div
+    at div
+    at form
+    at div
+    at div
+    at RoasterForm (webpack-internal:///(app-pages-browser)/./src/app/admin/roasters/page.tsx:463:11)
+    at AdminRoastersPage (webpack-internal:///(app-pages-browser)/./src/app/admin/roasters/page.tsx:22:53)
+    at ClientPageRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/client-page.js:14:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at InnerLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:243:11)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:76:9)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:349:11)
+    at ErrorBoundaryHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:113:9)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at OuterLayoutRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:370:11)
+    at div
+    at LanguageProvider (webpack-internal:///(app-pages-browser)/./src/contexts/LanguageContext.tsx:36:11)
+    at AuthProvider (webpack-internal:///(app-pages-browser)/./src/contexts/AuthContext.tsx:16:11)
+    at QueryClientProvider (webpack-internal:///(app-pages-browser)/./node_modules/@tanstack/react-query/build/lib/QueryClientProvider.mjs:41:11)
+    at Providers (webpack-internal:///(app-pages-browser)/./src/app/providers.tsx:21:11)
+    at body
+    at html
+    at RootLayout (Server)
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:76:9)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at DevRootNotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/dev-root-not-found-boundary.js:33:11)
+    at ReactDevOverlay (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/ReactDevOverlay.js:87:9)
+    at HotReload (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:321:11)
+    at Router (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/app-router.js:207:11)
+    at ErrorBoundaryHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:113:9)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at AppRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/app-router.js:585:13)
+    at ServerRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:112:27)
+    at Root (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:117:11)
+window.console.error @ app-index.js:33
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+:5000/api/people:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+:5000/api/people:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+page.tsx:400 Already a direct image URL: https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop
+hot-reloader-client.js:187 [Fast Refresh] rebuilding
+hot-reloader-client.js:44 [Fast Refresh] done in 3477ms
+```
+
+I can see the issue. The error shows a 400 (Bad Request) followed by a 500 (Internal Server Error) when trying to save a person. The problem is that the frontend is still sending `name` in some places but the backend now expects `firstName` and `lastName`. Let me check the server logs and fix the issue: 
+
+✔ `docker logs the-beans-server-1 --tail 50`
+
+Good! The error is clear: "Unique constraint failed on the fields: (`roasterId`,`email`)". This means you're trying to add a person with an email that already exists for that roaster. But the initial 400 error suggests the validation is failing. Let me check what data is being sent. Let me also look for where the person form is being reset improperly: 
+
+✔ Searched text for `setpersonForm.*\{.*name:.*''` (`**/admin/roasters/page.tsx`), no results
+
+✔ Searched text for `personForm.*=.*\{|setpersonForm\(\{` (`**/admin/roasters/page.tsx`), 20 results
+
+Let me check line 745-746 where `resetPersonForm` is defined: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 745 to 760
+
+Found it! The `resetPersonForm` function still has `name: ''` instead of `firstName` and `lastName`. Let me fix this: 
+
+Now let me restart the client container: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The issue was in the `resetPersonForm` function which was still using the old `name` field instead of `firstName` and `lastName`. This was causing the form to send invalid data to the backend.
+
+The fix I applied:
+- Updated `resetPersonForm()` to use `firstName: ''` and `lastName: ''` instead of `name: ''`
+
+The client has been restarted. Now when you try to add a new contact in the Edit Roaster form, it should work correctly! 
+
+Note: The 500 error you saw earlier about "Unique constraint failed" was a secondary issue - it means you were trying to add a person with an email that already exists for that roaster. Make sure to use a unique email for each person within the same roaster.
+
+## 837th try
+
+> save contact gave {"error":"Internal server error"}
+
+```json
+{"error":"Internal server error"}
+```
+
+Let me check the server logs to see what the actual error is: 
+
+`docker logs the-beans-server-1 --tail 30`
+
+```shell
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/roasters/roaster3 HTTP/1.1" 200 1827 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/countries HTTP/1.1" 200 14940 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"      
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/roasters/roaster3/images HTTP/1.1" 200 13 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/roasters/roaster3 HTTP/1.1" 200 1827 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/countries HTTP/1.1" 200 14940 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"      
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/roasters/roaster3/source-countries HTTP/1.1" 200 2 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/specialties?lang=en&includeDeprecated=true HTTP/1.1" 200 3946 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/roasters/roaster3/images HTTP/1.1" 200 13 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/people/roaster/roaster3 HTTP/1.1" 200 537 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:10 +0000] "GET /api/people/roaster/roaster3 HTTP/1.1" 200 537 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+172.18.0.1 - - [09/Nov/2025:15:09:47 +0000] "POST /api/people HTTP/1.1" 400 111 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+Create person error: PrismaClientKnownRequestError:
+Invalid `prisma.roasterPerson.create()` invocation in
+/app/src/routes/people.ts:262:47
+
+  259 }
+  260
+  261 // Create the person
+→ 262 const person = await prisma.roasterPerson.create(
+Unique constraint failed on the fields: (`roasterId`,`email`)
+    at $n.handleRequestError (/app/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/app/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/app/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/app/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async /app/src/routes/people.ts:262:20 {
+  code: 'P2002',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'RoasterPerson', target: [ 'roasterId', 'email' ] }    
+}
+172.18.0.1 - - [09/Nov/2025:15:09:53 +0000] "POST /api/people HTTP/1.1" 500 33 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+```
+
+I see the issue! The error is "Unique constraint failed on the fields: (`roasterId`,`email`)". This means:
+
+1. You're trying to add a contact with an email address that already exists for that roaster
+2. The database has a unique constraint that prevents duplicate email addresses per roaster
+
+This is actually a **data validation issue**, not a bug in the code. The roaster you're editing already has a person with the email you're trying to add.
+
+However, the error handling should be better. Let me improve the error message so it's clearer to the user: 
+
+✔ Read `server/src/routes/people.ts`, lines 300 to 330
+
+`people.ts +9 -1`
+
+Now let me also add the same error handling to the UPDATE endpoint: 
+
+✔ Read `server/src/routes/people.ts`, lines 455 to 485
+
+✔ Read `server/src/routes/people.ts`, lines 495 to 515
+
+`people.ts +9 -1`
+
+Now let me restart the server: 
+
+✔ `docker-compose restart server`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've improved the error handling. Now when you try to save a contact:
+
+## What I Fixed:
+
+1. **Better error messages**: Instead of "Internal server error", you'll now get a clear message: **"A person with this email already exists for this roaster"**
+
+2. **Proper HTTP status code**: Returns 400 (Bad Request) instead of 500 (Internal Server Error) when there's a duplicate email
+
+## Why You're Getting This Error:
+
+The roaster you're editing already has a contact with the email address you're trying to add. Each roaster can only have **one person per email address** (this is enforced by a database constraint).
+
+## How to Fix:
+
+To successfully add a new contact, you have **two options**:
+
+1. **Use a different email address** for the new contact
+2. **Leave the email field blank** if the contact doesn't need an email (email is optional)
+3. **Edit the existing contact** instead of creating a new one if you want to update the person with that email
+
+The server has been restarted with the improved error handling, so now you'll see the helpful error message when trying to add a duplicate email!
+
+## 838th try
+
+*(can now save and better error messaging)*
+
+> Adding a contact should not force a role as we may know a person exists before we know what their role is
+
+I'll help you modify the contact/person addition functionality to make the role optional. Let me first search for where contacts/persons are being added to understand the current implementation. 
+
+✔ Searched text for `AddPersonForm|addPerson|createPerson|role.*required`, 20 results
+
+✔ Searched codebase for "add person contact form role required validation", 18 results
+
+Now let me look at the backend validation for creating a person to understand the role requirement: 
+
+✔ Read `server/src/routes/people.ts`, lines 190 to 240
+
+Now let me check the PUT route for updating a person: 
+
+✔ Read `server/src/routes/people.ts`, lines 330 to 380
+
+Perfect! I can see the issue. The backend validation on line 199 requires at least one role when creating a person:
+
+```typescript
+body('roles').isArray({ min: 1 }).withMessage('At least one role is required'),
+```
+
+However, on the PUT endpoint (line 337), roles are optional:
+
+```typescript
+body('roles').optional().isArray({ min: 1 }).withMessage('At least one role is required if provided'),
+```
+
+I need to make roles optional for both POST and PUT endpoints. Let me update the backend validation: 
+
+`people.ts +2 -2`
+
+Now let me also check if there's any validation in the PUT route that needs to be adjusted: 
+
+`people.ts +1 -1`
+
+Now let me check if there's any additional validation logic in the route handlers themselves that enforces the role requirement: 
+
+✔ Read `server/src/routes/people.ts`, lines 200 to 300
+
+Good! I can see the code creates the person with whatever roles are provided (line 269: `roles,`). Since we made roles optional in the validation, it will now accept an empty array or undefined.
+
+However, I need to make sure the database schema allows roles to be an empty array. Let me check the Prisma schema: 
+
+✔ Searched text for `model RoasterPerson` (`**/schema.prisma`), 1 result
+
+✔ Read `server/prisma/schema.prisma`, lines 104 to 154
+
+Perfect! The `roles` field is defined as `String[]` which means it's an array that can be empty. The schema already supports optional/empty roles, so no schema changes are needed.
+
+Now let me update the frontend components to reflect that roles are optional. Let me first check the AddPersonForm component: 
+
+✔ Read `client/src/components/AddPersonForm.tsx`
+
+Good! The AddPersonForm already allows empty roles by default (it initializes with an empty array). The form doesn't have any client-side validation that requires at least one role to be selected. The roles are just toggle buttons, so a user can deselect all of them.
+
+Now let me check the inline form in the admin roasters page to see if there's any validation there: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 780 to 880
+
+The code looks good - there's no client-side validation requiring roles. Now let me restart the Docker containers to apply the backend changes: 
+
+✔ `docker-compose restart server`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The changes have been applied. Let me create a summary of what was changed:
+
+## Summary
+
+I've successfully modified the person/contact creation to make the **role field optional**. This allows you to add a person even when you don't yet know what their role is.
+
+### Changes Made:
+
+**Backend (people.ts):**
+
+1. **POST `/api/people` endpoint** - Changed role validation from:
+   - ❌ `body('roles').isArray({ min: 1 }).withMessage('At least one role is required')`
+   - ✅ `body('roles').optional().isArray().withMessage('Roles must be an array if provided')`
+
+2. **PUT `/api/people/:id` endpoint** - Changed role validation from:
+   - ❌ `body('roles').optional().isArray({ min: 1 }).withMessage('At least one role is required if provided')`
+   - ✅ `body('roles').optional().isArray().withMessage('Roles must be an array if provided')`
+
+### What This Means:
+
+- ✅ You can now add a contact with **no roles selected**
+- ✅ The `roles` field can be an empty array `[]`
+- ✅ You can update a contact and remove all roles
+- ✅ The frontend forms already support this (no client-side validation requiring roles)
+- ✅ The database schema (`RoasterPerson.roles` as `String[]`) already supports empty arrays
+
+The backend server has been restarted and the changes are now live. You can add contacts without specifying their role, then come back later to assign roles once you know what they are.
+
+## 839th try
+
+> The "A person with this email already exists for this roaster" doesn't get removed when the contact is saved so when I edit it later the error is still there even though there is no issue.
+
+I need to find where this error message is displayed and ensure it gets cleared when the form is successfully saved or when entering edit mode. Let me search for this error message: 
+
+✔ Searched text for `A person with this email already exists for this roaster`, 4 results
+
+Now let me search for where the error state is displayed in the frontend: 
+
+✔ Searched text for `error.*bg-red|setError|error\s*&&` (`**/admin/roasters/page.tsx`), 10 results
+
+Let me look at the functions that handle editing and adding persons, particularly the `handleEditPerson` and `resetPersonForm` functions: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 740 to 780
+
+Now let me look at the `submitPerson` function to see where errors are cleared: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 786 to 866
+
+I can see the issue now. The problem is:
+
+1. When `submitPerson` succeeds (line 813), it clears the editing state but **does NOT clear the error**
+2. When `handleEditPerson` is called (line 764), it sets up the form but **does NOT clear the error**
+3. When `handleAddPerson` is called (line 758), it calls `resetPersonForm` but **does NOT clear the error**
+
+The error state persists because it's never cleared in these functions. I need to add `setError(null)` in the appropriate places: 
+
+`page.tsx +2 -0`
+
+Now I also need to clear the error when a person is successfully saved: 
+
+`page.tsx +1 -0`
+
+Perfect! Now let me restart the frontend container to apply these changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Excellent! The changes have been applied. Here's what I fixed:
+
+## Summary of Changes
+
+The error message "A person with this email already exists for this roaster" was persisting because the error state was never being cleared. I've added error clearing in three key locations:
+
+### Changes in page.tsx:
+
+1. **`resetPersonForm()` function** - Added `setError(null)` to clear errors when the form is reset
+   
+2. **`handleEditPerson()` function** - Added `setError(null)` to clear errors when entering edit mode for a person
+
+3. **`submitPerson()` function** - Added `setError(null)` when the person is successfully saved
+
+### How This Fixes the Issue:
+
+- ✅ When you save a contact successfully, the error is cleared
+- ✅ When you click "Edit" on a contact, any previous error messages are cleared
+- ✅ When you click "Add Contact", any previous error messages are cleared
+- ✅ The error only shows when there's an actual problem with the current operation
+
+The frontend has been restarted and the changes are now live. The error message will now properly disappear after a successful save and won't persist when you edit the contact again.
+
+## 840th try
+
+*(works! checking in)*

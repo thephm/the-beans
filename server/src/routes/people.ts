@@ -191,12 +191,13 @@ router.get('/roaster/:roasterId', [
 // POST /api/people - Create a new person
 router.post('/', [
   body('roasterId').isString().notEmpty().withMessage('Roaster ID is required'),
-  body('name').isString().isLength({ min: 1, max: 100 }).withMessage('Name is required and must be 1-100 characters'),
+  body('firstName').isString().isLength({ min: 1, max: 50 }).withMessage('First name is required and must be 1-50 characters'),
+  body('lastName').optional().isString().isLength({ max: 50 }).withMessage('Last name must be 50 characters or less'),
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
-  body('roles').isArray({ min: 1 }).withMessage('At least one role is required'),
-  body('roles.*').isIn(Object.values(PersonRole)).withMessage('Invalid role'),
+  body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
+  body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
   body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean')
 ], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -206,7 +207,8 @@ router.post('/', [
     }
 
   const roasterId = req.body.roasterId;
-  const name = req.body.name;
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
   const title = req.body.title;
   const email = req.body.email;
   const mobile = req.body.mobile;
@@ -261,7 +263,8 @@ router.post('/', [
       data: {
         roasterId,
         userId: linkedUserId,
-        name,
+        firstName,
+        lastName,
         title,
         email,
         mobile,
@@ -296,7 +299,7 @@ router.post('/', [
       action: 'CREATE',
       entityType: 'person',
       entityId: person.id,
-      entityName: person.name,
+      entityName: `${person.firstName} ${person.lastName || ''}`.trim(),
       userId,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),
@@ -308,8 +311,16 @@ router.post('/', [
       person: personWithPermissions
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create person error:', error);
+    
+    // Handle unique constraint violation
+    if (error.code === 'P2002') {
+      return res.status(400).json({ 
+        error: 'A person with this email already exists for this roaster' 
+      });
+    }
+    
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -318,11 +329,12 @@ router.post('/', [
 router.put('/:id', [
   param('id').isString().notEmpty().withMessage('person ID is required'),
   body('roasterId').optional().isString().notEmpty().withMessage('Roaster ID must be a valid string'),
-  body('name').optional().isString().isLength({ min: 1, max: 100 }).withMessage('Name must be 1-100 characters'),
+  body('firstName').optional().isString().isLength({ min: 1, max: 50 }).withMessage('First name must be 1-50 characters'),
+  body('lastName').optional().isString().isLength({ max: 50 }).withMessage('Last name must be 50 characters or less'),
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
-  body('roles').optional().isArray({ min: 1 }).withMessage('At least one role is required if provided'),
+  body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
   body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean'),
   body('isActive').optional().isBoolean().withMessage('isActive must be a boolean')
@@ -335,7 +347,8 @@ router.put('/:id', [
 
   const id = req.params.id;
   const roasterId = req.body.roasterId;
-  const name = req.body.name;
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
   const title = req.body.title;
   const email = req.body.email;
   const mobile = req.body.mobile;
@@ -434,7 +447,8 @@ router.put('/:id', [
       where: { id },
       data: {
         ...(roasterId !== undefined && { roasterId: newRoasterId }),
-        ...(name !== undefined && { name }),
+        ...(firstName !== undefined && { firstName }),
+        ...(lastName !== undefined && { lastName }),
         ...(title !== undefined && { title }),
         ...(email !== undefined && { email }),
         ...(mobile !== undefined && { mobile }),
@@ -476,7 +490,7 @@ router.put('/:id', [
       action: 'UPDATE',
       entityType: 'person',
       entityId: updatedperson.id,
-      entityName: updatedperson.name,
+      entityName: `${updatedperson.firstName} ${updatedperson.lastName || ''}`.trim(),
       userId,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),
@@ -489,8 +503,16 @@ router.put('/:id', [
       person: personWithPermissions
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update person error:', error);
+    
+    // Handle unique constraint violation
+    if (error.code === 'P2002') {
+      return res.status(400).json({ 
+        error: 'A person with this email already exists for this roaster' 
+      });
+    }
+    
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -540,7 +562,7 @@ router.delete('/:id', [
       action: 'DELETE',
       entityType: 'person',
       entityId: existingperson.id,
-      entityName: existingperson.name,
+      entityName: `${existingperson.firstName} ${existingperson.lastName || ''}`.trim(),
       userId,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),

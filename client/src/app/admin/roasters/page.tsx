@@ -32,7 +32,8 @@ const AdminRoastersPage: React.FC = () => {
   const [showAddPerson, setShowAddPerson] = useState(false);
   const [editingPerson, setEditingPerson] = useState<RoasterPerson | null>(null);
   const [personForm, setpersonForm] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     mobile: '',
     bio: '',
@@ -344,7 +345,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const [showAddPerson, setShowAddPerson] = useState(false);
   const [editingPerson, setEditingPerson] = useState<RoasterPerson | null>(null);
   const [personForm, setpersonForm] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     mobile: '',
     bio: '',
@@ -685,7 +687,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         }
 
         // If this is a new roaster and contact info is filled, save the contact
-        if (!roaster?.id && personForm.name) {
+        if (!roaster?.id && personForm.firstName) {
           try {
             const personPayload = { ...personForm, roasterId: roasterId };
             const personResponse = await fetch(`${apiUrl}/api/people`, {
@@ -742,7 +744,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   const resetPersonForm = () => {
     setpersonForm({
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       mobile: '',
       bio: '',
@@ -751,6 +754,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     });
     setEditingPerson(null);
     setShowAddPerson(false);
+    setError(null); // Clear any existing errors
   };
 
   const handleAddPerson = () => {
@@ -760,7 +764,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   const handleEditPerson = (person: RoasterPerson) => {
     setpersonForm({
-      name: person.name,
+      firstName: person.firstName,
+      lastName: person.lastName || '',
       email: person.email || '',
       mobile: person.mobile || '',
       bio: person.bio || '',
@@ -769,6 +774,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     });
     setEditingPerson(person);
     setShowAddPerson(true);
+    setError(null); // Clear any existing errors when editing
   };
 
   const handlePersonRoleChange = (role: PersonRole, checked: boolean) => {
@@ -807,6 +813,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       });
 
       if (response.ok) {
+        setError(null); // Clear any existing errors on success
         setEditingPerson(null);
         setShowAddPerson(false);
         resetPersonForm();
@@ -1270,11 +1277,19 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               </div>
                             )}
                             <div className="space-y-3">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Name
-                                </label>
-                                <input type="text" placeholder="Name" value={personForm.name} onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    First Name
+                                  </label>
+                                  <input type="text" placeholder="First Name" value={personForm.firstName} onChange={e => setpersonForm(f => ({ ...f, firstName: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Last Name
+                                  </label>
+                                  <input type="text" placeholder="Last Name" value={personForm.lastName} onChange={e => setpersonForm(f => ({ ...f, lastName: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                                </div>
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
@@ -1346,7 +1361,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                                   href={`/admin/people/edit/${person.id}`}
                                   className="text-blue-600 hover:text-blue-800 hover:underline"
                                 >
-                                  {person.name}
+                                  {`${person.firstName} ${person.lastName || ''}`.trim()}
                                 </a>
                               </div>
                               {person.email && <div className="text-sm text-gray-700">{person.email}</div>}
@@ -1377,16 +1392,30 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       </div>
                     )}
                     <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Name
-                        </label>
-                        <input 
-                          type="text" 
-                          value={personForm.name} 
-                          onChange={e => setpersonForm(f => ({ ...f, name: e.target.value }))} 
-                          className="w-full px-3 py-2 border rounded" 
-                        />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            First Name
+                          </label>
+                          <input 
+                            type="text" 
+                            value={personForm.firstName} 
+                            onChange={e => setpersonForm(f => ({ ...f, firstName: e.target.value }))} 
+                            className="w-full px-3 py-2 border rounded" 
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Last Name
+                          </label>
+                          <input 
+                            type="text" 
+                            value={personForm.lastName} 
+                            onChange={e => setpersonForm(f => ({ ...f, lastName: e.target.value }))} 
+                            className="w-full px-3 py-2 border rounded" 
+                          />
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>

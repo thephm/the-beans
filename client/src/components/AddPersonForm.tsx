@@ -18,7 +18,8 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
   const router = useRouter();
   const { t } = useTranslation();
   const [form, setForm] = useState({
-    name: initialPerson?.name || '',
+    firstName: initialPerson?.firstName || '',
+    lastName: initialPerson?.lastName || '',
     title: initialPerson?.title || '',
     email: initialPerson?.email || '',
     mobile: initialPerson?.mobile || '',
@@ -31,7 +32,8 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
   useEffect(() => {
     if (initialPerson) {
       setForm({
-        name: initialPerson.name || '',
+        firstName: initialPerson.firstName || '',
+        lastName: initialPerson.lastName || '',
         title: initialPerson.title || '',
         email: initialPerson.email || '',
         mobile: initialPerson.mobile || '',
@@ -61,20 +63,28 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
   return (
     <form onSubmit={handleSubmit}>
       <div className="space-y-6 mb-8">
-        {/* Name and Title - side by side on medium+ screens */}
+        {/* First Name and Last Name - side by side on medium+ screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('admin.people.name', 'Name')}
+              {t('admin.people.firstName', 'First Name')}
             </label>
-            <input type="text" placeholder={t('admin.people.name', 'Name')} value={form.name} onChange={e => handleChange('name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+            <input type="text" placeholder={t('admin.people.firstName', 'First Name')} value={form.firstName} onChange={e => handleChange('firstName', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('admin.people.jobTitle', 'Title')}
+              {t('admin.people.lastName', 'Last Name')}
             </label>
-            <input type="text" placeholder={t('admin.people.jobTitle', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <input type="text" placeholder={t('admin.people.lastName', 'Last Name')} value={form.lastName} onChange={e => handleChange('lastName', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
+        </div>
+
+        {/* Title - full width */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('admin.people.jobTitle', 'Title')}
+          </label>
+          <input type="text" placeholder={t('admin.people.jobTitle', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
         </div>
 
         {/* Email and Mobile - side by side on medium+ screens */}

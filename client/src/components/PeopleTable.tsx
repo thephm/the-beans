@@ -109,13 +109,18 @@ export default function PeopleTable() {
     if (!searchTerm.trim()) {
       setFilteredPeople(people);
     } else {
-      const filtered = people.filter(person =>
-        person.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        person.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        person.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        person.roaster?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        person.roles?.some(role => role.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+      const filtered = people.filter(person => {
+        const fullName = `${person.firstName} ${person.lastName || ''}`.trim();
+        return (
+          fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          person.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          person.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          person.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          person.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          person.roaster?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          person.roles?.some(role => role.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      });
       setFilteredPeople(filtered);
     }
   }, [searchTerm, people]);
@@ -216,7 +221,7 @@ export default function PeopleTable() {
                     href={`/admin/people/edit/${person.id}`}
                     className="text-lg font-semibold text-blue-600 hover:text-blue-800"
                   >
-                    {person.name}
+                    {`${person.firstName} ${person.lastName || ''}`.trim()}
                   </a>
                   {person.title && (
                     <div className="text-sm text-gray-600 mt-1">
@@ -315,7 +320,7 @@ export default function PeopleTable() {
                         href={`/admin/people/edit/${person.id}`}
                         className="text-blue-700 hover:text-blue-900 underline cursor-pointer"
                       >
-                        {person.name}
+                        {`${person.firstName} ${person.lastName || ''}`.trim()}
                       </a>
                       {person.title && (
                         <div className="text-sm text-gray-600 mt-1">
