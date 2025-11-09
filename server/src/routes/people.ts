@@ -195,6 +195,7 @@ router.post('/', [
   body('lastName').optional().isString().isLength({ max: 50 }).withMessage('Last name must be 50 characters or less'),
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
+  body('linkedinUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid LinkedIn URL'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
@@ -212,6 +213,7 @@ router.post('/', [
   const title = req.body.title;
   const email = req.body.email;
   const mobile = req.body.mobile;
+  const linkedinUrl = req.body.linkedinUrl;
   const bio = req.body.bio;
   const roles = req.body.roles;
   const isPrimary = req.body.isPrimary;
@@ -268,6 +270,7 @@ router.post('/', [
         title,
         email,
         mobile,
+        linkedinUrl,
         bio,
         roles,
         isPrimary: isPrimary || false,
@@ -333,6 +336,7 @@ router.put('/:id', [
   body('lastName').optional().isString().isLength({ max: 50 }).withMessage('Last name must be 50 characters or less'),
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
+  body('linkedinUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid LinkedIn URL'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
@@ -352,6 +356,7 @@ router.put('/:id', [
   const title = req.body.title;
   const email = req.body.email;
   const mobile = req.body.mobile;
+  const linkedinUrl = req.body.linkedinUrl;
   const bio = req.body.bio;
   const roles = req.body.roles;
   const isPrimary = req.body.isPrimary;
@@ -452,6 +457,7 @@ router.put('/:id', [
         ...(title !== undefined && { title }),
         ...(email !== undefined && { email }),
         ...(mobile !== undefined && { mobile }),
+        ...(linkedinUrl !== undefined && { linkedinUrl }),
         ...(bio !== undefined && { bio }),
         ...(roles !== undefined && { roles }),
         ...(isPrimary !== undefined && { isPrimary }),
