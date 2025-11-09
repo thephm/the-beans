@@ -104372,11 +104372,11 @@ The LinkedIn URL field is now available in both Add Person and Edit Person forms
 
 Let me investigate the Edit Roaster page to see how contacts are managed there and add the LinkedIn URL field. 
 
-Searched text for `edit.*contact|contact.*edit|manage.*contact` (`**/client/src/app/admin/roasters/**`), 1 result
+✔ Searched text for `edit.*contact|contact.*edit|manage.*contact` (`**/client/src/app/admin/roasters/**`), 1 result
 
-Searched for files matching `**/admin/roasters/edit/**/page.tsx`, 2 matches
+✔ Searched for files matching `**/admin/roasters/edit/**/page.tsx`, 2 matches
 
-Read `client/src/app/admin/roasters/edit/%5Bid%5D/page.tsx`
+✔ Read `client/src/app/admin/roasters/edit/%5Bid%5D/page.tsx`
 
 I see, the edit functionality is actually in the main roasters page. Let me check that file: 
 
@@ -104496,3 +104496,64 @@ Both forms now match the layout and functionality of the standalone Edit Person 
 *(just as well it ignored the part about using the same form as edit person as it would've likely broken the edit roaster page again)*
 
 *(OK the field is in all places, checking in)*
+
+## Change Add Contact to green Add button in edit roaster #203
+
+https://github.com/thephm/the-beans/issues/203
+
+> Change Add Contact button to "Add" and make it green  in edit roaster. See attachment for context
+
+I'll help you change the "Add Contact" button to just "Add" and make it green in the edit roaster page. Let me first look at the current implementation. 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1380 to 1440
+
+✔ Searched text for `Add Contact.*button` (`**/admin/roasters/page.tsx`), no results
+
+✔ Searched text for `Add Contact` (`**/admin/roasters/page.tsx`), 3 results
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1240 to 1260
+
+Perfect! I found the "Add Contact" button. Now I'll change it to just "Add" and make it green by changing the class from `bg-blue-600` to `bg-green-600` and `hover:bg-blue-700` to `hover:bg-green-700`. 
+
+`page.tsx +2 -2`
+
+Now I need to check if the translation key exists in the translation files. Let me check both English and French translation files: 
+
+✔ Searched text for `adminForms` (`**/locales/en/common.json`), 1 result
+
+✔ Read `client/public/locales/en/common.json`, lines 522 to 602
+
+✔ Searched text for `addContact` (`**/locales/en/common.json`), no results
+
+I see that the translation key `adminForms.roasters.addContact` doesn't exist yet in the translation files. I should add the "add" key to both English and French translation files. Let me add it to the `adminForms.roasters` section: 
+
+`common.json +1 -0`
+
+Now let me add the French translation: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 522 to 602
+
+`common.json +1 -0`
+
+Perfect! Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully changed the "Add Contact" button to just "Add" and made it green. Here's what was changed:
+
+## Changes Made:
+
+1. **Button Text** - Changed from `{t('adminForms.roasters.addContact', 'Add Contact')}` to `{t('adminForms.roasters.add', 'Add')}`
+
+2. **Button Color** - Changed from blue to green:
+   - `bg-blue-600` → `bg-green-600`
+   - `hover:bg-blue-700` → `hover:bg-green-700`
+
+3. **Translation Keys Added**:
+   - **English** (common.json): Added `"add": "Add"`
+   - **French** (common.json): Added `"add": "Ajouter"`
+
+4. **Container Restarted** - The client container has been restarted to apply the changes
+
+The button in the Contacts section of the Edit Roaster page now shows "Add" in green instead of "Add Contact" in blue, matching the style shown in your screenshot attachment.

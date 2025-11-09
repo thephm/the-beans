@@ -1243,9 +1243,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                   <button
                     type="button"
                     onClick={handleAddPerson}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm"
                   >
-                    {t('adminForms.roasters.addContact', 'Add Contact')}
+                    {t('adminForms.roasters.add', 'Add')}
                   </button>
                 )}
                 <button
