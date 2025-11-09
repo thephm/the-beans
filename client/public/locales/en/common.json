@@ -88,7 +88,10 @@
     "ethiopian": "Ethiopian",
     "italianRoast": "Italian Roast",
     "nitroCoffee": "Nitro Coffee",
-    "sustainable": "Sustainable"
+    "sustainable": "Sustainable",
+    "awards": "Awards",
+    "microlots": "Microlots",
+    "experimental": "Experimental"
   },
   "roasters": {
     "featured": "Featured",
@@ -97,7 +100,7 @@
     "featuredTitle": "Featured Coffee Roasters",
     "featuredTitleMobile": "Featured Roasters",
     "featuredSubtitle": "Discover exceptional coffee from our featured roasters",
-    "viewDetails": "View Details",
+    "viewDetails": "Details",
     "about": "About",
     "hours": "Hours",
     "contact": "Contact",

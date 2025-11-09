@@ -99,7 +99,10 @@
     "ethiopian": "Éthiopien",
     "italianRoast": "Torréfaction italienne",
     "nitroCoffee": "Café nitro",
-    "sustainable": "Durable"
+    "sustainable": "Durable",
+    "awards": "Récompenses",
+    "microlots": "Microlots",
+    "experimental": "Expérimental"
   },
   "roasters": {
     "featured": "En vedette",
@@ -108,7 +111,7 @@
     "featuredTitle": "Torréfacteurs de café en vedette",
     "featuredTitleMobile": "Torréfacteurs en vedette",
     "featuredSubtitle": "Découvrez un café exceptionnel de nos torréfacteurs en vedette",
-    "viewDetails": "Voir les détails",
+    "viewDetails": "Détails",
     "about": "À propos",
     "hours": "Heures",
     "contact": "Contact",

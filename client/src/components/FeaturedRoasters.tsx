@@ -3,13 +3,9 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '@/contexts/AuthContext'
-import { useFeatureFlags } from '@/hooks/useFeatureFlags'
-import RoasterImage from './RoasterImage'
+import { RoasterCard } from './RoasterCard'
 import { apiClient } from '@/lib/api'
-import { Star, LocationOn, Favorite, FavoriteBorder } from '@mui/icons-material'
 
 interface Specialty {
   id: string
@@ -32,38 +28,9 @@ interface Roaster {
 
 export function FeaturedRoasters() {
   const { t, i18n } = useTranslation()
-  const { user } = useAuth()
-  const { showRatings } = useFeatureFlags()
-  const router = useRouter()
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
-  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km')
-  const [favorites, setFavorites] = useState<string[]>([])
-  // Always use the latest value from localStorage on every render
-  useEffect(() => {
-    const settings = JSON.parse(localStorage.getItem('settings') || '{}');
-    setDistanceUnit(settings?.preferences?.distanceUnit || 'km');
-    const savedFavorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]');
-    setFavorites(savedFavorites)
-  }, []);
-
-  const toggleFavorite = (roasterId: string) => {
-    // Check if user is authenticated
-    if (!user) {
-      router.push('/login')
-      return
-    }
-
-    let updatedFavorites
-    if (favorites.includes(roasterId)) {
-      updatedFavorites = favorites.filter(id => id !== roasterId)
-    } else {
-      updatedFavorites = [...favorites, roasterId]
-    }
-    setFavorites(updatedFavorites)
-    localStorage.setItem('favoriteRoasters', JSON.stringify(updatedFavorites))
-  }
 
   // Get user location
   useEffect(() => {
@@ -74,36 +41,6 @@ export function FeaturedRoasters() {
       )
     }
   }, [])
-  // Haversine formula to calculate distance between two lat/lng points
-  function calcDistance(lat1: number, lng1: number, lat2: number, lng2: number, unit: 'km' | 'mi') {
-    const toRad = (v: number) => v * Math.PI / 180
-    const R = unit === 'mi' ? 3958.8 : 6371
-    const dLat = toRad(lat2 - lat1)
-    const dLng = toRad(lng2 - lng1)
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2) * Math.sin(dLng/2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-    return R * c
-  }
-
-  // Translate specialty using i18n keys matching backend data
-  const translateSpecialty = (specialty: string) => {
-    if (!specialty) return '';
-    let key = specialty;
-    // If specialty already starts with 'specialties.', use as-is
-    if (!key.startsWith('specialties.')) {
-      // Convert to camelCase key
-      key = key.replace(/\s+(.)/g, (_, c) => c.toUpperCase());
-      key = key.charAt(0).toLowerCase() + key.slice(1);
-      key = key.replace(/[^a-zA-Z0-9]/g, '');
-      key = `specialties.${key}`;
-    }
-    const translated = t(key);
-    if (translated === key) {
-      // Fallback: show original specialty string (without 'specialties.' prefix)
-      return specialty.startsWith('specialties.') ? specialty.replace('specialties.', '') : specialty;
-    }
-    return translated;
-  }
 
   useEffect(() => {
     fetchFeaturedRoasters()
@@ -177,88 +114,13 @@ export function FeaturedRoasters() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all opacity-100"
+              className="opacity-100"
             >
-              <div className="relative h-48">
-                <RoasterImage
-                  src={roaster.imageUrl || 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=300&fit=crop'}
-                  alt={roaster.name}
-                  className="w-full h-full object-cover"
-                  width={400}
-                  height={300}
-                />
-                {showRatings && (
-                  <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600 flex items-center gap-1">
-                    <Star sx={{ fontSize: 16 }} />
-                    {roaster.rating}
-                  </div>
-                )}
-                <button
-                  onClick={() => toggleFavorite(roaster.id)}
-                  className={`absolute bottom-4 right-4 p-2 rounded-full z-20 pointer-events-auto ${
-                    favorites.includes(roaster.id)
-                      ? 'bg-red-500 text-white' 
-                      : 'bg-white text-red-500 hover:bg-red-50'
-                  } shadow-lg transition-all transform hover:scale-110`}
-                  aria-label={favorites.includes(roaster.id) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
-                >
-                  {favorites.includes(roaster.id) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
-                </button>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{roaster.name}</h3>
-                {(roaster.city || roaster.state) && (
-                  <p className="text-gray-600 mb-2 flex items-center">
-                    <LocationOn sx={{ fontSize: 16, marginRight: 0.5 }} />
-                    {[roaster.city, roaster.state].filter(Boolean).join(', ')}
-                  </p>
-                )}
-                {userLocation && roaster.latitude && roaster.longitude ? (() => {
-                  const dist = calcDistance(userLocation.lat, userLocation.lng, roaster.latitude, roaster.longitude, distanceUnit);
-                  if (isFinite(dist) && !isNaN(dist)) {
-                    return (
-                      <p className="text-gray-600 mb-2">
-                        {dist.toFixed(1)} {distanceUnit === 'mi' ? t('mi').toLowerCase() : t('km').toLowerCase()}
-                      </p>
-                    );
-                  }
-                  return null;
-                })() : null}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {roaster.specialties && roaster.specialties.length > 0 ? (
-                    roaster.specialties.map((spec) => (
-                      <Link
-                        key={spec.id}
-                        href={`/discover?specialty=${encodeURIComponent(spec.name)}`}
-                        className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200 hover:bg-primary-100 transition-colors"
-                      >
-                        {translateSpecialty(spec.name)}
-                      </Link>
-                    ))
-                  ) : (
-                    <span className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold border border-primary-200">
-                      {t('specialties.artisanal')}
-                    </span>
-                  )}
-                </div>
-                <p className="text-gray-600 text-sm mb-4">{roaster.description}</p>
-                <div className="flex gap-2">
-                  <Link
-                    href={`/roasters/${roaster.id}`}
-                    className="flex-1 bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-4 py-2 rounded-lg text-center font-medium hover:shadow-lg transition-all transform hover:scale-105"
-                  >
-                    {t('roasters.viewDetails')}
-                  </Link>
-                  {user?.role === 'admin' && (
-                    <Link
-                      href={`/admin/roasters?edit=${roaster.id}&returnTo=/`}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
-                    >
-                      Edit
-                    </Link>
-                  )}
-                </div>
-              </div>
+              <RoasterCard
+                roaster={roaster}
+                userLocation={userLocation}
+                returnTo="/"
+              />
             </motion.div>
           ))}
         </div>
