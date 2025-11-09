@@ -463,6 +463,8 @@
   "deleteCancel": "Cancel",
   "search": "Search by name, email, roaster, title, or role...",
   "name": "Name",
+  "firstName": "First Name",
+  "lastName": "Last Name",
   "jobTitle": "Title",
   "email": "Email",
   "mobile": "Mobile",

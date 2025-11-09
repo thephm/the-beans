@@ -258,7 +258,8 @@ export interface RoasterPerson {
     id: string;
     name: string;
   };
-  name: string;
+  firstName: string;
+  lastName?: string;
   title?: string;
   email?: string;
   mobile?: string;
