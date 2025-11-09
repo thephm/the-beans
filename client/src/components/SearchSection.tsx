@@ -224,7 +224,7 @@ export function SearchSection({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
-          className={`bg-gradient-to-r from-lavender-50 to-orchid-50 rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-8 pb-8' : 'p-8'}`}
+          className={`bg-gradient-to-r from-lavender-50 to-orchid-50 rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-4 sm:px-8 pb-8' : 'p-4 sm:p-8'}`}
         >
           {/* Search input row */}
           {/* Responsive row: all fields/buttons in one row on md+ screens, stacked on mobile */}
