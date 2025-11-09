@@ -8,7 +8,8 @@ List of requirements and user stories for roasters.
 - Users can search roasters by name, city, state, specialty, or proximity.
 - Users can view detailed information for each roaster.
 - Users can favorite/unfavorite roasters and see their favorites.
-- Roaster profiles display ratings, review counts, specialties, contact info, and hours.
+- Roaster profiles display ratings, review counts, specialties, contact info, hours, and founding year.
+- Roaster profiles include links to social media accounts (Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X/Twitter, Reddit).
 - Authenticated users can create new roasters.
 - Roaster data is available in multiple languages.
 - Roaster owners can provide detailed contact information (name, email, bio, mobile).

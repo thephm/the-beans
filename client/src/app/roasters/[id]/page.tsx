@@ -54,7 +54,7 @@ interface Roaster {
   showHours?: boolean
   onlineOnly?: boolean
   story?: string
-  founded?: string
+  founded?: number
   owner?: string | { id: string; username: string; firstName: string; lastName: string }
   images?: string[]
   roasterImages?: RoasterImageData[]
@@ -507,9 +507,10 @@ export default function RoasterDetail() {
 
                   {/* Founded */}
                   {roaster.founded && (
-                    <div className="mb-4 pb-4 border-b border-gray-200">
-                      <p className="font-medium text-gray-900">Founded</p>
-                      <p className="text-gray-600">{roaster.founded}</p>
+                    <div className="mb-4">
+                      <p className="text-gray-700">
+                        <span className="font-medium">{t('roasterDetail.foundedIn', 'Founded in')}</span> {roaster.founded}
+                      </p>
                     </div>
                   )}
 

@@ -230,6 +230,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     country: roaster?.country || '',
     latitude: roaster?.latitude || '',
     longitude: roaster?.longitude || '',
+    founded: roaster?.founded || '',
     specialtyIds: roaster?.specialties?.map(s => s.id) || [],
     verified: roaster?.verified || false,
     featured: roaster?.featured || false,
@@ -278,6 +279,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               country: data.country || '',
               latitude: data.latitude || '',
               longitude: data.longitude || '',
+              founded: data.founded || '',
               specialtyIds: data.specialties?.map((s: any) => s.id) || [],
               verified: data.verified || false,
               featured: data.featured || false,
@@ -638,6 +640,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         hours: convertedHours,
         latitude: formData.latitude ? parseFloat(String(formData.latitude)) : undefined,
         longitude: formData.longitude ? parseFloat(String(formData.longitude)) : undefined,
+        founded: formData.founded ? parseInt(String(formData.founded)) : undefined,
         rating: parseFloat(String(formData.rating)) || 0,
         specialtyIds: formData.specialtyIds, // Send specialty IDs array directly
       };
@@ -706,6 +709,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             country: data.country || '',
             latitude: data.latitude || '',
             longitude: data.longitude || '',
+            founded: data.founded || '',
             specialtyIds: data.specialties?.map(s => s.id) || [],
             verified: data.verified || false,
             featured: data.featured || false,
@@ -1065,6 +1069,22 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       name="website"
                       value={formData.website}
                       onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.founded', 'Founded')}
+                    </label>
+                    <input
+                      type="number"
+                      name="founded"
+                      value={formData.founded}
+                      onChange={handleInputChange}
+                      placeholder="e.g. 2020"
+                      min="1800"
+                      max="2100"
+                      step="1"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
