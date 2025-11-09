@@ -84,6 +84,8 @@ export interface Roaster {
   x?: string;
   reddit?: string;
   
+  founded?: number;
+  
   verified: boolean;
   featured: boolean;
   rating: number;

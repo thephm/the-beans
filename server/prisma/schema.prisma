@@ -97,6 +97,7 @@ model Roaster {
   bluesky            String?
   x                  String?
   reddit             String?
+  founded            Int?
   beans              Bean[]
   favorites          Favorite[]
   reviews            Review[]

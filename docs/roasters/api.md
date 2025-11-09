@@ -57,8 +57,19 @@ Create a new roaster (requires authentication).
 	"zipCode": "...",
 	"latitude": 0,
 	"longitude": 0,
+	"founded": 2020,
 	"specialties": ["Espresso", ...],
-	"ownerEmail": "..."
+	"ownerEmail": "...",
+	"instagram": "https://instagram.com/...",
+	"tiktok": "https://tiktok.com/@...",
+	"facebook": "https://facebook.com/...",
+	"linkedin": "https://linkedin.com/company/...",
+	"youtube": "https://youtube.com/@...",
+	"threads": "https://threads.net/@...",
+	"pinterest": "https://pinterest.com/...",
+	"bluesky": "https://bsky.app/profile/...",
+	"x": "https://x.com/...",
+	"reddit": "https://reddit.com/r/..."
 }
 ```
 
@@ -98,7 +109,8 @@ Delete an image (requires authentication and ownership).
 
 ## Roaster Object Fields
 
-- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `people`, `_count`
+- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `founded`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `people`, `_count`
+- **Social Networks:** `instagram`, `tiktok`, `facebook`, `linkedin`, `youtube`, `threads`, `pinterest`, `bluesky`, `x`, `reddit`
 
 **Note:** `people` field contains RoasterPerson objects (contacts/roles). Legacy owner contact fields are deprecated.
 
