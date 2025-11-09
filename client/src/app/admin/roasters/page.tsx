@@ -246,6 +246,16 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       sunday: { open: '08:00', close: '18:00', closed: false },
     },
     images: roaster?.images || [],
+    instagram: roaster?.instagram || '',
+    tiktok: roaster?.tiktok || '',
+    facebook: roaster?.facebook || '',
+    linkedin: roaster?.linkedin || '',
+    youtube: roaster?.youtube || '',
+    threads: roaster?.threads || '',
+    pinterest: roaster?.pinterest || '',
+    bluesky: roaster?.bluesky || '',
+    x: roaster?.x || '',
+    reddit: roaster?.reddit || '',
   });
   useEffect(() => {
     if (roaster?.id) {
@@ -276,6 +286,16 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               showHours: data.showHours !== undefined ? data.showHours : true,
               hours: convertHoursFormat(data.hours),
               images: data.images || [],
+              instagram: data.instagram || '',
+              tiktok: data.tiktok || '',
+              facebook: data.facebook || '',
+              linkedin: data.linkedin || '',
+              youtube: data.youtube || '',
+              threads: data.threads || '',
+              pinterest: data.pinterest || '',
+              bluesky: data.bluesky || '',
+              x: data.x || '',
+              reddit: data.reddit || '',
             });
           }
         } catch (err) {
@@ -369,6 +389,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const [specialtiesExpanded, setSpecialtiesExpanded] = useState(true);
   const [settingsExpanded, setSettingsExpanded] = useState(true);
   const [urlImagesExpanded, setUrlImagesExpanded] = useState(false);
+  const [socialNetworksExpanded, setSocialNetworksExpanded] = useState(false);
 
   // Basic form UI for editing roaster
   // ...existing code...
@@ -1228,6 +1249,168 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                   )}
                 </div>
                 )}
+              </>
+            )}
+          </div>
+
+          {/* Social Networks */}
+          <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-800 select-none">
+                {t('adminForms.roasters.socialNetworks', 'Social Networks')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSocialNetworksExpanded(!socialNetworksExpanded)}
+                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                title={socialNetworksExpanded ? 'Collapse section' : 'Expand section'}
+              >
+                <svg 
+                  className="w-4 h-4 transition-transform duration-200" 
+                  style={{ transform: socialNetworksExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+            
+            {socialNetworksExpanded && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.instagram', 'Instagram')}
+                    </label>
+                    <input
+                      type="text"
+                      name="instagram"
+                      value={formData.instagram}
+                      onChange={handleInputChange}
+                      placeholder="https://instagram.com/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.tiktok', 'TikTok')}
+                    </label>
+                    <input
+                      type="text"
+                      name="tiktok"
+                      value={formData.tiktok}
+                      onChange={handleInputChange}
+                      placeholder="https://tiktok.com/@..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.facebook', 'Facebook')}
+                    </label>
+                    <input
+                      type="text"
+                      name="facebook"
+                      value={formData.facebook}
+                      onChange={handleInputChange}
+                      placeholder="https://facebook.com/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.linkedin', 'LinkedIn')}
+                    </label>
+                    <input
+                      type="text"
+                      name="linkedin"
+                      value={formData.linkedin}
+                      onChange={handleInputChange}
+                      placeholder="https://linkedin.com/company/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.youtube', 'YouTube')}
+                    </label>
+                    <input
+                      type="text"
+                      name="youtube"
+                      value={formData.youtube}
+                      onChange={handleInputChange}
+                      placeholder="https://youtube.com/@..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.threads', 'Threads')}
+                    </label>
+                    <input
+                      type="text"
+                      name="threads"
+                      value={formData.threads}
+                      onChange={handleInputChange}
+                      placeholder="https://threads.net/@..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.pinterest', 'Pinterest')}
+                    </label>
+                    <input
+                      type="text"
+                      name="pinterest"
+                      value={formData.pinterest}
+                      onChange={handleInputChange}
+                      placeholder="https://pinterest.com/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.bluesky', 'BlueSky')}
+                    </label>
+                    <input
+                      type="text"
+                      name="bluesky"
+                      value={formData.bluesky}
+                      onChange={handleInputChange}
+                      placeholder="https://bsky.app/profile/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.x', 'X (Twitter)')}
+                    </label>
+                    <input
+                      type="text"
+                      name="x"
+                      value={formData.x}
+                      onChange={handleInputChange}
+                      placeholder="https://x.com/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('adminForms.roasters.reddit', 'Reddit')}
+                    </label>
+                    <input
+                      type="text"
+                      name="reddit"
+                      value={formData.reddit}
+                      onChange={handleInputChange}
+                      placeholder="https://reddit.com/r/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
               </>
             )}
           </div>
