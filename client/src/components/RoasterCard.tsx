@@ -192,10 +192,13 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
           )}
         </div>
         {(roaster.city || roaster.state) && (
-          <p className="text-gray-600 mb-2 flex items-center">
-            <LocationOn sx={{ fontSize: 16, marginRight: 0.5 }} />
-            {[roaster.city, roaster.state].filter(Boolean).join(', ')}
-          </p>
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-gray-600 flex items-center">
+              <LocationOn sx={{ fontSize: 16, marginRight: 0.5 }} />
+              {[roaster.city, roaster.state].filter(Boolean).join(', ')}
+            </p>
+            {calculateDistance()}
+          </div>
         )}
         {roaster.description && (
           <p className="text-gray-700 mb-4">{roaster.description}</p>
@@ -212,9 +215,6 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
           ))}
         </div>
         <div className="mt-auto">
-          <div className="flex justify-between items-center mb-4">
-            {calculateDistance()}
-          </div>
           <div className="flex gap-2 items-center justify-between">
             {user?.role === 'admin' && (
               <Link

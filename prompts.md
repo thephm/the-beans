@@ -104112,3 +104112,44 @@ The frontend has been restarted and the changes are now live. The error message 
 ## 840th try
 
 *(works! checking in)*
+
+## Move distance to the right of location #197
+
+https://github.com/thephm/the-beans/issues/197
+
+> Move distance to the right of location in roaster card , right alinged, see screenshot
+
+I'll help you move the distance to the right of the location in the roaster card. Let me first find the roaster card component to see the current layout. 
+
+✔ Searched text for `Portland, OR|miles|RoasterCard` (`**/client/src/components/**/*.tsx`), 6 results
+
+✔ Read `client/src/components/RoasterCard.tsx`
+
+Now I can see the issue. The distance is currently displayed in its own row with a flex container that doesn't align it with the location. I need to move the distance to be on the same line as the location, aligned to the right. Let me update the code: 
+
+`RoasterCard.tsx +4 -4`
+
+The lint errors are pre-existing and not related to my changes. Now I need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+✔ `docker-compose ps`
+*Auto approved by rule `docker-compose`*
+
+Perfect! The client container has restarted successfully (it shows "Up 4 seconds"). The changes have been applied:
+
+**Changes made:**
+- Moved the distance display from a separate row to the same line as the location
+- The location and distance are now in a flex container with `justify-between` to push the distance to the right side
+- The distance remains right-aligned as requested
+
+The roaster card now shows:
+- **Location** (Portland, OR) on the left
+- **Distance** (2095.2 miles) on the right, aligned on the same line
+
+The client container is now running with the updated layout. You should be able to see the changes at `http://localhost:3000`.
+
+## 841st try
+
+*(looks good, committing!)*
