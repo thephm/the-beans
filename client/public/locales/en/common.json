@@ -500,6 +500,7 @@
       "deleteCancel": "Cancel",
       "deprecateToggle": "Deprecate Specialty",
       "deprecateHelp": "Deprecated specialties are hidden from selection but remain visible on roasters that already use them.",
+      "deprecatedWarning": "This specialty is deprecated. Consider removing it.",
       "languageLabel": "Language",
       "nameLabel": "Name",
       "descriptionLabel": "Description",
