@@ -263,6 +263,7 @@ export interface RoasterPerson {
   title?: string;
   email?: string;
   mobile?: string;
+  linkedinUrl?: string;
   bio?: string;
   userId?: string;
   user?: User;

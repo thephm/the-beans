@@ -36,6 +36,7 @@ const AdminRoastersPage: React.FC = () => {
     lastName: '',
     email: '',
     mobile: '',
+    linkedinUrl: '',
     bio: '',
     roles: [] as PersonRole[],
     isPrimary: false
@@ -349,6 +350,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     lastName: '',
     email: '',
     mobile: '',
+    linkedinUrl: '',
     bio: '',
     roles: [] as PersonRole[],
     isPrimary: false
@@ -748,6 +750,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       lastName: '',
       email: '',
       mobile: '',
+      linkedinUrl: '',
       bio: '',
       roles: [],
       isPrimary: false
@@ -768,6 +771,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       lastName: person.lastName || '',
       email: person.email || '',
       mobile: person.mobile || '',
+      linkedinUrl: person.linkedinUrl || '',
       bio: person.bio || '',
       roles: person.roles,
       isPrimary: person.isPrimary
@@ -1307,6 +1311,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               </div>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  LinkedIn URL
+                                </label>
+                                <input type="url" placeholder="https://www.linkedin.com/in/username" value={personForm.linkedinUrl} onChange={e => setpersonForm(f => ({ ...f, linkedinUrl: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
                                   Bio
                                 </label>
                                 <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" rows={3} />
@@ -1440,6 +1450,18 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                             className="w-full px-3 py-2 border rounded" 
                           />
                         </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          LinkedIn URL
+                        </label>
+                        <input 
+                          type="url" 
+                          placeholder="https://www.linkedin.com/in/username"
+                          value={personForm.linkedinUrl} 
+                          onChange={e => setpersonForm(f => ({ ...f, linkedinUrl: e.target.value }))} 
+                          className="w-full px-3 py-2 border rounded" 
+                        />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">

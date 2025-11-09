@@ -468,6 +468,8 @@
   "jobTitle": "Title",
   "email": "Email",
   "mobile": "Mobile",
+  "linkedinUrl": "LinkedIn URL",
+  "linkedinUrlPlaceholder": "https://www.linkedin.com/in/username",
   "roaster": "Roaster",
   "selectRoaster": "Select a roaster",
   "primaryContact": "Primary Contact",

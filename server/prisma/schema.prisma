@@ -108,6 +108,7 @@ model RoasterPerson {
   lastName    String?
   email       String?
   mobile      String?
+  linkedinUrl String?
   bio         String?
   userId      String?
   roles       String[]

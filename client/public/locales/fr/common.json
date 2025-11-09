@@ -467,6 +467,8 @@
   "jobTitle": "Titre",
   "email": "E-mail",
   "mobile": "Mobile",
+  "linkedinUrl": "URL LinkedIn",
+  "linkedinUrlPlaceholder": "https://www.linkedin.com/in/nomutilisateur",
   "roaster": "Torréfacteur",
   "selectRoaster": "Sélectionner un torréfacteur",
   "primaryContact": "Contact principal",

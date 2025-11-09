@@ -23,6 +23,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
     title: initialPerson?.title || '',
     email: initialPerson?.email || '',
     mobile: initialPerson?.mobile || '',
+    linkedinUrl: initialPerson?.linkedinUrl || '',
     bio: initialPerson?.bio || '',
     roles: initialPerson?.roles || [] as PersonRole[],
     roasterId: initialPerson?.roasterId || '',
@@ -37,6 +38,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
         title: initialPerson.title || '',
         email: initialPerson.email || '',
         mobile: initialPerson.mobile || '',
+        linkedinUrl: initialPerson.linkedinUrl || '',
         bio: initialPerson.bio || '',
         roles: initialPerson.roles || [] as PersonRole[],
         roasterId: initialPerson.roasterId || '',
@@ -101,6 +103,14 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
             </label>
             <input type="text" placeholder={t('admin.people.mobile', 'Mobile')} value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
+        </div>
+
+        {/* LinkedIn URL - full width */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('admin.people.linkedinUrl', 'LinkedIn URL')}
+          </label>
+          <input type="url" placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')} value={form.linkedinUrl} onChange={e => handleChange('linkedinUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
         </div>
 
         {/* Roaster, Primary, and Role - grouped in a frame */}
