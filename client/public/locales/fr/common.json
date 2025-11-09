@@ -499,6 +499,7 @@
       "deleteCancel": "Annuler",
       "deprecateToggle": "Déprécier la Spécialité",
       "deprecateHelp": "Les spécialités dépréciées sont masquées de la sélection mais restent visibles sur les torréfacteurs qui les utilisent déjà.",
+      "deprecatedWarning": "Cette spécialité est dépréciée. Envisagez de la supprimer.",
       "languageLabel": "Langue",
       "nameLabel": "Nom",
       "descriptionLabel": "Description",

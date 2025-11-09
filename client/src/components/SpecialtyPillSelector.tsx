@@ -15,10 +15,11 @@ export default function SpecialtyPillSelector({
   language = 'en' 
 }: SpecialtyPillSelectorProps) {
   const { t } = useTranslation();
-  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [allSpecialties, setAllSpecialties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch all specialties once when component mounts or language changes
   useEffect(() => {
     fetchSpecialties();
   }, [language]);
@@ -29,7 +30,8 @@ export default function SpecialtyPillSelector({
       const token = localStorage.getItem('token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
-      const response = await fetch(`${apiUrl}/api/specialties?lang=${language}`, {
+      // Include deprecated specialties so we can show them if they're currently selected
+      const response = await fetch(`${apiUrl}/api/specialties?lang=${language}&includeDeprecated=true`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
 
@@ -38,12 +40,24 @@ export default function SpecialtyPillSelector({
       }
 
       const data = await response.json();
-      // API returns array of SpecialtyListItem (flattened structure)
-      // Convert to Specialty format with translations for compatibility
-      const activeSpecialties = Array.isArray(data) 
-        ? data
-            .filter((s: any) => !s.deprecated)
-            .map((s: any) => ({
+      // Store all specialties (including deprecated ones) from the API
+      setAllSpecialties(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load specialties');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter and format specialties based on current selected IDs
+  // This happens on every render but is fast since it's just array operations
+  const specialties = React.useMemo(() => {
+    return allSpecialties
+      // Filter deprecated specialties UNLESS they are currently selected
+      // This allows editing roasters with deprecated specialties while preventing
+      // new roasters or other roasters from using deprecated specialties
+      .filter((s: any) => !s.deprecated || selectedSpecialtyIds.includes(s.id))
+      .map((s: any) => ({
               id: s.id,
               deprecated: s.deprecated,
               roasterCount: s.roasterCount,
@@ -57,19 +71,12 @@ export default function SpecialtyPillSelector({
               createdAt: s.createdAt,
               updatedAt: s.updatedAt
             }))
-            .sort((a: any, b: any) => {
-              const nameA = a.translations?.[language]?.name || a.translations?.['en']?.name || 'Unknown';
-              const nameB = b.translations?.[language]?.name || b.translations?.['en']?.name || 'Unknown';
-              return nameA.localeCompare(nameB);
-            })
-        : [];
-      setSpecialties(activeSpecialties);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load specialties');
-    } finally {
-      setLoading(false);
-    }
-  };
+      .sort((a: any, b: any) => {
+        const nameA = a.translations?.[language]?.name || a.translations?.['en']?.name || 'Unknown';
+        const nameB = b.translations?.[language]?.name || b.translations?.['en']?.name || 'Unknown';
+        return nameA.localeCompare(nameB);
+      });
+  }, [allSpecialties, selectedSpecialtyIds, language]);
 
   const handleToggleSpecialty = (specialtyId: string) => {
     const newSelection = selectedSpecialtyIds.includes(specialtyId)
@@ -92,6 +99,7 @@ export default function SpecialtyPillSelector({
       <div className="flex flex-wrap gap-2">
         {specialties.map((specialty) => {
           const isSelected = selectedSpecialtyIds.includes(specialty.id);
+          const isDeprecated = specialty.deprecated;
           const specialtyName = specialty.translations?.[language]?.name || 
                                specialty.translations?.['en']?.name || 
                                'Unknown';
@@ -102,12 +110,18 @@ export default function SpecialtyPillSelector({
               onClick={() => handleToggleSpecialty(specialty.id)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                 isSelected
-                  ? 'bg-purple-600 text-white hover:bg-purple-700'
+                  ? isDeprecated
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
               }`}
+              title={isDeprecated ? t('admin.specialties.deprecatedWarning', 'This specialty is deprecated. Consider removing it.') : ''}
             >
               {specialtyName}
-              {isSelected && (
+              {isDeprecated && isSelected && (
+                <span className="ml-1.5" title={t('admin.specialties.deprecated', 'Deprecated')}>⚠️</span>
+              )}
+              {!isDeprecated && isSelected && (
                 <span className="ml-1.5">✓</span>
               )}
             </button>
