@@ -482,7 +482,11 @@
     },
     "roasters": {
       "addTitle": "Ajouter un Torréfacteur",
-      "backToRoasters": "Retour aux Torréfacteurs"
+      "backToRoasters": "Retour aux Torréfacteurs",
+      "searchPlaceholder": "Rechercher par nom, description, ville ou pays...",
+      "searchResults": "{{count}} torréfacteur(s) trouvé(s)",
+      "noRoasters": "Aucun torréfacteur trouvé.",
+      "noSearchResults": "Aucun torréfacteur ne correspond à votre recherche."
     },
     "specialties": {
       "title": "Spécialités",

@@ -26,6 +26,7 @@ const AdminRoastersPage: React.FC = () => {
   const [showUnverifiedOnly, setShowUnverifiedOnly] = useState(false);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [images, setImages] = useState<RoasterImage[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // person management state
   const [people, setPeople] = useState<RoasterPerson[]>([]);
@@ -60,7 +61,10 @@ const AdminRoastersPage: React.FC = () => {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
       const data = await res.json();
-      setRoasters(data.roasters || []);
+      const sortedRoasters = (data.roasters || []).sort((a: Roaster, b: Roaster) => 
+        a.name.localeCompare(b.name)
+      );
+      setRoasters(sortedRoasters);
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -88,6 +92,19 @@ const AdminRoastersPage: React.FC = () => {
     return <RoasterForm roaster={roaster} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
   }
 
+  // Filter roasters based on search query
+  const filteredRoasters = roasters.filter(roaster => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    return (
+      roaster.name.toLowerCase().includes(query) ||
+      roaster.description?.toLowerCase().includes(query) ||
+      roaster.city?.toLowerCase().includes(query) ||
+      roaster.country?.toLowerCase().includes(query)
+    );
+  });
+
   // Render the list of roasters
   return (
     <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
@@ -100,14 +117,61 @@ const AdminRoastersPage: React.FC = () => {
           {t('common.add', 'Add')}
         </button>
       </div>
+      
+      {/* Search bar */}
+      <div className="mb-6 max-w-6xl mx-auto">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
+            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <svg
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              aria-label={t('common.clear', 'Clear')}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <div className="mt-2 text-sm text-gray-600">
+            {t('admin.roasters.searchResults', 'Found {{count}} roaster(s)', { count: filteredRoasters.length })}
+          </div>
+        )}
+      </div>
       <div className="max-w-6xl mx-auto">
-        {roasters.length === 0 ? (
-          <div className="text-gray-500 text-center py-12">{t('admin.roasters.noRoasters', 'No roasters found.')}</div>
+        {filteredRoasters.length === 0 ? (
+          <div className="text-gray-500 text-center py-12">
+            {searchQuery 
+              ? t('admin.roasters.noSearchResults', 'No roasters match your search.')
+              : t('admin.roasters.noRoasters', 'No roasters found.')
+            }
+          </div>
         ) : (
           <>
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
-              {roasters.map((roaster) => (
+              {filteredRoasters.map((roaster) => (
                 <div key={roaster.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                   {/* Roaster Header */}
                   <div className="mb-3">
@@ -172,7 +236,7 @@ const AdminRoastersPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {roasters.map((roaster) => (
+                  {filteredRoasters.map((roaster) => (
                     <tr key={roaster.id} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-2 font-medium">
                         <button

@@ -483,7 +483,11 @@
     },
     "roasters": {
       "addTitle": "Add Roaster",
-      "backToRoasters": "Back to Roasters"
+      "backToRoasters": "Back to Roasters",
+      "searchPlaceholder": "Search by name, description, city, or country...",
+      "searchResults": "Found {{count}} roaster(s)",
+      "noRoasters": "No roasters found.",
+      "noSearchResults": "No roasters match your search."
     },
     "specialties": {
       "title": "Specialties",
