@@ -294,7 +294,7 @@ export default function SimpleImageUpload({
         </div>
       ) : (
         <div className="text-center py-8 text-gray-500">
-          <p>No images uploaded yet</p>
+          <p>{t('roaster.images.noImages', 'No images uploaded yet')}</p>
         </div>
       )}
     </div>

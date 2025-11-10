@@ -1538,7 +1538,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     onClick={handleAddPerson}
                     className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm"
                   >
-                    {t('adminForms.roasters.add', 'Add')}
+                    {t('common.add', 'Add')}
                   </button>
                 )}
                 <button
@@ -1577,82 +1577,82 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    First Name
+                                    {t('adminForms.roasters.firstName', 'First Name')}
                                   </label>
-                                  <input type="text" placeholder="First Name" value={personForm.firstName} onChange={e => setpersonForm(f => ({ ...f, firstName: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
+                                  <input type="text" placeholder={t('adminForms.roasters.firstName', 'First Name')} value={personForm.firstName} onChange={e => setpersonForm(f => ({ ...f, firstName: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
                                 </div>
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Last Name
+                                    {t('adminForms.roasters.lastName', 'Last Name')}
                                   </label>
-                                  <input type="text" placeholder="Last Name" value={personForm.lastName} onChange={e => setpersonForm(f => ({ ...f, lastName: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                                  <input type="text" placeholder={t('adminForms.roasters.lastName', 'Last Name')} value={personForm.lastName} onChange={e => setpersonForm(f => ({ ...f, lastName: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                                 </div>
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email
+                                    {t('adminForms.roasters.email', 'Email')}
                                   </label>
-                                  <input type="email" placeholder="Email" value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                                  <input type="email" placeholder={t('adminForms.roasters.email', 'Email')} value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                                 </div>
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Mobile
+                                    {t('adminForms.roasters.mobile', 'Mobile')}
                                   </label>
-                                  <input type="text" placeholder="Mobile" value={personForm.mobile} onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                                  <input type="text" placeholder={t('adminForms.roasters.mobile', 'Mobile')} value={personForm.mobile} onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                                 </div>
                               </div>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  LinkedIn URL
+                                  {t('adminForms.roasters.linkedinUrl', 'LinkedIn URL')}
                                 </label>
                                 <input type="url" placeholder="https://www.linkedin.com/in/username" value={personForm.linkedinUrl} onChange={e => setpersonForm(f => ({ ...f, linkedinUrl: e.target.value }))} className="w-full px-3 py-2 border rounded" />
                               </div>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Bio
+                                  {t('adminForms.roasters.bio', 'Bio')}
                                 </label>
-                                <textarea placeholder="Bio" value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" rows={3} />
+                                <textarea placeholder={t('adminForms.roasters.bio', 'Bio')} value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" rows={3} />
                               </div>
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Primary Contact</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.primaryContact', 'Primary Contact')}</label>
                                 <button
                                   type="button"
                                   className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                                   onClick={() => setpersonForm(f => ({ ...f, isPrimary: !f.isPrimary }))}
                                 >
-                                  {personForm.isPrimary ? 'Yes' : 'No'}
+                                  {personForm.isPrimary ? t('adminForms.roasters.yes', 'Yes') : t('adminForms.roasters.no', 'No')}
                                 </button>
                               </div>
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.role', 'Role')}</label>
                                 <div className="flex gap-2 flex-wrap items-center">
                                   <button
                                     type="button"
                                     className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.OWNER) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                                     onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.OWNER) ? f.roles.filter(r => r !== PersonRole.OWNER) : [...f.roles, PersonRole.OWNER] }))}
                                   >
-                                    Owner
+                                    {t('adminForms.roasters.roleOwner', 'Owner')}
                                   </button>
                                   <button
                                     type="button"
                                     className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.ADMIN) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                                     onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.ADMIN) ? f.roles.filter(r => r !== PersonRole.ADMIN) : [...f.roles, PersonRole.ADMIN] }))}
                                   >
-                                    Admin
+                                    {t('adminForms.roasters.roleAdmin', 'Admin')}
                                   </button>
                                   <button
                                     type="button"
                                     className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.BILLING) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                                     onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.BILLING) ? f.roles.filter(r => r !== PersonRole.BILLING) : [...f.roles, PersonRole.BILLING] }))}
                                   >
-                                    Billing
+                                    {t('adminForms.roasters.roleBilling', 'Billing')}
                                   </button>
                                 </div>
                               </div>
                               <div className="flex gap-4 mt-4 justify-end">
-                                <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={resetPersonForm}>Cancel</button>
-                                <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>Save</button>
+                                <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={resetPersonForm}>{t('common.cancel', 'Cancel')}</button>
+                                <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>{t('common.save', 'Save')}</button>
                               </div>
                             </div>
                           </div>
@@ -1673,7 +1673,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                             </div>
                             <div className="mt-2 sm:mt-0 flex gap-2">
                               <button type="button" className="text-blue-600 hover:underline" onClick={() => handleEditPerson(person)}>
-                                Edit
+                                {t('common.edit', 'Edit')}
                               </button>
                             </div>
                           </div>
@@ -1683,7 +1683,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                   </div>
                 ) : (
                   roaster?.id && (
-                    <div className="text-gray-500 mb-4">No contacts found for this roaster.</div>
+                    <div className="text-gray-500 mb-4">{t('adminForms.roasters.noContactsFound', 'No contacts found for this roaster.')}</div>
                   )
                 )}
                 {/* Inline add contact form - shown by default when adding new roaster, or when "Add Contact" clicked when editing */}
@@ -1698,7 +1698,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            First Name
+                            {t('adminForms.roasters.firstName', 'First Name')}
                           </label>
                           <input 
                             type="text" 
@@ -1710,7 +1710,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Last Name
+                            {t('adminForms.roasters.lastName', 'Last Name')}
                           </label>
                           <input 
                             type="text" 
@@ -1723,7 +1723,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Email
+                            {t('adminForms.roasters.email', 'Email')}
                           </label>
                           <input 
                             type="email" 
@@ -1734,7 +1734,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Mobile
+                            {t('adminForms.roasters.mobile', 'Mobile')}
                           </label>
                           <input 
                             type="text" 
@@ -1746,7 +1746,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          LinkedIn URL
+                          {t('adminForms.roasters.linkedinUrl', 'LinkedIn URL')}
                         </label>
                         <input 
                           type="url" 
@@ -1758,7 +1758,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Bio
+                          {t('adminForms.roasters.bio', 'Bio')}
                         </label>
                         <textarea 
                           value={personForm.bio} 
@@ -1768,45 +1768,45 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Primary Contact</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.primaryContact', 'Primary Contact')}</label>
                         <button
                           type="button"
                           className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                           onClick={() => setpersonForm(f => ({ ...f, isPrimary: !f.isPrimary }))}
                         >
-                          {personForm.isPrimary ? 'Yes' : 'No'}
+                          {personForm.isPrimary ? t('adminForms.roasters.yes', 'Yes') : t('adminForms.roasters.no', 'No')}
                         </button>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.role', 'Role')}</label>
                         <div className="flex gap-2 flex-wrap items-center">
                           <button
                             type="button"
                             className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.OWNER) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                             onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.OWNER) ? f.roles.filter(r => r !== PersonRole.OWNER) : [...f.roles, PersonRole.OWNER] }))}
                           >
-                            Owner
+                            {t('adminForms.roasters.roleOwner', 'Owner')}
                           </button>
                           <button
                             type="button"
                             className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.ADMIN) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                             onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.ADMIN) ? f.roles.filter(r => r !== PersonRole.ADMIN) : [...f.roles, PersonRole.ADMIN] }))}
                           >
-                            Admin
+                            {t('adminForms.roasters.roleAdmin', 'Admin')}
                           </button>
                           <button
                             type="button"
                             className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.BILLING) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                             onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.BILLING) ? f.roles.filter(r => r !== PersonRole.BILLING) : [...f.roles, PersonRole.BILLING] }))}
                           >
-                            Billing
+                            {t('adminForms.roasters.roleBilling', 'Billing')}
                           </button>
                         </div>
                       </div>
                       {roaster?.id && (
                         <div className="flex gap-4 mt-4 justify-end">
-                          <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={resetPersonForm}>Cancel</button>
-                          <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>Save</button>
+                          <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={resetPersonForm}>{t('common.cancel', 'Cancel')}</button>
+                          <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>{t('common.save', 'Save')}</button>
                         </div>
                       )}
                     </div>
@@ -2162,7 +2162,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="text"
-                    placeholder="Add image URL (e.g., https://unsplash.com/photos/coffee-abc123def or direct URL)"
+                    placeholder={t('adminForms.roasters.addImageUrl', 'Add image URL...')}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
@@ -2191,7 +2191,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     }}
                     className="min-w-[110px] px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap ml-auto"
                   >
-                    Add
+                    {t('common.add', 'Add')}
                   </button>
                 </div>
               </div>
