@@ -102,7 +102,11 @@
     "sustainable": "Durable",
     "awards": "Récompenses",
     "microlots": "Microlots",
-    "experimental": "Expérimental"
+    "experimental": "Expérimental",
+    "carbonNeutral": "Carboneutre",
+    "omniRoast": "Torréfaction Omni",
+    "natural": "Naturel",
+    "washed": "Lavé"
   },
   "roasters": {
     "featured": "En vedette",
@@ -556,6 +560,8 @@
       "uploadedImages": "Images Téléchargées",
       "addImages": "Ajouter des Images",
       "imageGuidelines": "Recommandé : 800×450px minimum • JPG, PNG, WebP • Max 5 Mo chacune",
+      "aboutUrlImages": "À propos des images URL :",
+      "urlImagesFallback": "Les URL d'image servent d'images de secours lorsque les images téléchargées ne sont pas accessibles.",
   "add": "Ajouter",
   "cancel": "Annuler",
   "delete": "Supprimer",

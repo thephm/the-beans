@@ -19,6 +19,64 @@ export default function SpecialtyPillSelector({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Map specialty names to translation keys (matching RoasterCard.tsx approach)
+  const getSpecialtyTranslationKey = (name: string): string => {
+    const specialtyMap: { [key: string]: string } = {
+      'Espresso': 'espresso',
+      'Single Origin': 'singleOrigin',
+      'Origine unique': 'singleOrigin',
+      'Cold Brew': 'coldBrew',
+      'Café froid': 'coldBrew',
+      'Decaf': 'decaf',
+      'Décaféiné': 'decaf',
+      'Organic': 'organic',
+      'Biologique': 'organic',
+      'Artisanal': 'artisanal',
+      'Fair Trade': 'fairTrade',
+      'Commerce équitable': 'fairTrade',
+      'Dark Roast': 'darkRoast',
+      'Torréfaction foncée': 'darkRoast',
+      'Light Roast': 'lightRoast',
+      'Torréfaction claire': 'lightRoast',
+      'Medium Roast': 'mediumRoast',
+      'Torréfaction moyenne': 'mediumRoast',
+      'Pour Over': 'pourOver',
+      'Infusion lente': 'pourOver',
+      'Direct Trade': 'directTrade',
+      'Commerce direct': 'directTrade',
+      'Education': 'education',
+      'Éducation': 'education',
+      'Cupping': 'cupping',
+      'Dégustation': 'cupping',
+      'Blends': 'blends',
+      'Mélanges': 'blends',
+      'Ethiopian': 'ethiopian',
+      'Éthiopien': 'ethiopian',
+      'Italian Roast': 'italianRoast',
+      'Torréfaction italienne': 'italianRoast',
+      'Nitro Coffee': 'nitroCoffee',
+      'Café nitro': 'nitroCoffee',
+      'Sustainable': 'sustainable',
+      'Durable': 'sustainable',
+      'Awards': 'awards',
+      'Récompenses': 'awards',
+      'Microlots': 'microlots',
+      'Experimental': 'experimental',
+      'Expérimental': 'experimental',
+      'Carbon Neutral': 'carbonNeutral',
+      'Carboneutre': 'carbonNeutral',
+      'Omni Roast': 'omniRoast',
+      'Torréfaction Omni': 'omniRoast',
+      'Natural': 'natural',
+      'Naturel': 'natural',
+      'Washed': 'washed',
+      'Lavé': 'washed'
+    }
+    
+    const key = specialtyMap[name]
+    return key ? key : name.toLowerCase().replace(/\s+/g, '')
+  }
+
   // Fetch all specialties once when component mounts or language changes
   useEffect(() => {
     fetchSpecialties();
@@ -100,9 +158,13 @@ export default function SpecialtyPillSelector({
         {specialties.map((specialty) => {
           const isSelected = selectedSpecialtyIds.includes(specialty.id);
           const isDeprecated = specialty.deprecated;
-          const specialtyName = specialty.translations?.[language]?.name || 
-                               specialty.translations?.['en']?.name || 
-                               'Unknown';
+          const specialtyNameFromDb = specialty.translations?.[language]?.name || 
+                                      specialty.translations?.['en']?.name || 
+                                      'Unknown';
+          // Get the translation key and use it to get the translated name
+          const translationKey = getSpecialtyTranslationKey(specialtyNameFromDb);
+          const specialtyName = t(`specialties.${translationKey}`, specialtyNameFromDb);
+          
           return (
             <button
               key={specialty.id}

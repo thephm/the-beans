@@ -2197,8 +2197,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               </div>
 
               <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                <p className="font-medium">ℹ️ About URL Images:</p>
-                <p>Image URLs serve as fallback images when uploaded images are not accessible.</p>
+                <p className="font-medium">ℹ️ {t('adminForms.roasters.aboutUrlImages', 'About URL Images:')}</p>
+                <p>{t('adminForms.roasters.urlImagesFallback', 'Image URLs serve as fallback images when uploaded images are not accessible.')}</p>
               </div>
                 </>
               )}
