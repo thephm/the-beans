@@ -105145,7 +105145,7 @@ Now let me find the adminForms section in French:
 
 `common.json +1 -0`
 
-Starting (7/7) *Restart containers*
+✔ Starting (7/7) *Restart containers*
 
 Now let me restart the Docker containers to apply all the changes: 
 
@@ -105283,7 +105283,8 @@ Now let me add the English translation as well:
 
 Now let me restart the client container to apply the changes: 
 
-`docker-compose restart client`
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
 
 Perfect! I've updated the founded year display to show it on a single line as "Founded in 2022" with the following changes:
 
@@ -105300,3 +105301,148 @@ The client container has been restarted to apply the changes.
 ## 852nd try
 
 *(works, checking in)*
+
+2025-11-10
+
+## Roasters list in admin roasters should be sorted alphabetically
+
+I'll help you sort the roasters list alphabetically in the admin roasters page. Let me first examine the current implementation. 
+
+✔ Searched for files matching `**/admin/**/roasters/**`, 3 matches
+
+✔ Searched text for `admin.*roaster` (`**/client/src/app/admin/**`), 20 results
+
+Let me read the main admin roasters page to see how the roasters are currently displayed: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 2000
+
+Let me continue reading the file to see how roasters are rendered in the list: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 201
+
+Perfect! I can see the issue. The roasters are being displayed directly from the `roasters` state array without any sorting. I need to sort them alphabetically by name. Let me update the code to sort the roasters: 
+
+`page.tsx +4 -1`
+
+Now let's restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully updated the admin roasters page to sort the roasters list alphabetically by name. The changes are:
+
+1. **Modified the `fetchRoasters` function** to sort the roasters array alphabetically using `localeCompare()` after fetching them from the API
+2. **Restarted the client container** to apply the changes
+
+The roasters will now be displayed in alphabetical order in both the mobile card view and the desktop table view. The sorting uses `localeCompare()` which provides proper string comparison that handles special characters and different languages correctly.
+
+## 852nd try
+
+*(works!)*
+
+## Need the ability to search in admin roasters list by name, description, city, country
+
+I'll help you add search functionality to the admin roasters list. Let me first examine the current admin roasters implementation to understand the structure. 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 2000
+
+✔ Read `server/src/routes/roasters.ts`
+
+Now let me check the translation files to understand the existing structure: 
+
+✔ Read `client/public/locales/en/common.json`, lines 1 to 101
+
+Now I understand the structure. I need to:
+
+1. Add a search input field in the admin roasters page
+2. Implement filtering on the frontend based on name, description, city, and country
+3. Add translations for the search functionality
+
+Let me implement this: 
+
+`page.tsx +1 -0`
+`page.tsx +55 -0`
+`page.tsx +8 -3`
+`page.tsx +1 -1`
+
+Now let's add the translation keys for both English and French: 
+
+✔ Read `client/public/locales/en/common.json`, lines 300 to 400
+
+✔ Read `client/public/locales/en/common.json`, lines 400 to 500
+
+Let me find the admin.roasters section: 
+
+✔ Searched text for `"admin\.roasters"` (`**/client/public/locales/en/common.json`), no results
+
+✔ Searched text for `noRoasters` (`**/client/public/locales/en/common.json`), 1 result
+
+✔ Read `client/public/locales/en/common.json`, lines 470 to 520
+
+Now I need to add the missing translation keys. Let me update the admin.roasters section: 
+
+`common.json +5 -1`
+
+Now let's add the same translations to the French file: 
+
+✔ Read `client/public/locales/fr/common.json`, lines 470 to 520
+
+`common.json +5 -1`
+
+Now let's restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've successfully added search functionality to the admin roasters list. Here's what was implemented:
+
+## Changes Made:
+
+### 1. **Frontend Search Implementation** (page.tsx)
+   - Added `searchQuery` state to track the search input
+   - Created a `filteredRoasters` function that filters the roasters list by:
+     - **Name** (case-insensitive)
+     - **Description** (case-insensitive)
+     - **City** (case-insensitive)
+     - **Country** (case-insensitive)
+   - Added a search input field with:
+     - Search icon on the left
+     - Clear button (X) on the right when there's text
+     - Placeholder text with translations
+     - Results count display when searching
+   - Updated both mobile and desktop views to use `filteredRoasters` instead of `roasters`
+   - Added appropriate "no results" messages for empty search results vs. no roasters at all
+
+### 2. **Translations** 
+   Added new translation keys to both English and French:
+   
+   **English** (common.json):
+   - `searchPlaceholder`: "Search by name, description, city, or country..."
+   - `searchResults`: "Found {{count}} roaster(s)"
+   - `noRoasters`: "No roasters found."
+   - `noSearchResults`: "No roasters match your search."
+
+   **French** (common.json):
+   - `searchPlaceholder`: "Rechercher par nom, description, ville ou pays..."
+   - `searchResults`: "{{count}} torréfacteur(s) trouvé(s)"
+   - `noRoasters`: "Aucun torréfacteur trouvé."
+   - `noSearchResults`: "Aucun torréfacteur ne correspond à votre recherche."
+
+### 3. **Container Restart**
+   - Restarted the client container to apply the changes
+
+## Features:
+- ✅ Real-time search filtering as you type
+- ✅ Searches across name, description, city, and country fields
+- ✅ Case-insensitive search
+- ✅ Clear button to reset search
+- ✅ Results count display
+- ✅ Proper empty state messages
+- ✅ Works in both mobile and desktop views
+- ✅ Fully internationalized (English and French)
+
+The search functionality is now active. You can test it by navigating to the admin roasters page and typing in the search field. The list will filter in real-time as you search!
+
+## 853rd try
+
+*(works like a charm)*
