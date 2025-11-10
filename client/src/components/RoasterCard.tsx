@@ -81,7 +81,15 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
       'Awards': 'awards',
       'Récompenses': 'awards', // French database value that needs to map to awards
       'Microlots': 'microlots',
-      'Experimental': 'experimental'
+      'Experimental': 'experimental',
+      'Carbon Neutral': 'carbonNeutral',
+      'Carboneutre': 'carbonNeutral',
+      'Omni Roast': 'omniRoast',
+      'Torréfaction Omni': 'omniRoast',
+      'Natural': 'natural',
+      'Naturel': 'natural',
+      'Washed': 'washed',
+      'Lavé': 'washed'
     }
     
     const key = specialtyMap[name]
