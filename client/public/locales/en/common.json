@@ -584,7 +584,26 @@
       "pinterest": "Pinterest",
       "bluesky": "BlueSky",
       "x": "X (Twitter)",
-      "reddit": "Reddit"
+      "reddit": "Reddit",
+      "contacts": "Contacts",
+      "contact": "Contact",
+      "showHours": "Show Hours",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "mobile": "Mobile",
+      "linkedinUrl": "LinkedIn URL",
+      "bio": "Bio",
+      "primaryContact": "Primary Contact",
+      "role": "Role",
+      "roleOwner": "Owner",
+      "roleAdmin": "Admin",
+      "roleBilling": "Billing",
+      "yes": "Yes",
+      "no": "No",
+      "noContactsFound": "No contacts found for this roaster.",
+      "sourceCountries": "Source Countries",
+      "sourceCountriesDescription": "Select the coffee origin countries that this roaster sources from.",
+      "addImageUrl": "Add image URL..."
     }
   },
   "adminSection": {

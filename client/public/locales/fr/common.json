@@ -587,7 +587,26 @@
       "pinterest": "Pinterest",
       "bluesky": "BlueSky",
       "x": "X (Twitter)",
-      "reddit": "Reddit"
+      "reddit": "Reddit",
+      "contacts": "Contacts",
+      "contact": "Contact",
+      "showHours": "Afficher les heures",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "mobile": "Mobile",
+      "linkedinUrl": "URL LinkedIn",
+      "bio": "Biographie",
+      "primaryContact": "Contact principal",
+      "role": "Rôle",
+      "roleOwner": "Propriétaire",
+      "roleAdmin": "Administrateur",
+      "roleBilling": "Facturation",
+      "yes": "Oui",
+      "no": "Non",
+      "noContactsFound": "Aucun contact trouvé pour ce torréfacteur.",
+      "sourceCountries": "Pays d'origine",
+      "sourceCountriesDescription": "Sélectionnez les pays d'origine du café que ce torréfacteur s'approvisionne.",
+      "addImageUrl": "Ajouter une URL d'image..."
     }
   },
   "adminSection": {
