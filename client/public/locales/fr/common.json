@@ -339,7 +339,8 @@
   "onlineOnly": "En ligne seulement",
   "onlineOnlyDesc": "Ce torréfacteur fonctionne exclusivement en ligne sans magasin de détail physique.",
   "hoursNotAvailable": "Informations sur les heures non disponibles",
-  "callAction": "Appeler"
+  "callAction": "Appeler",
+  "socials": "Réseaux sociaux"
   },
   "carousel": {
     "image": "Image",

@@ -340,7 +340,8 @@
   "onlineOnly": "Online Only",
   "onlineOnlyDesc": "This roaster operates exclusively online with no physical retail location.",
   "hoursNotAvailable": "Hours information not available",
-  "callAction": "Call"
+  "callAction": "Call",
+  "socials": "Socials"
   },
   "carousel": {
     "image": "Image",
