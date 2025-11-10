@@ -18,8 +18,40 @@ import {
   Phone, 
   Email, 
   PhotoCamera,
-  Star
+  Star,
+  Instagram,
+  Facebook,
+  LinkedIn,
+  YouTube,
+  Pinterest,
+  Reddit
 } from '@mui/icons-material'
+import { SvgIcon } from '@mui/material'
+
+// Custom icons for social platforms not in MUI
+const TikTokIcon = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+  </SvgIcon>
+)
+
+const ThreadsIcon = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path d="M12.186 3.076c-.522 0-1.017.049-1.458.144-.44.096-.836.24-1.187.437a3.42 3.42 0 0 0-.932.72 3.39 3.39 0 0 0-.64 1.003 6.26 6.26 0 0 0-.353 1.234 11.39 11.39 0 0 0-.108 1.422v.696h3.334v-.696c0-.36.024-.684.072-.972.048-.288.126-.534.233-.739.107-.204.246-.36.419-.468.172-.108.383-.162.633-.162.227 0 .423.048.587.144.165.096.301.233.411.41.109.178.19.39.242.636.053.247.079.519.079.816 0 .324-.029.612-.086.864a2.17 2.17 0 0 1-.272.684 2.41 2.41 0 0 1-.468.558c-.186.162-.407.306-.662.432l-2.16 1.08v2.52h6.48v-3.024h-3.456l.624-.312c.504-.252.942-.54 1.314-.864.372-.324.684-.684.936-1.08.252-.396.444-.828.576-1.296.132-.468.198-.972.198-1.512 0-.612-.09-1.176-.27-1.692a3.78 3.78 0 0 0-.792-1.368 3.66 3.66 0 0 0-1.278-.918c-.504-.227-1.08-.34-1.728-.34z" />
+  </SvgIcon>
+)
+
+const BlueskyIcon = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z" />
+  </SvgIcon>
+)
+
+const XIcon = (props: any) => (
+  <SvgIcon {...props} viewBox="0 0 24 24">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </SvgIcon>
+)
 
 interface RoasterImageData {
   id: string
@@ -58,6 +90,16 @@ interface Roaster {
   owner?: string | { id: string; username: string; firstName: string; lastName: string }
   images?: string[]
   roasterImages?: RoasterImageData[]
+  instagram?: string
+  tiktok?: string
+  facebook?: string
+  linkedin?: string
+  youtube?: string
+  threads?: string
+  pinterest?: string
+  bluesky?: string
+  x?: string
+  reddit?: string
 }
 
 export default function RoasterDetail() {
@@ -209,6 +251,52 @@ export default function RoasterDetail() {
     
     localStorage.setItem('favoriteRoasters', JSON.stringify(updatedFavorites))
     setIsFavorite(!isFavorite)
+  }
+
+  // Helper to render social media icons
+  const renderSocialIcons = () => {
+    if (!roaster) return null
+
+    const socialLinks = [
+      { url: roaster.instagram, Icon: Instagram, name: 'Instagram', color: '#E4405F' },
+      { url: roaster.tiktok, Icon: TikTokIcon, name: 'TikTok', color: '#000000' },
+      { url: roaster.facebook, Icon: Facebook, name: 'Facebook', color: '#1877F2' },
+      { url: roaster.linkedin, Icon: LinkedIn, name: 'LinkedIn', color: '#0A66C2' },
+      { url: roaster.youtube, Icon: YouTube, name: 'YouTube', color: '#FF0000' },
+      { url: roaster.threads, Icon: ThreadsIcon, name: 'Threads', color: '#000000' },
+      { url: roaster.pinterest, Icon: Pinterest, name: 'Pinterest', color: '#E60023' },
+      { url: roaster.bluesky, Icon: BlueskyIcon, name: 'Bluesky', color: '#1185FE' },
+      { url: roaster.x, Icon: XIcon, name: 'X', color: '#000000' },
+      { url: roaster.reddit, Icon: Reddit, name: 'Reddit', color: '#FF4500' },
+    ].filter(social => social.url) // Only show icons where URL is defined
+
+    if (socialLinks.length === 0) return null
+
+    return (
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-2">
+          {socialLinks.map(({ url, Icon, name, color }) => (
+            <a
+              key={name}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-all transform hover:scale-110"
+              aria-label={name}
+              title={name}
+            >
+              <Icon 
+                sx={{ 
+                  fontSize: 24, 
+                  color: '#6B7280',
+                  '&:hover': { color: color }
+                }} 
+              />
+            </a>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -389,7 +477,16 @@ export default function RoasterDetail() {
                     )}
                   </div>
                 )}
-                
+
+                {/* Founded */}
+                {roaster.founded && (
+                  <div className="mb-8">
+                    <p className="text-gray-700">
+                      <span className="font-medium">{t('roasterDetail.foundedIn', 'Founded in')}</span> {roaster.founded}
+                    </p>
+                  </div>
+                )}
+
                 {/* Online Only Badge - Show separately if onlineOnly is true */}
                 {roaster.onlineOnly && (
                   <div className="mb-8">
@@ -505,14 +602,8 @@ export default function RoasterDetail() {
                     </div>
                   )}
 
-                  {/* Founded */}
-                  {roaster.founded && (
-                    <div className="mb-4">
-                      <p className="text-gray-700">
-                        <span className="font-medium">{t('roasterDetail.foundedIn', 'Founded in')}</span> {roaster.founded}
-                      </p>
-                    </div>
-                  )}
+                  {/* Social Media Icons */}
+                  {renderSocialIcons()}
 
                   {/* Action Buttons */}
                   <div className="space-y-3">
