@@ -1,6 +1,5 @@
 # Glossary
 
-
 ---
 
 **API**: Application Programming Interface. The backend RESTful service that exposes endpoints for client communication.
