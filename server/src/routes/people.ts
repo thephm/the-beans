@@ -12,7 +12,8 @@ const prisma = new PrismaClient();
 export enum PersonRole {
   OWNER = 'owner',
   ADMIN = 'admin',
-  BILLING = 'billing'
+  BILLING = 'billing',
+  MARKETING = 'marketing'
 }
 
 // Permission helper functions
