@@ -440,20 +440,22 @@ export default function RoasterDetail() {
                 </div>
 
                 {/* Specialties */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.specialties')}</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {roaster.specialties.map((specialty, index) => (
-                      <Link
-                        key={typeof specialty === 'string' ? specialty : specialty.id || index}
-                        href={`/discover?specialty=${encodeURIComponent(getSpecialtyKey(specialty))}`}
-                        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
-                      >
-                        {translateSpecialty(specialty)}
-                      </Link>
-                    ))}
+                {roaster.specialties && roaster.specialties.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.specialties')}</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {roaster.specialties.map((specialty, index) => (
+                        <Link
+                          key={typeof specialty === 'string' ? specialty : specialty.id || index}
+                          href={`/discover?specialty=${encodeURIComponent(getSpecialtyKey(specialty))}`}
+                          className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
+                        >
+                          {translateSpecialty(specialty)}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Hours / Online Only */}
                 {/* Only show Hours section if showHours is true AND not onlineOnly */}
