@@ -106692,3 +106692,33 @@ Once Docker is running and you restart the client container, the "Manage Images"
 ## 871st try
 
 *(fixed!)*
+
+## If no specialties, don't show the section #204
+
+https://github.com/thephm/the-beans/issues/204
+
+I'll help you hide the Specialties section when there are no specialties to display. Let me first examine the roaster detail page to see how the Specialties section is currently implemented. 
+
+✔ Searched for files matching `**/roasters/*/page.tsx`, 2 matches
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 380 to 460
+
+Now I can see the Specialties section. I need to add a conditional check to only show it when there are specialties. Let me update the code: 
+
+`page.tsx +2 -0`
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+Perfect! I've fixed the Specialties section to only display when there are specialties to show. The changes:
+
+1. **Added conditional rendering** - Wrapped the entire Specialties section in a check: `{roaster.specialties && roaster.specialties.length > 0 && (...)}`
+2. **Maintains the same layout** - When specialties exist, the section displays exactly as before
+3. **Hides completely** - When there are no specialties or the array is empty, the entire section (including the header) won't be shown
+
+The client container has been restarted, so the changes are now live. Roasters without specialties will no longer show an empty Specialties section.
+
+## 872nd try
+
+*(fixed!)*
+
