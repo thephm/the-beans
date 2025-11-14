@@ -1018,6 +1018,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         return 'bg-blue-100 text-blue-800';
       case PersonRole.BILLING:
         return 'bg-green-100 text-green-800';
+      case PersonRole.MARKETING:
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -1647,6 +1649,13 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                                     onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.BILLING) ? f.roles.filter(r => r !== PersonRole.BILLING) : [...f.roles, PersonRole.BILLING] }))}
                                   >
                                     {t('adminForms.roasters.roleBilling', 'Billing')}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.MARKETING) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                                    onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.MARKETING) ? f.roles.filter(r => r !== PersonRole.MARKETING) : [...f.roles, PersonRole.MARKETING] }))}
+                                  >
+                                    {t('adminForms.roasters.roleMarketing', 'Marketing')}
                                   </button>
                                 </div>
                               </div>

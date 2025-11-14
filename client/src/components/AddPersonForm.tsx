@@ -145,7 +145,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
                 {t('admin.people.role', 'Role')}
               </label>
               <div className="flex gap-2 flex-wrap items-center">
-                {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING].map(role => (
+                {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING, PersonRole.MARKETING].map(role => (
                   <button
                     key={role}
                     type="button"

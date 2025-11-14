@@ -484,6 +484,7 @@
   "roleOwner": "Owner",
   "roleAdmin": "Admin",
   "roleBilling": "Billing",
+  "roleMarketing": "Marketing",
   "bio": "Bio"
     },
     "roasters": {
@@ -605,6 +606,7 @@
       "roleOwner": "Owner",
       "roleAdmin": "Admin",
       "roleBilling": "Billing",
+      "roleMarketing": "Marketing",
       "yes": "Yes",
       "no": "No",
       "noContactsFound": "No contacts found for this roaster.",

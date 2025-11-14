@@ -237,6 +237,7 @@ export default function PeopleTable() {
                             role === 'owner' ? 'bg-purple-100 text-purple-800' :
                             role === 'admin' ? 'bg-blue-100 text-blue-800' :
                             role === 'billing' ? 'bg-green-100 text-green-800' :
+                            role === 'marketing' ? 'bg-orange-100 text-orange-800' :
                             'bg-gray-100 text-gray-800'
                           }`}
                         >
@@ -350,6 +351,7 @@ export default function PeopleTable() {
                                 role === 'owner' ? 'bg-purple-100 text-purple-800' :
                                 role === 'admin' ? 'bg-blue-100 text-blue-800' :
                                 role === 'billing' ? 'bg-green-100 text-green-800' :
+                                role === 'marketing' ? 'bg-orange-100 text-orange-800' :
                                 'bg-gray-100 text-gray-800'
                               }`}
                             >

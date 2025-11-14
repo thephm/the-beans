@@ -483,6 +483,7 @@
   "roleOwner": "Propriétaire",
   "roleAdmin": "Administrateur",
   "roleBilling": "Facturation",
+  "roleMarketing": "Marketing",
   "bio": "Biographie"
     },
     "roasters": {
@@ -608,6 +609,7 @@
       "roleOwner": "Propriétaire",
       "roleAdmin": "Administrateur",
       "roleBilling": "Facturation",
+      "roleMarketing": "Marketing",
       "yes": "Oui",
       "no": "Non",
       "noContactsFound": "Aucun contact trouvé pour ce torréfacteur.",

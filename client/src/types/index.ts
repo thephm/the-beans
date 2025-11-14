@@ -263,7 +263,8 @@ export interface AuditLogFilters {
 export enum PersonRole {
   OWNER = "owner",
   ADMIN = "admin", 
-  BILLING = "billing"
+  BILLING = "billing",
+  MARKETING = "marketing"
 }
 
 export interface RoasterPerson {
