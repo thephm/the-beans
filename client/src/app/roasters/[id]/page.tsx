@@ -620,22 +620,6 @@ export default function RoasterDetail() {
                       </div>
                     </div>
                   )}
-
-                  {/* Action Buttons */}
-                  <div className="space-y-3">
-                    {/* Manage Images Button for admins and email match */}
-                    {user && (user.role === 'admin' || 
-                      (roaster.email && user.email && roaster.email === user.email)
-                    ) && (
-                      <Link
-                        href={`/roasters/${roaster.id}/images`}
-                        className="block w-full bg-blue-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
-                      >
-                        <PhotoCamera sx={{ fontSize: 20 }} />
-                        {t('roasterDetail.manageImages', 'Manage Images')}
-                      </Link>
-                    )}
-                  </div>
                   </div>
 
                   {/* Social Media Icons - Bottom Aligned */}
@@ -648,6 +632,21 @@ export default function RoasterDetail() {
                 </div>
               </div>
             </div>
+
+            {/* Manage Images Button - Outside sidebar, only on mobile */}
+            {user && (user.role === 'admin' || 
+              (roaster.email && user.email && roaster.email === user.email)
+            ) && (
+              <div className="mt-6 lg:hidden">
+                <Link
+                  href={`/roasters/${roaster.id}/images`}
+                  className="block w-full bg-blue-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+                >
+                  <PhotoCamera sx={{ fontSize: 20 }} />
+                  {t('roasterDetail.manageImages', 'Manage Images')}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

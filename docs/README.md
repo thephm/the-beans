@@ -43,9 +43,13 @@ This project uses a **Docker-first development approach**. Key points:
 - **Database operations** require Prisma generate/migrate
 - **Full setup instructions** available in [main README](../README.md)
 
-## 🔧 Quick Navigation
+## � Deployment
+
+- 📦 [**Deployment Documentation**](./deployment/README.md) - Render.com deployment guides and troubleshooting
+
+## �🔧 Quick Navigation
 
 - 🏠 [**Back to Main README**](../README.md)
-- ⚙️ [**Setup Guide**](../SETUP.md)  
-- 🐳 [**Docker Documentation**](../DOCKER.md)
-- 📋 [**Project Summary**](../PROJECT_SUMMARY.md)
+- ⚙️ [**Setup Guide**](SETUP.md)  
+- 🐳 [**Docker Documentation**](DOCKER.md)
+- 📋 [**Project Summary**](PROJECT_SUMMARY.md)

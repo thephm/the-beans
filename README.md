@@ -130,7 +130,9 @@ Comprehensive documentation is maintained in the [`docs/`](./docs/) directory fo
 - 🏗️ [Architecture Overview](./docs/architecture.md)
 - 📖 [Documentation Index](./docs/README.md)
 - 📝 [Glossary](./docs/glossary.md)
-- ⚙️ [Setup Guide](./SETUP.md)
+- ⚙️ [Setup Guide](./docs/SETUP.md)
+- 🐳 [Docker Documentation](./docs/DOCKER.md)
+- 📋 [Project Summary](./docs/PROJECT_SUMMARY.md)
 
 ### Feature Documentation
 - 🔐 [Authentication System](./docs/auth/README.md)
@@ -209,6 +211,8 @@ docker-compose exec server npx prisma migrate dev
 - **Manual**: Admin dashboard at `/admin` (requires admin login)
 
 ## 🚀 Deployment
+
+For complete deployment documentation, see the **[Deployment Guide](./docs/deployment/README.md)**.
 
 ### 🌟 Render.com (Recommended)
 The Beans includes a complete `render.yaml` configuration for one-click deployment on Render.com:
