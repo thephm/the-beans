@@ -1667,7 +1667,14 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                                   {`${person.firstName} ${person.lastName || ''}`.trim()}
                                 </a>
                               </div>
-                              {person.email && <div className="text-sm text-gray-700">{person.email}</div>}
+                              {person.email && (
+                                <a 
+                                  href={`mailto:${person.email}`}
+                                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline underline"
+                                >
+                                  {person.email}
+                                </a>
+                              )}
                               {person.mobile && <div className="text-sm text-gray-700">{person.mobile}</div>}
                               {person.bio && <div className="text-xs text-gray-500 mt-1">{person.bio}</div>}
                             </div>
