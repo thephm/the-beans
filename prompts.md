@@ -106999,3 +106999,18 @@ You're absolutely right - I apologize for the oversight! Let me restart the cont
 Done! The containers have been restarted and the Marketing role is now live. 
 
 You're right to call this out - according to your project instructions, this is a Docker-first development environment where **hot reload is unreliable** and container restarts are required for code changes. I should have automatically restarted the containers immediately after making the changes, not suggested you do it manually. I'll remember this for future changes to The Beans project.
+
+## 876th try
+
+*(works)*
+
+## Add action button to Share the roaster with someone #137
+
+https://github.com/thephm/the-beans/issues/137
+
+https://materialui.co/icon/share
+
+import ShareIcon from '@mui/icons-material/Share';
+
+> Add action button to Share the roaster with someone. It should only be on the view roaster page, to the left of the favorite button. I like the white circle for the fav orite and then use the materia UI share icon https://materialui.co/icon/share ... Once clicked, use the native sharing mechaism on the device
+

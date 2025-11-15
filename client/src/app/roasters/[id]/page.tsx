@@ -24,7 +24,8 @@ import {
   LinkedIn,
   YouTube,
   Pinterest,
-  Reddit
+  Reddit,
+  Share
 } from '@mui/icons-material'
 import { SvgIcon } from '@mui/material'
 
@@ -253,6 +254,29 @@ export default function RoasterDetail() {
     setIsFavorite(!isFavorite)
   }
 
+  const handleShare = async () => {
+    if (!roaster) return
+
+    const shareData = {
+      title: roaster.name,
+      text: `Check out ${roaster.name} - ${roaster.description}`,
+      url: window.location.href
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(window.location.href)
+        alert('Link copied to clipboard!')
+      }
+    } catch (err) {
+      // User cancelled the share or an error occurred
+      console.log('Share cancelled or failed:', err)
+    }
+  }
+
   // Helper to check if there are any social links
   const hasSocialLinks = () => {
     if (!roaster) return false
@@ -399,16 +423,25 @@ export default function RoasterDetail() {
                 </p>
               )}
             </div>
-            <button
-              onClick={toggleFavorite}
-              className={`absolute bottom-6 right-6 p-3 rounded-full z-20 pointer-events-auto ${
-                isFavorite 
-                  ? 'bg-red-500 text-white' 
-                  : 'bg-white text-red-500 hover:bg-red-50'
-              } shadow-lg transition-all transform hover:scale-110`}
-            >
-              {isFavorite ? <Favorite /> : <FavoriteBorder />}
-            </button>
+            <div className="absolute bottom-6 right-6 flex gap-3 z-20">
+              <button
+                onClick={handleShare}
+                className="bg-white text-gray-700 hover:bg-gray-50 p-3 rounded-full shadow-lg transition-all transform hover:scale-110 pointer-events-auto"
+                aria-label="Share roaster"
+              >
+                <Share />
+              </button>
+              <button
+                onClick={toggleFavorite}
+                className={`p-3 rounded-full pointer-events-auto ${
+                  isFavorite 
+                    ? 'bg-red-500 text-white' 
+                    : 'bg-white text-red-500 hover:bg-red-50'
+                } shadow-lg transition-all transform hover:scale-110`}
+              >
+                {isFavorite ? <Favorite /> : <FavoriteBorder />}
+              </button>
+            </div>
           </div>
 
           {/* Content */}
