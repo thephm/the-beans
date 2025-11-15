@@ -148,8 +148,6 @@ router.get('/audit-logs',
                 id: true,
                 username: true,
                 email: true,
-                firstName: true,
-                lastName: true,
                 avatar: true
               }
             }
@@ -260,9 +258,7 @@ router.get('/audit-logs/stats',
         select: {
           id: true,
           username: true,
-          email: true,
-          firstName: true,
-          lastName: true
+          email: true
         }
       });
 
@@ -329,8 +325,6 @@ router.get('/audit-logs/:id',
               id: true,
               username: true,
               email: true,
-              firstName: true,
-              lastName: true,
               avatar: true
             }
           }

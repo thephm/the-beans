@@ -42,39 +42,17 @@ export default function ProfilePage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">
             <div className="flex items-center space-x-6 mb-8">
               <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-                {user?.firstName && user?.lastName 
-                  ? `${user.firstName[0]}${user.lastName[0]}`
-                  : user?.username?.slice(0, 2).toUpperCase() || '?'}
+                {user?.username?.slice(0, 2).toUpperCase() || '?'}
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {user?.firstName && user?.lastName 
-                    ? `${user.firstName} ${user.lastName}` 
-                    : user?.username}
+                  {user?.username}
                 </h2>
                 <p className="text-gray-600">{user?.email}</p>
               </div>
             </div>
 
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('profile.firstName')}</label>
-                <input 
-                  type="text" 
-                  defaultValue={user?.firstName || ''}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('profile.lastName')}</label>
-                <input 
-                  type="text" 
-                  defaultValue={user?.lastName || ''}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
-                />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.email')}</label>
                 <input 

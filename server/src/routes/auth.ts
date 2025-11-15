@@ -102,8 +102,6 @@ router.post('/register', [
   body('email').isEmail().normalizeEmail(),
   body('username').isLength({ min: 3, max: 50 }),
   body('password').isLength({ min: 6 }),
-  body('firstName').optional().isLength({ min: 1, max: 50 }),
-  body('lastName').optional().isLength({ min: 1, max: 50 }),
 ], async (req: any, res: any) => {
   try {
     // Set up audit context before validation
@@ -117,7 +115,7 @@ router.post('/register', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, username, password, firstName, lastName } = req.body;
+    const { email, username, password } = req.body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
@@ -146,8 +144,6 @@ router.post('/register', [
         email,
         username,
         password: hashedPassword,
-        firstName,
-        lastName,
         // For self-registration, createdById is null (user created themselves)
         createdById: null,
       },
@@ -155,8 +151,6 @@ router.post('/register', [
         id: true,
         email: true,
         username: true,
-        firstName: true,
-        lastName: true,
         avatar: true,
         bio: true,
         location: true,
@@ -336,8 +330,6 @@ router.get('/me', async (req: Request, res: Response) => {
         id: true,
         email: true,
         username: true,
-        firstName: true,
-        lastName: true,
         avatar: true,
         bio: true,
         location: true,

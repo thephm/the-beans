@@ -101,14 +101,12 @@ router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, 
     req.auditData.oldValues = oldUser;
     console.log('Admin update - audit setup:', { adminId: req.userId, targetUserId: id, hasOldUser: !!oldUser });
     
-    const { role, language, firstName, lastName } = req.body;
+    const { role, language } = req.body;
     const updated = await prisma.user.update({
       where: { id },
       data: { 
         role, 
-        language, 
-        firstName, 
-        lastName,
+        language,
         updatedById: req.userId // Set who updated this user
       },
     });
@@ -230,8 +228,6 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
         id: true,
         email: true,
         username: true,
-        firstName: true,
-        lastName: true,
         language: true,
         lastLogin: true,
         createdAt: true,
@@ -276,8 +272,6 @@ router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response)
         id: true,
         email: true,
         username: true,
-        firstName: true,
-        lastName: true,
         language: true,
         lastLogin: true,
         createdAt: true,
