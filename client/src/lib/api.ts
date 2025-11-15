@@ -146,6 +146,13 @@ class ApiClient {
     return this.request('/auth/me');
   }
 
+  async updateProfile(profileData: { email?: string; username?: string }) {
+    return this.request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  }
+
   // User settings
   async getUserSettings() {
     return this.request('/users/settings');

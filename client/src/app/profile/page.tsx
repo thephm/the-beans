@@ -2,19 +2,71 @@
 
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { apiClient } from '@/lib/api'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
-  const { user, isAuthenticated, loading } = useAuth()
+  const { user, isAuthenticated, loading, refreshUser } = useAuth()
   const router = useRouter()
+  
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/login')
     }
   }, [isAuthenticated, loading, router])
+
+  useEffect(() => {
+    if (user) {
+      setEmail(user.email || '')
+      setUsername(user.username || '')
+    }
+  }, [user])
+
+  const handleSave = async (e: any) => {
+    e.preventDefault()
+    setMessage(null)
+    setIsSaving(true)
+
+    try {
+      const updateData: { email?: string; username?: string } = {}
+      
+      if (email !== user?.email) {
+        updateData.email = email
+      }
+      if (username !== user?.username) {
+        updateData.username = username
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        setMessage({ type: 'error', text: t('profile.noChanges', 'No changes to save') })
+        setIsSaving(false)
+        return
+      }
+
+      const response = await apiClient.updateProfile(updateData)
+      setMessage({ type: 'success', text: t('profile.updateSuccess', 'Profile updated successfully') })
+      
+      // Refresh user data in context
+      if (refreshUser) {
+        await refreshUser()
+      }
+    } catch (error: any) {
+      console.error('Profile update error:', error)
+      setMessage({ 
+        type: 'error', 
+        text: error.message || t('profile.updateError', 'Failed to update profile') 
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center">
@@ -52,13 +104,23 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="space-y-6">
+            {message && (
+              <div className={`mb-6 p-4 rounded-lg ${
+                message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+              }`}>
+                {message.text}
+              </div>
+            )}
+
+            <form onSubmit={handleSave} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.email')}</label>
                 <input 
                   type="email" 
-                  defaultValue={user?.email || ''}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
                 />
               </div>
 
@@ -66,17 +128,25 @@ export default function ProfilePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.username')}</label>
                 <input 
                   type="text" 
-                  defaultValue={user?.username || ''}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                  minLength={3}
+                  maxLength={50}
                 />
               </div>
 
               <div className="pt-4 flex justify-end">
-                <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
-                  {t('common.save', 'Save')}
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {isSaving ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
