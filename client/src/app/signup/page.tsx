@@ -170,13 +170,13 @@ export default function SignupPage() {
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
                 {t('auth.agreeToTerms')}{' '}
-                <a href="#" className="text-primary-600 hover:text-primary-500">
+                <Link href="/terms" className="text-primary-600 hover:text-primary-500" target="_blank">
                   {t('auth.termsOfService')}
-                </a>{' '}
+                </Link>{' '}
                 {t('auth.and')}{' '}
-                <a href="#" className="text-primary-600 hover:text-primary-500">
+                <Link href="/privacy" className="text-primary-600 hover:text-primary-500" target="_blank">
                   {t('auth.privacyPolicy')}
-                </a>
+                </Link>
               </label>
             </div>
 
