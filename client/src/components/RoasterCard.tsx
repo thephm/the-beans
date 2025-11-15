@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import RoasterImage from '@/components/RoasterImage'
+import { apiClient } from '@/lib/api'
 import { 
   LocationOn, 
   Favorite, 
@@ -76,6 +77,7 @@ interface RoasterCardProps {
     bluesky?: string
     x?: string
     reddit?: string
+    isFavorited?: boolean
   }
   userLocation?: { lat: number; lng: number } | null
   onSpecialtyClick?: (specialtyName: string) => void
@@ -87,13 +89,12 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
   const { user } = useAuth()
   const { showRatings } = useFeatureFlags()
   const router = useRouter()
-  const [favorites, setFavorites] = useState<string[]>([])
+  const [isFavorited, setIsFavorited] = useState<boolean>(roaster.isFavorited || false)
 
-  // Load favorites from localStorage
+  // Update isFavorited when roaster prop changes
   useEffect(() => {
-    const savedFavorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
-    setFavorites(savedFavorites)
-  }, [])
+    setIsFavorited(roaster.isFavorited || false)
+  }, [roaster.isFavorited])
 
   // Helper function to translate specialty names
   const translateSpecialty = (specialty: Specialty | string): string => {
@@ -138,7 +139,7 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
     return key ? t(`specialties.${key}`, name) : name
   }
 
-  const toggleFavorite = (roasterId: string | number) => {
+  const toggleFavorite = async (roasterId: string | number) => {
     const idStr = roasterId.toString()
     
     // Check if user is authenticated
@@ -147,19 +148,22 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
       return
     }
 
-    let updatedFavorites
-    const wasRemoved = favorites.includes(idStr)
-    if (wasRemoved) {
-      updatedFavorites = favorites.filter(id => id !== idStr)
-    } else {
-      updatedFavorites = [...favorites, idStr]
-    }
-    setFavorites(updatedFavorites)
-    localStorage.setItem('favoriteRoasters', JSON.stringify(updatedFavorites))
-    
-    // Dispatch custom event for favorites page to remove card from display
-    if (wasRemoved) {
-      window.dispatchEvent(new CustomEvent('roasterUnfavorited', { detail: { roasterId: idStr } }))
+    try {
+      const wasRemoved = isFavorited
+      if (wasRemoved) {
+        await apiClient.removeFavorite(idStr)
+      } else {
+        await apiClient.addFavorite(idStr)
+      }
+      setIsFavorited(!isFavorited)
+      
+      // Dispatch custom event for favorites page to remove card from display
+      if (wasRemoved) {
+        window.dispatchEvent(new CustomEvent('roasterUnfavorited', { detail: { roasterId: idStr } }))
+      }
+    } catch (err) {
+      console.error('Toggle favorite error:', err)
+      alert('Failed to update favorite. Please try again.')
     }
   }
 
@@ -264,13 +268,13 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
         <button
           onClick={() => toggleFavorite(roaster.id)}
           className={`absolute bottom-4 right-4 p-2 rounded-full z-20 pointer-events-auto ${
-            favorites.includes(roasterIdStr)
+            isFavorited
               ? 'bg-red-500 text-white' 
               : 'bg-white text-red-500 hover:bg-red-50'
           } shadow-lg transition-all transform hover:scale-110`}
-          aria-label={favorites.includes(roasterIdStr) ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
+          aria-label={isFavorited ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
         >
-          {favorites.includes(roasterIdStr) ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
+          {isFavorited ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
         </button>
       </div>
       <div className="px-6 pt-6 pb-4 flex flex-col flex-grow">

@@ -251,6 +251,23 @@ class ApiClient {
   async getAuditLogById(id: string) {
     return this.request(`/admin/audit-logs/${id}`);
   }
+
+  // Favorites methods
+  async getFavorites() {
+    return this.request('/favorites');
+  }
+
+  async addFavorite(roasterId: string) {
+    return this.request(`/favorites/${roasterId}`, {
+      method: 'POST',
+    });
+  }
+
+  async removeFavorite(roasterId: string) {
+    return this.request(`/favorites/${roasterId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

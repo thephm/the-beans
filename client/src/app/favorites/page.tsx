@@ -57,18 +57,15 @@ export default function FavoritesPage() {
 
   useEffect(() => {
     const loadFavorites = async () => {
-      try {
-        // Get favorites from localStorage
-        const favoriteRoasterIds = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
+      if (!user) {
+        setIsLoading(false)
+        return
+      }
 
-        // Fetch roaster data
-        if (favoriteRoasterIds.length > 0) {
-          const roastersData = await apiClient.getRoasters({}) as any
-          // Handle both array and object response formats
-          const allRoasters = roastersData.roasters || roastersData
-          const favoriteRoastersData = allRoasters.filter((r: Roaster) => favoriteRoasterIds.includes(r.id.toString()))
-          setFavoriteRoasters(favoriteRoastersData)
-        }
+      try {
+        // Fetch favorites from backend API
+        const favoritesData = await apiClient.getFavorites() as any
+        setFavoriteRoasters(favoritesData)
       } catch (error) {
         console.error('Error loading favorites:', error)
       } finally {
@@ -77,7 +74,7 @@ export default function FavoritesPage() {
     }
 
     loadFavorites()
-  }, [])
+  }, [user])
 
   if (isLoading) {
     return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center">

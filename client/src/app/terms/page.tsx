@@ -99,7 +99,7 @@ export default function TermsPage() {
                 {t('terms.contact.title', '8. Questions?')}
               </h2>
               <p className="text-gray-700">
-                {t('terms.contact.description', 'If you have questions about these terms, please contact us at support@thebeans.app')}
+                {t('terms.contact.description', 'If you have questions about these terms, please contact us at support@thebeans.ca')}
               </p>
             </section>
           </div>
