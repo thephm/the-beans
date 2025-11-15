@@ -352,4 +352,142 @@ router.get('/me', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   put:
+ *     summary: Update user profile
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       409:
+ *         description: Email or username already taken
+ */
+router.put('/profile', [
+  body('email').optional().isEmail().normalizeEmail(),
+  body('username').optional().isLength({ min: 3, max: 50 }),
+], async (req: any, res: any) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: string };
+    
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, username } = req.body;
+    const userId = decoded.userId;
+
+    // Set up audit context
+    req.auditData = {
+      entityType: 'user',
+      action: 'UPDATE' as const
+    };
+    req.userId = userId;
+
+    // Get current user data for audit
+    const oldUser = await prisma.user.findUnique({ where: { id: userId } });
+    req.auditData.oldValues = oldUser;
+
+    // Check if email or username is already taken by another user
+    if (email || username) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          AND: [
+            { id: { not: userId } },
+            {
+              OR: [
+                email ? { email } : {},
+                username ? { username } : {}
+              ].filter(obj => Object.keys(obj).length > 0)
+            }
+          ]
+        }
+      });
+
+      if (existingUser) {
+        return res.status(409).json({
+          error: 'Email or username already taken',
+          message: existingUser.email === email ? 'Email already in use' : 'Username already taken'
+        });
+      }
+    }
+
+    // Update user profile
+    const updateData: any = { updatedById: userId };
+    if (email) updateData.email = email;
+    if (username) updateData.username = username;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        avatar: true,
+        bio: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        language: true,
+        role: true,
+        createdAt: true,
+      }
+    });
+
+    // Store entity for audit logging
+    res.locals.auditEntity = updatedUser;
+
+    // Create audit log
+    if (req.auditData && req.userId) {
+      const auditLogData = {
+        action: req.auditData.action,
+        entityType: req.auditData.entityType,
+        entityId: updatedUser.id,
+        entityName: getEntityName(req.auditData.entityType, updatedUser),
+        userId: req.userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        oldValues: req.auditData.oldValues,
+        newValues: updatedUser
+      };
+      
+      // Create audit log asynchronously
+      setTimeout(() => createAuditLog(auditLogData), 0);
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
