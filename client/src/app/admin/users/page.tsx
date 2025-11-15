@@ -12,8 +12,6 @@ interface User {
   id: string;
   email: string;
   username: string;
-  firstName?: string;
-  lastName?: string;
   language?: string;
   role?: string;
   lastLogin?: string;
@@ -58,9 +56,7 @@ const AdminUsersPage: React.FC = () => {
     } else {
       const filtered = users.filter(user => 
         user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredUsers(filtered);
     }
@@ -156,16 +152,6 @@ const AdminUsersPage: React.FC = () => {
                 </a>
               </div>
             </div>
-
-            {/* Full Name (if available) */}
-            {(user.firstName || user.lastName) && (
-              <div className="mb-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <span className="mr-2">👤</span>
-                  <span>{[user.firstName, user.lastName].filter(Boolean).join(' ')}</span>
-                </div>
-              </div>
-            )}
 
             {/* Dates */}
             <div className="mb-3 text-xs text-gray-500 space-y-1">

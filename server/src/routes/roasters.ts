@@ -285,8 +285,6 @@ router.get('/', [
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
           }
         },
         people: {
@@ -296,8 +294,6 @@ router.get('/', [
               select: {
                 id: true,
                 username: true,
-                firstName: true,
-                lastName: true,
                 email: true,
               }
             }
@@ -444,8 +440,6 @@ router.get('/:id', [
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
           }
         },
         beans: true,
@@ -474,8 +468,6 @@ router.get('/:id', [
               select: {
                 id: true,
                 username: true,
-                firstName: true,
-                lastName: true,
                 avatar: true,
               }
             }
@@ -688,8 +680,6 @@ router.post('/', [
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
             email: true,
           }
         },
@@ -957,8 +947,6 @@ router.put('/:id', [
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
             email: true,
           }
         },
@@ -1228,8 +1216,6 @@ router.get('/admin/unverified', [
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
           }
         },
         roasterImages: {
@@ -1335,8 +1321,6 @@ router.patch('/:id/verify', [
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
           }
         }
       }

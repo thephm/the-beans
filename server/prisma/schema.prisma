@@ -21,8 +21,6 @@ model User {
   email           String          @unique
   username        String          @unique
   password        String
-  firstName       String?
-  lastName        String?
   avatar          String?
   bio             String?
   location        String?

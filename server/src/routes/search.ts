@@ -135,15 +135,13 @@ router.get('/', [
     }
 
     // Search roasters in DB
-    let roasters: any[] = await prisma.roaster.findMany({
+    let roasters = await prisma.roaster.findMany({
       where: whereClause,
       include: {
         owner: {
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
           },
         },
         reviews: {
@@ -341,8 +339,6 @@ router.get('/roasters', [
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
           },
         },
         reviews: {
