@@ -99,6 +99,7 @@ interface Roaster {
   threads?: string
   pinterest?: string
   bluesky?: string
+  isFavorited?: boolean
   x?: string
   reddit?: string
 }
@@ -222,9 +223,8 @@ export default function RoasterDetail() {
         setRoasterImages([])
       }
       
-      // Check if roaster is in favorites
-      const favorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
-      setIsFavorite(favorites.includes(id))
+      // Check if roaster is in favorites using isFavorited from backend
+      setIsFavorite(roasterData.isFavorited || false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load roaster')
     } finally {
@@ -232,7 +232,7 @@ export default function RoasterDetail() {
     }
   }
 
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     // Check if user is authenticated
     if (!user) {
       router.push('/login')
@@ -241,17 +241,17 @@ export default function RoasterDetail() {
 
     if (!roaster) return
     
-    const favorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]')
-    let updatedFavorites
-    
-    if (isFavorite) {
-      updatedFavorites = favorites.filter((id: string) => id !== roaster.id)
-    } else {
-      updatedFavorites = [...favorites, roaster.id]
+    try {
+      if (isFavorite) {
+        await apiClient.removeFavorite(roaster.id)
+      } else {
+        await apiClient.addFavorite(roaster.id)
+      }
+      setIsFavorite(!isFavorite)
+    } catch (err) {
+      console.error('Toggle favorite error:', err)
+      alert('Failed to update favorite. Please try again.')
     }
-    
-    localStorage.setItem('favoriteRoasters', JSON.stringify(updatedFavorites))
-    setIsFavorite(!isFavorite)
   }
 
   const handleShare = async () => {

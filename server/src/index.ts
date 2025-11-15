@@ -20,6 +20,7 @@ import regionRoutes from './routes/regions';
 import countryRoutes from './routes/countries';
 import specialtyRoutes from './routes/specialties';
 import contactRouter from './routes/contact'; // Import contact router
+import favoritesRoutes from './routes/favorites';
 
 // Load environment variables
 dotenv.config();
@@ -129,6 +130,7 @@ app.use('/api/regions', regionRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/specialties', specialtyRoutes);
 app.use('/api/contact', contactRouter); // Register contact route
+app.use('/api/favorites', favoritesRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 app.use('/api/debug', debugRoutes); // Debug authentication routes
 
