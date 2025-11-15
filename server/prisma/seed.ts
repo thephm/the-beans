@@ -22,8 +22,6 @@ async function main() {
         email: 'coffee@lover.com',
         username: existingUser ? `coffeelover_${Date.now()}` : 'coffeelover',
         password: await bcrypt.hash('password123', 10),
-        firstName: 'Coffee',
-        lastName: 'Lover',
         location: 'Everywhere',
         latitude: 0,
         longitude: 0,
@@ -54,8 +52,6 @@ async function main() {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
   const adminUsername = process.env.ADMIN_USERNAME || 'admin';
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-  const adminFirstName = process.env.ADMIN_FIRSTNAME || 'Admin';
-  const adminLastName = process.env.ADMIN_LASTNAME || 'User';
   const adminLocation = process.env.ADMIN_LOCATION || 'Headquarters';
   const adminLatitude = process.env.ADMIN_LATITUDE ? parseFloat(process.env.ADMIN_LATITUDE) : undefined;
   const adminLongitude = process.env.ADMIN_LONGITUDE ? parseFloat(process.env.ADMIN_LONGITUDE) : undefined;
@@ -79,8 +75,6 @@ async function main() {
         email: adminEmail,
         username: adminUsername,
         password: hashedAdminPassword,
-        firstName: adminFirstName,
-        lastName: adminLastName,
         location: adminLocation,
         latitude: adminLatitude,
         longitude: adminLongitude,
