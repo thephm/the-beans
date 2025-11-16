@@ -442,16 +442,22 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [showAddPerson, setShowAddPerson] = useState(false);
   const [editingPerson, setEditingPerson] = useState<RoasterPerson | null>(null);
-  const [personForm, setpersonForm] = useState({
+  const [personForm, setpersonForm] = useState<RoasterPerson>({
     id: '',
+    roasterId: '',
     firstName: '',
     lastName: '',
+    title: '',
     email: '',
     mobile: '',
     linkedinUrl: '',
     bio: '',
-    roles: [] as PersonRole[],
-    isPrimary: false
+    userId: '',
+    roles: [],
+    isActive: true,
+    isPrimary: false,
+    createdAt: '',
+    updatedAt: ''
   });
 
   // Source countries state

@@ -110096,3 +110096,119 @@ You can now reload the app and verify the fix. Let me know if you encounter any 
 ## 911th ty
 
 *(works! can't deprecated my account either now phew!)*
+
+Deploy to Render failed, logs: 
+
+```shell
+2025-11-16T21:49:08.790883389Z ==> Downloading cache...
+2025-11-16T21:49:08.828106733Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-16T21:49:09.445827671Z ==> Checking out commit d959680fdecda7817e7b3eff496cbcc55fdc3848 in branch main
+2025-11-16T21:49:23.707473417Z ==> Downloaded 532MB in 3s. Extraction took 12s.
+2025-11-16T21:49:43.255249971Z ==> Using Node.js version 22.16.0 (default)
+2025-11-16T21:49:43.280933737Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-16T21:49:43.400772587Z ==> Running build command 'npm install && npm run build'...
+2025-11-16T21:49:44.224333684Z 
+2025-11-16T21:49:44.224354146Z up to date, audited 252 packages in 755ms
+2025-11-16T21:49:44.224361316Z 
+2025-11-16T21:49:44.224363216Z 54 packages are looking for funding
+2025-11-16T21:49:44.224389748Z   run `npm fund` for details
+2025-11-16T21:49:44.225326572Z 
+2025-11-16T21:49:44.225343693Z found 0 vulnerabilities
+2025-11-16T21:49:44.382864619Z 
+2025-11-16T21:49:44.382880431Z > the-beans-client@0.1.0 build
+2025-11-16T21:49:44.382882601Z > next build
+2025-11-16T21:49:44.382884181Z 
+2025-11-16T21:49:44.930739664Z   ▲ Next.js 14.2.33
+2025-11-16T21:49:44.931021194Z 
+2025-11-16T21:49:44.942632367Z    Creating an optimized production build ...
+2025-11-16T21:50:07.671981343Z  ✓ Compiled successfully
+2025-11-16T21:50:07.672971341Z    Linting and checking validity of types ...
+2025-11-16T21:50:13.732224339Z Failed to compile.
+2025-11-16T21:50:13.732252191Z 
+2025-11-16T21:50:13.732629747Z ./src/app/admin/roasters/page.tsx:890:7
+2025-11-16T21:50:13.732643218Z Type error: Object literal may only specify known properties, and 'title' does not exist in type 'SetStateAction<{ id: string; firstName: string; lastName: string; email: string; mobile: string; linkedinUrl: string; bio: string; roles: PersonRole[]; isPrimary: boolean; }>'.
+2025-11-16T21:50:13.732647028Z 
+2025-11-16T21:50:13.732650708Z   888 |       firstName: person.firstName,
+2025-11-16T21:50:13.732654828Z   889 |       lastName: person.lastName || '',
+2025-11-16T21:50:13.732658469Z > 890 |       title: person.title || '',
+2025-11-16T21:50:13.732662449Z       |       ^
+2025-11-16T21:50:13.732666249Z   891 |       email: person.email || '',
+2025-11-16T21:50:13.732691551Z   892 |       mobile: person.mobile || '',
+2025-11-16T21:50:13.732694911Z   893 |       linkedinUrl: person.linkedinUrl || '',
+2025-11-16T21:50:13.813348103Z Next.js build worker exited with code: 1 and signal: null
+2025-11-16T21:50:14.022187427Z ==> Build failed 😞
+2025-11-16T21:50:14.022200938Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+Your Render deploy failed due to a TypeScript type error in page.tsx at line 890. The error message:
+
+> Object literal may only specify known properties, and 'title' does not exist in type 'SetStateAction<{ id: string; firstName: string; lastName: string; email: string; mobile: string; linkedinUrl: string; bio: string; roles: PersonRole[]; isPrimary: boolean; }>'
+
+This means you are trying to set a `title` property on an object, but the type definition for this object does not include `title`.
+
+To fix this, you need to do one of the following:
+1. Remove the `title` property from the object if it is not needed.
+2. Add `title: string` to the type definition for this object (likely in your types file).
+
+Would you like to add `title` to the type, or remove it from the object?
+
+> why would I remove it, it's title for a person
+
+You should not remove the `title` property if it is needed for your person object. The error occurs because the type definition for your person object does not include `title`. To resolve this, you need to add `title: string` to the relevant type definition for a person.
+
+I will locate and update the type definition to include `title: string`. 
+
+✔ Searched text for `id.*:.*string;|firstName.*:.*string;|lastName.*:.*string;|email.*:.*string;|mobile.*:.*string;|linkedinUrl.*:.*string;|bio.*:.*string;|roles.*:.*PersonRole\[\];|isPrimary.*:.*boolean;` (`**/client/src/types/**`), 20 results
+
+✔ Read `client/src/types/index.ts`, lines 1 to 61
+
+✔ Read `client/src/types/index.ts`, lines 61 to 121
+
+✔ Searched text for `PersonRole|RoasterPerson|firstName|lastName|linkedinUrl` (`**/client/src/types/index.ts`), 7 results
+
+✔ Read `client/src/types/index.ts`, lines 269 to 309
+
+The correct type for a person is `RoasterPerson`, and it already includes an optional `title?: string` property. 
+
+The error is likely because the object you are updating or creating is typed as something else (not `RoasterPerson`), or the type used in your state does not match `RoasterPerson`. You should update the type of your state or object to use `RoasterPerson` so that `title` is recognized.
+
+Would you like me to update the state type in your `page.tsx` to use `RoasterPerson`?
+
+> of course
+
+✔ Searched for files matching `**/client/src/app/admin/roasters/page.tsx`, 2 matches
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 61
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 61 to 121
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 830 to 890
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 890 to 950
+
+`page.tsx +9 -3`
+
+The `personForm` state in page.tsx is now typed as `RoasterPerson` and includes the `title` property, matching your data model. This will resolve the TypeScript error and allow you to use `title` for a person.
+
+You can now redeploy to Render. If you encounter any further issues, let me know!
+
+> shouldn't you restart here and I test first?
+
+Yes, you should restart the frontend container to apply code changes before testing. For your setup, run:
+
+```pwsh
+docker-compose restart client
+```
+
+After the restart, test the app locally to confirm the fix before redeploying to Render. Let me know if you need help with testing or encounter any issues!
+
+> go ahead
+
+✔ `docker-compose restart client`
+*Auto approved by rule `docker-compose`*
+
+The frontend container has been restarted. You can now test the app locally to confirm the fix. If everything works as expected, you can proceed with your Render deployment. Let me know if you need further assistance!
+
+## 912th try
+
+*(works locally still)*
