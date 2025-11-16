@@ -896,6 +896,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const handleEditPerson = (person: RoasterPerson) => {
     setpersonForm({
       id: person.id,
+      roasterId: person.roasterId,
       firstName: person.firstName,
       lastName: person.lastName || '',
       title: person.title || '',
@@ -904,7 +905,10 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       linkedinUrl: person.linkedinUrl || '',
       bio: person.bio || '',
       roles: person.roles,
-      isPrimary: person.isPrimary
+      isActive: person.isActive,
+      isPrimary: person.isPrimary,
+      createdAt: person.createdAt,
+      updatedAt: person.updatedAt
     });
     setEditingPerson(person);
     setShowAddPerson(true);
