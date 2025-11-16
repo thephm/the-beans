@@ -110482,3 +110482,87 @@ This should resolve the Render deployment failure. If you encounter further issu
 ## 915th try
 
 *(committing yet again)*
+
+> Now the 5th  time the client deployment fails on Render
+
+```shell
+2025-11-16T22:25:18.064832501Z ==> Downloading cache...
+2025-11-16T22:25:18.105431868Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-16T22:25:18.899109651Z ==> Checking out commit 4bacbc7ccf6d1a9225f3692fa51677c846e34bab in branch main
+2025-11-16T22:25:32.731397275Z ==> Downloaded 524MB in 3s. Extraction took 11s.
+2025-11-16T22:25:46.630585032Z ==> Using Node.js version 22.16.0 (default)
+2025-11-16T22:25:46.65738654Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-16T22:25:46.781789799Z ==> Running build command 'npm install && npm run build'...
+2025-11-16T22:25:47.639579455Z 
+2025-11-16T22:25:47.639597606Z up to date, audited 252 packages in 789ms
+2025-11-16T22:25:47.639640529Z 
+2025-11-16T22:25:47.63965215Z 54 packages are looking for funding
+2025-11-16T22:25:47.63965827Z   run `npm fund` for details
+2025-11-16T22:25:47.640867214Z 
+2025-11-16T22:25:47.640884675Z found 0 vulnerabilities
+2025-11-16T22:25:47.818802524Z 
+2025-11-16T22:25:47.818823895Z > the-beans-client@0.1.0 build
+2025-11-16T22:25:47.818827046Z > next build
+2025-11-16T22:25:47.818829606Z 
+2025-11-16T22:25:48.390992929Z   ▲ Next.js 14.2.33
+2025-11-16T22:25:48.391195641Z 
+2025-11-16T22:25:48.402636826Z    Creating an optimized production build ...
+2025-11-16T22:26:06.772281768Z  ✓ Compiled successfully
+2025-11-16T22:26:06.773399306Z    Linting and checking validity of types ...
+2025-11-16T22:26:09.731681748Z Failed to compile.
+2025-11-16T22:26:09.7317165Z 
+2025-11-16T22:26:09.731961525Z ./src/app/admin/users/[id]/edit/page.tsx:75:34
+2025-11-16T22:26:09.731976396Z Type error: Property 'isDeprecated' does not exist on type 'Partial<User>'.
+2025-11-16T22:26:09.731981166Z 
+2025-11-16T22:26:09.731985736Z   73 |         username: editData.username,
+2025-11-16T22:26:09.731990157Z   74 |         email: editData.email,
+2025-11-16T22:26:09.731994527Z > 75 |         isDeprecated: !!editData.isDeprecated
+2025-11-16T22:26:09.731999007Z      |                                  ^
+2025-11-16T22:26:09.732003138Z   76 |       };
+2025-11-16T22:26:09.732007258Z   77 |       const res = await fetch(`${apiUrl}/api/users/${user.id}`, {
+2025-11-16T22:26:09.732011228Z   78 |         method: 'PUT',
+2025-11-16T22:26:09.801378903Z Next.js build worker exited with code: 1 and signal: null
+2025-11-16T22:26:09.996825767Z ==> Build failed 😞
+2025-11-16T22:26:09.996845008Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+✔ Searched text for `isDeprecated` (`**/client/src/types/**`), no results
+
+✔ Searched text for `isDeprecated` (`**/server/prisma/schema.prisma`), 1 result
+
+✔ Searched text for `User` (`**/client/src/types/**`), 10 results
+
+✔ Read `client/src/types/index.ts`, lines 1 to 61
+
+✔ Read `client/src/types/index.ts`, lines 61 to 121
+
+✔ Read `client/src/types/index.ts`, lines 121 to 181
+
+✔ Read `client/src/types/index.ts`, lines 181 to 241
+
+✔ Read `client/src/types/index.ts`, lines 241 to 340
+
+`index.ts +1 -0`
+
+❌ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "client"
+}
+
+✔ Ran `list_containers` 
+Completed with input: {}
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+The deployment error was caused by a missing `isDeprecated` property in your `User` type. I have added `isDeprecated?: boolean;` to index.ts to match your Prisma schema.
+
+The client container has been restarted. This should resolve the Render build failure. Please redeploy and confirm if the issue is fixed.
+
+## 916th try
+
+*(wow, it wanted to take the easy way out and remove deprecated?!)*

@@ -22,6 +22,7 @@ export interface User {
     id: string;
     username: string;
   };
+  isDeprecated?: boolean;
 }
 
 export interface RoasterImage {
