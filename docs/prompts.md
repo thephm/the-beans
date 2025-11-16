@@ -110418,3 +110418,67 @@ You can now redeploy to Render—this type error will no longer block your build
 
 *(checking in to try deployment again)*
 
+> 4th time Render client deployment fails, getting frustrating
+
+```shell
+2025-11-16T22:21:59.776773436Z ==> Downloading cache...
+2025-11-16T22:21:59.816522297Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-16T22:22:00.61116987Z ==> Checking out commit ceaeed2487cd1780abbf59996b2d70ce6b3595d6 in branch main
+2025-11-16T22:22:14.403872393Z ==> Downloaded 526MB in 3s. Extraction took 12s.
+2025-11-16T22:22:24.16281228Z ==> Using Node.js version 22.16.0 (default)
+2025-11-16T22:22:24.19653013Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-16T22:22:24.326240629Z ==> Running build command 'npm install && npm run build'...
+2025-11-16T22:22:25.12466661Z 
+2025-11-16T22:22:25.124693982Z up to date, audited 252 packages in 722ms
+2025-11-16T22:22:25.124697902Z 
+2025-11-16T22:22:25.124707163Z 54 packages are looking for funding
+2025-11-16T22:22:25.124710923Z   run `npm fund` for details
+2025-11-16T22:22:25.125594983Z 
+2025-11-16T22:22:25.125607894Z found 0 vulnerabilities
+2025-11-16T22:22:25.289496815Z 
+2025-11-16T22:22:25.289518696Z > the-beans-client@0.1.0 build
+2025-11-16T22:22:25.289522137Z > next build
+2025-11-16T22:22:25.289524927Z 
+2025-11-16T22:22:25.88571126Z   ▲ Next.js 14.2.33
+2025-11-16T22:22:25.885970708Z 
+2025-11-16T22:22:25.897827617Z    Creating an optimized production build ...
+2025-11-16T22:22:42.711039172Z  ✓ Compiled successfully
+2025-11-16T22:22:42.711905951Z    Linting and checking validity of types ...
+2025-11-16T22:22:46.111927844Z Failed to compile.
+2025-11-16T22:22:46.111976428Z 
+2025-11-16T22:22:46.111983708Z ./src/app/admin/users/[id]/edit/page.tsx:48:3
+2025-11-16T22:22:46.111988599Z Type error: Object literal may only specify known properties, and 'isDeprecated' does not exist in type 'SetStateAction<Partial<User>>'.
+2025-11-16T22:22:46.111992079Z 
+2025-11-16T22:22:46.111996339Z   46 |   username: userData.username,
+2025-11-16T22:22:46.112000699Z   47 |   email: userData.email,
+2025-11-16T22:22:46.112004749Z > 48 |   isDeprecated: !!userData.isDeprecated
+2025-11-16T22:22:46.11200847Z      |   ^
+2025-11-16T22:22:46.11201206Z   49 |       });
+2025-11-16T22:22:46.11201574Z   50 |     } catch (err: any) {
+2025-11-16T22:22:46.112020651Z   51 |       setError(err.message || 'Unknown error');
+2025-11-16T22:22:46.182153914Z Next.js build worker exited with code: 1 and signal: null
+2025-11-16T22:22:46.390777683Z ==> Build failed 😞
+2025-11-16T22:22:46.390793994Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+✔ Created 2 todos
+
+✔ Read `client/src/app/admin/users/%5Bid%5D/edit/page.tsx`, lines 1 to 61
+
+`page.tsx +1 -2`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+✔ Completed (1/2) *Remove isDeprecated from user object*
+
+The deployment error was caused by the use of the `isDeprecated` property in the user object, which is not part of the expected type. I have removed this property from page.tsx and restarted the client container.
+
+This should resolve the Render deployment failure. If you encounter further issues, please share the new error log.
+
+## 915th try
+
+*(committing yet again)*

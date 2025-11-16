@@ -40,13 +40,12 @@ const EditUserPage: React.FC = () => {
       if (!res.ok) throw new Error('Failed to fetch user');
       const userData = await res.json();
       setUser(userData);
-      setEditData({
-  role: userData.role,
-  language: userData.language,
-  username: userData.username,
-  email: userData.email,
-  isDeprecated: !!userData.isDeprecated
-      });
+        setEditData({
+          role: userData.role,
+          language: userData.language,
+          username: userData.username,
+          email: userData.email
+        });
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
