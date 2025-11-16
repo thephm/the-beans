@@ -887,6 +887,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       id: person.id,
       firstName: person.firstName,
       lastName: person.lastName || '',
+      title: person.title || '',
       email: person.email || '',
       mobile: person.mobile || '',
       linkedinUrl: person.linkedinUrl || '',
@@ -926,13 +927,13 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       
       // Sanitize payload - convert empty strings to undefined for optional fields
       const sanitizedData = { ...dataToSave };
-      if (sanitizedData.email === '') sanitizedData.email = undefined;
-      if (sanitizedData.linkedinUrl === '') sanitizedData.linkedinUrl = undefined;
-      if (sanitizedData.mobile === '') sanitizedData.mobile = undefined;
-      if (sanitizedData.lastName === '') sanitizedData.lastName = undefined;
-      if (sanitizedData.title === '') sanitizedData.title = undefined;
-      if (sanitizedData.bio === '') sanitizedData.bio = undefined;
-      if (sanitizedData.roasterId === '') sanitizedData.roasterId = undefined;
+  if (sanitizedData.email === '') sanitizedData.email = undefined;
+  if (sanitizedData.linkedinUrl === '') sanitizedData.linkedinUrl = undefined;
+  if (sanitizedData.mobile === '') sanitizedData.mobile = undefined;
+  if (sanitizedData.lastName === '') sanitizedData.lastName = undefined;
+  if (sanitizedData.title === '') sanitizedData.title = null;
+  if (sanitizedData.bio === '') sanitizedData.bio = undefined;
+  if (sanitizedData.roasterId === '') sanitizedData.roasterId = undefined;
       
       const payload = editingPerson
         ? { ...sanitizedData }
