@@ -571,3 +571,96 @@ Here are the details, capabilities, and caveats you should know:
 - There are usage, attribution, and terms of service constraints (you have to follow Google’s branding / usage policies).
 
 - Some data (e.g. “popular times,” real-time live occupancy) is not (or not officially) exposed in the standard APIs. (Third-party scrapers sometimes try to extract those, but that violates terms.)
+
+## Tracking Submittor contact
+
+For my coffee roaster discovery site, I'm trying to think of a good label for a person who submits a roaster to be added to my site and tied to the roaster for attribution. Recommendor doesn't make sense if they don't really recommend the roaster, just telling me about it. Suggestor? Other?
+
+Here are some options that feel natural, neutral, and don’t imply endorsement:
+
+### **Best fits**
+
+* **Contributor** — clean, common, and doesn’t imply approval.
+* **Submitter** — very clear; they submitted the roaster.
+* **Source** — works well if you want to show “who this information came from.”
+
+### **More personality / community-leaning**
+
+* **Finder** — implies they discovered it and brought it to your site.
+* **Spotter** — like “coffee spotter”; nice if your brand leans casual.
+* **Scout** — suggests they located the roaster but doesn’t imply they recommend it.
+
+### **If you want a tech-data tone**
+
+* **Reporter** — they reported the roaster’s existence.
+* **Originator** — they originated the entry (though a bit formal).
+
+### My recommendation
+
+**Contributor** or **Scout**.
+
+* *Contributor* fits any site, clean and professional.
+* *Scout* gives it a community vibe without implying endorsement.
+
+If you tell me the tone you want for the site—professional, fun, coffee-nerdy—I can refine it further.
+
+> I kind of like finder but then also think we could have them be roaster scouts or also like roaster spotter. Finder seems blah but logical. I agree contributor is also logical but no personality. With the others i could have badges down the road if I go more social
+
+If you’re thinking about future badges, community features, and giving the role some personality, then **Scout** and **Spotter** open up the most room for fun.
+
+Here’s how the options stack up with that in mind:
+
+### **Roaster Scout**
+
+⭐ Best blend of personality + clarity
+
+* Implies discovery and exploration
+* Easy to build a badge system around (“Senior Scout,” “Master Scout,” etc.)
+* Feels like they’re helping expand the map of coffee roasters
+
+### **Roaster Spotter**
+
+* Slightly more playful and casual
+* Has a “birdwatcher” vibe — they *spotted* a roaster
+* Easy badge names: “Sharp-Eyed Spotter,” “First Spot,” “Top Spotter”
+
+### **Roaster Finder**
+
+* Most literal
+* Sounds like a function, not a role
+* Works but has less energy
+
+### **My recommendation**
+
+If you want personality and room to grow **without implying endorsement**, go with:
+
+**→ Roaster Scout**
+or
+**→ Roaster Spotter**
+
+Between the two:
+
+* **Scout** feels more like a recognized role on a platform.
+* **Spotter** feels more fun and quirky.
+
+If you want, I can help brainstorm badge names or short descriptions for the role.
+
+> Yeah I think you're right scout
+
+Great choice — **Roaster Scout** hits the sweet spot.
+
+If you ever want to build around it later, here are some things that will slot in naturally:
+
+### **Role Description (optional for your site)**
+
+*A Roaster Scout is someone who discovers new or lesser-known coffee roasters and submits them to help grow our directory.*
+
+### **Future Badge Ideas**
+
+* **First Scout** — for their first submission
+* **Trailblazer** — found a roaster in a new city or country
+* **Master Scout** — 10+ verified submissions
+* **Cartographer** — helped complete detailed info
+* **Eagle Eye** — spotted a roaster before it became popular
+
+Just let me know if you want me to generate branding text or microcopy for the role.
