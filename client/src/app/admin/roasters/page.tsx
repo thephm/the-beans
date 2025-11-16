@@ -869,14 +869,19 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const resetPersonForm = () => {
     setpersonForm({
       id: '',
+      roasterId: '',
       firstName: '',
       lastName: '',
+      title: '',
       email: '',
       mobile: '',
       linkedinUrl: '',
       bio: '',
       roles: [],
-      isPrimary: false
+      isActive: true,
+      isPrimary: false,
+      createdAt: '',
+      updatedAt: ''
     });
     setEditingPerson(null);
     setShowAddPerson(false);
