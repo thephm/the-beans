@@ -98,14 +98,16 @@ router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, 
     const oldUser = await prisma.user.findUnique({ where: { id } });
     req.auditData.oldValues = oldUser;
     
-    const { role, language } = req.body;
+    const { role, language, isDeprecated } = req.body;
+    const updateData: any = {
+      updatedById: req.userId
+    };
+    if (typeof role !== 'undefined') updateData.role = role;
+    if (typeof language !== 'undefined') updateData.language = language;
+    if (typeof isDeprecated !== 'undefined') updateData.isDeprecated = isDeprecated;
     const updated = await prisma.user.update({
       where: { id },
-      data: { 
-        role, 
-        language,
-        updatedById: req.userId // Set who updated this user
-      },
+      data: updateData,
     });
 
     // Store entity for audit logging
@@ -143,6 +145,25 @@ router.delete('/:id', requireAuth, auditBefore('user', 'DELETE'), captureOldValu
       };
     }
     
+    // Check for related records before deleting
+    const related = await Promise.all([
+      prisma.review.findFirst({ where: { userId: id } }),
+      prisma.favorite.findFirst({ where: { userId: id } }),
+      prisma.roaster.findFirst({ where: { ownerId: id } }),
+      prisma.roaster.findFirst({ where: { createdById: id } }),
+      prisma.roaster.findFirst({ where: { updatedById: id } }),
+      prisma.roasterPerson.findFirst({ where: { userId: id } }),
+      prisma.bean.findFirst({ where: { createdById: id } }),
+      prisma.bean.findFirst({ where: { updatedById: id } }),
+      prisma.comment.findFirst({ where: { userId: id } }),
+      prisma.notification.findFirst({ where: { userId: id } }),
+      prisma.auditLog.findFirst({ where: { userId: id } })
+    ]);
+    if (related.some(r => r)) {
+      // Soft deprecate user if related records exist
+      await prisma.user.update({ where: { id }, data: { isDeprecated: true } });
+      return res.json({ success: true, deprecated: true });
+    }
     await prisma.user.delete({ where: { id } });
     
     // Create audit log manually (same pattern as roasters)
@@ -224,6 +245,7 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
         createdAt: true,
         updatedAt: true,
         role: true,
+        isDeprecated: true,
         createdById: true,
         updatedById: true,
         createdBy: {
@@ -268,6 +290,7 @@ router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response)
         createdAt: true,
         updatedAt: true,
         role: true,
+        isDeprecated: true,
         createdById: true,
         updatedById: true,
         createdBy: {

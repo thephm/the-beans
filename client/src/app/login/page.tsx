@@ -29,7 +29,11 @@ export default function LoginPage() {
       login(data.token, data.user)
       router.push('/discover')
     } catch (error: any) {
-      setError(error.message || 'Login failed')
+      if (error.message && error.message.toLowerCase().includes('deprecated')) {
+  setError(t('auth.deprecatedAccount', 'This account has been deprecated.'));
+      } else {
+        setError(error.message || 'Login failed');
+      }
     } finally {
       setLoading(false)
     }
