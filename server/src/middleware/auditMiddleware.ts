@@ -20,16 +20,6 @@ export function auditBefore(entityType: string, action: 'CREATE' | 'UPDATE' | 'D
  */
 export function auditAfter() {
   return async (req: any, res: any, next: any) => {
-    console.log('auditAfter called:', {
-      statusCode: res.statusCode,
-      hasAuditData: !!req.auditData,
-      hasUserId: !!req.userId,
-      action: req.auditData?.action,
-      entityType: req.auditData?.entityType,
-      entityId: (res.locals.auditEntity || res.locals.entity)?.id || req.params.id,
-      oldValues: req.auditData?.oldValues
-    });
-
     // Log both successful AND failed operations
     if (req.auditData && req.userId) {
       try {
@@ -63,7 +53,6 @@ export function auditAfter() {
 
         // For DELETE actions, call audit log synchronously
         if (req.auditData.action === 'DELETE') {
-          console.log('Calling createAuditLog synchronously for DELETE:', auditLogData);
           await createAuditLog(auditLogData);
         } else {
           // Create audit log asynchronously for other actions

@@ -190,8 +190,6 @@ export async function createAuditLog(data: AuditLogData): Promise<void> {
         userId: data.userId
       }
     });
-
-    console.log(`Audit log created: ${data.action} ${data.entityType} ${data.entityId} by user ${data.userId}`);
   } catch (error) {
     console.error('Failed to create audit log:', error);
     // Don't throw error - audit logging shouldn't break the main functionality

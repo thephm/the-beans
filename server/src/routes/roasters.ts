@@ -760,7 +760,6 @@ router.post('/', [
         oldValues: undefined,
         newValues: roaster
       });
-      console.log('CREATE audit log written for roaster:', roaster.id);
     } catch (auditErr) {
       console.error('Failed to write CREATE audit log for roaster:', auditErr);
     }
@@ -1140,7 +1139,6 @@ router.delete('/:id', [
         oldValues: deletedRoaster,
         newValues: undefined
       });
-      console.log('DELETE audit log written for roaster:', deletedRoaster.id);
     } catch (auditErr) {
       console.error('Failed to write DELETE audit log for roaster:', auditErr);
     }
