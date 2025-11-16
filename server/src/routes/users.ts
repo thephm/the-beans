@@ -28,7 +28,6 @@ router.put('/language', [
     // Capture old values for audit
     const oldUser = await prisma.user.findUnique({ where: { id: userId } });
     req.auditData.oldValues = oldUser;
-    console.log('Language update - audit setup:', { userId, hasAuditData: !!req.auditData, hasOldUser: !!oldUser });
 
     // Update user language in database
     const updatedUser = await prisma.user.update({
@@ -41,7 +40,6 @@ router.put('/language', [
 
     // Store entity for audit logging
     res.locals.auditEntity = updatedUser;
-    console.log('Language update - storing entity:', { entityId: updatedUser.id, language: updatedUser.language });
 
     res.json({ 
       message: 'Language preference updated successfully',
@@ -99,7 +97,6 @@ router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, 
     // Capture old values for audit
     const oldUser = await prisma.user.findUnique({ where: { id } });
     req.auditData.oldValues = oldUser;
-    console.log('Admin update - audit setup:', { adminId: req.userId, targetUserId: id, hasOldUser: !!oldUser });
     
     const { role, language } = req.body;
     const updated = await prisma.user.update({
@@ -113,7 +110,6 @@ router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, 
 
     // Store entity for audit logging
     res.locals.auditEntity = updated;
-    console.log('Admin update - stored entity for audit:', { entityId: updated.id, hasEntity: !!res.locals.auditEntity });
 
     // Call audit logging directly since middleware doesn't run after response
     const auditMiddleware = auditAfter();
@@ -130,7 +126,6 @@ router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, 
 router.delete('/:id', requireAuth, auditBefore('user', 'DELETE'), captureOldValues(prisma.user), async (req: any, res: any) => {
   try {
     req.userId = req.user?.id; // Set for audit middleware
-    console.log('User DELETE - audit setup:', { userId: req.userId, hasAuditData: !!req.auditData, hasOldValues: !!res.locals.oldValues });
     
     const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
@@ -152,7 +147,6 @@ router.delete('/:id', requireAuth, auditBefore('user', 'DELETE'), captureOldValu
     
     // Create audit log manually (same pattern as roasters)
     if (req.auditData && req.userId) {
-      console.log('Creating user DELETE audit log manually:', { action: 'DELETE', entityId: id, userId: req.userId });
       await createAuditLog({
         action: 'DELETE',
         entityType: 'user',
@@ -163,9 +157,6 @@ router.delete('/:id', requireAuth, auditBefore('user', 'DELETE'), captureOldValu
         ipAddress: req.ip,
         userAgent: req.get('User-Agent')
       });
-      console.log('User DELETE audit log created successfully');
-    } else {
-      console.log('User DELETE audit log skipped:', { hasAuditData: !!req.auditData, hasUserId: !!req.userId });
     }
     
     res.json({ success: true });

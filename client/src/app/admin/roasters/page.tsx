@@ -498,7 +498,6 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     if (url.includes('unsplash.com')) {
       // If it's already a direct images.unsplash.com URL, return as is
       if (url.includes('images.unsplash.com')) {
-        console.log('Already a direct image URL:', url);
         return url;
       }
       
@@ -507,12 +506,10 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         const photoPathMatch = url.match(/\/photos\/([^/?#]+)/);
         if (photoPathMatch) {
           const photoId = photoPathMatch[1];
-          console.log('Extracted photo ID:', photoId);
           
           // For URLs like https://unsplash.com/photos/ZmOhgTobRQI
           // The photo ID is directly after /photos/
           const directImageUrl = `https://images.unsplash.com/photo-${photoId}?w=800&h=600&fit=crop&auto=format&q=80`;
-          console.log('Converting to:', directImageUrl);
           
           return directImageUrl;
         }
