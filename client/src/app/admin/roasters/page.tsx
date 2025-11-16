@@ -7,6 +7,8 @@ import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '@/types';
 import SimpleImageUpload from '@/components/SimpleImageUpload';
 import SpecialtyPillSelector from '@/components/SpecialtyPillSelector';
+import AddPersonForm from '@/components/AddPersonForm';
+import PersonRoleButtons from '@/components/PersonRoleButtons';
 
 
 const AdminRoastersPage: React.FC = () => {
@@ -33,6 +35,7 @@ const AdminRoastersPage: React.FC = () => {
   const [showAddPerson, setShowAddPerson] = useState(false);
   const [editingPerson, setEditingPerson] = useState<RoasterPerson | null>(null);
   const [personForm, setpersonForm] = useState({
+    id: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -440,6 +443,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const [showAddPerson, setShowAddPerson] = useState(false);
   const [editingPerson, setEditingPerson] = useState<RoasterPerson | null>(null);
   const [personForm, setpersonForm] = useState({
+    id: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -861,6 +865,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   const resetPersonForm = () => {
     setpersonForm({
+      id: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -882,6 +887,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   const handleEditPerson = (person: RoasterPerson) => {
     setpersonForm({
+      id: person.id,
       firstName: person.firstName,
       lastName: person.lastName || '',
       email: person.email || '',
@@ -896,16 +902,19 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     setError(null); // Clear any existing errors when editing
   };
 
-  const handlePersonRoleChange = (role: PersonRole, checked: boolean) => {
+  const handlePersonRoleChange = (role: PersonRole) => {
     setpersonForm(prev => ({
       ...prev,
-      roles: checked 
-        ? [...prev.roles, role]
-        : prev.roles.filter(r => r !== role)
+      roles: prev.roles.includes(role)
+        ? prev.roles.filter(r => r !== role)
+        : [...prev.roles, role]
     }));
   };
 
-  const submitPerson = async () => {
+  const submitPerson = async (personData?: any) => {
+    // If personData is provided (from AddPersonForm), use it; otherwise fall back to personForm state
+    const dataToSave = personData || personForm;
+    
     if (!roaster?.id && !formData.name) return;
     
     try {
@@ -918,9 +927,19 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       
       const method = editingPerson ? 'PUT' : 'POST';
       
+      // Sanitize payload - convert empty strings to undefined for optional fields
+      const sanitizedData = { ...dataToSave };
+      if (sanitizedData.email === '') sanitizedData.email = undefined;
+      if (sanitizedData.linkedinUrl === '') sanitizedData.linkedinUrl = undefined;
+      if (sanitizedData.mobile === '') sanitizedData.mobile = undefined;
+      if (sanitizedData.lastName === '') sanitizedData.lastName = undefined;
+      if (sanitizedData.title === '') sanitizedData.title = undefined;
+      if (sanitizedData.bio === '') sanitizedData.bio = undefined;
+      if (sanitizedData.roasterId === '') sanitizedData.roasterId = undefined;
+      
       const payload = editingPerson
-        ? { ...personForm }
-        : { ...personForm, roasterId: roaster?.id || 'temp' };
+        ? { ...sanitizedData }
+        : { ...sanitizedData, roasterId: roaster?.id || 'temp' };
 
       const response = await fetch(url, {
         method,
@@ -1020,6 +1039,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         return 'bg-green-100 text-green-800';
       case PersonRole.MARKETING:
         return 'bg-orange-100 text-orange-800';
+      case PersonRole.SCOUT:
+        return 'bg-yellow-100 text-yellow-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -1569,102 +1590,13 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     {people.map((person) => (
                       <div key={person.id} className="w-full">
                         {editingPerson && editingPerson.id === person.id ? (
-                          <div className="border rounded-lg p-4 bg-blue-50 mb-4 mx-auto w-full">
-                            {error && (
-                              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                                {error}
-                              </div>
-                            )}
-                            <div className="space-y-3">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    {t('adminForms.roasters.firstName', 'First Name')}
-                                  </label>
-                                  <input type="text" placeholder={t('adminForms.roasters.firstName', 'First Name')} value={personForm.firstName} onChange={e => setpersonForm(f => ({ ...f, firstName: e.target.value }))} className="w-full px-3 py-2 border rounded" required />
-                                </div>
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    {t('adminForms.roasters.lastName', 'Last Name')}
-                                  </label>
-                                  <input type="text" placeholder={t('adminForms.roasters.lastName', 'Last Name')} value={personForm.lastName} onChange={e => setpersonForm(f => ({ ...f, lastName: e.target.value }))} className="w-full px-3 py-2 border rounded" />
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    {t('adminForms.roasters.email', 'Email')}
-                                  </label>
-                                  <input type="email" placeholder={t('adminForms.roasters.email', 'Email')} value={personForm.email} onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded" />
-                                </div>
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    {t('adminForms.roasters.mobile', 'Mobile')}
-                                  </label>
-                                  <input type="text" placeholder={t('adminForms.roasters.mobile', 'Mobile')} value={personForm.mobile} onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} className="w-full px-3 py-2 border rounded" />
-                                </div>
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  {t('adminForms.roasters.linkedinUrl', 'LinkedIn URL')}
-                                </label>
-                                <input type="url" placeholder="https://www.linkedin.com/in/username" value={personForm.linkedinUrl} onChange={e => setpersonForm(f => ({ ...f, linkedinUrl: e.target.value }))} className="w-full px-3 py-2 border rounded" />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  {t('adminForms.roasters.bio', 'Bio')}
-                                </label>
-                                <textarea placeholder={t('adminForms.roasters.bio', 'Bio')} value={personForm.bio} onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} className="w-full px-3 py-2 border rounded" rows={3} />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.primaryContact', 'Primary Contact')}</label>
-                                <button
-                                  type="button"
-                                  className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                                  onClick={() => setpersonForm(f => ({ ...f, isPrimary: !f.isPrimary }))}
-                                >
-                                  {personForm.isPrimary ? t('adminForms.roasters.yes', 'Yes') : t('adminForms.roasters.no', 'No')}
-                                </button>
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.role', 'Role')}</label>
-                                <div className="flex gap-2 flex-wrap items-center">
-                                  <button
-                                    type="button"
-                                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.OWNER) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                                    onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.OWNER) ? f.roles.filter(r => r !== PersonRole.OWNER) : [...f.roles, PersonRole.OWNER] }))}
-                                  >
-                                    {t('adminForms.roasters.roleOwner', 'Owner')}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.ADMIN) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                                    onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.ADMIN) ? f.roles.filter(r => r !== PersonRole.ADMIN) : [...f.roles, PersonRole.ADMIN] }))}
-                                  >
-                                    {t('adminForms.roasters.roleAdmin', 'Admin')}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.BILLING) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                                    onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.BILLING) ? f.roles.filter(r => r !== PersonRole.BILLING) : [...f.roles, PersonRole.BILLING] }))}
-                                  >
-                                    {t('adminForms.roasters.roleBilling', 'Billing')}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.MARKETING) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                                    onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.MARKETING) ? f.roles.filter(r => r !== PersonRole.MARKETING) : [...f.roles, PersonRole.MARKETING] }))}
-                                  >
-                                    {t('adminForms.roasters.roleMarketing', 'Marketing')}
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="flex gap-4 mt-4 justify-end">
-                                <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={resetPersonForm}>{t('common.cancel', 'Cancel')}</button>
-                                <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>{t('common.save', 'Save')}</button>
-                              </div>
-                            </div>
-                          </div>
+                          <AddPersonForm
+                            roasterId={roaster?.id}
+                            initialPerson={personForm}
+                            mode="edit"
+                            onSave={submitPerson}
+                            onCancel={resetPersonForm}
+                          />
                         ) : (
                           <div className="border rounded-lg p-4 bg-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between mx-auto w-full">
                             <div>
@@ -1704,129 +1636,13 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                 )}
                 {/* Inline add contact form - shown by default when adding new roaster, or when "Add Contact" clicked when editing */}
                 {(!roaster?.id || showAddPerson) && !editingPerson && (
-                  <div className="border rounded-lg p-4 bg-blue-50 mb-4 mx-auto max-w-xl">
-                    {error && (
-                      <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                        {error}
-                      </div>
-                    )}
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('adminForms.roasters.firstName', 'First Name')}
-                          </label>
-                          <input 
-                            type="text" 
-                            value={personForm.firstName} 
-                            onChange={e => setpersonForm(f => ({ ...f, firstName: e.target.value }))} 
-                            className="w-full px-3 py-2 border rounded" 
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('adminForms.roasters.lastName', 'Last Name')}
-                          </label>
-                          <input 
-                            type="text" 
-                            value={personForm.lastName} 
-                            onChange={e => setpersonForm(f => ({ ...f, lastName: e.target.value }))} 
-                            className="w-full px-3 py-2 border rounded" 
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('adminForms.roasters.email', 'Email')}
-                          </label>
-                          <input 
-                            type="email" 
-                            value={personForm.email} 
-                            onChange={e => setpersonForm(f => ({ ...f, email: e.target.value }))} 
-                            className="w-full px-3 py-2 border rounded" 
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('adminForms.roasters.mobile', 'Mobile')}
-                          </label>
-                          <input 
-                            type="text" 
-                            value={personForm.mobile} 
-                            onChange={e => setpersonForm(f => ({ ...f, mobile: e.target.value }))} 
-                            className="w-full px-3 py-2 border rounded" 
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t('adminForms.roasters.linkedinUrl', 'LinkedIn URL')}
-                        </label>
-                        <input 
-                          type="url" 
-                          placeholder="https://www.linkedin.com/in/username"
-                          value={personForm.linkedinUrl} 
-                          onChange={e => setpersonForm(f => ({ ...f, linkedinUrl: e.target.value }))} 
-                          className="w-full px-3 py-2 border rounded" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t('adminForms.roasters.bio', 'Bio')}
-                        </label>
-                        <textarea 
-                          value={personForm.bio} 
-                          onChange={e => setpersonForm(f => ({ ...f, bio: e.target.value }))} 
-                          className="w-full px-3 py-2 border rounded" 
-                          rows={3}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.primaryContact', 'Primary Contact')}</label>
-                        <button
-                          type="button"
-                          className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                          onClick={() => setpersonForm(f => ({ ...f, isPrimary: !f.isPrimary }))}
-                        >
-                          {personForm.isPrimary ? t('adminForms.roasters.yes', 'Yes') : t('adminForms.roasters.no', 'No')}
-                        </button>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminForms.roasters.role', 'Role')}</label>
-                        <div className="flex gap-2 flex-wrap items-center">
-                          <button
-                            type="button"
-                            className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.OWNER) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                            onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.OWNER) ? f.roles.filter(r => r !== PersonRole.OWNER) : [...f.roles, PersonRole.OWNER] }))}
-                          >
-                            {t('adminForms.roasters.roleOwner', 'Owner')}
-                          </button>
-                          <button
-                            type="button"
-                            className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.ADMIN) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                            onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.ADMIN) ? f.roles.filter(r => r !== PersonRole.ADMIN) : [...f.roles, PersonRole.ADMIN] }))}
-                          >
-                            {t('adminForms.roasters.roleAdmin', 'Admin')}
-                          </button>
-                          <button
-                            type="button"
-                            className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${personForm.roles.includes(PersonRole.BILLING) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                            onClick={() => setpersonForm(f => ({ ...f, roles: f.roles.includes(PersonRole.BILLING) ? f.roles.filter(r => r !== PersonRole.BILLING) : [...f.roles, PersonRole.BILLING] }))}
-                          >
-                            {t('adminForms.roasters.roleBilling', 'Billing')}
-                          </button>
-                        </div>
-                      </div>
-                      {roaster?.id && (
-                        <div className="flex gap-4 mt-4 justify-end">
-                          <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={resetPersonForm}>{t('common.cancel', 'Cancel')}</button>
-                          <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={() => submitPerson()}>{t('common.save', 'Save')}</button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <AddPersonForm
+                    roasterId={roaster?.id}
+                    initialPerson={personForm}
+                    mode="add"
+                    onSave={submitPerson}
+                    onCancel={resetPersonForm}
+                  />
                 )}
               </>
             )}

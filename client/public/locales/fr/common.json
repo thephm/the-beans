@@ -484,6 +484,7 @@
   "roleAdmin": "Administrateur",
   "roleBilling": "Facturation",
   "roleMarketing": "Marketing",
+  "roleScout": "Découvreur",
   "bio": "Biographie"
     },
     "roasters": {
@@ -610,6 +611,7 @@
       "roleAdmin": "Administrateur",
       "roleBilling": "Facturation",
       "roleMarketing": "Marketing",
+      "roleScout": "Découvreur",
       "yes": "Oui",
       "no": "Non",
       "noContactsFound": "Aucun contact trouvé pour ce torréfacteur.",

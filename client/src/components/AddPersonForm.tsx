@@ -3,10 +3,12 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { PersonRole } from '../types';
 import { Roaster } from '../types';
+import PersonRoleButtons from './PersonRoleButtons';
 
 
 interface AddPersonFormProps {
-  roasters: Roaster[];
+  roasters?: Roaster[];
+  roasterId?: string; // If provided, roaster selector is hidden and this is used
   onSave: (person: any) => void;
   onCancel: () => void;
   onDelete?: () => void;
@@ -14,7 +16,7 @@ interface AddPersonFormProps {
   initialPerson?: Partial<any>;
 }
 
-export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mode = 'add', initialPerson }: AddPersonFormProps) {
+export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, onDelete, mode = 'add', initialPerson }: AddPersonFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [form, setForm] = useState({
@@ -26,7 +28,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
     linkedinUrl: initialPerson?.linkedinUrl || '',
     bio: initialPerson?.bio || '',
     roles: initialPerson?.roles || [] as PersonRole[],
-    roasterId: initialPerson?.roasterId || '',
+    roasterId: roasterId || initialPerson?.roasterId || '',
     isPrimary: initialPerson?.isPrimary || false,
   });
 
@@ -63,7 +65,7 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
     onSave(form);
   };
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <div className="space-y-6 mb-8">
         {/* First Name and Last Name - side by side on medium+ screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -118,16 +120,18 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
           <div className="space-y-4">
             {/* Roaster and Primary */}
             <div className="flex flex-col sm:flex-row items-end gap-4">
-              <div className="flex-1 w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
-                  <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
-                  {safeRoasters.map(roaster => (
-                    <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-full sm:w-auto">
+              {!roasterId && roasters && (
+                <div className="flex-1 w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
+                    <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
+                    {safeRoasters.map(roaster => (
+                      <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className={`w-full ${!roasterId && roasters ? 'sm:w-auto' : ''}`}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.people.primaryContact', 'Primary Contact')}</label>
                 <button
                   type="button"
@@ -144,18 +148,10 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t('admin.people.role', 'Role')}
               </label>
-              <div className="flex gap-2 flex-wrap items-center">
-                {[PersonRole.OWNER, PersonRole.ADMIN, PersonRole.BILLING, PersonRole.MARKETING].map(role => (
-                  <button
-                    key={role}
-                    type="button"
-                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.roles.includes(role) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                    onClick={() => handleRoleToggle(role)}
-                  >
-                    {t(`admin.people.role${role.charAt(0).toUpperCase() + role.slice(1)}`, role.charAt(0).toUpperCase() + role.slice(1))}
-                  </button>
-                ))}
-              </div>
+              <PersonRoleButtons 
+                selectedRoles={form.roles} 
+                onRoleToggle={handleRoleToggle} 
+              />
             </div>
           </div>
         </div>
@@ -182,9 +178,9 @@ export default function AddPersonForm({ roasters, onSave, onCancel, onDelete, mo
         </div>
         <div className="flex gap-4">
           <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>{t('common.cancel', 'Cancel')}</button>
-          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">{t('common.save', 'Save')}</button>
+          <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={handleSubmit}>{t('common.save', 'Save')}</button>
         </div>
       </div>
-    </form>
+    </div>
   );
 }
