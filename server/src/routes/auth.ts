@@ -262,6 +262,14 @@ router.post('/login', [
       });
     }
 
+    // Block login for deprecated users
+    if (user.isDeprecated) {
+      return res.status(403).json({
+        error: 'Account deprecated',
+        message: 'This account has been deprecated and cannot log in.'
+      });
+    }
+
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {

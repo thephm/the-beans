@@ -15,6 +15,10 @@ const EditUserPage: React.FC = () => {
   const router = useRouter();
   const params = useParams();
   const userId = params?.id as string;
+  // Auth context for current user
+  // Use correct import path for useAuth
+  // @ts-ignore-next-line
+  const { user: currentUser } = require('../../../../../contexts/AuthContext').useAuth();
 
   const [user, setUser] = useState<User | null>(null);
   const [editData, setEditData] = useState<Partial<User>>({});
@@ -37,10 +41,11 @@ const EditUserPage: React.FC = () => {
       const userData = await res.json();
       setUser(userData);
       setEditData({
-        role: userData.role,
-        language: userData.language,
-        username: userData.username,
-        email: userData.email
+  role: userData.role,
+  language: userData.language,
+  username: userData.username,
+  email: userData.email,
+  isDeprecated: !!userData.isDeprecated
       });
     } catch (err: any) {
       setError(err.message || 'Unknown error');
@@ -62,17 +67,23 @@ const EditUserPage: React.FC = () => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      // Only send fields that are present
+      const payload: any = {
+        role: editData.role,
+        language: editData.language,
+        username: editData.username,
+        email: editData.email,
+        isDeprecated: !!editData.isDeprecated
+      };
       const res = await fetch(`${apiUrl}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify(editData),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Failed to update user');
-      
-      // Redirect back to users list
       router.push('/admin/users');
     } catch (err: any) {
       setError(err.message || 'Unknown error');
@@ -99,8 +110,18 @@ const EditUserPage: React.FC = () => {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to delete user');
+        let errorMsg = 'Failed to delete user';
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.error || errorData.message || errorMsg;
+        } catch {}
+        // Show a user-friendly message if related records exist
+        if (errorMsg.includes('related records')) {
+          errorMsg = t('admin.users.deleteRelatedError', 'Cannot delete user: user has related records in the database. Remove or reassign related data before deleting.');
+        }
+        setError(errorMsg);
+        setShowDeleteConfirm(false);
+        return;
       }
       router.push('/admin/users');
     } catch (err: any) {
@@ -187,6 +208,9 @@ const EditUserPage: React.FC = () => {
 
       <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
   <h1 className="text-2xl font-bold mb-8">{t('admin.users.editUser', 'Edit User')}</h1>
+        {user?.isDeprecated && (
+          <span className="inline-block mb-4 px-3 py-1 text-sm font-semibold rounded bg-yellow-200 text-yellow-900">{t('admin.users.deprecated', 'Deprecated')}</span>
+        )}
         
         {showDeleteConfirm && (
           <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded">
@@ -211,6 +235,20 @@ const EditUserPage: React.FC = () => {
         )}
         
         <form onSubmit={e => { e.preventDefault(); saveEdit(); }}>
+          {/* Hide deprecated checkbox if editing own account */}
+          {user?.id !== currentUser?.id && (
+            <div className="mb-6">
+              <label className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  checked={!!editData.isDeprecated}
+                  onChange={e => setEditData(prev => ({ ...prev, isDeprecated: e.target.checked }))}
+                  className="form-checkbox h-4 w-4 text-yellow-600"
+                />
+                <span className="ml-2 text-sm text-yellow-900 font-medium">{t('admin.users.deprecatedCheckbox', 'Deprecated')}</span>
+              </label>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

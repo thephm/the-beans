@@ -17,6 +17,7 @@ interface User {
   lastLogin?: string;
   createdAt?: string;
   updatedAt?: string;
+  isDeprecated?: boolean;
 }
 
 
@@ -139,6 +140,9 @@ const AdminUsersPage: React.FC = () => {
                       {user.language.toUpperCase()}
                     </span>
                   )}
+                  {user.isDeprecated && (
+                    <span className="px-2 py-1 text-xs font-semibold rounded bg-yellow-200 text-yellow-900">Deprecated</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -203,6 +207,9 @@ const AdminUsersPage: React.FC = () => {
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
                     {user.username}
+                    {user.isDeprecated && (
+                      <span className="ml-2 px-2 py-1 text-xs font-semibold rounded bg-yellow-200 text-yellow-900">Deprecated</span>
+                    )}
                   </Link>
                 </td>
                 <td className="py-3 px-4 text-left">

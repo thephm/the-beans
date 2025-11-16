@@ -31,6 +31,7 @@ model User {
   language        String          @default("en") @db.VarChar(5)
   settings        Json?
   role            String          @default("user") @db.VarChar(16)
+  isDeprecated    Boolean         @default(false)
   createdById     String?
   updatedById     String?
   lastLogin       DateTime?
