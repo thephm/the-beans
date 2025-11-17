@@ -32,6 +32,13 @@ class ApiClient {
 
   // ...existing code...
 
+  async updateRoaster(id: string, roasterData: any) {
+    return this.request(`/roasters/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(roasterData),
+    });
+  }
+
   // People (contacts/CRM)
   async getPeople(params?: Record<string, any>) {
     const searchParams = params ? new URLSearchParams(params).toString() : '';
