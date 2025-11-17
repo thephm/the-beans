@@ -603,7 +603,7 @@ export default function RoasterDetail() {
 
               {/* Sidebar */}
               <div className="lg:col-span-1">
-                <div className="bg-gray-50 rounded-xl p-6 sticky top-8 flex flex-col min-h-[400px]">
+                <div className="bg-gray-50 rounded-xl p-6 sticky top-8 flex flex-col min-h-[400px] pl-0">
                   <div className="flex-grow">
                     <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.contactInfo')}</h3>
                     
