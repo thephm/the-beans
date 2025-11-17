@@ -12,6 +12,7 @@ import PersonRoleButtons from '@/components/PersonRoleButtons';
 
 
 const AdminRoastersPage: React.FC = () => {
+  // ...existing code...
   useEffect(() => {
     fetchRoasters();
   }, []);
@@ -96,6 +97,8 @@ const AdminRoastersPage: React.FC = () => {
   }
 
   // Filter roasters based on search query
+
+  // ...existing code...
   const filteredRoasters = roasters.filter(roaster => {
     if (!searchQuery.trim()) return true;
     

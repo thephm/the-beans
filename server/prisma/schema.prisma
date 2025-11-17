@@ -107,9 +107,22 @@ model Roaster {
   createdBy          User?                  @relation("RoasterCreatedBy", fields: [createdById], references: [id])
   owner              User?                  @relation(fields: [ownerId], references: [id])
   updatedBy          User?                  @relation("RoasterUpdatedBy", fields: [updatedById], references: [id])
+    sourceType         RoasterSourceType?
+    sourceDetails      String?
 
   @@map("roasters")
 }
+  enum RoasterSourceType {
+    Scout
+    Google
+    Reddit
+    ChatGPT
+    YouTube
+    Instagram
+    TikTok
+    API
+    Other
+  }
 
 model RoasterPerson {
   id          String   @id @default(cuid())

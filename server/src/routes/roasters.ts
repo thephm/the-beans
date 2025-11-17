@@ -634,6 +634,8 @@ router.post('/', [
   body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
   body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
+  body('sourceType').optional().isIn(['Scout','Google','Reddit','ChatGPT','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
+  body('sourceDetails').optional().isString().isLength({ max: 1000 }).withMessage('Source details must be less than 1000 characters'),
 ], requireAuth, auditBefore('roaster', 'CREATE'), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -660,8 +662,9 @@ router.post('/', [
     const roasterData = {
       ...req.body,
       ownerId: ownerId,
+      sourceType: req.body.sourceType,
+      sourceDetails: req.body.sourceDetails,
     };
-    
     // Remove fields that aren't part of the Roaster schema
     delete roasterData.ownerEmail;
     delete roasterData.ownerName;
@@ -669,7 +672,6 @@ router.post('/', [
     delete roasterData.ownerMobile;
     delete roasterData.ownerContact; // Remove nested owner contact object
     delete roasterData.specialtyIds; // Will be handled separately
-    
     const roaster = await prisma.roaster.create({
       data: {
         ...roasterData,
@@ -869,6 +871,8 @@ router.put('/:id', [
   body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
   body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
+  body('sourceType').optional().isIn(['Scout','Google','Reddit','ChatGPT','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
+  body('sourceDetails').optional().isString().isLength({ max: 1000 }).withMessage('Source details must be less than 1000 characters'),
 ], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -888,6 +892,8 @@ router.put('/:id', [
 
     const { id } = req.params;
   const updateData = { ...req.body };
+  if (req.body.sourceType) updateData.sourceType = req.body.sourceType;
+  if (req.body.sourceDetails) updateData.sourceDetails = req.body.sourceDetails;
   // Remove deprecated contact fields if present
   delete updateData.ownerName;
   delete updateData.ownerBio;

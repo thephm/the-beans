@@ -106,11 +106,18 @@ export function Navbar() {
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
                       onClick={() => {
                         setIsAdminMenuOpen(false);
-                        // Force a full navigation to clear query parameters
                         window.location.href = '/admin/roasters';
                       }}
                     >
                       {t('adminSection.roasters', 'Roasters')}
+                    </Link>
+                    {/* Only one 'Roasters (New)' link in Admin dropdown */}
+                    <Link 
+                      href="/admin/roasters/new-admin" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-700 transition-colors font-semibold"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('adminSection.roastersNew', 'Roasters (New)')}
                     </Link>
                     <Link 
                       href="/admin/specialties" 
@@ -169,11 +176,8 @@ export function Navbar() {
           </button>
         </div>
 
-        {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div
-            className="md:hidden border-t border-lavender-200 mt-2 pt-4 pb-4"
-          >
+          <div className="md:hidden border-t border-lavender-200 mt-2 pt-4 pb-4">
             <div className="flex flex-col space-y-3">
               <Link href="/discover" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.discover')}
@@ -199,19 +203,25 @@ export function Navbar() {
                     className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      // Force a full navigation to clear query parameters
                       window.location.href = '/admin/roasters';
                     }}
                   >
                     {t('adminSection.roasters', 'Roasters')}
                   </Link>
-                    <Link 
-                      href="/admin/people" 
-                      className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {t('adminSection.people', 'People')}
-                    </Link>
+                  <Link 
+                    href="/admin/roasters/new-admin" 
+                    className="block pl-4 text-gray-600 hover:text-green-700 py-1 font-semibold" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('adminSection.roastersNew', 'Roasters (New)')}
+                  </Link>
+                  <Link 
+                    href="/admin/people" 
+                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('adminSection.people', 'People')}
+                  </Link>
                   <Link 
                     href="/admin/specialties" 
                     className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
@@ -228,12 +238,10 @@ export function Navbar() {
                   </Link>
                 </div>
               )}
-              
               {/* Mobile Language Selector */}
               <div className="py-2">
                 <LanguageSelector />
               </div>
-              
               {/* Mobile Authentication */}
               {loading ? (
                 <div className="w-6 h-6 animate-spin rounded-full border-2 border-primary-600 border-t-transparent mx-auto"></div>

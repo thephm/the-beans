@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import RoasterSourceFields from '@/components/RoasterSourceFields'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
@@ -78,6 +79,8 @@ interface Roaster {
   phone?: string
   website?: string
   email?: string
+  sourceType?: string
+  sourceDetails?: string
   rating: number
   reviewCount: number
   specialties: string[] | Specialty[]
@@ -105,12 +108,35 @@ interface Roaster {
 }
 
 export default function RoasterDetail() {
+  const handleSourceSave = async () => {
+    if (!roaster) return
+    setSourceSaving(true)
+    try {
+      await apiClient.updateRoaster(roaster.id, {
+        sourceType,
+        sourceDetails,
+      })
+      setEditingSource(false)
+      setRoaster({ ...roaster, sourceType, sourceDetails })
+    } catch (err) {
+      alert('Failed to save source attribution. Please try again.')
+    } finally {
+      setSourceSaving(false)
+    }
+  }
   const { t } = useTranslation()
   const { user } = useAuth()
   const { showRatings } = useFeatureFlags()
   const params = useParams()
   const router = useRouter()
   const [roaster, setRoaster] = useState<Roaster | null>(null)
+  const [editingSource, setEditingSource] = useState(false)
+  const [sourceType, setSourceType] = useState('')
+  const [sourceDetails, setSourceDetails] = useState('')
+  const [sourceSaving, setSourceSaving] = useState(false)
+
+  // Fix: define canEditSource in function body before return
+  const canEditSource = user && (user.role === 'admin' || (roaster?.owner && user.id && (typeof roaster.owner === 'string' ? roaster.owner === user.id : roaster.owner.id === user.id)))
   const [roasterImages, setRoasterImages] = useState<RoasterImageData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -204,7 +230,27 @@ export default function RoasterDetail() {
         roasterData.specialties = sortedSpecialties;
       }
       
-      setRoaster(roasterData)
+  setRoaster(roasterData)
+  setSourceType(roasterData.sourceType || '')
+  setSourceDetails(roasterData.sourceDetails || '')
+  const canEditSource = user && (user.role === 'admin' || (roaster?.owner && user.id && (typeof roaster.owner === 'string' ? roaster.owner === user.id : roaster.owner.id === user.id)))
+
+  const handleSourceSave = async () => {
+    if (!roaster) return
+    setSourceSaving(true)
+    try {
+      await apiClient.updateRoaster(roaster.id, {
+        sourceType,
+        sourceDetails,
+      })
+      setEditingSource(false)
+      setRoaster({ ...roaster, sourceType, sourceDetails })
+    } catch (err) {
+      alert('Failed to save source attribution. Please try again.')
+    } finally {
+      setSourceSaving(false)
+    }
+  }
       
       // Convert the images array to the format expected by the carousel
       // First try roasterImages (new format), fallback to images array (legacy)
@@ -540,7 +586,6 @@ export default function RoasterDetail() {
                   </div>
                 )}
 
-                {/* Online Only Badge - Show separately if onlineOnly is true */}
                 {roaster.onlineOnly && (
                   <div className="mb-8">
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

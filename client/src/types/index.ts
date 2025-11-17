@@ -100,6 +100,8 @@ export interface Roaster {
   isFavorited?: boolean;
   createdBy?: User;
   updatedBy?: User;
+  sourceType?: string;
+  sourceDetails?: string;
 }
 
 export interface Region {
