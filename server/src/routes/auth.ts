@@ -2,12 +2,12 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 import { auditBefore, auditAfter } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
 
 const router = Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 /**
  * @swagger

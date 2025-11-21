@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { query, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 
 // Updated search routes with image URL support - roasters only
 const router = Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 // Middleware to extract user from token (optional for public routes)
 const optionalAuth = async (req: any, res: any, next: any) => {

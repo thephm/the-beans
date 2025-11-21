@@ -108,15 +108,28 @@ const EditUserPage: React.FC = () => {
         method: 'DELETE',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
+      let responseData = null;
+      try {
+        responseData = await res.json();
+      } catch {}
       if (!res.ok) {
         let errorMsg = 'Failed to delete user';
-        try {
-          const errorData = await res.json();
-          errorMsg = errorData.error || errorData.message || errorMsg;
-        } catch {}
+        if (responseData) {
+          errorMsg = responseData.error || responseData.message || errorMsg;
+        }
         // Show a user-friendly message if related records exist
         if (errorMsg.includes('related records')) {
           errorMsg = t('admin.users.deleteRelatedError', 'Cannot delete user: user has related records in the database. Remove or reassign related data before deleting.');
+        }
+        setError(errorMsg);
+        setShowDeleteConfirm(false);
+        return;
+      }
+      // Check for deprecated flag in response
+      if (responseData && responseData.deprecated) {
+        let errorMsg = t('admin.users.deleteDeprecated', 'User could not be deleted because they have related records. User was marked as deprecated instead.');
+        if (responseData.relatedRecords && responseData.relatedRecords.length > 0) {
+          errorMsg += '\n' + t('admin.users.relatedRecordsList', 'Related records found:') + ' ' + responseData.relatedRecords.map((r: string) => r).join(', ');
         }
         setError(errorMsg);
         setShowDeleteConfirm(false);

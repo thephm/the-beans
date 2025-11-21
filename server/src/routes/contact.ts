@@ -6,6 +6,8 @@ const router = express.Router();
 
 const CONTACT_US_EMAIL = process.env.CONTACT_US_EMAIL;
 
+import { prisma } from '../lib/prisma'; // Use shared Prisma client
+
 router.post(
   '/',
   [

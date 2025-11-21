@@ -26,5 +26,9 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Start development server with Prisma migration
-CMD ["sh", "-c", "sleep 10 && npx prisma migrate deploy && npm run dev"]
+
+# Build TypeScript before starting
+RUN npm run build
+
+# Start production server with Prisma migration
+CMD ["sh", "-c", "sleep 10 && npx prisma migrate deploy && npm start"]

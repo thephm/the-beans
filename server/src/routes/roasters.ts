@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { body, validationResult, param, query } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 import { upload, deleteImage, uploadImageFromUrl } from '../lib/cloudinary';
 import { canEditRoaster } from '../middleware/roasterAuth';
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
 
 const router = Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 // Middleware to extract user from token (optional for public routes)
 const optionalAuth = async (req: any, res: any, next: any) => {

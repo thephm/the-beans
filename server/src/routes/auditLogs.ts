@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { query, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 // Required auth middleware
 const requireAuth = async (req: any, res: any, next: any) => {
