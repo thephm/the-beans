@@ -1,9 +1,9 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
 
 const router = express.Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 // Get current user's favorites
 router.get('/', requireAuth, async (req: any, res: any) => {

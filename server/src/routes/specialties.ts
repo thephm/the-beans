@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
 import { auditBefore, auditAfter } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
 
 const router = Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 // Middleware to check if user is admin
 const requireAdmin = async (req: any, res: Response, next: any) => {

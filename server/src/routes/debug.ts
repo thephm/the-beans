@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { param } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 // Debug endpoint to help troubleshoot authentication issues
 router.get('/auth/validate/:roasterId?', async (req: any, res: any) => {

@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 import { AuthenticatedRequest } from '../types';
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 
 const router = Router();
-const prisma = new PrismaClient();
+// Use shared Prisma client
 
 // Person roles enum
 export enum PersonRole {
