@@ -52,7 +52,7 @@ export default function RoasterSourceFields({
   useEffect(() => {
     if (sourceType === 'Scout' || sourceType === 'API') {
       setLoadingPeople(true);
-      apiClient.get('/people')
+        apiClient.getPeople()
         .then((res: any) => {
           setPeople(res.data || []);
         })
