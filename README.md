@@ -274,6 +274,25 @@ npx prisma generate
 - **Database changes require** Prisma generate + migrate
 - **New translations require** client container restart
 
+### Do Not Edit Compiled Files in Containers
+
+- The project builds TypeScript sources into a `dist/` directory during the Docker image build. The files in `/app/dist` inside a running container are compiled artifacts and are not the authoritative source.
+- Do **not** edit files inside running containers. Changes made directly inside a container are ephemeral and will be overwritten the next time you rebuild the image or recreate the container.
+- To apply changes, edit the true source files (for the backend `server/src/`, for the frontend `client/src/`) and rebuild/restart the appropriate container(s):
+
+```powershell
+# Rebuild server image and start it
+docker-compose up -d --build server
+
+# Or restart after code changes
+docker-compose restart server
+
+# Inspect compiled output in a running server container
+docker exec the-beans-server-1 ls -la /app/dist
+```
+
+- Recommended CI check: add a job that runs `npm run build` in the `server` (and optionally `client`) package to ensure TypeScript builds succeed on pull requests. This prevents mismatches between `src/` and compiled `dist/` artifacts.
+
 ### Common Issues
 - **Container won't start**: Check Docker Desktop is running
 - **Database connection fails**: Ensure PostgreSQL container is healthy

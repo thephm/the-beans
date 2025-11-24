@@ -5,13 +5,6 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
-// Log uncaught exceptions and unhandled promise rejections
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-});
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -30,6 +23,7 @@ import reviewRoutes from './routes/reviews';
 import searchRoutes from './routes/search';
 import auditLogRoutes from './routes/auditLogs';
 import debugRoutes from './routes/debug';
+import adminUsersRoutes from './routes/adminUsers';
 import regionRoutes from './routes/regions';
 import countryRoutes from './routes/countries';
 import specialtyRoutes from './routes/specialties';
@@ -147,6 +141,7 @@ app.use('/api/contact', contactRouter); // Register contact route
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 app.use('/api/debug', debugRoutes); // Debug authentication routes
+app.use('/api/admin/users', adminUsersRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -169,3 +164,4 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
   console.log(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
 });
+
