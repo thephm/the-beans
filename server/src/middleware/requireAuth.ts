@@ -16,6 +16,8 @@ export const requireAuth = async (
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: string };
     req.user = { id: decoded.userId };
+    // Some middleware (audit, logging) expect `req.userId` directly — set it for compatibility
+    (req as any).userId = decoded.userId;
     next();
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });
