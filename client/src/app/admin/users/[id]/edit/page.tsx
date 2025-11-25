@@ -115,11 +115,15 @@ const EditUserPage: React.FC = () => {
       if (!res.ok) {
         let errorMsg = 'Failed to delete user';
         if (responseData) {
-          errorMsg = responseData.error || responseData.message || errorMsg;
-        }
-        // Show a user-friendly message if related records exist
-        if (errorMsg.includes('related records')) {
-          errorMsg = t('admin.users.deleteRelatedError', 'Cannot delete user: user has related records in the database. Remove or reassign related data before deleting.');
+          // Prefer server-provided userMessage for UI-friendly text
+          if (responseData.userMessage) {
+            errorMsg = responseData.userMessage;
+          } else if (responseData.code === 'USER_DELETE_CONFLICT') {
+            // Localized fallback for known conflict code
+            errorMsg = t('admin.users.deleteRelatedError', 'Cannot delete user: user has related records in the database. Remove or reassign related data before deleting.');
+          } else {
+            errorMsg = responseData.error || responseData.message || errorMsg;
+          }
         }
         setError(errorMsg);
         setShowDeleteConfirm(false);
