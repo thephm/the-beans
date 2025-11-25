@@ -137,7 +137,11 @@ router.delete('/:id', requireAuth, auditDelete('user', prisma.user), async (req:
         };
 
         return res.status(409).json({
-          error: 'Conflict',
+          // Top-level error is made user-friendly so UI doesn't show 'Conflict'
+          error: 'Unable to delete user',
+          code: 'USER_DELETE_CONFLICT',
+          // Concise message suitable for direct display to end users
+          userMessage: 'This user cannot be deleted because they have related content. Retry with ?force=true or contact an admin to perform a cleanup.',
           message: 'Unable to delete user because related records exist which prevent deletion.',
           details: detailParts
         });
@@ -241,21 +245,45 @@ router.post('/:id/cascade-delete', requireAuth, async (req: AuthenticatedRequest
 
     const userId = req.params.id;
 
-    // Run a transaction to remove common dependent records that typically
-    // prevent a user from being deleted due to FK constraints.
     await prisma.$transaction([
+      // Remove direct user-owned relations
       prisma.favorite.deleteMany({ where: { userId } }),
       prisma.notification.deleteMany({ where: { userId } }),
-      prisma.comment.deleteMany({ where: { userId } }),
+
+      // Comments: remove comments created by the user, and comments on reviews
+      // written by the user (other users' comments on these reviews).
+      prisma.comment.deleteMany({ where: { OR: [{ userId }, { review: { userId } }] } }),
+
+      // Delete reviews authored by the user (after comments removed)
       prisma.review.deleteMany({ where: { userId } }),
+
+      // Remove images uploaded by the user
       prisma.roasterImage.deleteMany({ where: { uploadedById: userId } }),
+
+      // Nullify user references on RoasterPerson entries
       prisma.roasterPerson.updateMany({ where: { userId }, data: { userId: null } }),
-      // Null out createdBy/updatedBy where appropriate so those records remain
-      // but no longer reference the deleted user.
+      prisma.roasterPerson.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.roasterPerson.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+
+      // Null out createdBy/updatedBy on beans and roasters
       prisma.bean.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
       prisma.bean.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
       prisma.roaster.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
       prisma.roaster.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+
+      // Nullify owner relationship on roasters the user owned
+      prisma.roaster.updateMany({ where: { ownerId: userId }, data: { ownerId: null } }),
+
+      // Nullify createdBy/updatedBy on reviews (if any remain)
+      prisma.review.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.review.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+
+      // Nullify audit logs referencing this user (keep logs, but detach user)
+      prisma.auditLog.updateMany({ where: { userId }, data: { userId: null } }),
+
+      // Nullify createdBy/updatedBy on other users referencing this user
+      prisma.user.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.user.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
     ]);
 
     return res.json({ message: 'Cascade cleanup completed for user (partial).' });
