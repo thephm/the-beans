@@ -108,7 +108,7 @@ const EditUserPage: React.FC = () => {
         method: 'DELETE',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      let responseData = null;
+      let responseData: any = null;
       try {
         responseData = await res.json();
       } catch {}
