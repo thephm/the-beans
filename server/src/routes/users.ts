@@ -100,54 +100,59 @@ router.delete('/:id', requireAuth, auditDelete('user', prisma.user), async (req:
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
 
-    const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+    const userId = req.params.id;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Allow an explicit force delete to remove common dependent records first
-    const force = req.query.force === 'true' || req.body?.force === true;
-    if (force) {
-      // Remove common dependent records that commonly block deletion.
-      // This is cautious and only removes favorites, notifications, comments, and reviews.
-      await prisma.$transaction([
-        prisma.favorite.deleteMany({ where: { userId: req.params.id } }),
-        prisma.notification.deleteMany({ where: { userId: req.params.id } }),
-        prisma.comment.deleteMany({ where: { userId: req.params.id } }),
-        prisma.review.deleteMany({ where: { userId: req.params.id } }),
-      ]);
-    }
+    // Perform a comprehensive cleanup similar to the previous admin cascade endpoint,
+    // then delete the user. We keep roaster rows but nullify owner/createdBy/updatedBy references.
+    await prisma.$transaction([
+      // Remove direct user-owned relations
+      prisma.favorite.deleteMany({ where: { userId } }),
+      prisma.notification.deleteMany({ where: { userId } }),
 
-    try {
-      await prisma.user.delete({ where: { id: req.params.id } });
-      return res.json({ message: 'User deleted successfully' });
-    } catch (err) {
-      // If we hit a foreign key constraint, return a clearer 409 response
-      // with actionable guidance. Prisma throws a PrismaClientKnownRequestError
-      // with code 'P2003' for FK violations; include any available meta info.
-      const pErr = err as any;
-      if (pErr?.code === 'P2003') {
-        // Attempt to extract constraint/field information from Prisma meta
-        const constraint = pErr?.meta?.constraint || pErr?.meta?.field_name || null;
-        const detailParts: any = {
-          suggestion: 'Retry with ?force=true to remove favorites, notifications, comments and reviews first, or use POST /api/admin/users/:id/cascade-delete as an admin to perform a broader cleanup.',
-          affectedConstraint: constraint,
-          removedByForce: ['favorites', 'notifications', 'comments', 'reviews'],
-          adminEndpoint: '/api/admin/users/:id/cascade-delete'
-        };
+      // Comments: remove comments created by the user, and comments on reviews
+      // written by the user (other users' comments on these reviews).
+      prisma.comment.deleteMany({ where: { OR: [{ userId }, { review: { userId } }] } }),
 
-        return res.status(409).json({
-          // Top-level error is made user-friendly so UI doesn't show 'Conflict'
-          error: 'Unable to delete user',
-          code: 'USER_DELETE_CONFLICT',
-          // Concise message suitable for direct display to end users
-          userMessage: 'This user cannot be deleted because they have related content. Retry with ?force=true or contact an admin to perform a cleanup.',
-          message: 'Unable to delete user because related records exist which prevent deletion.',
-          details: detailParts
-        });
-      }
-      throw err; // rethrow for outer catch
-    }
+      // Delete reviews authored by the user (after comments removed)
+      prisma.review.deleteMany({ where: { userId } }),
+
+      // Remove images uploaded by the user
+      prisma.roasterImage.deleteMany({ where: { uploadedById: userId } }),
+
+      // Nullify user references on RoasterPerson entries
+      prisma.roasterPerson.updateMany({ where: { userId }, data: { userId: null } }),
+      prisma.roasterPerson.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.roasterPerson.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+
+      // Null out createdBy/updatedBy on beans and roasters (do not delete roasters)
+      prisma.bean.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.bean.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+      prisma.roaster.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.roaster.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+
+      // Nullify owner relationship on roasters the user owned
+      prisma.roaster.updateMany({ where: { ownerId: userId }, data: { ownerId: null } }),
+
+      // Nullify createdBy/updatedBy on reviews (if any remain)
+      prisma.review.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.review.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+
+      // Nullify audit logs referencing this user (keep logs, but detach user)
+      prisma.auditLog.updateMany({ where: { userId }, data: { userId: null } }),
+
+      // Nullify createdBy/updatedBy on other users referencing this user
+      prisma.user.updateMany({ where: { createdById: userId }, data: { createdById: null } }),
+      prisma.user.updateMany({ where: { updatedById: userId }, data: { updatedById: null } }),
+
+      // Finally remove the user record itself
+      prisma.user.delete({ where: { id: userId } }),
+    ]);
+
+    return res.json({ message: 'User deleted successfully (cascade cleanup applied).' });
   } catch (error) {
     console.error('Error deleting user by ID:', error);
     return res.status(500).json({ error: 'Failed to delete user' });

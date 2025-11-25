@@ -19,18 +19,18 @@ export function auditBefore(entityType: string, action: 'CREATE' | 'UPDATE' | 'D
  * This should be called after the CRUD operation completes successfully
  */
 export function auditAfter() {
-  return async (req: any, res: any, next: any) => {
-    // Log both successful AND failed operations
-    if (req.auditData && req.userId) {
+  return (req: any, res: any, next: any) => {
+    // Defer audit logging until after the response is finished so middleware
+    // can be attached before route handlers. This ensures we capture the
+    // final status code and any res.locals set by handlers.
+    res.on('finish', async () => {
+      // Only proceed if audit data is present and we have a user id
+      const userId = req.userId || req.user?.id;
+      if (!req.auditData || !userId) return;
       try {
-        // Extract entity information from the response or request
         const entity = res.locals.auditEntity || res.locals.entity;
         const entityId = entity?.id || req.params.id;
-
-        // For failed operations, we might not have an entity, so use a placeholder
         const finalEntityId = entityId || 'unknown';
-
-        // Determine if operation was successful
         const isSuccess = res.statusCode >= 200 && res.statusCode < 300;
 
         const auditLogData: AuditLogData = {
@@ -38,12 +38,11 @@ export function auditAfter() {
           entityType: req.auditData.entityType,
           entityId: finalEntityId,
           entityName: entity ? getEntityName(req.auditData.entityType, entity) : undefined,
-          userId: req.userId,
+          userId,
           ipAddress: getClientIP(req),
           userAgent: getUserAgent(req),
           oldValues: req.auditData.oldValues,
           newValues: isSuccess ? entity : undefined,
-          // Add failure information for failed operations
           metadata: isSuccess ? undefined : {
             failed: true,
             statusCode: res.statusCode,
@@ -51,17 +50,16 @@ export function auditAfter() {
           }
         };
 
-        // For DELETE actions, call audit log synchronously
         if (req.auditData.action === 'DELETE') {
           await createAuditLog(auditLogData);
         } else {
-          // Create audit log asynchronously for other actions
           setTimeout(() => createAuditLog(auditLogData), 0);
         }
       } catch (error) {
         console.error('Audit logging error:', error);
       }
-    }
+    });
+
     next();
   };
 }
