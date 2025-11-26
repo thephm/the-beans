@@ -122139,3 +122139,26 @@ Yes, I restarted the client and server containers with `docker-compose restart c
 
 ## 991st try
 
+*(No longer get 500 error)*
+
+> Saving roaster social networks works but loading doesn't show the social networks 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 320 to 2131
+
+✔ Summarized conversation history
+
+✔ `page.tsx +12 -10`
+
+✔ `docker-compose restart client`
+
+✔ `docker-compose restart client`
+
+Perfect! The client container has been restarted. Now when you load an existing roaster for editing, the social network fields should properly populate from the `socialNetworks` object stored in the database.
+
+The issue was that the initial data fetch was still trying to read individual social fields (`data.instagram`, `data.tiktok`, etc.) directly from the API response, but the API now only returns the consolidated `socialNetworks` object. I've updated the code to extract the individual fields from `socialNetworks` in both the initial load and after saving, so the form should now correctly display existing social network data.
+
+Try = loading a roaster that has social networks saved - they should now appear in the form fields!
+
+## 992nd try
+
+*(FINALLY works!)*

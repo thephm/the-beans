@@ -336,6 +336,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           const res = await fetch(`${apiUrl}/api/roasters/${roaster.id}`);
           if (res.ok) {
             const data = await res.json();
+            // Extract individual social fields from socialNetworks object for form display
+            const socialNetworks = data.socialNetworks || {};
             setFormData({
               name: data.name || '',
               description: data.description || '',
@@ -366,16 +368,16 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                 sunday: { open: '08:00', close: '18:00', closed: false },
               },
               images: data.images || [],
-              instagram: data.instagram || '',
-              tiktok: data.tiktok || '',
-              facebook: data.facebook || '',
-              linkedin: data.linkedin || '',
-              youtube: data.youtube || '',
-              threads: data.threads || '',
-              pinterest: data.pinterest || '',
-              bluesky: data.bluesky || '',
-              x: data.x || '',
-              reddit: data.reddit || '',
+              instagram: socialNetworks.instagram || '',
+              tiktok: socialNetworks.tiktok || '',
+              facebook: socialNetworks.facebook || '',
+              linkedin: socialNetworks.linkedin || '',
+              youtube: socialNetworks.youtube || '',
+              threads: socialNetworks.threads || '',
+              pinterest: socialNetworks.pinterest || '',
+              bluesky: socialNetworks.bluesky || '',
+              x: socialNetworks.x || '',
+              reddit: socialNetworks.reddit || '',
             });
           }
         } catch (err) {
