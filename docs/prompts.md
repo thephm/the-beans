@@ -119484,3 +119484,206 @@ Recommended next steps (you can run or I can help)
   - Run a repo-wide search for leftover legacy social reads and prepare a PR that replaces them with `getSocial()`.
 
 Do you want me to open a PR with the verification fix + any remaining small updates, or run a repo-wide replacement for legacy reads and prepare that PR?
+
+## 979th try
+
+*(worked with the new social networks collection, checking in)*
+
+> Render deploy failed
+
+```shell
+2025-11-26T01:43:19.417009848Z ==> Downloading cache...
+2025-11-26T01:43:19.465012063Z ==> Cloning from https://github.com/thephm/the-beans
+2025-11-26T01:43:21.221184128Z ==> Checking out commit e7a2106ad7f454fd89cefa3c25becb7bf446382b in branch main
+2025-11-26T01:43:38.502013971Z ==> Downloaded 524MB in 6s. Extraction took 13s.
+2025-11-26T01:43:58.109880422Z ==> Using Node.js version 22.16.0 (default)
+2025-11-26T01:43:58.136588056Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-11-26T01:43:58.27785198Z ==> Running build command 'npm install && npm run build'...
+2025-11-26T01:43:59.461314492Z 
+2025-11-26T01:43:59.461345023Z up to date, audited 252 packages in 986ms
+2025-11-26T01:43:59.461369433Z 
+2025-11-26T01:43:59.461377724Z 54 packages are looking for funding
+2025-11-26T01:43:59.461417674Z   run `npm fund` for details
+2025-11-26T01:43:59.464885743Z 
+2025-11-26T01:43:59.464902133Z 1 high severity vulnerability
+2025-11-26T01:43:59.464906293Z 
+2025-11-26T01:43:59.464910313Z To address all issues, run:
+2025-11-26T01:43:59.464914173Z   npm audit fix
+2025-11-26T01:43:59.464917893Z 
+2025-11-26T01:43:59.464921574Z Run `npm audit` for details.
+2025-11-26T01:43:59.658361346Z 
+2025-11-26T01:43:59.658379477Z > the-beans-client@0.1.0 build
+2025-11-26T01:43:59.658386177Z > next build
+2025-11-26T01:43:59.658391147Z 
+2025-11-26T01:44:00.350281447Z   ▲ Next.js 14.2.33
+2025-11-26T01:44:00.350523133Z 
+2025-11-26T01:44:00.362077784Z    Creating an optimized production build ...
+2025-11-26T01:44:20.868888839Z  ✓ Compiled successfully
+2025-11-26T01:44:20.870385073Z    Linting and checking validity of types ...
+2025-11-26T01:44:26.885903853Z Failed to compile.
+2025-11-26T01:44:26.885928134Z 
+2025-11-26T01:44:26.886345183Z ./src/app/roasters/[id]/page.tsx:367:13
+2025-11-26T01:44:26.886363794Z Type error: Type 'string | null' is not assignable to type 'string | undefined'.
+2025-11-26T01:44:26.886368424Z 
+2025-11-26T01:44:26.886373824Z   365 |           <a
+2025-11-26T01:44:26.886378234Z   366 |             key={name}
+2025-11-26T01:44:26.886383034Z > 367 |             href={url}
+2025-11-26T01:44:26.886387414Z       |             ^
+2025-11-26T01:44:26.886392114Z   368 |             target="_blank"
+2025-11-26T01:44:26.886397454Z   369 |             rel="noopener noreferrer"
+2025-11-26T01:44:26.886402904Z   370 |             className="transition-all transform hover:scale-110"
+2025-11-26T01:44:26.96495345Z Next.js build worker exited with code: 1 and signal: null
+2025-11-26T01:44:27.219498805Z ==> Build failed 😞
+2025-11-26T01:44:27.219519125Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+I'll open `src/app/roasters/[id]/page.tsx` to inspect the code around the reported error and propose a small type-safe fix.I'll open the file at page.tsx to view the offending code.
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`
+
+I'll patch `renderSocialIcons` so social `url` values are normalized to `string | undefined`, preventing `null` from being passed to `href`.
+
+`page.tsx +3 -2`
+
+I'll add a short todo list tracking the fix and remaining verification steps.
+
+Created 4 todos
+
+Update complete.
+
+**What I changed**
+- File: page.tsx  
+- Change: normalized social link `url` values from `null` to `undefined` and added a type-guarding `.filter(...)` so TypeScript knows `url` is a `string` when used as `href`. This prevents the TypeScript error you saw in Render:
+  - Error: "Type 'string | null' is not assignable to type 'string | undefined'."
+
+**Why this fixes it**
+- React/Next `href` does not accept `null`. Converting `null` → `undefined` and narrowing the array ensures `href={url}` gets a `string | undefined`, matching expected types.
+
+**Next steps (recommended)**
+- Run the client build locally to verify the fix:
+```pwsh
+cd 'c:\data\github\the-beans\client'
+npm install
+npm run build
+```
+- If the build succeeds, commit and push the change and redeploy on Render:
+```pwsh
+git add client/src/app/roasters/[id]/page.tsx
+git commit -m "fix(roaster): normalize social urls to avoid null href build error"
+git push
+```
+- If Render still fails, paste the new build log and I’ll iterate.
+
+Do you want me to run the local build now (it may take several minutes)?
+
+I'll run `npm install` then `npm run build` in the client folder to verify the TypeScript fix locally.
+
+Ran terminal command: cd 'c:\data\github\the-beans\client'; npm install; npm run build
+
+Updating the TODO list to reflect I attempted the local build and hit an environment issue (no npm available). I'll mark the build step as in-progress.
+
+Starting: *Run local build* (3/4)
+
+Short summary and next steps:
+
+- What happened: I attempted to run the local build (`npm install && npm run build`) but the environment's PowerShell didn't have `npm` available, so I couldn't verify the build here.
+- What you can run locally (PowerShell):
+```pwsh
+cd 'C:\data\github\the-beans\client'
+npm install
+npm run build
+```
+- Docker alternative if you don't want to install Node locally:
+```pwsh
+# Build an image using the client Dockerfile and run the build inside it
+docker build -t the-beans-client-build .\client
+docker run --rm the-beans-client-build npm run build
+```
+- If you'd like, I can:
+  - Provide a CI-friendly GitHub Actions workflow to run the client build on push, or
+  - Attempt the build inside a Docker container here (requires Docker access from this environment).
+
+Which would you prefer me to do next: run the build locally for you (if you can run commands and paste output), set up a GitHub Action to verify builds, or try the Docker build here?
+
+> build inside docker like you always do
+
+I'll build the client inside Docker: I'll build the Docker image from Dockerfile then run the image to execute `npm run build` so we can see the Next.js build output.
+
+✔ `docker build -t the-beans-client-build -f "c:\data\github\the-beans\client\Dockerfile" "c:\data\github\the-beans\client"; docker run --rm the-beans-client-build npm run build`
+
+> wasn't working so I stopped you 
+
+I'll quickly open Dockerfile to confirm the right build steps and environment before retrying.
+
+✔ Read `client/Dockerfile`
+
+✔ Read `client/package.json`
+
+Got it — you stopped the run because it wasn’t working. I won’t retry automatically.
+
+Options (pick one):
+- I retry the Docker build here now and capture the full Next.js build output. This can take several minutes.
+- I give you the exact PowerShell/docker commands so you can run it locally and paste the output if it fails.
+- I set up a quick GitHub Action to run the client build on push so you get CI verification before Render deploy.
+
+If you want me to retry here, I’ll run:
+```pwsh
+# Build image from client Dockerfile
+docker build -t the-beans-client-build -f "C:\data\github\the-beans\client\Dockerfile" "C:\data\github\the-beans\client"
+
+# Run the build inside the image (overrides CMD)
+docker run --rm the-beans-client-build npm run build
+```
+
+Notes:
+- The Dockerfile currently runs `npm install --omit=dev`. That's fine because `next` is in `dependencies`.
+- The build will produce a lot of log output; let me know if you want me to save and paste only the error portion.
+- The change I made to page.tsx is applied in the workspace but not yet committed — I can commit & push it before or after we confirm the build.
+
+Which do you want me to do next?
+
+> no just build
+
+```shell
+[+] Building 1.0s (10/10) FINISHED                     docker:desktop-linux
+ => [internal] load build definition from Dockerfile                   0.1s
+ => => transferring dockerfile: 343B                                   0.0s
+ => [internal] load metadata for docker.io/library/node:18-alpine      0.4s
+ => [internal] load .dockerignore                                      0.0s
+ => => transferring context: 245B                                      0.0s
+ => [1/5] FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c2  0.0s
+ => [internal] load build context                                      0.1s
+ => => transferring context: 5.47kB                                    0.1s
+ => CACHED [2/5] WORKDIR /app                                          0.0s
+ => CACHED [3/5] COPY package*.json ./                                 0.0s
+ => CACHED [4/5] RUN npm install --omit=dev                            0.0s
+ => CACHED [5/5] COPY . .                                              0.0s 
+ => exporting to image                                                 0.1s 
+ => => exporting layers                                                0.0s
+ => => writing image sha256:b5ba76f8202669d93d2f435237ac7e7d8e7593b97  0.0s
+ => => naming to docker.io/library/the-beans-client-build              0.0s 
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/pxd4x46bcgsoz3du30syxbsy6
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview
+
+> the-beans-client@0.1.0 build
+> next build
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+  ▲ Next.js 14.2.33
+
+   Creating an optimized production build ...
+```
+
+*(stopped it again)*
+
+> it's just hanging at 
+  ▲ Next.js 14.2.33
+
+   Creating an optimized production build ...

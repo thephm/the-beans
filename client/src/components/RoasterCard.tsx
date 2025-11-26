@@ -191,12 +191,13 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
 
     const socialLinks = networks
       .map(({ key, Icon, name, color }) => ({
-        url: getSocial(roaster as any, key),
+        // Normalize null -> undefined so href accepts the value
+        url: getSocial(roaster as any, key) ?? undefined,
         Icon,
         name,
         color,
       }))
-      .filter(s => s.url)
+      .filter((s): s is { url: string; Icon: any; name: string; color: string } => Boolean(s.url))
 
     if (socialLinks.length === 0) return null
 
