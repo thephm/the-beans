@@ -75,28 +75,6 @@ export interface Roaster {
   // Consolidated social networks collection. Keys should be network names
   // (e.g. 'instagram', 'facebook') and values are URLs or handles.
   socialNetworks?: Record<string, string>;
-
-  // Deprecated individual social fields — kept for backward compatibility.
-  /** @deprecated Use `socialNetworks` instead */
-  instagram?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  tiktok?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  facebook?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  linkedin?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  youtube?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  threads?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  pinterest?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  bluesky?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  x?: string;
-  /** @deprecated Use `socialNetworks` instead */
-  reddit?: string;
   
   founded?: number;
   

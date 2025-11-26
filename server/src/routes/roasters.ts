@@ -386,6 +386,9 @@ router.get('/', [
       if (roaster.distance && typeof roaster.distance === 'number') {
         result.distance = parseFloat(roaster.distance.toFixed(1));
       }
+
+      // Only expose socialNetworks field
+      (result as any).socialNetworks = roaster.socialNetworks ?? null;
       
       return result;
     });
@@ -544,6 +547,9 @@ router.get('/:id', [
       isFavorited,
     };
 
+    // Only expose socialNetworks field
+    (roasterWithImageUrl as any).socialNetworks = roaster.socialNetworks ?? null;
+
     res.json(roasterWithImageUrl);
   } catch (error) {
     console.error('Get roaster error:', error);
@@ -623,16 +629,6 @@ router.post('/', [
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   
   // Social network validation
-  body('instagram').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Instagram URL must be less than 200 characters'),
-  body('tiktok').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('TikTok URL must be less than 200 characters'),
-  body('facebook').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Facebook URL must be less than 200 characters'),
-  body('linkedin').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('LinkedIn URL must be less than 200 characters'),
-  body('youtube').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('YouTube URL must be less than 200 characters'),
-  body('threads').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Threads URL must be less than 200 characters'),
-  body('pinterest').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Pinterest URL must be less than 200 characters'),
-  body('bluesky').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('BlueSky URL must be less than 200 characters'),
-  body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
-  body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
   // New consolidated socialNetworks object (key -> url/handle)
   body('socialNetworks').optional().custom(value => {
     if (typeof value !== 'object' || Array.isArray(value)) throw new Error('socialNetworks must be an object');
@@ -664,11 +660,25 @@ router.post('/', [
       ownerId = ownerUser.id;
     }
 
+    // Consolidate social network fields into socialNetworks object
+    const socialKeys = ['instagram','tiktok','facebook','linkedin','youtube','threads','pinterest','bluesky','x','reddit'];
+    const socialNetworks: Record<string, string> = {};
+    socialKeys.forEach(key => {
+      if (req.body[key] && typeof req.body[key] === 'string' && req.body[key].trim() !== '') {
+        socialNetworks[key] = req.body[key];
+      }
+    });
+    // If socialNetworks provided as object, merge it in
+    if (req.body.socialNetworks && typeof req.body.socialNetworks === 'object' && !Array.isArray(req.body.socialNetworks)) {
+      Object.assign(socialNetworks, req.body.socialNetworks);
+    }
+
     const roasterData = {
       ...req.body,
       ownerId: ownerId,
       sourceType: req.body.sourceType,
       sourceDetails: req.body.sourceDetails,
+      socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined,
     };
     // Remove fields that aren't part of the Roaster schema
     delete roasterData.ownerEmail;
@@ -677,6 +687,9 @@ router.post('/', [
     delete roasterData.ownerMobile;
     delete roasterData.ownerContact; // Remove nested owner contact object
     delete roasterData.specialtyIds; // Will be handled separately
+    // Remove individual social fields
+    socialKeys.forEach(key => delete roasterData[key]);
+
     const roaster = await prisma.roaster.create({
       data: {
         ...roasterData,
@@ -865,16 +878,6 @@ router.put('/:id', [
   body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   
   // Social network validation
-  body('instagram').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Instagram URL must be less than 200 characters'),
-  body('tiktok').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('TikTok URL must be less than 200 characters'),
-  body('facebook').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Facebook URL must be less than 200 characters'),
-  body('linkedin').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('LinkedIn URL must be less than 200 characters'),
-  body('youtube').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('YouTube URL must be less than 200 characters'),
-  body('threads').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Threads URL must be less than 200 characters'),
-  body('pinterest').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Pinterest URL must be less than 200 characters'),
-  body('bluesky').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('BlueSky URL must be less than 200 characters'),
-  body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
-  body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
   // New consolidated socialNetworks object (key -> url/handle)
   body('socialNetworks').optional().custom(value => {
     if (typeof value !== 'object' || Array.isArray(value)) throw new Error('socialNetworks must be an object');
@@ -901,6 +904,19 @@ router.put('/:id', [
     }
 
     const { id } = req.params;
+  // Consolidate social network fields into socialNetworks object
+  const socialKeys = ['instagram','tiktok','facebook','linkedin','youtube','threads','pinterest','bluesky','x','reddit'];
+  const socialNetworks: Record<string, string> = {};
+  socialKeys.forEach(key => {
+    if (req.body[key] && typeof req.body[key] === 'string' && req.body[key].trim() !== '') {
+      socialNetworks[key] = req.body[key];
+    }
+  });
+  // If socialNetworks provided as object, merge it in
+  if (req.body.socialNetworks && typeof req.body.socialNetworks === 'object' && !Array.isArray(req.body.socialNetworks)) {
+    Object.assign(socialNetworks, req.body.socialNetworks);
+  }
+
   const updateData = { ...req.body };
   if (req.body.sourceType) updateData.sourceType = req.body.sourceType;
   if (req.body.sourceDetails) updateData.sourceDetails = req.body.sourceDetails;
@@ -909,7 +925,10 @@ router.put('/:id', [
   delete updateData.ownerBio;
   delete updateData.ownerMobile;
   delete updateData.ownerContact; // Remove nested owner contact object
-  
+  // Remove individual social fields
+  socialKeys.forEach(key => delete updateData[key]);
+  // Set consolidated socialNetworks
+  updateData.socialNetworks = Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined;
   // Handle specialty IDs separately
   const specialtyIds = updateData.specialtyIds;
   delete updateData.specialtyIds;
@@ -942,6 +961,9 @@ router.put('/:id', [
         delete updateData[key];
       }
     });
+
+    // Final cleanup: ensure no top-level social fields remain in updateData before Prisma call
+    socialKeys.forEach(key => delete updateData[key]);
 
     // Capture old specialty IDs for audit trail BEFORE updating
     const oldSpecialtyIds = specialtyIds !== undefined ? (

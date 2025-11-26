@@ -89,16 +89,6 @@ model Roaster {
   // Consolidated social networks as JSON (key -> url/handle).
   // We keep legacy individual columns for backward compatibility during migration.
   socialNetworks     Json?
-  instagram          String?
-  tiktok             String?
-  facebook           String?
-  linkedin           String?
-  youtube            String?
-  threads            String?
-  pinterest          String?
-  bluesky            String?
-  x                  String?
-  reddit             String?
   founded            Int?
   beans              Bean[]
   favorites          Favorite[]
