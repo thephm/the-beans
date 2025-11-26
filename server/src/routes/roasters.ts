@@ -633,6 +633,11 @@ router.post('/', [
   body('bluesky').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('BlueSky URL must be less than 200 characters'),
   body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
   body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
+  // New consolidated socialNetworks object (key -> url/handle)
+  body('socialNetworks').optional().custom(value => {
+    if (typeof value !== 'object' || Array.isArray(value)) throw new Error('socialNetworks must be an object');
+    return true;
+  }).withMessage('socialNetworks must be an object mapping network->url'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
   body('sourceType').optional().isIn(['Scout','Google','Reddit','ChatGPT','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
   body('sourceDetails').optional().isString().isLength({ max: 1000 }).withMessage('Source details must be less than 1000 characters'),
@@ -870,6 +875,11 @@ router.put('/:id', [
   body('bluesky').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('BlueSky URL must be less than 200 characters'),
   body('x').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('X URL must be less than 200 characters'),
   body('reddit').optional({ checkFalsy: true }).isLength({ max: 200 }).withMessage('Reddit URL must be less than 200 characters'),
+  // New consolidated socialNetworks object (key -> url/handle)
+  body('socialNetworks').optional().custom(value => {
+    if (typeof value !== 'object' || Array.isArray(value)) throw new Error('socialNetworks must be an object');
+    return true;
+  }).withMessage('socialNetworks must be an object mapping network->url'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
   body('sourceType').optional().isIn(['Scout','Google','Reddit','ChatGPT','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
   body('sourceDetails').optional().isString().isLength({ max: 1000 }).withMessage('Source details must be less than 1000 characters'),

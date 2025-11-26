@@ -17,7 +17,10 @@ services:
     region: oregon # Choose region closest to your users
     plan: free # Free tier web service
     rootDir: server
-    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy && npx prisma db seed && npm run build
+    buildCommand: npm install && npx prisma generate && npm run build
+    # Run DB migrations and populate socialNetworks from legacy columns at release time.
+    # This runs after the build and before the service starts.
+    releaseCommand: npx prisma migrate deploy && npx prisma generate && npm run migrate:socials && npm run verify:socials
     startCommand: npm run start
     healthCheckPath: /health
     envVars:
