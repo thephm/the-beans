@@ -95,36 +95,42 @@ interface Roaster {
   owner?: string | { id: string; username: string; firstName: string; lastName: string }
   images?: string[]
   roasterImages?: RoasterImageData[]
-  instagram?: string
-  tiktok?: string
-  facebook?: string
-  linkedin?: string
-  youtube?: string
-  threads?: string
-  pinterest?: string
-  bluesky?: string
+  socialNetworks?: Record<string, string>
   isFavorited?: boolean
-  x?: string
-  reddit?: string
 }
 
 export default function RoasterDetail() {
-  const handleSourceSave = async () => {
-    if (!roaster) return
-    setSourceSaving(true)
-    try {
-      await apiClient.updateRoaster(roaster.id, {
-        sourceType,
-        sourceDetails,
-      })
-      setEditingSource(false)
-      setRoaster({ ...roaster, sourceType, sourceDetails })
-    } catch (err) {
-      alert('Failed to save source attribution. Please try again.')
-    } finally {
-      setSourceSaving(false)
-    }
+  // Utility to strip deprecated social fields from payload
+  function sanitizeRoasterPayload(data: any) {
+    const deprecatedSocials = [
+      'instagram', 'tiktok', 'facebook', 'linkedin', 'youtube', 'threads', 'pinterest', 'bluesky', 'x', 'reddit'
+    ];
+    const clean = { ...data };
+    deprecatedSocials.forEach((field) => {
+      if (field in clean) delete clean[field];
+    });
+    return clean;
   }
+
+  const handleSourceSave = async () => {
+    if (!roaster) return;
+    setSourceSaving(true);
+    try {
+      await apiClient.updateRoaster(
+        roaster.id,
+        sanitizeRoasterPayload({
+          sourceType,
+          sourceDetails,
+        })
+      );
+      setEditingSource(false);
+      setRoaster({ ...roaster, sourceType, sourceDetails });
+    } catch (err) {
+      alert('Failed to save source attribution. Please try again.');
+    } finally {
+      setSourceSaving(false);
+    }
+  } 
   const { t } = useTranslation()
   const { user } = useAuth()
   const { showRatings } = useFeatureFlags()
@@ -241,8 +247,11 @@ export default function RoasterDetail() {
     setSourceSaving(true)
     try {
       await apiClient.updateRoaster(roaster.id, {
-        sourceType,
-        sourceDetails,
+        ...sanitizeRoasterPayload({
+          ...roaster,
+          sourceType,
+          sourceDetails,
+        })
       })
       setEditingSource(false)
       setRoaster({ ...roaster, sourceType, sourceDetails })
@@ -327,39 +336,34 @@ export default function RoasterDetail() {
   // Helper to check if there are any social links
   const hasSocialLinks = () => {
     if (!roaster) return false
-    const networks = ['instagram','tiktok','facebook','linkedin','youtube','threads','pinterest','bluesky','twitter','reddit']
-    return networks.some(n => Boolean(getSocial(roaster as any, n)))
+    if (!roaster.socialNetworks) return false;
+    return Object.keys(roaster.socialNetworks).length > 0;
   }
 
   // Helper to render social media icons
   const renderSocialIcons = () => {
     if (!roaster) return null
 
-    const networks = [
-      { key: 'instagram', Icon: Instagram, name: 'Instagram', color: '#E4405F' },
-      { key: 'tiktok', Icon: TikTokIcon, name: 'TikTok', color: '#000000' },
-      { key: 'facebook', Icon: Facebook, name: 'Facebook', color: '#1877F2' },
-      { key: 'linkedin', Icon: LinkedIn, name: 'LinkedIn', color: '#0A66C2' },
-      { key: 'youtube', Icon: YouTube, name: 'YouTube', color: '#FF0000' },
-      { key: 'threads', Icon: ThreadsIcon, name: 'Threads', color: '#000000' },
-      { key: 'pinterest', Icon: Pinterest, name: 'Pinterest', color: '#E60023' },
-      { key: 'bluesky', Icon: BlueskyIcon, name: 'Bluesky', color: '#1185FE' },
-      { key: 'twitter', Icon: XIcon, name: 'X', color: '#000000' },
-      { key: 'reddit', Icon: Reddit, name: 'Reddit', color: '#FF4500' },
-    ]
-
-    const socialLinks = networks
-      .map(({ key, Icon, name, color }) => ({
-        // Normalize null -> undefined so href accepts the value
-        url: getSocial(roaster as any, key) ?? undefined,
-        Icon,
-        name,
-        color,
-      }))
-      .filter((s): s is { url: string; Icon: any; name: string; color: string } => Boolean(s.url))
-
-    if (socialLinks.length === 0) return null
-
+    if (!roaster.socialNetworks) return null;
+    const iconMap: Record<string, { Icon: any; name: string; color: string }> = {
+      instagram: { Icon: Instagram, name: 'Instagram', color: '#E4405F' },
+      tiktok: { Icon: TikTokIcon, name: 'TikTok', color: '#000000' },
+      facebook: { Icon: Facebook, name: 'Facebook', color: '#1877F2' },
+      linkedin: { Icon: LinkedIn, name: 'LinkedIn', color: '#0A66C2' },
+      youtube: { Icon: YouTube, name: 'YouTube', color: '#FF0000' },
+      threads: { Icon: ThreadsIcon, name: 'Threads', color: '#000000' },
+      pinterest: { Icon: Pinterest, name: 'Pinterest', color: '#E60023' },
+      bluesky: { Icon: BlueskyIcon, name: 'Bluesky', color: '#1185FE' },
+      x: { Icon: XIcon, name: 'X', color: '#000000' },
+      reddit: { Icon: Reddit, name: 'Reddit', color: '#FF4500' },
+    };
+    const socialLinks = Object.entries(roaster.socialNetworks)
+      .filter(([key, url]) => iconMap[key] && url)
+      .map(([key, url]) => ({
+        url,
+        ...iconMap[key],
+      }));
+    if (socialLinks.length === 0) return null;
     return (
       <div className="flex flex-wrap gap-2">
         {socialLinks.map(({ url, Icon, name, color }) => (
@@ -382,7 +386,7 @@ export default function RoasterDetail() {
           </a>
         ))}
       </div>
-    )
+    );
   }
 
   if (loading) {

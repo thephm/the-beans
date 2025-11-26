@@ -29,11 +29,14 @@ const defaultFormData = {
   sourceDetails: '',
   sourceCountries: [],
   images: [],
+  socialNetworks: {},
 };
 
 const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel }) => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState<any>(roaster ? { ...defaultFormData, ...roaster } : defaultFormData);
+  // Only use socialNetworks, ignore any legacy social fields
+  const initialFormData = roaster ? { ...defaultFormData, ...roaster, socialNetworks: roaster.socialNetworks || {} } : defaultFormData;
+  const [formData, setFormData] = useState<any>(initialFormData);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,9 +63,17 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     e.preventDefault();
     setSaving(true);
     setError(null);
+    // Remove deprecated social fields before submit
+    const deprecatedSocials = [
+      'instagram', 'tiktok', 'facebook', 'linkedin', 'youtube', 'threads', 'pinterest', 'bluesky', 'x', 'reddit'
+    ];
+    const cleanFormData = { ...formData };
+    deprecatedSocials.forEach((field) => {
+      if (field in cleanFormData) delete cleanFormData[field];
+    });
     try {
       // TODO: Replace with actual API call (create or update)
-      // await apiClient.createRoaster(formData) or updateRoaster
+      // await apiClient.createRoaster(cleanFormData) or updateRoaster
       setSaving(false);
       if (onSuccess) onSuccess();
     } catch (err: any) {

@@ -11,8 +11,6 @@ export function getSocial(roaster: any, network: string): string | null {
     return roaster[network];
   }
 
-  // Back-compat alias mapping (e.g., 'twitter' -> 'x')
-  if (network === 'twitter' && roaster.x) return roaster.x;
 
   return null;
 }

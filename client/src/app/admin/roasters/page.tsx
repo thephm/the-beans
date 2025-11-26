@@ -717,8 +717,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         if (v && String(v).trim() !== '') socialNetworks[k] = String(v).trim();
       });
 
+      // Create payload without individual social fields
+      const { instagram, tiktok, facebook, linkedin, youtube, threads, pinterest, bluesky, x, reddit, ...payloadData } = formData;
+
       const payload = {
-        ...formData,
+        ...payloadData,
         hours: convertedHours,
         latitude: formData.latitude ? parseFloat(String(formData.latitude)) : undefined,
         longitude: formData.longitude ? parseFloat(String(formData.longitude)) : undefined,
@@ -780,6 +783,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         const res = await fetch(`${apiUrl}/api/roasters/${roasterId}`);
         if (res.ok) {
           const data = await res.json();
+          // Extract individual social fields from socialNetworks object for form display
+          const socialNetworks = data.socialNetworks || {};
           setFormData({
             name: data.name || '',
             description: data.description || '',
@@ -810,16 +815,16 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               sunday: { open: '08:00', close: '18:00', closed: false },
             },
             images: data.images || [],
-            instagram: data.instagram || '',
-            tiktok: data.tiktok || '',
-            facebook: data.facebook || '',
-            linkedin: data.linkedin || '',
-            youtube: data.youtube || '',
-            threads: data.threads || '',
-            pinterest: data.pinterest || '',
-            bluesky: data.bluesky || '',
-            x: data.x || '',
-            reddit: data.reddit || '',
+            instagram: socialNetworks.instagram || '',
+            tiktok: socialNetworks.tiktok || '',
+            facebook: socialNetworks.facebook || '',
+            linkedin: socialNetworks.linkedin || '',
+            youtube: socialNetworks.youtube || '',
+            threads: socialNetworks.threads || '',
+            pinterest: socialNetworks.pinterest || '',
+            bluesky: socialNetworks.bluesky || '',
+            x: socialNetworks.x || '',
+            reddit: socialNetworks.reddit || '',
           });
         }
 
