@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import RoasterImage from '@/components/RoasterImage'
 import { apiClient } from '@/lib/api'
+import { getSocial } from '@/lib/socials'
 import { 
   LocationOn, 
   Favorite, 
@@ -175,18 +176,27 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
 
   // Helper to render social media icons
   const renderSocialIcons = () => {
-    const socialLinks = [
-      { url: roaster.instagram, Icon: Instagram, name: 'Instagram', color: '#E4405F' },
-      { url: roaster.tiktok, Icon: TikTokIcon, name: 'TikTok', color: '#000000' },
-      { url: roaster.facebook, Icon: Facebook, name: 'Facebook', color: '#1877F2' },
-      { url: roaster.linkedin, Icon: LinkedIn, name: 'LinkedIn', color: '#0A66C2' },
-      { url: roaster.youtube, Icon: YouTube, name: 'YouTube', color: '#FF0000' },
-      { url: roaster.threads, Icon: ThreadsIcon, name: 'Threads', color: '#000000' },
-      { url: roaster.pinterest, Icon: Pinterest, name: 'Pinterest', color: '#E60023' },
-      { url: roaster.bluesky, Icon: BlueskyIcon, name: 'Bluesky', color: '#1185FE' },
-      { url: roaster.x, Icon: XIcon, name: 'X', color: '#000000' },
-      { url: roaster.reddit, Icon: Reddit, name: 'Reddit', color: '#FF4500' },
-    ].filter(social => social.url) // Only show icons where URL is defined
+    const networks = [
+      { key: 'instagram', Icon: Instagram, name: 'Instagram', color: '#E4405F' },
+      { key: 'tiktok', Icon: TikTokIcon, name: 'TikTok', color: '#000000' },
+      { key: 'facebook', Icon: Facebook, name: 'Facebook', color: '#1877F2' },
+      { key: 'linkedin', Icon: LinkedIn, name: 'LinkedIn', color: '#0A66C2' },
+      { key: 'youtube', Icon: YouTube, name: 'YouTube', color: '#FF0000' },
+      { key: 'threads', Icon: ThreadsIcon, name: 'Threads', color: '#000000' },
+      { key: 'pinterest', Icon: Pinterest, name: 'Pinterest', color: '#E60023' },
+      { key: 'bluesky', Icon: BlueskyIcon, name: 'Bluesky', color: '#1185FE' },
+      { key: 'twitter', Icon: XIcon, name: 'X', color: '#000000' },
+      { key: 'reddit', Icon: Reddit, name: 'Reddit', color: '#FF4500' },
+    ]
+
+    const socialLinks = networks
+      .map(({ key, Icon, name, color }) => ({
+        url: getSocial(roaster as any, key),
+        Icon,
+        name,
+        color,
+      }))
+      .filter(s => s.url)
 
     if (socialLinks.length === 0) return null
 

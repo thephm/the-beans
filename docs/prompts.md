@@ -118909,3 +118909,578 @@ Would you like me to:
 - Push the changes to a branch and open a PR?
 
 ## 978th try
+
+*(worked, committing)*
+
+2025-11-25
+
+> Shouldn't social networks be a collection #223
+
+https://github.com/thephm/the-beans/issues/223
+
+see this in `client\src\types\index.ts`
+
+```
+  // Social Networks
+  instagram?: string;
+  tiktok?: string;
+  facebook?: string;
+  linkedin?: string;
+  youtube?: string;
+  threads?: string;
+  pinterest?: string;
+  bluesky?: string;
+  x?: string;
+  reddit?: string;
+```
+
+I'll add a short plan (tracked in the todo list), inspect the type file, then update the social network fields to a single collection while keeping backward-compatible deprecated fields. I'll mark steps done as I go.
+
+✔ Created 1 todo
+
+✔ Read `client/src/types/index.ts`
+
+I'll update index.ts: add `socialNetworks` as a `Record<string,string>` and mark the existing individual fields as deprecated (keeps backward compatibility). Then I'll search for usages of `socialNetworks` and common social keys.
+
+`index.ts +15 -0`
+
+✔ Searched for regex `socialNetworks|instagram|tiktok|facebook|threads|bluesky|pinterest|linkedin|reddit|x`, 200 results
+
+Completed: *Add todo plan* (1/1)
+
+**Summary:** I consolidated the roaster social fields into a single collection and kept the old fields as deprecated aliases.
+
+- **File updated:** index.ts — added `socialNetworks?: Record<string,string>` and marked the individual fields (`instagram`, `tiktok`, `facebook`, `linkedin`, `youtube`, `threads`, `pinterest`, `bluesky`, `x`, `reddit`) with `@deprecated` JSDoc so existing code continues to type-check.
+
+Why: using a map/collection is more flexible (supports arbitrary networks and simplifies serialization), while keeping deprecated fields preserves backward compatibility until callers are migrated.
+
+Next suggestions (optional):
+- Update backend API / Prisma schema to return a `socialNetworks` object (JSON) for roasters, or map individual DB columns into the collection in server response.
+- Grep and migrate usages in the client code to read from `roaster.socialNetworks['instagram']` (or normalize access via a helper).
+- Remove deprecated fields later once the codebase and API are migrated.
+
+If you want, I can:
+- Search and list all places that read/write individual social fields and present a migration plan.
+- Update server types and API responses to include `socialNetworks`.
+- Implement a small helper (e.g., `getSocial(roaster, 'instagram')`) to support both formats during migration.
+
+What would you like me to do next?
+
+I'll create a migration plan, update the Prisma schema, add a migration script to populate existing rows, update the server API to expose `socialNetworks`, and add a small client helper for gradual migration. I'll track progress in the todo list and then apply changes.
+
+Starting: *Migrate social fields to collection* (1/1)
+
+✔ Read `server/prisma/schema.prisma`
+
+Searched for regex `findMany\(|roaster.find|prisma.roaster|getRoasters|roasters` (`**/server/src/**`), 200 results
+
+✔ Read `server/src/routes/roasters.ts`
+
+✔ Read `server/src/seed.ts`
+
+Now I'll update the Prisma schema, server routes, seed, and add a DB migration script plus a client helper — these changes add `socialNetworks` JSON support and a script to populate it from existing columns. I'll apply patches to four files.
+
+`schema.prisma +3 -0`
+`migrate-social-networks.ts +58 -1`
+`roasters.ts +10 -0`
+`seed.ts +9 -0`
+`socials.ts +19 -1`
+
+✔ Created `docs/RENDER_SOCIALS_MIGRATION.md`
+
+✔ Read `server/package.json`
+
+`package.json +1 -0`
+
+Completed: *Migrate social fields to collection* (1/1)
+
+Progress update — done the core migration work and notes.
+
+What I changed
+- **Schema**: Added `socialNetworks Json?` to schema.prisma (keeps legacy columns for now).
+- **Migration script**: Added migrate-social-networks.ts — copies non-empty legacy social columns into `socialNetworks` JSON.
+- **Server routes**: Updated roasters.ts to accept `socialNetworks` on create/update (with validation) and pass it through to Prisma.
+- **Seed**: Added sample `socialNetworks` entries in seed.ts to exercise the new field.
+- **NPM script**: Added server script `migrate:socials` to run the migration: `ts-node prisma/migrate-social-networks.ts`.
+- **Client helper**: Added socials.ts with `getSocial(roaster, network)` to prefer `socialNetworks` and fall back to legacy fields.
+- **Docs**: Added RENDER_SOCIALS_MIGRATION.md with step-by-step instructions for running the migration on Render (including Prisma migrate/generate and running the script).
+
+Why this approach
+- Keeps the system backwards-compatible: the API still exposes legacy fields and the client helper supports both formats.
+- Adds a single, idempotent migration script you can run during deployment to populate the new JSON column from existing data.
+- Leaves deletion of legacy columns as a separate, safe follow-up step after verification.
+
+Next recommended steps for you (I can do these if you want)
+- Run the Prisma migration and script in a staging environment and verify data:
+  - Example commands (PowerShell):
+    ```pwsh
+    cd server
+    npx prisma migrate dev --name add-social-networks   # locally to generate SQL/migration
+    npx prisma generate
+    npm run migrate:socials
+    ```
+  - On Render, add the equivalent to your build/release steps:
+    ```pwsh
+    cd server
+    npx prisma migrate deploy
+    npx prisma generate
+    npm run migrate:socials
+    ```
+- Grep & migrate client usages: I can find every place the code reads `roaster.instagram`, `roaster.x`, etc., and update them to use `getSocial()` from socials.ts. This will let you remove deprecated fields later.
+- After full verification (client & API changes deployed and in use), create a follow-up migration to drop the legacy columns from schema.prisma, and run `prisma migrate` to remove them from the DB.
+
+Would you like me to:
+- Run a repo-wide search and open a PR patching client code (components/pages) to use `getSocial()` (I can do this safely, a few files at a time), or
+- Prepare the Render release commands (e.g., edit render.yaml or provide exact Render UI steps) so the migration runs automatically during deployment?
+
+Which next step do you want me to take?
+
+> prepare the render release commands
+
+I'll search the repo for existing Render config and prepare a render.yaml update with release commands to run migrations and the social-network migration. I'll then add instructions in RENDER_SOCIALS_MIGRATION.md with exact release commands.
+
+✔ Searched for files matching `**/render.yaml`, 1 match
+
+✔ Read `render.yaml`
+
+I'm going to update render.yaml to add a `releaseCommand` for the API service and simplify the `buildCommand` to avoid running migrations during build. This ensures migrations and the social migration script run at release time on Render.
+
+`render.yaml +4 -1`
+
+✔ Read `docs/RENDER_SOCIALS_MIGRATION.md`
+
+✔ Updating documentation
+
+`RENDER_SOCIALS_MIGRATION.md +13 -0`
+
+✔ Crafting the final response...
+
+Done — I updated the repo and docs so Render will run DB migrations and the social-network migration during release.
+
+What I changed
+- **render.yaml**: added a `releaseCommand` for the API service:
+  - Runs `prisma migrate deploy`, `prisma generate`, and the social migration script before starting the service.
+- **package.json**: added `migrate:socials` script (runs `ts-node prisma/migrate-social-networks.ts`).
+- **Docs**: updated RENDER_SOCIALS_MIGRATION.md with the exact `releaseCommand` snippet and usage notes.
+
+Release command (what Render will run)
+- The repo now contains this command (already added to render.yaml for `the-beans-api` service):
+```yaml
+releaseCommand: npx prisma migrate deploy && npx prisma generate && npm run migrate:socials
+```
+
+Recommended deploy steps (PowerShell, copy/paste)
+- Locally (prepare and test migrations):
+```pwsh
+cd server
+# create dev migration locally (generates SQL & migration files)
+npx prisma migrate dev --name add-social-networks
+
+# generate Prisma client
+npx prisma generate
+
+# run the social migration script locally to test
+npm run migrate:socials
+
+# run tests / exercise API locally
+npm run dev
+```
+
+- On Render (what the `releaseCommand` runs automatically on each deploy):
+```pwsh
+cd server
+npx prisma migrate deploy
+npx prisma generate
+npm run migrate:socials
+```
+
+Notes and precautions
+- The `releaseCommand` runs after build and before the service starts, so schema changes are applied before the API accepts traffic.
+- The migration script is idempotent for our purposes: it writes `socialNetworks` only when at least one legacy field has a value.
+- Back up your production database (or snapshot) before running migrations in production.
+- I left legacy columns in place for compatibility. After you verify the migration and update all clients, remove legacy columns in a follow-up Prisma migration.
+
+Next steps I can take
+- Update the frontend codebase to use `getSocial()` via socials.ts across components (I can locate usages and create a PR).
+- Create a small Render release hook / health-check step to verify `socialNetworks` population and fail release if verification fails.
+- Prepare a follow-up migration that drops legacy columns after you've confirmed everything is migrated.
+
+Which of the next steps should I do for you now?
+
+> Update the frontend codebase to use getSocial() via socials.ts across components (I can locate usages and create a PR).
+> Create a small Render release hook / health-check step to verify socialNetworks population and fail release if verification fails.
+
+I'll search the frontend for places that read legacy social fields (like `.instagram`, `.x`, `.facebook`) so I can update them to use `getSocial()` and add imports. I'll then patch those files and add a verification script and release changes.
+
+✔ Searched for regex `\.instagram|\.tiktok|\.facebook|\.linkedin|\.youtube|\.threads|\.pinterest|\.bluesky|\.x\b|\.reddit` (`**/client/**`), 200 results
+
+✔ Summarized conversation history
+
+Now I'll search the source files (not .next) for places that render social link objects that should use `getSocial()` instead.
+
+✔ Searched for regex `url: roaster\.|roaster\.instagram|getSocial\(|socialNetworks` (`**/client/src/**`), 46 results
+
+Next I'll open the two frontend files and the server package.json to modify them, then add the verification script and update render.yaml. I'll patch multiple files in one batch.
+
+✔ Read `client/src/components/RoasterCard.tsx`
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`
+
+✔ Read `client/src/lib/socials.ts`
+
+✔ Read `server/prisma/migrate-social-networks.ts`
+
+✔ Read `server/package.json`
+
+✔ Read `render.yaml`
+
+Patching files next: I'll update the two frontend components to import and use `getSocial()`, add the new `verify-socials` script, update package.json, and add `server/prisma/verify-socials.ts`. I'll mark the first todo in-progress.
+
+✔ Starting: *Use getSocial in UI components* (1/4)
+
+`RoasterCard.tsx +22 -12`
+`page.tsx +24 -27`
+`verify-socials.ts +67 -1`
+
+✔ Updating package scripts
+
+`package.json +1 -0`
+
+✔ Updating command structure
+
+`render.yaml +1 -1`
+
+✔ Updating task statuses
+
+✔ Completed: *Use getSocial in UI components* (1/4)
+
+✔ Searched for regex `roaster\.instagram|roaster\.tiktok|roaster\.facebook|roaster\.linkedin|roaster\.youtube|roaster\.threads|roaster\.pinterest|roaster\.bluesky|roaster\.x\b|roaster\.reddit` (`**/client/src/**`), 2 results
+
+I'll summarize what I changed, why, and how to test — then list the exact commands to run locally or on Render.
+
+**What I changed**
+- **Frontend:** Replaced direct legacy social-field reads with `getSocial()` in the UI components that render social icons:
+  - RoasterCard.tsx — now imports `getSocial` and uses it for social links.
+  - page.tsx — now imports `getSocial` and uses it for social links and presence checks.
+- **Helper (already present):** socials.ts continues to provide `getSocial(roaster, network)` and is used by the updated components.
+- **Server migration verification:** Added a verification script to make releases fail if migration didn't populate `socialNetworks`:
+  - verify-socials.ts — queries the DB and exits non-zero when legacy social fields remain while `socialNetworks` is null.
+- **Server package scripts:** Added an npm script to run the verifier:
+  - package.json — added `"verify:socials": "ts-node prisma/verify-socials.ts"`.
+- **Render release command:** Updated to run verification after the migration:
+  - render.yaml — `releaseCommand` now runs `npx prisma migrate deploy && npx prisma generate && npm run migrate:socials && npm run verify:socials`.
+
+Files changed/added
+- Updated: RoasterCard.tsx
+- Updated: page.tsx
+- Added: verify-socials.ts
+- Updated: package.json (added `verify:socials`)
+- Updated: render.yaml (added `npm run verify:socials` to `releaseCommand`)
+
+Why this approach
+- `getSocial()` centralizes read logic and prefers the new `socialNetworks` JSON map while falling back to legacy fields for backwards compatibility.
+- The verification script is idempotent and simple: it ensures no roaster still has legacy social columns populated without `socialNetworks` being set. Running it in the release step will cause the release to fail if the migration script did not populate `socialNetworks` correctly.
+
+How to test locally (PowerShell commands)
+- From repo root, run the normal Prisma migration + migration script + verify script in server:
+
+```pwsh
+cd server
+npm install
+# run migrations for local/dev (use dev flow vs deploy depending on environment)
+npx prisma migrate dev
+npx prisma generate
+npm run migrate:socials
+npm run verify:socials
+```
+
+- If `npm run verify:socials` exits 0 and prints "Verification passed", the migration populated `socialNetworks`. If it exits non-zero it will print offending roaster examples.
+
+Render behavior
+- On Render the `releaseCommand` now runs:
+  - `npx prisma migrate deploy && npx prisma generate && npm run migrate:socials && npm run verify:socials`
+- If the verification script exits non-zero, Render release will fail, preventing deployment until the issue is addressed.
+
+Notes / next steps (recommended)
+- I updated the display components that show social icons (card and detail page). If you want, I can:
+  - Search & update any remaining places where legacy social fields are used for display (I already scanned src and replaced direct references inside source files).
+  - Update admin forms to store into `socialNetworks` on submit (currently the admin UI still shows legacy fields for editing — preserving existing behavior is safe during migration). I can wire the admin create/update paths to send a `socialNetworks` object when you want to switch the backend to expect that field.
+  - After you confirm migrations are successful in staging + client changes are deployed, schedule a follow-up migration to drop the legacy columns from the DB.
+- To run a full staging test, deploy the changes to a staging environment or run the same migration/verify commands against a staging DB snapshot.
+
+Progress / status
+- All requested changes implemented and the repo updated.
+- Verified there are no remaining direct `roaster.instagram` (etc.) usages in src (display code now uses `getSocial()`).
+
+If you'd like, I can:
+- Create a branch + PR with these changes and open it for review.
+- Update admin pages so their form submissions build a `socialNetworks` map automatically.
+- Run an offline check against a database dump (if you provide credentials) to validate the migration result.
+
+Which next step would you like? Create a PR, update admin save logic to send `socialNetworks`, or run the staging verification commands for you?
+
+> Update admin pages so their form submissions build a socialNetworks map automatically.
+
+I'll open the admin roasters page to modify its form submit handler so it builds and sends `socialNetworks` from the individual inputs. I'll then patch the file to include that behavior.
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 2000
+
+Now I'll patch page.tsx to build a `socialNetworks` map just before creating the `payload` in `handleSubmit`. This will keep legacy fields but send the consolidated map too.
+
+`page.tsx +10 -0`
+
+✔ Searched for text `socialNetworks` (`**/client/src/app/admin/roasters/page.tsx`), 13 results
+
+✔ Searched for text `instagram: data.instagram` (`**/client/src/app/admin/roasters/page.tsx`), 2 results
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 340 to 400
+
+✔ Searched for text `roaster?.instagram` (`**/client/src/app/admin/roasters/page.tsx`), 1 result
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 300 to 340
+
+Summarized conversation history**Recent Agent Commands & Tool Results (concise)**
+
+- **Searches:** ran repo-wide searches (broad regex → ~200 hits, narrowed to ~46 relevant matches in src). Key matches in RoasterCard.tsx, page.tsx, and page.tsx.
+- **File reads:** opened large admin file (~2126 lines) plus RoasterCard.tsx, roaster detail page, socials.ts, migrate-social-networks.ts, package.json, and render.yaml to locate edit points.
+- **Patches applied:** edits saved successfully to the repo:
+  - RoasterCard.tsx: switched legacy social reads to `getSocial()`.
+  - page.tsx: replaced legacy reads with `getSocial()`.
+  - page.tsx: updated `handleSubmit` to build and include `socialNetworks` in the payload (keeps legacy fields for back-compat).
+  - verify-socials.ts: added verification script (exits non-zero if migration incomplete).
+  - package.json: added `"verify:socials"` npm script.
+  - render.yaml: updated `releaseCommand` to run migrations, run the migration script, then run verification.
+- **Tool outputs:** all apply_patch operations reported success; new/updated files written to disk; todo list updated to mark related steps completed.
+- **Verification behavior:** the new `verify-socials.ts` counts roasters with legacy fields but null `socialNetworks` and exits non-zero if any are found — wired into Render release to block a release on failure.
+- **Recommended staging commands:** run the migration & verification in staging (PowerShell-friendly chaining):
+  - `npx prisma migrate deploy; npx prisma generate; npm run migrate:socials; npm run verify:socials`
+- **Next suggested actions:** run the above sequence in a staging snapshot, confirm `socialNetworks` populated (DB query or API), then deploy to production. After monitoring, schedule a follow-up migration to drop legacy columns.
+
+Would you like me to open a PR with these changes, run a repo-wide final sweep for remaining legacy reads, or prepare a short staging-run checklist you can follow?
+
+> You need to do everything and this is a docker deployment, I will test locally and if it works I will commit which will deploy to Render
+
+I'll create a short TODO plan for the deployment and then verify the server scripts and migration files before running the Docker Compose migration commands.
+
+✔ Created 6 todos
+
+Now I'll check the server package scripts and confirm the migration/verify script files exist. I'll read package.json and the two prisma scripts.
+
+✔ Read `server/package.json`
+
+✔ Read `server/prisma`
+
+✔ Read `server/prisma/migrate-social-networks.ts`
+
+✔ Read `server/prisma/verify-socials.ts`
+
+I'll run the Docker Compose migration and verification commands inside the server container (runs Prisma migrations, generates client, executes migration script, then verification). This will use PowerShell-friendly semicolon chaining.
+
+✔ `docker-compose exec server npx prisma migrate deploy; docker-compose exec server npx prisma generate; docker-compose exec server npm run migrate:socials; docker-compose exec server npm run verify:socials`
+
+✔ Read `server/prisma/schema.prisma`
+
+Marking the verification step as done, then I'll create & apply a Prisma migration that adds `socialNetworks` to the DB schema.
+
+✔ Completed: *Verify migration scripts* (1/6)
+
+✔ `docker-compose exec server npx prisma migrate dev --name add-socialnetworks --create-only; docker-compose exec server npx prisma migrate deploy; docker-compose exec server npx prisma generate`
+
+Next I'll run the data migration script then the verification script inside the server container. This will populate `socialNetworks` and confirm results.
+
+✔ `docker-compose exec server npm run migrate:socials; docker-compose exec server npm run verify:socials`
+
+```shell
+
+> the-beans-server@1.0.0 migrate:socials
+> ts-node prisma/migrate-social-networks.ts
+
+Starting social networks migration...
+Migration complete. Updated 2 roaster(s).
+
+> the-beans-server@1.0.0 verify:socials
+> ts-node prisma/verify-socials.ts
+
+/app/node_modules/ts-node/src/index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);       
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+prisma/verify-socials.ts:11:9 - error TS2322: Type 'null' is not assignable to type 'JsonNullableFilter<"Roaster"> | undefined'.
+
+11         socialNetworks: null,
+           ~~~~~~~~~~~~~~
+prisma/verify-socials.ts:38:9 - error TS2322: Type 'null' is not assignable to type 'JsonNullableFilter<"Roaster"> | undefined'.
+
+38         socialNetworks: null,
+           ~~~~~~~~~~~~~~
+
+    at createTSError (/app/node_modules/ts-node/src/index.ts:859:12)        
+    at reportTSError (/app/node_modules/ts-node/src/index.ts:863:19)        
+    at getOutput (/app/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/app/node_modules/ts-node/src/index.ts:1433:41)      
+    at Module.m._compile (/app/node_modules/ts-node/src/index.ts:1617:30)   
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)    
+    at Object.require.extensions.<computed> [as .ts] (/app/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)     
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12) {
+  diagnosticCodes: [ 2322, 2322 ]
+}
+```
+
+I'll patch verify-socials.ts to use the correct Prisma JSON null filter (`{ equals: null }`) and then re-run the verification.
+
+`verify-socials.ts +21 -39`
+
+I'll run the verification script again inside the server container, then query the DB to show a few sample roaster rows and whether `social_networks` is populated.
+
+✔ `docker-compose exec server npm run verify:socials; docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT id, name, (social_networks IS NOT NULL) AS has_socials FROM roasters ORDER BY created_at DESC LIMIT 10;"`
+
+```shell
+
+> the-beans-server@1.0.0 verify:socials
+> ts-node prisma/verify-socials.ts
+
+Verifying socialNetworks migration...
+Verification script failed: PrismaClientKnownRequestError: 
+Invalid `prisma.$queryRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `42703`. Message: `column "social_networks" does not exist`
+    at $n.handleRequestError (/app/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/app/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/app/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/app/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async verify (/app/prisma/verify-socials.ts:8:25) {
+  code: 'P2010',
+  clientVersion: '5.22.0',
+  meta: { code: '42703', message: 'column "social_networks" does not exist' }
+}
+ERROR:  column "social_networks" does not exist
+LINE 1: SELECT id, name, (social_networks IS NOT NULL) AS has_social...     
+                          ^
+HINT:  Perhaps you meant to reference the column "roasters.socialNetworks".
+```
+
+I'll patch verify-socials.ts to use raw SQL queries (avoids the Prisma JSON filter typing issue), then re-run verification and sample DB query.
+
+`verify-socials.ts +21 -39`
+
+✔ `docker-compose exec server npm run verify:socials; docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT id, name, (social_networks IS NOT NULL) AS has_socials FROM roasters ORDER BY created_at DESC LIMIT 10;"`
+
+```shell
+
+> the-beans-server@1.0.0 verify:socials
+> ts-node prisma/verify-socials.ts
+
+Verifying socialNetworks migration...
+Verification passed — no legacy social fields remain without socialNetworks.
+psql: warning: extra command-line argument "socialNetworks\ IS NOT NULL) AS has_socials FROM roasters ORDER BY created_at DESC LIMIT 10;" ignored       
+ERROR:  syntax error at or near "\"
+LINE 1: SELECT id, name, (\
+                          ^
+```
+
+✔ Read `server/prisma/migrations/20251126012750_add_socialnetworks`
+
+✔ Read `server/prisma/migrations/20251126012750_add_socialnetworks/migration.sql`
+
+`verify-socials.ts +2 -2`
+
+✔ `docker-compose exec server npm run verify:socials; docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT id, name, (\"socialNetworks\" IS NOT NULL) AS has_socials FROM roasters ORDER BY created_at DESC LIMIT 10;"`
+
+I'll mark migration steps complete in the todo list, restart the server and client containers, and run a DB sample query to show migrated rows.
+
+✔ Completed: *Run Prisma migrations in Docker* (2/6)
+
+✔ `docker-compose restart server; docker-compose restart client; docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db -c 'SELECT id, name, ("socialNetworks" IS NOT NULL) AS has_socials FROM roasters ORDER BY created_at DESC LIMIT 10;'`
+
+```shell
+ERROR:  column "created_at" does not exist
+LINE 1: ...S NOT NULL) AS has_socials FROM roasters ORDER BY created_at...  
+                                                             ^
+HINT:  Perhaps you meant to reference the column "roasters.createdAt".  
+```
+
+✔ `docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db -c 'SELECT id, name, ("socialNetworks" IS NOT NULL) AS has_socials FROM roasters ORDER BY "createdAt" DESC LIMIT 10;'`
+
+```sql
+            id             |           name            | has_socials 
+---------------------------+---------------------------+-------------       
+ cmfs1w26g0001ua27odl9tzak | Detour                    | f
+ cmf03jd150007scuawj1nxtnf | Violet Coffee Works       | f
+ cmf03jd0y0005scua29m279q1 | Lavender Bean Co.         | f
+ cmf03jd0k0003scuavxlsqw1q | Purple Mountain Coffee    | t
+ roaster3                  | Intelligentsia Coffee     | f
+ roaster2                  | Stumptown Coffee Roasters | f
+ roaster1                  | Blue Bottle Coffee        | t
+(7 rows
+```
+
+✔ Completed: *Restart service containers* (5/6)
+
+Summary of what I did (done locally in your Docker Compose environment)
+
+- Verified and inspected migration assets:
+  - Confirmed package.json has scripts: `migrate:socials` and `verify:socials`.
+  - Confirmed migration script files: migrate-social-networks.ts and verify-socials.ts exist.
+
+- Created & applied DB migration:
+  - Created a Prisma migration to add the `socialNetworks` JSON column and applied it to the local DB.
+  - Ran `prisma generate` to update the client.
+
+- Ran data migration and fixed verification script:
+  - Executed `npm run migrate:socials` in the server container; it populated `socialNetworks` (updated 2 roaster(s) in this run).
+  - Updated verify-socials.ts to use raw SQL (avoids Prisma JSON filter typing issues) and re-ran `npm run verify:socials` — verification passed.
+
+- Restarted services and validated:
+  - Restarted server and client containers.
+  - Queried the database for a sample of recent roasters and confirmed `socialNetworks` populated for some rows:
+    - Example output (sample): 7 rows returned; some `has_socials = t` (true).
+
+Files I edited
+- verify-socials.ts — replaced typed JSON filter usage with raw SQL and adjusted quoting.
+- (Migration was created by Prisma) migration.sql — added column `"socialNetworks" JSONB`.
+
+Commands I ran (you can re-run locally — PowerShell / pwsh)
+- Create+apply migration, generate client:
+```powershell
+docker-compose exec server npx prisma migrate dev --name add-socialnetworks --create-only
+docker-compose exec server npx prisma migrate deploy
+docker-compose exec server npx prisma generate
+```
+- Run data migration + verification:
+```powershell
+docker-compose exec server npm run migrate:socials
+docker-compose exec server npm run verify:socials
+```
+- Restart containers:
+```powershell
+docker-compose restart server
+docker-compose restart client
+```
+- Quick DB sample (shows whether `socialNetworks` is set):
+```powershell
+docker exec -i the-beans-database-1 psql -U beans_user -d the_beans_db -c 'SELECT id, name, ("socialNetworks" IS NOT NULL) AS has_socials FROM roasters ORDER BY "createdAt" DESC LIMIT 10;'
+```
+
+Current todo status (I tracked progress)
+- `Verify migration scripts`: completed
+- `Run Prisma migrations in Docker`: completed
+- `Run data migration script`: completed
+- `Run verification script`: completed
+- `Restart service containers`: completed
+- `Validate migration results`: completed
+
+Recommended next steps (you can run or I can help)
+- Run a more thorough validation in staging:
+  - Snapshot DB, run the same commands, and review full counts:
+    - Count of roasters migrated: `SELECT COUNT(*) FROM roasters WHERE "socialNetworks" IS NOT NULL;`
+    - Count remaining legacy-only rows: `SELECT COUNT(*) FROM roasters WHERE "socialNetworks" IS NULL AND (instagram IS NOT NULL OR x IS NOT NULL OR ...);`
+- Sweep the frontend for any remaining direct legacy field reads and replace with `getSocial(...)` where missing.
+- After a monitoring window (once client+server are live and verified), schedule a migration to drop legacy columns.
+- If you'd like, I can:
+  - Open a PR with these changes (including the updated verify-socials.ts).
+  - Run a repo-wide search for leftover legacy social reads and prepare a PR that replaces them with `getSocial()`.
+
+Do you want me to open a PR with the verification fix + any remaining small updates, or run a repo-wide replacement for legacy reads and prepare that PR?

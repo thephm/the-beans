@@ -22,6 +22,9 @@ async function main() {
       name: 'Purple Mountain Coffee',
       description: 'A roaster from the mountains.',
       ownerId: testUser.id,
+      socialNetworks: {
+        instagram: 'https://instagram.com/purplemountain',
+      },
     },
   } as any);
 
@@ -32,6 +35,9 @@ async function main() {
       name: 'Lavender Bean Co.',
       description: 'Lavender-infused beans.',
       ownerId: testUser.id,
+      socialNetworks: {
+        facebook: 'https://facebook.com/lavenderbean',
+      },
     },
   } as any);
 
@@ -42,6 +48,9 @@ async function main() {
       name: 'Violet Coffee Works',
       description: 'Violet-inspired coffee blends.',
       ownerId: testUser.id,
+      socialNetworks: {
+        twitter: 'https://twitter.com/violetcoffee',
+      },
     },
   } as any);
 

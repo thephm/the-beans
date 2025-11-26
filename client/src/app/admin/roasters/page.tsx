@@ -709,6 +709,14 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         }
       });
 
+      // Build consolidated socialNetworks map from individual inputs for backend
+      const socialKeys = ['instagram','tiktok','facebook','linkedin','youtube','threads','pinterest','bluesky','x','reddit'];
+      const socialNetworks: Record<string,string> = {};
+      socialKeys.forEach((k) => {
+        const v = (formData as any)[k];
+        if (v && String(v).trim() !== '') socialNetworks[k] = String(v).trim();
+      });
+
       const payload = {
         ...formData,
         hours: convertedHours,
@@ -717,6 +725,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         founded: formData.founded ? parseInt(String(formData.founded)) : undefined,
         rating: parseFloat(String(formData.rating)) || 0,
         specialtyIds: formData.specialtyIds, // Send specialty IDs array directly
+        // Include consolidated map when any networks provided
+        ...(Object.keys(socialNetworks).length > 0 ? { socialNetworks } : {}),
       };
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
