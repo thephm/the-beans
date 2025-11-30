@@ -122388,3 +122388,103 @@ Completed with input: {
 ✔ Completed: *Restart client container* (3/3)
 
 The "Visit" button has been removed from the roaster contact info card, and the client container has been restarted. The website link will still appear, but without the button. The change is now live.
+
+## Clicking speciality pill in home or favorites doesn't work #210
+
+https://github.com/thephm/the-beans/issues/210
+
+> Clicking speciality pill in home or favorites doesn't workShould take you to discover page with that search criteria filled in and search performed
+
+To address this, the "speciality pill" components on the home and favorites pages need to trigger navigation to the `/discover` page, passing the selected specialty as a search parameter and automatically performing the search.
+
+Here's what needs to be done:
+
+1. Update the pill/button component to use Next.js router to navigate to `/discover?specialty=...`.
+2. On the `/discover` page, read the `specialty` query parameter, pre-fill the search field, and trigger the search automatically.
+3. Ensure this works for both the home and favorites pages.
+
+I'll identify the relevant pill component and the discover page logic, then make the necessary changes. 
+
+✔ Searched for regex `specialt|pill|discover` (`**/client/src/components/**`), 30 results
+
+✔ Searched for regex `pill` (`**/client/src/components/**`), 7 results
+
+✔ Searched for regex `SpecialtyPillSelector` (`**/client/src/app/**`), 3 results
+
+✔ Searched for regex `pill|specialt` (`**/client/src/app/**`), 20 results
+
+✔ Searched for regex `FeaturedRoasters|favorites` (`**/client/src/app/**`), 20 results
+
+✔ Searched for text `specialt` (`**/client/src/components/FeaturedRoasters.tsx`), 11 results
+
+✔ Searched for text `pill|button` (`**/client/src/components/FeaturedRoasters.tsx`), no results
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 1 to 81
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 81 to 149
+
+✔ Searched for text `specialt|pill|button` (`**/client/src/components/RoasterCard.tsx`), 34 results
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 300 to 351
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 80 to 140
+
+✔ Read `client/src/app/favorites/page.tsx`, lines 1 to 81
+
+✔ Read `client/src/app/favorites/page.tsx`, lines 81 to 142
+
+✔ Read `client/src/app/page.tsx`
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 81
+
+✔ Read `client/src/app/discover/page.tsx`, lines 81 to 161
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 81 to 149
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 160 to 220
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 1 to 81
+
+✔ Read `client/src/app/favorites/page.tsx`, lines 1 to 81
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 60 to 120
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 1 to 81
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 81 to 149
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 300 to 351
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 1 to 81
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 81 to 149
+
+✔ Read `client/src/app/favorites/page.tsx`, lines 81 to 142
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 1 to 61
+
+`FeaturedRoasters.tsx +7 -0`
+`page.tsx +5 -0`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "client"
+}
+
+✔ Ran `list_containers` 
+Completed with input: {}
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+The specialty pill click is now fixed: clicking a specialty on the home or favorites page will take you to the discover page with that specialty pre-filled and the search performed. The frontend container has been restarted for your changes to take effect.
+
+You can now test this in your browser. Let me know if you need further adjustments!
+
+## 993rd try
+
+*(pills work now)*

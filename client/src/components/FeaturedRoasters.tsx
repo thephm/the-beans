@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RoasterCard } from './RoasterCard'
+import { useRouter } from 'next/navigation'
 import { apiClient } from '@/lib/api'
 
 interface Specialty {
@@ -31,6 +32,7 @@ export function FeaturedRoasters() {
   const [featuredRoasters, setFeaturedRoasters] = useState<Roaster[]>([])
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
+  const router = useRouter();
 
   // Get user location
   useEffect(() => {
@@ -120,6 +122,11 @@ export function FeaturedRoasters() {
                 roaster={roaster}
                 userLocation={userLocation}
                 returnTo="/"
+                onSpecialtyClick={(specialtyName) => {
+                  if (specialtyName) {
+                    router.push(`/discover?specialty=${encodeURIComponent(specialtyName)}`);
+                  }
+                }}
               />
             </motion.div>
           ))}
