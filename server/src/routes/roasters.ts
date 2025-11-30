@@ -86,6 +86,40 @@ const requireAuth = async (req: any, res: any, next: any) => {
  *           type: array
  *           items:
  *             type: string
+ *         founded:
+ *           type: integer
+ *           description: Year the roaster was founded
+ *         socialNetworks:
+ *           type: object
+ *           additionalProperties:
+ *             type: string
+ *           description: Social network URLs/handles (e.g. instagram, facebook, x, etc.)
+ *         people:
+ *           type: array
+ *           description: Array of people/contacts for the roaster
+ *           items:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               mobile:
+ *                 type: string
+ *               title:
+ *                 type: string
+ *               roles:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               isPrimary:
+ *                 type: boolean
+ *               isActive:
+ *                 type: boolean
  *         verified:
  *           type: boolean
  *         featured:
