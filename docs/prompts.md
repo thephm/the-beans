@@ -122350,3 +122350,41 @@ There are endpoints in users.ts that allow an admin to:
 All of these are admin-only, but they do exist. There are no public endpoints for user creation (sign-up is likely handled in auth.ts), but admin-level user management endpoints are present.
 
 If you want to restrict or remove these endpoints, let me know how you want to proceed.
+
+## Visit button cut off on mobile, let's delete it #211
+
+https://github.com/thephm/the-beans/issues/211
+
+✔ Created 3 todos
+
+✔ Starting: *Find Visit button component* (1/3)
+
+✔ Searched for text `Visit` (`**/client/src/components/**,client/src/app/roasters/**`), no results
+
+✔ Searched for regex `button.*visit|visit.*button|VisitButton|visit.*btn|btn.*visit` (`**/client/src/components/**,client/src/app/roasters/**`), no results
+
+✔ Searched for regex `href.*vintagecoffee|href.*website|href.*http|href.*www` (`**/client/src/components/**,client/src/app/roasters/**`), no results
+
+✔ Searched for regex `website|contact info|contactInfo|contact-info` (`**/client/src/components/**,client/src/app/roasters/**`), no results
+
+✔ Searched for regex `card|Card|contact|Contact` (`**/client/src/components/**,client/src/app/roasters/**`), no results
+
+✔ Searched for regex `button|Button` (`**/client/src/app/roasters/**`), 13 results
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 450 to 550
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 600 to 700
+
+`page.tsx +8 -18`
+
+✔ Completed: *Find Visit button component* (1/3)
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+✔ Completed: *Restart client container* (3/3)
+
+The "Visit" button has been removed from the roaster contact info card, and the client container has been restarted. The website link will still appear, but without the button. The change is now live.
