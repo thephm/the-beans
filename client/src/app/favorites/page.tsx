@@ -92,7 +92,7 @@ export default function FavoritesPage() {
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
               {t('favorites.title')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               {t('favorites.subtitle')}
             </p>
           </div>

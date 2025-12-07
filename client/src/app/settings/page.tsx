@@ -115,7 +115,7 @@ export default function SettingsPage() {
                     <select
                       value={settings.language}
                       onChange={e => setSettings(prev => ({ ...prev, language: e.target.value }))}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       {languageContext?.supportedLanguages.map(lang => (
                         <option key={lang.code} value={lang.code}>{lang.nativeName}</option>
@@ -131,7 +131,7 @@ export default function SettingsPage() {
                         ...prev,
                         preferences: { ...prev.preferences, distanceUnit: e.target.value }
                       }))}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="km">{t('km')}</option>
                       <option value="mi">{t('mi')}</option>
@@ -182,7 +182,7 @@ export default function SettingsPage() {
                         ...prev,
                         preferences: { ...prev.preferences, roastLevel: e.target.value }
                       }))}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="light">{t('settings.light')} roast</option>
                       <option value="medium">{t('settings.medium')} roast</option>

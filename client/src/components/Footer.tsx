@@ -38,12 +38,12 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">{t('nav.discover')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/discover" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/discover" className="text-gray-400 hover:text-primary-400 transition-colors">
                   {t('nav.discover')}
                 </Link>
               </li>
               <li>
-                <Link href="/favorites" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/favorites" className="text-gray-400 hover:text-primary-400 transition-colors">
                   {t('nav.favorites')}
                 </Link>
               </li>
@@ -55,12 +55,12 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">{t('footer.support')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/contact" className="text-gray-400 hover:text-primary-400 transition-colors">
                   {t('footer.contactUs')}
                 </Link>
               </li>
               <li>
-                <a href={`${getApiBaseUrl()}/api-docs`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <a href={`${getApiBaseUrl()}/api-docs`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary-400 transition-colors">
                   {t('footer.apiDocs')}
                 </a>
               </li>
@@ -73,13 +73,13 @@ export function Footer() {
             {t('footer.copyright')}
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <Link href="/privacy" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
               {t('footer.privacyPolicy')}
             </Link>
-            <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <Link href="/terms" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
               {t('footer.termsOfService')}
             </Link>
-            <Link href="/cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <Link href="/cookies" className="text-gray-400 hover:text-primary-400 text-sm transition-colors">
               {t('footer.cookiePolicy')}
             </Link>
           </div>

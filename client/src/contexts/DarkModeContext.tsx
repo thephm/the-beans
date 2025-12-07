@@ -18,17 +18,16 @@ export const useDarkMode = () => {
 };
 
 export const DarkModeProvider = ({ children }: { children: ReactNode }) => {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
+  // Initialize dark mode state from localStorage or system preference
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
     const stored = localStorage.getItem('darkMode');
     if (stored !== null) {
-      setDarkMode(stored === 'true');
-    } else {
-      // Default: match system preference
-      setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+      return stored === 'true';
     }
-  }, []);
+    // Default: match system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   useEffect(() => {
     localStorage.setItem('darkMode', String(darkMode));
