@@ -125774,3 +125774,30 @@ Now when you open the mobile menu in dark mode, you'll see the dark mode sun/moo
 ## 1061st try
 
 *(works)*
+
+## Left part of language menu is cut off on mobile #231
+
+https://github.com/thephm/the-beans/issues/231
+
+I'll examine the mobile language menu to see why the left part is being cut off. 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 200 to 240
+
+✔ Read `client/src/components/Navbar.tsx`, lines 240 to 280
+
+Now let me check the LanguageSelector component to see its styling: 
+
+✔ Read `client/src/components/LanguageSelector.tsx`, lines 1 to 80
+
+I can see the issue! The language dropdown has `absolute right-0` which positions it from the right edge of its parent container. In the mobile menu, this causes the left side to be cut off. The dropdown should be full-width on mobile or positioned differently. Let me fix this: 
+
+`LanguageSelector.tsx +1 -1`
+
+✔ `docker-compose restart client`
+
+Fixed! The language dropdown menu was positioned with `absolute right-0` which caused it to align from the right edge and cut off the left side on mobile screens. I've updated it to use `absolute left-0 sm:right-0 sm:left-auto`, which means:
+
+- On mobile: The dropdown aligns from the left edge (preventing cutoff)
+- On desktop (sm and up): The dropdown aligns from the right edge as before
+
+The client container has been restarted, so the language menu should now be fully visible on mobile without any cutoff on the left side.
