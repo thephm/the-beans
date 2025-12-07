@@ -209,7 +209,7 @@ export function SearchSection({
 
   return (
 
-    <section className={`px-4 sm:px-6 lg:px-8 bg-white ${user ? 'pt-8 pb-8' : 'py-8'}`}>
+    <section className={`px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 dark:bg-none dark:text-gray-100 ${user ? 'pt-8 pb-8' : 'py-8'}`}>
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -224,14 +224,14 @@ export function SearchSection({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
-          className={`bg-gradient-to-r from-lavender-50 to-orchid-50 rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-4 sm:px-8 pb-8' : 'p-4 sm:p-8'}`}
+          className={`bg-gradient-to-r from-lavender-50 to-orchid-50 dark:bg-gray-900 dark:bg-none rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-4 sm:px-8 pb-8' : 'p-4 sm:p-8'}`}
         >
           {/* Search input row */}
           {/* Responsive row: all fields/buttons in one row on md+ screens, stacked on mobile */}
           <div className="flex flex-col md:flex-row gap-2 mt-4 items-stretch">
             {/* Search for roasters */}
             <div className="md:flex-1">
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2 md:mb-0">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2 md:mb-0">
                 {t('search.searchLabel')}
               </label>
               <input
@@ -241,12 +241,12 @@ export function SearchSection({
                 onChange={(e) => handleSearchQueryChange(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={t('search.searchPlaceholder')}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
             </div>
             {/* Location field */}
             <div className="md:flex-1">
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2 md:mb-0">
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2 md:mb-0">
                 {t('search.locationLabel')}
               </label>
               <div className="flex gap-2">
@@ -257,7 +257,7 @@ export function SearchSection({
                   onChange={(e) => handleLocationChange(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={t('search.locationPlaceholder')}
-                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900"
+                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 />
                 <button
                   onClick={detectLocation}
@@ -286,7 +286,7 @@ export function SearchSection({
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <span className="text-sm text-gray-600">{t('search.popularSearches')}:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300">{t('search.popularSearches')}:</span>
             {popularSearches.length === 0 ? (
               <span className="text-sm text-gray-400 ml-2">{t('search.noPopularSearches') || 'No data yet'}</span>
             ) : (
@@ -294,7 +294,7 @@ export function SearchSection({
                 <button
                   key={query}
                   onClick={() => handlePopularSearchClick(query)}
-                  className="px-3 py-1 bg-white text-primary-600 rounded-full text-sm border border-primary-200 hover:bg-primary-50 transition-colors break-words max-w-xs truncate"
+                  className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full text-sm hover:bg-primary-200 dark:hover:bg-primary-900/50 hover:text-primary-800 dark:hover:text-primary-300 transition-colors cursor-pointer break-words max-w-xs truncate"
                   title={query}
                 >
                   {query}

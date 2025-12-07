@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { LanguageProvider } from '@/contexts/LanguageContext'
+import { DarkModeProvider } from '@/contexts/DarkModeContext'
 import i18n from '@/lib/i18n'
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -36,7 +37,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LanguageProvider>
-          {children}
+          <DarkModeProvider>
+            {children}
+          </DarkModeProvider>
         </LanguageProvider>
       </AuthProvider>
     </QueryClientProvider>

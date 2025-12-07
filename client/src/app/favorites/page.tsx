@@ -77,7 +77,7 @@ export default function FavoritesPage() {
   }, [user])
 
   if (isLoading) {
-    return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 flex items-center justify-center">
       <div className="text-xl">Loading...</div>
     </div>
   }
@@ -85,9 +85,9 @@ export default function FavoritesPage() {
   const hasFavorites = favoriteRoasters.length > 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
-      <div className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
+      <section className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="pt-24 pb-16">
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">
               {t('favorites.title')}
@@ -98,7 +98,7 @@ export default function FavoritesPage() {
           </div>
 
           {!hasFavorites ? (
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -140,7 +140,7 @@ export default function FavoritesPage() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }

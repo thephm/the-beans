@@ -112,7 +112,7 @@ export default function DiscoverPage() {
   // }, [filters])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
+    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
       <div className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -121,14 +121,14 @@ export default function DiscoverPage() {
               <span className="block sm:hidden">{t('discover.titleMobile')}</span>
               <span className="hidden sm:block">{t('discover.title')}</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               <span className="block sm:hidden">{t('discover.subtitleMobile')}</span>
               <span className="hidden sm:block">{t('discover.subtitle')}</span>
             </p>
           </div>
 
           {/* Search Section */}
-          <div className="mb-12">
+          <div className="mb-12 dark:bg-gray-900 dark:rounded-2xl dark:shadow-lg">
             <SearchSection 
               searchQuery={filters.search}
               location={filters.location}
@@ -149,7 +149,7 @@ export default function DiscoverPage() {
             {loading ? (
               // Loading skeletons
               Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
+                <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden animate-pulse">
                   <div className="h-48 bg-gray-200"></div>
                   <div className="p-6">
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>

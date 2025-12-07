@@ -11,6 +11,11 @@ export const metadata = {
   manifest: '/manifest.json',
 }
 
+
+
+
+import { DarkModeScript } from './theme-script'
+
 export default function RootLayout({
   children,
 }: {
@@ -26,8 +31,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192x192.png" sizes="192x192" />
         <meta name="theme-color" content="#a673ff" />
       </head>
-      <body className={`${inter.className} bg-gradient-lavender min-h-screen`}>
+      <body className={`${inter.className} min-h-screen`}>
         <Providers>
+          <DarkModeScript />
           <div>
             <Navbar />
             {children}

@@ -235,7 +235,7 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
       let dist = roaster.distance
       if (unit === 'km') dist = dist * 1.60934
       return (
-        <span className="text-sm text-gray-500 flex items-center">
+        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
           <LocationOn sx={{ fontSize: 14, marginRight: 0.25 }} />
           {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}
         </span>
@@ -253,7 +253,7 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
       const dist = R * c
       return (
-        <span className="text-sm text-gray-500 flex items-center">
+        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
           <LocationOn sx={{ fontSize: 14, marginRight: 0.25 }} />
           {dist.toFixed(1)} {unit === 'km' ? t('km').toLowerCase() : t('mi').toLowerCase()}
         </span>
@@ -265,7 +265,7 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
   const roasterIdStr = roaster.id.toString()
 
   return (
-    <div className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col ${
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col border border-gray-200 dark:border-gray-700 ${
       user?.role === 'admin' && !roaster.verified ? 'border-4 border-red-500' : ''
     }`}>
       <div className="relative h-48">
@@ -290,17 +290,17 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
       </div>
       <div className="px-6 pt-6 pb-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-bold text-gray-900">{roaster.name}</h3>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">{roaster.name}</h3>
           {showRatings && roaster.rating && (
             <div className="flex items-center">
               <Star sx={{ fontSize: 20, color: '#fbbf24' }} />
-              <span className="text-gray-600 ml-1">{roaster.rating}</span>
+              <span className="text-gray-600 dark:text-gray-300 ml-1">{roaster.rating}</span>
             </div>
           )}
         </div>
         {(roaster.city || roaster.state) && (
           <div className="flex justify-between items-center mb-2">
-            <p className="text-gray-600 flex items-center">
+            <p className="text-gray-600 dark:text-gray-300 flex items-center">
               <LocationOn sx={{ fontSize: 16, marginRight: 0.5 }} />
               {[roaster.city, roaster.state].filter(Boolean).join(', ')}
             </p>
@@ -308,14 +308,14 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
           </div>
         )}
         {roaster.description && (
-          <p className="text-gray-700 mb-4">{roaster.description}</p>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">{roaster.description}</p>
         )}
         <div className="flex flex-wrap gap-2 mb-4">
           {roaster.specialties && roaster.specialties.map((specialty) => (
             <button
               key={specialty.id}
               onClick={() => handleSpecialtyClick(specialty.name)}
-              className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
+              className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full text-sm hover:bg-primary-200 dark:hover:bg-primary-900/50 hover:text-primary-800 dark:hover:text-primary-300 transition-colors cursor-pointer"
             >
               {translateSpecialty(specialty)}
             </button>

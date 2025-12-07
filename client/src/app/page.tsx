@@ -26,7 +26,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
       <Hero />
       <SearchSection onSearch={handleSearch} />
       <FeaturedRoasters />

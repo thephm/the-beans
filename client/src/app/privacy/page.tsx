@@ -6,10 +6,10 @@ export default function PrivacyPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 dark:bg-none py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">
             {t('privacy.title', 'Privacy Policy')}
           </h1>
           
