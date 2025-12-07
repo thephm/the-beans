@@ -3,11 +3,13 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { LanguageSelector } from './LanguageSelector'
 import { UserMenu } from './UserMenu'
-import { Coffee } from '@mui/icons-material'
+import { Coffee, DarkMode, LightMode } from '@mui/icons-material'
+import { useDarkMode } from '@/contexts/DarkModeContext'
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -16,6 +18,8 @@ export function Navbar() {
   const { user, logout, loading } = useAuth()
   const { t } = useTranslation()
   const adminMenuRef = useRef<HTMLDivElement>(null)
+
+    const { darkMode, toggleDarkMode } = useDarkMode()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,11 +44,11 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-lavender-200' 
-          : 'bg-white/90 backdrop-blur-sm shadow-sm'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300
+        ${isScrolled
+          ? 'bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-lg border-b border-lavender-200 dark:border-gray-800'
+          : 'bg-white/90 dark:bg-gray-900 backdrop-blur-sm shadow-sm'}
+      `}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -60,20 +64,20 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/discover" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/discover" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               {t('nav.discover')}
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               {t('nav.about')}
             </Link>
-            <Link href="/favorites" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/favorites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               {t('nav.favorites')}
             </Link>
             {user?.role === 'admin' && (
               <div className="relative" ref={adminMenuRef}>
                 <button
                   onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
-                  className="flex items-center text-gray-700 hover:text-gray-900 font-semibold transition-colors"
+                  className="flex items-center text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white font-semibold transition-colors"
                 >
                   {t('admin.title', 'Admin')}
                   <svg 
@@ -86,24 +90,24 @@ export function Navbar() {
                   </svg>
                 </button>
                 {isAdminMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 py-2 z-50">
                     <Link 
                       href="/admin/users" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('adminSection.users', 'Users')}
                     </Link>
                       <Link 
                         href="/admin/people" 
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                        className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                         onClick={() => setIsAdminMenuOpen(false)}
                       >
                         {t('adminSection.people', 'People')}
                       </Link>
                     <Link 
                       href="/admin/roasters" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => {
                         setIsAdminMenuOpen(false);
                         window.location.href = '/admin/roasters';
@@ -114,21 +118,21 @@ export function Navbar() {
                     {/* Only one 'Roasters (New)' link in Admin dropdown */}
                     <Link 
                       href="/admin/roasters/new-admin" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-700 transition-colors font-semibold"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-green-700 transition-colors font-semibold"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('adminSection.roastersNew', 'Roasters (New)')}
                     </Link>
                     <Link 
                       href="/admin/specialties" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('admin.specialties.title', 'Specialties')}
                     </Link>
                     <Link 
                       href="/admin/audit-logs" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('adminSection.auditLogs', 'Audit Logs')}
@@ -138,6 +142,17 @@ export function Navbar() {
               </div>
             )}
             
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              aria-label={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
+              className="p-2 rounded-lg hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200"
+              title={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
+            >
+              {darkMode ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
+            </button>
+
             {/* Language Selector */}
             <LanguageSelector />
             
@@ -148,7 +163,7 @@ export function Navbar() {
               <UserMenu />
             ) : (
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="text-gray-700 hover:text-primary-600 transition-colors">
+                <Link href="/login" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   {t('nav.login')}
                 </Link>
                 <Link 
@@ -164,7 +179,7 @@ export function Navbar() {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-lavender-100 transition-colors"
+            className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMobileMenuOpen ? (
@@ -179,28 +194,28 @@ export function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-lavender-200 mt-2 pt-4 pb-4">
             <div className="flex flex-col space-y-3">
-              <Link href="/discover" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/discover" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.discover')}
               </Link>
-              <Link href="/about" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.about')}
               </Link>
-              <Link href="/favorites" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/favorites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.favorites')}
               </Link>
               {user?.role === 'admin' && (
                 <div className="py-2">
-                  <div className="text-gray-700 font-semibold mb-2">{t('admin.title', 'Admin')}</div>
+                  <div className="text-gray-700 dark:text-gray-200 font-semibold mb-2">{t('admin.title', 'Admin')}</div>
                   <Link 
                     href="/admin/users" 
-                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('adminSection.users', 'Users')}
                   </Link>
                   <Link 
                     href="/admin/roasters" 
-                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       window.location.href = '/admin/roasters';
@@ -210,14 +225,14 @@ export function Navbar() {
                   </Link>
                   <Link 
                     href="/admin/roasters/new-admin" 
-                    className="block pl-4 text-gray-600 hover:text-green-700 py-1 font-semibold" 
+                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-green-700 dark:hover:text-green-400 py-1 font-semibold" 
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('adminSection.roastersNew', 'Roasters (New)')}
                   </Link>
                   <Link 
                     href="/admin/people" 
-                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('adminSection.people', 'People')}
@@ -238,8 +253,16 @@ export function Navbar() {
                   </Link>
                 </div>
               )}
-              {/* Mobile Language Selector */}
-              <div className="py-2">
+              {/* Mobile Dark Mode Toggle & Language Selector */}
+              <div className="py-2 flex items-center space-x-2">
+                <button
+                  onClick={toggleDarkMode}
+                  aria-label={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
+                  className="p-2 rounded-lg hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200"
+                  title={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
+                >
+                  {darkMode ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
+                </button>
                 <LanguageSelector />
               </div>
               {/* Mobile Authentication */}

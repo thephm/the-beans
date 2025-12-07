@@ -7,7 +7,7 @@ export default function CookiePolicyPage() {
   const { t } = useTranslation()
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
+    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
       <div className="pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}

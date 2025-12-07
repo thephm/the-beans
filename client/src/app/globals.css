@@ -1,47 +1,56 @@
+@layer utilities {
+  html.dark body,
+  html.dark body > *,
+  html.dark section,
+  html.dark main,
+  html.dark .bg-white,
+  html.dark .bg-lavender-50,
+  html.dark .bg-gradient-lavender {
+    background-image: none !important;
+    background-color: #030712 !important;
+    color: #f3f4f6 !important;
+  }
+}
+@layer utilities {
+  html.dark body {
+    background-image: none !important;
+    background-color: #030712 !important;
+    color: #f3f4f6 !important;
+  }
+}
+/* --- DARK MODE OVERRIDE: ENSURE THIS IS LAST --- */
+html.dark body {
+  background-image: none !important;
+  background-color: #030712 !important;
+  color: #f3f4f6 !important;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+body {
+  @apply text-gray-900;
+  background-image: linear-gradient(135deg, #faf8ff 0%, #f3f0ff 50%, #e9e5ff 100%);
+}
+
+
+html.dark body {
+  @apply text-gray-100 bg-gray-950;
+  background-image: none !important;
+  background-color: #030712 !important;
+  color: #f3f4f6 !important;
+}
+
+
+
 @layer base {
   input, select, textarea {
     @apply text-gray-900;
   }
   table, th, td {
-    @apply text-gray-900;
-  }
-}
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-/* Disabled automatic dark mode to prevent white text issues on mobile
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-*/
-
-body {
-  color: #111827; /* Force dark gray text */
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-/* Ensure all input, select, and textarea fields have visible text color */
-input, select, textarea {
-}
-
-@layer base {
-  input, select, textarea {
     @apply text-gray-900;
   }
 }

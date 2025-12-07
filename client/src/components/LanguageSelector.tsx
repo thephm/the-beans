@@ -39,7 +39,7 @@ export function LanguageSelector() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isChanging}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-lavender-100 transition-colors disabled:opacity-50"
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
         aria-label={t('settings.selectLanguage')}
       >
         <span className="text-lg">{currentLanguage.flag}</span>
@@ -58,9 +58,9 @@ export function LanguageSelector() {
 
       {/* Language Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-          <div className="px-4 py-2 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900">{t('settings.language')}</p>
+        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+          <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('settings.language')}</p>
           </div>
           <div className="py-1">
             {supportedLanguages.map((language) => (
@@ -71,8 +71,8 @@ export function LanguageSelector() {
                 className={`
                   w-full flex items-center px-4 py-2 text-sm transition-colors
                   ${currentLanguage.code === language.code 
-                    ? 'bg-primary-50 text-primary-700' 
-                    : 'text-gray-700 hover:bg-lavender-50'
+                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400' 
+                    : 'text-gray-700 dark:text-gray-200 hover:bg-lavender-50 dark:hover:bg-gray-700'
                   }
                   disabled:opacity-50
                 `}
@@ -80,7 +80,7 @@ export function LanguageSelector() {
                 <span className="mr-3 text-lg">{language.flag}</span>
                 <div className="flex-1 text-left">
                   <p className="font-medium">{language.nativeName}</p>
-                  <p className="text-xs text-gray-500">{language.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{language.name}</p>
                 </div>
                 {currentLanguage.code === language.code && (
                   <svg className="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">

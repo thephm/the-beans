@@ -74,7 +74,7 @@ export default function SettingsPage() {
   }
 
   if (loading) {
-    return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none flex items-center justify-center">
       <div className="text-xl">{t('common.loading')}</div>
     </div>
   }
@@ -84,20 +84,20 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
+    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
       <div className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6 leading-normal pb-2">
               {t('settings.title')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               <span className="sm:hidden">{t('settings.descriptionMobile')}</span>
               <span className="hidden sm:inline">{t('settings.description')}</span>
             </p>
           </div>
 
-          <form onSubmit={handleSaveSettings} className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">
+          <form onSubmit={handleSaveSettings} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-8 max-w-2xl mx-auto">
             {success && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-green-800">{t('settings.saveSuccess')}</p>
@@ -107,11 +107,11 @@ export default function SettingsPage() {
             <div className="space-y-8">
               {/* Preferences (Language & Distance Unit) */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.preferences')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('settings.preferences')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Language Preference */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.language')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.language')}</label>
                     <select
                       value={settings.language}
                       onChange={e => setSettings(prev => ({ ...prev, language: e.target.value }))}
@@ -124,7 +124,7 @@ export default function SettingsPage() {
                   </div>
                   {/* Distance Unit */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('distanceUnit')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('distanceUnit')}</label>
                     <select
                       value={settings.preferences.distanceUnit}
                       onChange={e => setSettings(prev => ({
@@ -141,7 +141,7 @@ export default function SettingsPage() {
               </div>
               {/* Privacy */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Privacy</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Privacy</h3>
                 <div className="space-y-3">
                   <label className="flex items-center">
                     <input 
@@ -153,7 +153,7 @@ export default function SettingsPage() {
                       }))}
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                     />
-                    <span className="ml-3 text-gray-700">{t('settings.showProfile')}</span>
+                    <span className="ml-3 text-gray-700 dark:text-gray-300">{t('settings.showProfile')}</span>
                   </label>
                   <label className="flex items-center">
                     <input 
@@ -165,17 +165,17 @@ export default function SettingsPage() {
                       }))}
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
                     />
-                    <span className="ml-3 text-gray-700">{t('settings.allowLocationTracking')}</span>
+                    <span className="ml-3 text-gray-700 dark:text-gray-300">{t('settings.allowLocationTracking')}</span>
                   </label>
                 </div>
               </div>
 
               {/* Coffee Preferences */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.coffeePreferences')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('settings.coffeePreferences')}</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('settings.roastLevel')}</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.roastLevel')}</label>
                     <select 
                       value={settings.preferences.roastLevel}
                       onChange={(e) => setSettings(prev => ({
