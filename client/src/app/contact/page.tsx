@@ -2,6 +2,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import FormCard from '@/components/FormCard';
 
 export default function ContactPage() {
   const router = useRouter();
@@ -48,44 +49,47 @@ export default function ContactPage() {
 
   if (submitted) {
     return (
-      <div className="max-w-lg mx-auto mt-[88px] p-6 bg-white rounded shadow">
-        <h2 className="text-2xl font-bold mb-4">Thank You!</h2>
-        <p>Your message has been sent. We will get back to you soon.</p>
+      <div className="max-w-lg mx-auto mt-[88px]">
+        <FormCard>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Thank You!</h2>
+          <p className="text-gray-700 dark:text-gray-300">Your message has been sent. We will get back to you soon.</p>
+        </FormCard>
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto mt-[88px] p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
-      <form onSubmit={handleSubmit} className="space-y-4 relative pb-20">
+    <div className="max-w-lg mx-auto mt-[88px]">
+      <FormCard>
+        <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Contact Us</h2>
+        <form onSubmit={handleSubmit} className="space-y-4 relative pb-20">
         {/* First Name and Last Name - side by side on medium+ screens */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="firstName">First Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="firstName">First Name</label>
             <input
               type="text"
               id="firstName"
               name="firstName"
               value={form.firstName}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="lastName">Last Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="lastName">Last Name</label>
             <input
               type="text"
               id="lastName"
               name="lastName"
               value={form.lastName}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="email">
             Email <span className="text-red-500">*</span>
           </label>
           <input
@@ -94,12 +98,12 @@ export default function ContactPage() {
             name="email"
             value={form.email}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="message">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="message">
             Message <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -107,7 +111,7 @@ export default function ContactPage() {
             name="message"
             value={form.message}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={5}
             required
           />
@@ -116,7 +120,7 @@ export default function ContactPage() {
         <div className="absolute bottom-4 right-4 flex gap-4">
           <button
             type="button"
-            className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400"
+            className="bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
             onClick={handleCancel}
             disabled={sending}
           >
@@ -131,6 +135,7 @@ export default function ContactPage() {
           </button>
         </div>
       </form>
+      </FormCard>
     </div>
   );
 }

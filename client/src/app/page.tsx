@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { Hero } from '@/components/Hero'
 import { FeaturedRoasters } from '@/components/FeaturedRoasters'
 import { SearchSection } from '@/components/SearchSection'
-import { Footer } from '@/components/Footer'
 
 export default function Home() {
   const router = useRouter()
@@ -26,11 +25,10 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
+    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
       <Hero />
       <SearchSection onSearch={handleSearch} />
       <FeaturedRoasters />
-      <Footer />
-    </main>
+    </div>
   )
 }

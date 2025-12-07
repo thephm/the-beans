@@ -24,7 +24,7 @@ export default function AboutPage() {
           </div>
 
           {/* Mission Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-8 mb-12">
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Coffee sx={{ color: 'white', fontSize: 32 }} />
@@ -38,7 +38,7 @@ export default function AboutPage() {
 
           {/* Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-6 text-center">
               <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Map sx={{ color: '#2563eb', fontSize: 24 }} />
               </div>
@@ -48,7 +48,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-6 text-center">
               <div className="w-12 h-12 bg-orchid-100 dark:bg-orchid-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Group sx={{ color: '#a855f7', fontSize: 24 }} />
               </div>
@@ -58,7 +58,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-6 text-center">
               <div className="w-12 h-12 bg-lavender-100 dark:bg-lavender-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Star sx={{ color: '#8b5cf6', fontSize: 24 }} />
               </div>
@@ -86,7 +86,7 @@ export default function AboutPage() {
           </div>
 
           {/* Values Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-8 mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">{t('about.values.title')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
@@ -117,7 +117,7 @@ export default function AboutPage() {
           </div>
 
           {/* Team Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-12">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-8 mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">{t('about.team.title')}</h2>
             <div className="text-center">
               <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
