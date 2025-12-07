@@ -47,27 +47,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 flex items-center justify-center pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none flex items-center justify-center pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6">{t('auth.welcomeBack')}</h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
             {t('auth.signInToDiscover')}
           </p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('auth.email')}
               </label>
               <input
@@ -78,13 +78,13 @@ export default function LoginPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                 placeholder={t('auth.email')}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('auth.password')}
               </label>
               <input
@@ -95,7 +95,7 @@ export default function LoginPage() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                 placeholder={t('auth.password')}
               />
             </div>
@@ -106,15 +106,15 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded text-gray-900"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                   {t('auth.rememberMe')}
                 </label>
               </div>
 
               <div className="text-sm">
-                <a href="#" className="text-primary-600 hover:text-primary-500">
+                <a href="#" className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
                   {t('auth.forgotPassword')}
                 </a>
               </div>
@@ -130,9 +130,9 @@ export default function LoginPage() {
           </form>
 
           {/* Demo Account */}
-          <div className="mt-6 p-4 bg-lavender-50 rounded-lg border border-lavender-200">
-            <h3 className="text-sm font-medium text-lavender-800 mb-2">{t('auth.demo.title')}</h3>
-            <p className="text-sm text-lavender-700">
+          <div className="mt-6 p-4 bg-lavender-50 dark:bg-lavender-900/20 rounded-lg border border-lavender-200 dark:border-lavender-800">
+            <h3 className="text-sm font-medium text-lavender-800 dark:text-lavender-300 mb-2">{t('auth.demo.title')}</h3>
+            <p className="text-sm text-lavender-700 dark:text-lavender-400">
               <span className="flex items-center gap-1 mb-1">
                 <Email sx={{ fontSize: 16 }} />
                 Email: coffee@lover.com
@@ -144,7 +144,7 @@ export default function LoginPage() {
             </p>
             <button
               onClick={() => setFormData({ email: 'coffee@lover.com', password: 'password123' })}
-              className="mt-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+              className="mt-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
             >
               {t('auth.demo.fillCredentials')}
             </button>
@@ -156,9 +156,9 @@ export default function LoginPage() {
 
         {/* Sign up link */}
         <div className="text-center">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {t('auth.dontHaveAccount')}{' '}
-            <Link href="/signup" className="text-primary-600 hover:text-primary-500 font-medium">
+            <Link href="/signup" className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 font-medium">
               {t('auth.signUpForFree')}
             </Link>
           </p>

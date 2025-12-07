@@ -125611,3 +125611,72 @@ All input fields now have consistent dark mode styling that matches the rest of 
 ## 1057th try
 
 *(input fields are dark background now)*
+
+## Join our community dark mode not done #234
+
+https://github.com/thephm/the-beans/issues/234
+
+> the login page is not setup for dark mode, see attached. same for signup page
+
+I'll update the login and signup pages to add dark mode styling to their input fields to match the rest of the app. 
+
+✔ Read `client/src/app/login/page.tsx`, lines 50 to 130
+
+✔ Read `client/src/app/signup/page.tsx`, lines 80 to 160
+
+Now let me check the rest of the signup page and also look at the page backgrounds: 
+
+✔ Read `client/src/app/login/page.tsx`, lines 45 to 85
+
+✔ Read `client/src/app/signup/page.tsx`, lines 72 to 80
+
+✔ Read `client/src/app/signup/page.tsx`, lines 160 to 211
+
+Now I'll update both the login and signup pages to add dark mode styling to the background, form container, labels, inputs, and text elements: 
+
+`page.tsx +11 -11`
+`page.tsx +18 -18`
+
+Now I need to check the login demo account section to add dark mode there as well: 
+
+✔ Read `client/src/app/login/page.tsx`, lines 135 to 171
+
+Now let me update the demo section and signup link in the login page: 
+
+`page.tsx +6 -6`
+
+Perfect! Now let me restart the client container to apply all the changes: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've successfully added complete dark mode styling to both the login and signup pages. Here's what was updated:
+
+**Login Page:**
+- Dark background (`dark:bg-gray-950`)
+- Dark form container with border (`dark:bg-gray-800`, `dark:border-gray-700`)
+- Email and password inputs with dark backgrounds and text
+- Error messages with dark styling
+- Remember me checkbox with dark mode
+- Forgot password link with dark colors
+- Demo account section with dark background
+- Sign up link with dark text colors
+
+**Signup Page:**
+- Dark background (`dark:bg-gray-950`)
+- Dark form container with border (`dark:bg-gray-800`, `dark:border-gray-700`)
+- All input fields (email, password, confirm password) with dark styling
+- Password strength indicator with dark background
+- Terms checkbox and links with dark mode
+- Error messages with dark styling
+- Login link with dark text colors
+
+All input fields now have:
+- `dark:bg-gray-700` for dark backgrounds
+- `dark:border-gray-600` for dark borders
+- `dark:text-white` for white text in dark mode
+- `dark:placeholder-gray-400` for placeholder text
+
+The styling is now consistent across all forms in the app (Profile, Settings, Login, and Signup pages).
+
+## 1058th try
+
