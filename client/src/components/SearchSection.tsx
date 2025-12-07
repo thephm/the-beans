@@ -208,8 +208,7 @@ export function SearchSection({
   }
 
   return (
-
-    <section className={`px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 dark:bg-none dark:text-gray-100 ${user ? 'pt-8 pb-8' : 'py-8'}`}>
+  <section className={`px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900 dark:bg-none dark:text-gray-100 ${user ? 'pt-8 pb-8' : 'py-8'}`}>
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -224,7 +223,7 @@ export function SearchSection({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
-          className={`bg-gradient-to-r from-lavender-50 to-orchid-50 dark:bg-gray-900 dark:bg-none rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-4 sm:px-8 pb-8' : 'p-4 sm:p-8'}`}
+          className={`bg-white dark:bg-gray-900 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 opacity-100 ${user ? 'pt-4 px-4 sm:px-8 pb-8' : 'p-4 sm:p-8'}`}
         >
           {/* Search input row */}
           {/* Responsive row: all fields/buttons in one row on md+ screens, stacked on mobile */}

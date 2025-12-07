@@ -391,19 +391,19 @@ export default function RoasterDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:bg-gray-950 dark:bg-none">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="h-96 bg-gray-200"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6"></div>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+              <div className="h-96 bg-gray-200 dark:bg-gray-700"></div>
               <div className="p-8">
-                <div className="h-8 bg-gray-200 rounded mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3 mb-6"></div>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-6"></div>
                 <div className="space-y-3">
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                 </div>
               </div>
             </div>
@@ -415,14 +415,14 @@ export default function RoasterDetail() {
 
   if (error || !roaster) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:bg-gray-950 dark:bg-none">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="text-center py-12">
             <div className="mb-4">
               <Coffee sx={{ fontSize: 96, color: '#6b7280' }} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Roaster Not Found</h2>
-            <p className="text-gray-600 mb-6">{error || 'The roaster you\'re looking for doesn\'t exist.'}</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Roaster Not Found</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">{error || 'The roaster you\'re looking for doesn\'t exist.'}</p>
             <Link
               href="/discover"
               className="inline-flex items-center bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
@@ -436,20 +436,20 @@ export default function RoasterDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:bg-gray-950 dark:bg-none">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
           <Link 
             href="/discover" 
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
           >
             ← Discover Roasters
           </Link>
         </nav>
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-6xl mx-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden max-w-6xl mx-auto border border-gray-200 dark:border-gray-700">
           {/* Hero Image Carousel */}
           <div className="relative">
             <ImageCarousel
@@ -502,20 +502,20 @@ export default function RoasterDetail() {
                   <div className="flex items-center mb-6">
                     <div className="flex items-center mr-6">
                       <Star sx={{ fontSize: 32, color: '#fbbf24' }} />
-                      <span className="text-2xl font-bold text-gray-900 ml-2">{roaster.rating}</span>
-                      <span className="text-gray-500 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
+                      <span className="text-2xl font-bold text-gray-900 dark:text-white ml-2">{roaster.rating}</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-2">({roaster.reviewCount} {t('roasterDetail.reviews')})</span>
                     </div>
                   </div>
                 )}
 
                 {/* Description */}
                 <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('roasterDetail.about')}</h2>
-                  <p className="text-gray-700 leading-relaxed">{roaster.description}</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('roasterDetail.about')}</h2>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{roaster.description}</p>
                   {roaster.story && (
                     <div className="mt-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Our Story</h3>
-                      <p className="text-gray-700 leading-relaxed">{roaster.story}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Our Story</h3>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{roaster.story}</p>
                     </div>
                   )}
                 </div>
@@ -523,13 +523,13 @@ export default function RoasterDetail() {
                 {/* Specialties */}
                 {roaster.specialties && roaster.specialties.length > 0 && (
                   <div className="mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.specialties')}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('roasterDetail.specialties')}</h3>
                     <div className="flex flex-wrap gap-3">
                       {roaster.specialties.map((specialty, index) => (
                         <Link
                           key={typeof specialty === 'string' ? specialty : specialty.id || index}
                           href={`/discover?specialty=${encodeURIComponent(getSpecialtyKey(specialty))}`}
-                          className="px-4 py-2 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 hover:text-primary-800 transition-colors cursor-pointer"
+                          className="px-4 py-2 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full font-medium hover:bg-primary-200 dark:hover:bg-primary-900/50 hover:text-primary-800 dark:hover:text-primary-300 transition-colors cursor-pointer"
                         >
                           {translateSpecialty(specialty)}
                         </Link>
@@ -542,7 +542,7 @@ export default function RoasterDetail() {
                 {/* Only show Hours section if showHours is true AND not onlineOnly */}
                 {roaster.showHours !== false && !roaster.onlineOnly && (
                   <div className="mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.hours')}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('roasterDetail.hours')}</h3>
                     {roaster.hours ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {(() => {
@@ -560,8 +560,8 @@ export default function RoasterDetail() {
                           
                           return sortedEntries.map(([day, hours]) => (
                             <div key={day} className="flex items-center py-1">
-                              <span className="font-medium text-gray-700 w-24">{t(`time.${day.toLowerCase()}`)}:</span>
-                              <span className="text-gray-600 ml-2">
+                              <span className="font-medium text-gray-700 dark:text-gray-300 w-24">{t(`time.${day.toLowerCase()}`)}:</span>
+                              <span className="text-gray-600 dark:text-gray-400 ml-2">
                                 {typeof hours === 'string' 
                                   ? formatTime(hours)
                                   : typeof hours === 'object' && hours !== null && 'open' in hours && 'close' in hours
@@ -574,7 +574,7 @@ export default function RoasterDetail() {
                         })()}
                       </div>
                     ) : (
-                      <p className="text-gray-500">{t('roasterDetail.hoursNotAvailable', 'Hours information not available')}</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t('roasterDetail.hoursNotAvailable', 'Hours information not available')}</p>
                     )}
                   </div>
                 )}
@@ -582,7 +582,7 @@ export default function RoasterDetail() {
                 {/* Founded */}
                 {roaster.founded && (
                   <div className="mb-8">
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 dark:text-gray-300">
                       <span className="font-medium">{t('roasterDetail.foundedIn', 'Founded in')}</span> {roaster.founded}
                     </p>
                   </div>
@@ -590,12 +590,12 @@ export default function RoasterDetail() {
 
                 {roaster.onlineOnly && (
                   <div className="mb-8">
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-lg p-4">
                       <div className="flex items-center">
                         <Language sx={{ fontSize: 20, color: '#2563eb', marginRight: 1 }} />
-                        <span className="text-blue-800 font-medium">{t('roasterDetail.onlineOnly', 'Online Only')}</span>
+                        <span className="text-blue-800 dark:text-blue-400 font-medium">{t('roasterDetail.onlineOnly', 'Online Only')}</span>
                       </div>
-                      <p className="text-blue-700 text-sm mt-2">
+                      <p className="text-blue-700 dark:text-gray-300 text-sm mt-2">
                         {t('roasterDetail.onlineOnlyDesc', 'This roaster operates exclusively online with no physical retail location.')}
                       </p>
                     </div>
@@ -605,9 +605,9 @@ export default function RoasterDetail() {
 
               {/* Sidebar */}
               <div className="lg:col-span-1">
-                <div className="bg-gray-50 rounded-xl p-6 sticky top-8 flex flex-col min-h-[400px] pl-0">
+                <div className="rounded-xl p-6 sticky top-8 flex flex-col min-h-[400px] pl-0">
                   <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.contactInfo')}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('roasterDetail.contactInfo')}</h3>
                     
                     {/* Address */}
                     {(roaster.address || roaster.city || roaster.state) && (
@@ -615,10 +615,10 @@ export default function RoasterDetail() {
                         <div className="flex items-start">
                           <LocationOn sx={{ fontSize: 20, color: '#6b7280', marginRight: 1, marginTop: 0.25 }} />
                           <div>
-                            <p className="font-medium text-gray-900">{t('roasterDetail.address')}</p>
-                            {roaster.address && <p className="text-gray-600">{roaster.address}</p>}
+                            <p className="font-medium text-gray-900 dark:text-white">{t('roasterDetail.address')}</p>
+                            {roaster.address && <p className="text-gray-600 dark:text-gray-300">{roaster.address}</p>}
                             {(roaster.city || roaster.state) && (
-                              <p className="text-gray-600">
+                              <p className="text-gray-600 dark:text-gray-300">
                                 {[roaster.city, roaster.state].filter(Boolean).join(', ')}
                               </p>
                             )}
@@ -633,11 +633,11 @@ export default function RoasterDetail() {
                       <div className="flex items-center">
                         <Phone sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
                         <div>
-                          <p className="font-medium text-gray-900">{t('roasterDetail.phone')}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{t('roasterDetail.phone')}</p>
                           <div className="flex items-center gap-2">
                             <a 
                               href={`tel:${roaster.phone}`}
-                              className="text-primary-600 hover:text-primary-700"
+                              className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                             >
                               {roaster.phone}
                             </a>
@@ -661,12 +661,12 @@ export default function RoasterDetail() {
                       <div className="flex items-center">
                         <Language sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900">{t('roasterDetail.website')}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{t('roasterDetail.website')}</p>
                           <a 
                             href={roaster.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary-600 hover:text-primary-700"
+                            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                           >
                             {roaster.website.replace(/^https?:\/\//, '')}
                           </a>
@@ -681,10 +681,10 @@ export default function RoasterDetail() {
                       <div className="flex items-center">
                         <Email sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
                         <div>
-                          <p className="font-medium text-gray-900">{t('roasterDetail.email')}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{t('roasterDetail.email')}</p>
                           <a 
                             href={`mailto:${roaster.email}`}
-                            className="text-blue-600 hover:text-blue-800 hover:underline underline cursor-pointer"
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline underline cursor-pointer"
                           >
                             {roaster.email}
                           </a>
@@ -696,8 +696,8 @@ export default function RoasterDetail() {
 
                   {/* Social Media Icons - Bottom Aligned */}
                   {hasSocialLinks() && (
-                    <div className="mt-auto pt-4 border-t border-gray-200">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">{t('roasterDetail.socials')}</h3>
+                    <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-600">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('roasterDetail.socials')}</h3>
                       {renderSocialIcons()}
                     </div>
                   )}

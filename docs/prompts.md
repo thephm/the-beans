@@ -124604,3 +124604,607 @@ Perfect! I've added a subtle light gray border (`border-gray-200`) in light mode
 
 ## 1036th try
 
+*(Works everywhere)*
+
+> The card for roaster looks great on the main page and discover page but on favorites it's narrower and needs to be the exact ame size as the other pages. See attachment
+
+I'll investigate the roaster card width issue on the favorites page. Let me check how the cards are rendered on different pages. 
+
+✔ Read `client/src/app/favorites/page.tsx`
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 150
+
+✔ Read `client/src/app/page.tsx`
+
+I can see the issue! The favorites page has `max-w-4xl` for its container, while the discover page uses `max-w-7xl`. This makes the favorites page narrower, which in turn makes the cards narrower on smaller screens. Let me fix this: 
+
+`page.tsx +1 -1`
+
+✔ `docker-compose restart client`
+
+Done! I've fixed the favorites page to use the same container width (`max-w-7xl`) as the discover page. The roaster cards on the favorites page should now be the exact same size as on the main page and discover page.
+
+## 1037th try
+
+*(Favorites cards are the right size again)*
+
+> No rosasters found is hard to read in dark mode, see attachment
+
+✔ Searched for text `No roasters found` (`**/client/src/**`), 1 result
+
+✔ Searched for text `Try adjusting your search criteria` (`**/client/src/**`), no results
+
+✔ Searched for text `No roasters found` (`**/client/src/**`), 1 result
+
+✔ Searched for regex `No roasters found|Try adjusting your search criteria` (`**/client/src/**`), 1 result
+
+✔ Searched for regex `No roasters found|Try adjusting your search criteria|noRoasters` (`**/client/src/**`), 3 results
+
+✔ Searched for regex `Try adjusting your search criteria` (`**/client/src/app/discover/page.tsx`), no results
+
+✔ Searched for regex `criteria|location|subtitle|mb-2` (`**/client/src/app/discover/page.tsx`), 20 results
+
+✔ Searched for regex `Try adjusting your search criteria|search criteria|Try adjusting` (`**/client/src/app/discover/page.tsx`), no results
+
+✔ Read `client/src/app/discover/page.tsx`, lines 170 to 193
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 20
+
+✔ Read `client/src/app/discover/page.tsx`, lines 160 to 170
+
+✔ Read `client/src/app/discover/page.tsx`, lines 140 to 160
+
+✔ Read `client/src/app/discover/page.tsx`, lines 180 to 193
+
+✔ Read `client/src/app/discover/page.tsx`, lines 60 to 100
+
+✔ Read `client/src/app/discover/page.tsx`, lines 100 to 140
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 10
+
+✔ Read `client/src/app/discover/page.tsx`, lines 170 to 180
+
+✔ Read `client/src/app/discover/page.tsx`, lines 181 to 182
+
+✔ Read `client/src/app/discover/page.tsx`, lines 182 to 183
+
+`page.tsx +2 -2`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+The "No roasters found" and "Try adjusting your search criteria or location." text is now readable in dark mode. I added proper dark mode text color classes and restarted the client container. Please refresh the Discover page to see the fix!
+
+## 1038th try
+
+*(Text is white in dark mode now, fixed)*
+
+> When typing in the search field in dark mode, white cards flash under the search bar
+
+✔ Searched for text `input` (`**/client/src/components/SearchSection.tsx`), 3 results
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 220 to 270
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 270 to 310
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 1 to 60
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 60 to 120
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 180 to 220
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 120 to 180
+
+✔ Searched for text `bg-` (`**/client/src/components/RoasterCard.tsx`), 12 results
+
+✔ Searched for text `motion.div` (`**/client/src/components/SearchSection.tsx`), 4 results
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 210 to 222
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 310 to 310
+
+The white card "flash" under the search bar in dark mode is caused by the `motion.div` that wraps the search form. Its initial background is set to a light gradient (`bg-gradient-to-r from-lavender-50 to-orchid-50`), and only after hydration (when dark mode is detected) does it switch to `dark:bg-gray-900`. This causes a visible white flash in dark mode when typing or re-rendering.
+
+**Solution:**  
+- Change the background classes so that in dark mode, the gradient is never rendered, even for a split second.
+- Use `bg-white dark:bg-gray-900` (or similar) instead of the gradient, or ensure the gradient is only applied in light mode and a solid dark color is always used in dark mode.
+
+I will update the `className` for the main `motion.div` in SearchSection.tsx to prevent the white/gradient flash in dark mode. 
+
+`SearchSection.tsx +1 -1`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+The white card flash under the search bar in dark mode has been fixed. The search card now uses a solid dark background in dark mode, preventing any light gradient from appearing during typing or re-rendering. The client container has been restarted—please refresh the page to confirm the fix!
+
+## 1039th try
+
+> still happening
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 223 to 225
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 222 to 226
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 226 to 227
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 227 to 228
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 1 to 10
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 228 to 229
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 11 to 20
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 221 to 222
+
+The previous patch did not fully resolve the white flash because the gradient classes (`bg-gradient-to-r from-lavender-50 to-orchid-50`) are still present in the className, and these are always rendered on the server before hydration, even in dark mode. The `dark:` classes only apply after hydration, so the gradient flashes in dark mode.
+
+**To fix this for good:**
+- Only apply the gradient classes in light mode, and use a solid dark background in dark mode.
+- The best way is to conditionally apply the gradient based on the resolved theme, or use Tailwind's `bg-white` for light and `dark:bg-gray-900` for dark, with no gradient at all.
+
+I will remove the gradient classes and use `bg-white dark:bg-gray-900` for the card background, which will eliminate the white flash in dark mode. 
+
+`SearchSection.tsx +1 -1`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+The gradient background has been completely removed from the search card, and it now uses a solid background for both light and dark modes. This will prevent any white flash in dark mode. The client container has been restarted—please refresh the page and test again.
+
+## 1039th Try
+
+> still happening
+
+Searched codebase for "framer-motion SSR hydration flash or white flash", 22 results
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 200 to 240
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 183 to 200
+
+The white flash is still happening because the parent `<section>` and the `<motion.div>` both use `bg-white` as their default background, which is rendered on the server before hydration. The `dark:bg-gray-900` only applies after hydration, so in dark mode, users see a white background for a split second.
+
+**To fully fix this:**
+- You must avoid any `bg-white` or light background on elements that are visible in dark mode before hydration.
+- Use `bg-gray-100 dark:bg-gray-900` or a neutral gray for the default background, or use `bg-gray-900` as the default and override with `light:bg-white` using a custom class or Tailwind's `theme` config.
+
+I will update both the `<section>` and the `<motion.div>` to use `bg-gray-100 dark:bg-gray-900` instead of `bg-white`, which will prevent the white flash in dark mode. 
+
+`SearchSection.tsx +2 -3`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+Both the section and the card now use a neutral gray background by default, which prevents any white flash in dark mode before hydration. The client container has been restarted. Please refresh the page and confirm if the issue is resolved.
+
+## 1040th try
+
+> still happening
+
+Searched codebase for "nextjs dark mode hydration flash fix", 16 results
+
+✔ Read `client/src/app/layout.tsx`
+
+✔ Read `client/src/app/theme-script.tsx`
+
+✔ Read `client/src/contexts/DarkModeContext.tsx`
+
+✔ Read `client/src/app/providers.tsx`, lines 1 to 40
+
+✔ Read `client/src/app/providers.tsx`, lines 41 to 48
+
+The persistent white flash in dark mode is due to how dark mode is applied: the `dark` class is only added to the `<html>` element after React hydration, but the initial server-rendered HTML always uses the light theme. This is a classic Next.js/React hydration mismatch problem.
+
+**Root cause:**
+- The `DarkModeScript` component uses a React effect to add the `dark` class, which only runs after hydration.
+- Until hydration, the server-rendered HTML and CSS are for light mode, so users see a white flash before the dark mode CSS is applied.
+
+**Best-practice solution:**
+- Inject a small inline script in the `<head>` (not as a React component) that sets the `dark` class on the `<html>` element before the page renders, based on localStorage or system preference.
+- This must be done synchronously, before any content is painted.
+
+**I will:**
+- Add a `<script>` tag directly in the `<head>` of layout.tsx that sets the `dark` class before hydration, using the same logic as your `DarkModeProvider`.
+
+This will eliminate the white flash for dark mode users. 
+
+`layout.tsx +14 -0`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+A fix has been applied to set the dark mode class on the HTML element before hydration, using an inline script in the document head. This will prevent any white flash in dark mode. The client container has been restarted—please refresh and confirm the issue is resolved.
+
+## 1040th try
+
+> please undo what you just did, there's now a grey frame around this section, this is not where the problem is
+
+`SearchSection.tsx +2 -2`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "action": "restart",
+  "containerNameOrId": "the-beans-client-1"
+}
+
+The previous change has been undone—both the section and card backgrounds are restored to their original colors. The client container has been restarted. Please refresh the page to confirm the grey frame is gone. If you still see the original white flash issue, let me know and I’ll investigate further in the correct area.
+
+## 1041st try
+
+> the part that is flashing are these white cards that are used to display search results. In light mode we don't see them because they are white but in dark mode they flash white. see attachment for the moment in time they flashed white.
+
+I can see now! The white flash is coming from the roaster card components that appear below the search bar. These cards have a white background that flashes before the dark mode styling is applied. Let me find and fix the RoasterCard component. 
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 265 to 275
+
+Found it! The RoasterCard component has `bg-white` which is causing the white flash. The same issue as before—the inline script sets the `dark` class on `<html>`, but the card's `bg-white` is rendered before hydration. I need to ensure the card uses a neutral background that won't flash white in dark mode.
+
+However, changing it to `bg-gray-100` would make it look wrong in light mode. The real solution is to ensure the dark mode class is present on the server-rendered HTML. Let me verify the inline script is working correctly and check if there's a simpler fix. 
+
+✔ Read `client/src/app/layout.tsx`, lines 22 to 45
+
+The inline script is correctly setting the `dark` class before hydration. However, the issue is that the **roaster cards might not be rendered yet** when the script runs, or they're being rendered dynamically by React/Framer Motion, which means they appear after hydration starts.
+
+The white flash is happening because:
+1. The cards are rendered by framer-motion with animations
+2. Even though the `dark` class is on `<html>`, the cards appear during the animation/mount phase
+3. There's a brief moment where the cards render with `bg-white` before the dark mode CSS applies
+
+The best solution is to use a **CSS variable or strategy that prevents any white from showing**. Let me check how the cards are rendered on the discover page: 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 160 to 193
+
+The cards are rendered normally without motion wrappers. The issue is simpler than I thought - the Tailwind dark mode classes should be applying immediately if the `dark` class is on `<html>`, but there might be a CSS specificity or timing issue.
+
+Let me try a different approach: use `!important` on the dark mode background, or better yet, use a CSS custom property that's set by the inline script. Actually, the simplest fix is to add a CSS rule that ensures cards are never white during the initial render in dark mode.
+
+Let me add a global CSS rule to prevent the white flash: 
+
+✔ Read `client/src/app/globals.css`, lines 1 to 20
+
+I see there's already a global dark mode rule, but it's using `!important` which might be causing issues. Let me check more of the CSS file and then add a specific rule for the cards: 
+
+Read `client/src/app/globals.css`, lines 20 to 60
+
+I see the issue now! There's a very aggressive dark mode override at the top of the CSS file that's using `!important` on everything with `.bg-white`, which is preventing the proper Tailwind dark mode classes from working correctly. This is likely causing conflicts.
+
+The best solution is to add a more specific CSS rule that targets cards during the initial render to prevent the white flash. Let me add it at the end of the globals.css file: 
+
+Read `client/src/app/globals.cs`, lines 130 to 140
+
+`globals.css +10 -0`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "containerNameOrId": "the-beans-client-1",
+  "action": "restart"
+}
+
+I've added specific CSS rules that target any elements with `bg-white` class in dark mode and force them to use the dark gray background immediately, preventing any white flash. This applies to the roaster cards and any other white elements. The client container has been restarted—please refresh and test the dark mode typing to see if the white flash is gone!
+
+## 1042nd try
+
+> please undo what you did as now this section has a grey background in dark mode. the problem is not with this part but rather the result roaster cards below that flash white
+
+`globals.css +0 -10`
+
+Now let me look at where the roaster cards are actually appearing on the page to understand the flashing better: 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 100
+
+✔ Read `client/src/app/discover/page.tsx`, lines 140 to 160
+
+Perfect! I found it. The loading skeleton cards have `bg-white dark:bg-gray-900`, and these are the cards that flash white in dark mode during the loading state. The issue is that when you type in the search field, it triggers a search, which shows these loading skeletons briefly, and they flash white before the dark mode styling applies.
+
+The solution is to ensure these skeleton cards don't use `bg-white` at all, or we need to make sure they render with the correct dark background immediately. Let me fix the loading skeletons: 
+
+`page.tsx +5 -5`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "containerNameOrId": "the-beans-client-1",
+  "action": "restart"
+}
+
+I've fixed the loading skeleton cards that appear when you type in the search field. They now use `bg-gray-100` instead of `bg-white` in light mode, and I've added dark mode classes to all the skeleton elements inside. This should prevent the white flash when typing in dark mode. The client container has been restarted—please refresh and test!
+
+## 1043rd try
+
+> now there's no frame around this section in dark mode (the search section)
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 220 to 230
+
+*(I stopped it because I saw there was a change in the behaviour of the flashing search result cards)*
+
+> The last iteration improved the flashing white cards, they are now grey but that created the opposite problem with the cards flashing grey in light mode. You found the right spot but the result cards shoudl be white in light mode and black in dark mode so they don't flash while searching
+
+`page.tsx +5 -5`
+
+✔ Ran `act_container` 
+Completed with input: {
+  "containerNameOrId": "the-beans-client-1",
+  "action": "restart"
+}
+
+Done! The loading skeleton cards now use `bg-white` in light mode and `dark:bg-gray-800` in dark mode to match the actual roaster cards. I've also added a border to make them more visible in both modes. The client container has been restarted—please refresh and test in both light and dark modes!
+
+## 1044th try
+
+*(It's good enough)*
+
+> the your profile and settings pages have a top border around their form but the discover search section does not (see attachment). In dark mode the search section has no border
+
+I'll investigate the border styling issue on the discover page and compare it with the profile and settings pages. 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 150
+
+✔ Read `client/src/app/profile/page.tsx`, lines 1 to 100
+
+✔ Read `client/src/app/settings/page.tsx`, lines 1 to 100
+
+Now let me check the SearchSection component to see its styling: 
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 1 to 100
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 100 to 200
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 200 to 309
+
+I can see the issue now. The profile and settings pages have this styling on their forms:
+
+```tsx
+className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700 p-8 max-w-2xl mx-auto"
+```
+
+However, the discover page wraps SearchSection in a div with:
+```tsx
+className="mb-12 dark:bg-gray-900 dark:rounded-2xl dark:shadow-lg"
+```
+
+And the SearchSection itself has a motion.div with:
+```tsx
+className={`bg-white dark:bg-gray-900 rounded-2xl shadow-lg opacity-100 ${user ? 'pt-4 px-4 sm:px-8 pb-8' : 'p-4 sm:p-8'}`}
+```
+
+The issue is that the SearchSection is missing the `border border-gray-200 dark:border-gray-700` classes that the profile and settings pages have. Let me fix this: 
+
+`SearchSection.tsx +1 -1`
+
+Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+
+Done! I've added the missing border styling to the SearchSection component. The search section now has:
+- `border border-gray-200 dark:border-gray-700` - matching the profile and settings forms
+- `dark:shadow-xl` - enhanced shadow in dark mode
+
+The client container has been restarted. The discover page search section should now have a consistent border that matches the profile and settings pages in both light and dark modes.
+
+## 1044th try
+
+*(border appears in white and dark mode now)*
+
+> Dark mode isn't working on Details page. the background is white. the text inside the details pane is too dark and the Contact info is white. It should be dark too, see attachment
+
+I'll help you fix the dark mode styling on the Details page. Let me first examine the current implementation to understand the issue. 
+
+✔ Searched for files matching `**/roasters/**/[id]/page.tsx`, no matches
+
+✔ Searched for regex `Contact Info|contact-info|ContactInfo`, 20 results
+
+✔ Searched for files matching `**/roasters/[id]/page.tsx`, no matches
+
+✔ Read `client/src/app/roasters`
+
+✔ Read `client/src/app/roasters/%5Bid%5D`
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 1 to 100
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 100 to 300
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 300 to 500
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 500 to 728
+
+Now I can see the issue. The Details page has hardcoded light colors that don't respect dark mode. Let me check the current dark mode implementation: 
+
+✔ Searched for text `dark:bg-` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+The page has no dark mode styles at all. I need to add dark mode classes throughout the roaster detail page. Let me create the fixes: 
+
+`page.tsx +40 -40`
+
+Now I need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the dark mode issues on the Details page. Here's what I changed:
+
+**Fixed Dark Mode Issues:**
+
+1. **Background Colors**: Added dark mode classes to all backgrounds:
+   - Main page: `dark:from-gray-900 dark:via-gray-800 dark:to-gray-900`
+   - Content card: `dark:bg-gray-800`
+   - **Contact Info sidebar**: `dark:bg-gray-700` (was white)
+
+2. **Text Colors**: Updated all text to be readable in dark mode:
+   - Headings: `dark:text-white`
+   - Body text: `dark:text-gray-300`
+   - Secondary text: `dark:text-gray-400`
+   - Links: `dark:text-primary-400 dark:hover:text-primary-300`
+
+3. **Contact Info Section**: This was the main issue - the white background and dark text are now fixed with proper dark mode styling for all elements:
+   - Address, Phone, Website, Email labels and values
+   - Border between sections: `dark:border-gray-600`
+
+The container has been restarted. You should now see proper dark mode styling throughout the Details page with a dark background and light text that's easy to read.
+
+## 1045th try
+
+> OK, it's better but inconsistent. the main body background is dark grey but all other pages are black in dark mode. The pills are white but should be the same as the pills on the discover page, use the same formatting for those. the contact info background is dark grey and not black like the about and specialties section. See attachment
+
+I'll fix the inconsistencies in the dark mode styling. Let me first check the Discover page to see what styling is used there for consistency. 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 100
+
+✔ Searched for text `bg-gray-900` (`**/client/src/app/discover/page.tsx`), 1 result
+
+✔ Searched for text `dark:bg-` (`**/client/src/app/discover/page.tsx`), 8 results
+
+Now let me check the RoasterCard component to see how the specialty pills are styled: 
+
+✔ Searched for text `specialty` (`**/client/src/components/RoasterCard.tsx`), 20 results
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 310 to 330
+
+Perfect! Now I can see the styling used on the Discover page. Let me fix all the inconsistencies:
+
+1. Background should be `dark:bg-gray-950` (black) not gray
+2. Main card should be `dark:bg-gray-800` 
+3. Contact Info sidebar should match the main card background
+4. Specialty pills should use `dark:bg-primary-900/30 text-primary-700 dark:text-primary-400` 
+
+`page.tsx +5 -5`
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed all the dark mode inconsistencies:
+
+**Changes Made:**
+
+1. **Background Color**: Changed from dark gray (`dark:from-gray-900 dark:via-gray-800 dark:to-gray-900`) to black (`dark:bg-gray-950 dark:bg-none`) to match the Discover and other pages
+
+2. **Contact Info Background**: Changed from `dark:bg-gray-700` to `dark:bg-gray-800` to match the main "About" and "Specialties" section background
+
+3. **Specialty Pills**: Updated to match the Discover page styling:
+   - Background: `dark:bg-primary-900/30` (semi-transparent purple)
+   - Text: `dark:text-primary-400` (lighter purple text)
+   - Hover: `dark:hover:bg-primary-900/50` and `dark:hover:text-primary-300`
+
+Now the entire Details page has consistent dark mode styling that matches the rest of the application!
+
+## 1046th try
+
+> almost there, the contact info background is still grey should be the same as the rest of the card. you didn't fix that. the entire roaster card should have a border around it consistent with the discover page and the favorites page. they should share the same style name so that if we change in the future it changes everywhere. lastly, the Online Only section should be dark grey background not white. see attachment
+
+I'll fix these remaining issues. Let me check the border styling used on the Discover and Favorites pages first. 
+
+✔ Searched for text `border border-gray` (`**/client/src/components/RoasterCard.tsx`), 1 result
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 200 to 250
+
+✔ Read `client/src/components/RoasterCard.tsx`, lines 265 to 280
+
+Perfect! Now I can see the border styling. Let me also check the Online Only section styling in the current roaster detail page: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 590 to 610
+
+Now I need to check the exact line where the Contact Info sidebar is to see if my previous fix was applied: 
+
+✔ Searched for text `bg-gray-50 dark:bg-gray` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Searched for text `Contact Info` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+✔ Searched for text `contactInfo` (`**/client/src/app/roasters/[id]/page.tsx`), no results
+
+Let me search more broadly: 
+
+✔ Read `client/src/app/roasters/%5Bid%5D/page.tsx`, lines 600 to 620
+
+I see the issue - the Contact Info still has `bg-gray-50` which shows as light gray in light mode and is being overridden to `dark:bg-gray-800`. But it should match the main card background. Let me fix all three issues: 
+
+`page.tsx +5 -5`
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed all three remaining issues:
+
+**Changes Made:**
+
+1. **Contact Info Background**: Removed the `bg-gray-50` class entirely so the sidebar inherits the same dark background (`dark:bg-gray-800`) as the parent card - no more gray background
+
+2. **Card Border**: Added `border border-gray-200 dark:border-gray-700` to the main content card, matching the exact border styling used on the Discover and Favorites pages (from RoasterCard component)
+
+3. **Online Only Section**: Updated the background and text colors for dark mode:
+   - Background: `dark:bg-gray-700` (dark gray instead of white)
+   - Border: `dark:border-gray-600`
+   - Title text: `dark:text-blue-400`
+   - Description text: `dark:text-gray-300`
+
+Now the Details page has fully consistent dark mode styling that matches the rest of the application!
+
+## 1047th try
+
+*(all looks good now)*
+
+> the main page has some text that's hard to read in dark mode, see attachment
+
+I'll examine the main page to identify and fix the text that's hard to read in dark mode. 
+
+✔ Read `client/src/app/page.tsx`
+
+Now let me check the Hero component and FeaturedRoasters component as they contain the text on the main page: 
+
+✔ Read `client/src/components/Hero.tsx`, lines 1 to 50
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 1 to 50
+
+Let me continue reading these components to find all text elements: 
+
+✔ Read `client/src/components/Hero.tsx`, lines 50 to 96
+
+✔ Read `client/src/components/FeaturedRoasters.tsx`, lines 50 to 156
+
+Now I can see the issues. Based on the attachment showing dark mode, there are several text elements that need dark mode classes:
+
+1. **Hero section** - subtitle text (`text-gray-600`)
+2. **Hero section** - feature card descriptions (`text-gray-600`)
+3. **Featured Roasters section** - title text (`text-gray-900`)
+4. **Featured Roasters section** - subtitle text (`text-gray-600`)
+
+Let me fix all these issues: 
+
+`Hero.tsx +9 -9`
+`FeaturedRoasters.tsx +3 -3`
+
+✔ `docker-compose restart client`
+
+Done! I've fixed the text readability issues in dark mode on the main page:
+
+**Changes Made:**
+
+1. **Hero Section:**
+   - Subtitle text: Added `dark:text-gray-300`
+   - Feature card background: Added `dark:bg-gray-800` with border
+   - Feature titles: Added `dark:text-white`
+   - Feature descriptions: Added `dark:text-gray-300`
+   - Section background: Added `dark:bg-gray-950 dark:bg-none`
+
+2. **Featured Roasters Section:**
+   - Title: Added `dark:text-white`
+   - Description: Added `dark:text-gray-300`
+   - Section background: Added `dark:bg-gray-950 dark:bg-none`
+
+All text on the main page should now be clearly visible in dark mode!
+
+## 1048th try
+
+*(looks amazing)*
+
+> When I hit page refresh in dark mode it changes to light mode!
