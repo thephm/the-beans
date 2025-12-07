@@ -125680,3 +125680,97 @@ The styling is now consistent across all forms in the app (Profile, Settings, Lo
 
 ## 1058th try
 
+*(fixed)*
+
+## Login and signup buttons too dark on mobile when in dark mode #232
+
+I can see the issue in the mobile screenshot. The "Login" and "Sign Up" buttons in the hamburger menu are too dark and hard to read in dark mode. Let me examine the navigation component to fix this. 
+
+✔ Searched for regex `Login.*Sign Up|mobile.*menu|hamburger` (`**/client/src/components/**/*.tsx`), 18 results
+
+✔ Read `client/src/components/Navbar.tsx`, lines 285 to 295
+
+Perfect! I found the issue. The Login and Sign Up links in the mobile menu (lines 288 and 291) are missing dark mode text color classes. They only have `text-gray-700` which is too dark to read in dark mode. Let me fix this: 
+
+`Navbar.tsx +2 -2`
+
+✔ `docker-compose restart client`
+
+Done! I've fixed the dark mode styling for the Login and Sign Up buttons in the mobile menu. The changes include:
+
+**Updated styling:**
+- Added `dark:text-gray-200` for light gray text in dark mode (was only `text-gray-700`)
+- Added `dark:hover:text-primary-400` for purple hover color in dark mode
+
+Now the Login and Sign Up links in the mobile hamburger menu will be clearly visible with light gray text in dark mode, matching the other navigation links like Discover, About, and Favorites. The container has been restarted, so the changes should be visible immediately on mobile.
+
+## 1059th try
+
+> the login and signup buttons on mobile hard to read
+
+I can see from the screenshot that the "Settings" and "Logout" links (circled in blue) in the mobile menu are also hard to read in dark mode. Let me check if they need dark mode styling as well. 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 260 to 280
+
+✔ Read `client/src/components/Navbar.tsx`, lines 275 to 285
+
+Perfect! I can see that the Settings link (line 273) and Logout button (line 281) are also missing dark mode text colors. They only have `text-gray-700` which is hard to read in dark mode. Let me fix all of these together: 
+
+`Navbar.tsx +2 -2`
+
+✔ `docker-compose restart client`
+
+Done! I've fixed the dark mode styling for the Settings and Logout links in the mobile menu. Combined with the previous fix for Login and Sign Up, all mobile menu items now have proper dark mode support:
+
+**Updated styling:**
+- Settings link: Added `dark:text-gray-200` and `dark:hover:text-primary-400`
+- Logout button: Added `dark:text-gray-200` and `dark:hover:text-primary-400`
+
+All navigation links in the mobile hamburger menu will now be clearly visible with light gray text in dark mode, and will turn purple when hovered. The container has been restarted.
+
+## 1060th try
+
+*(fixed)*
+
+## Move the dark mode button here on mobile #230
+
+I can see from the screenshot that you want to move the dark mode toggle button to the top area of the mobile menu (where it's circled in red), next to the close button. Let me examine the Navbar component to make this change. 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 190 to 270
+
+Now let me check the header section to see where the close button is: 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 1 to 30
+
+✔ Read `client/src/components/Navbar.tsx`, lines 45 to 105
+
+Now I need to see the mobile menu structure better. Let me look at where the mobile menu starts and the header with the close button: 
+
+✔ Searched for text `The Beans` (`**/client/src/components/Navbar.tsx`), no results
+
+Let me search for where the mobile menu opens: 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 170 to 200
+
+I can see the current structure. The mobile menu button (hamburger/close) is at line 179-190, and when the menu opens, it shows below. Currently, the dark mode toggle is inside the mobile menu content (around line 257-265). I need to move it to the top header area next to the hamburger button. Let me make this change: 
+
+`Navbar.tsx +23 -13`
+
+Now I need to remove the dark mode toggle from inside the mobile menu content since it's now in the header: 
+
+`Navbar.tsx +2 -10`
+
+✔ `docker-compose restart client`
+
+Perfect! I've moved the dark mode toggle button to the top of the mobile navigation, right next to the hamburger/close button. 
+
+**Changes made:**
+1. **Moved dark mode button to header**: The dark mode toggle now appears in the top navigation bar on mobile, positioned to the left of the hamburger menu button
+2. **Kept language selector in menu**: The language selector remains in the mobile menu content for easy access
+3. **Consistent styling**: The button uses the same hover and color styling as other mobile controls
+
+Now when you open the mobile menu in dark mode, you'll see the dark mode sun/moon icon next to the close (X) button at the top, exactly where you indicated in the screenshot. The container has been restarted.
+
+## 1061st try
+
+*(works)*

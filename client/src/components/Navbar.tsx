@@ -176,19 +176,29 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+          {/* Mobile controls (Dark Mode & Menu button) */}
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={toggleDarkMode}
+              aria-label={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
+              className="p-2 rounded-lg hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200"
+              title={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
+            >
+              {darkMode ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
+            </button>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
 
         {isMobileMenuOpen && (
@@ -253,16 +263,8 @@ export function Navbar() {
                   </Link>
                 </div>
               )}
-              {/* Mobile Dark Mode Toggle & Language Selector */}
-              <div className="py-2 flex items-center space-x-2">
-                <button
-                  onClick={toggleDarkMode}
-                  aria-label={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
-                  className="p-2 rounded-lg hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200"
-                  title={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
-                >
-                  {darkMode ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
-                </button>
+              {/* Mobile Language Selector */}
+              <div className="py-2">
                 <LanguageSelector />
               </div>
               {/* Mobile Authentication */}
@@ -270,7 +272,7 @@ export function Navbar() {
                 <div className="w-6 h-6 animate-spin rounded-full border-2 border-primary-600 border-t-transparent mx-auto"></div>
               ) : user ? (
                 <>
-                  <Link href="/settings" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/settings" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                     {t('nav.settings')}
                   </Link>
                   <button
@@ -278,17 +280,17 @@ export function Navbar() {
                       logout()
                       setIsMobileMenuOpen(false)
                     }}
-                    className="text-gray-700 hover:text-primary-600 py-2 text-left"
+                    className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2 text-left"
                   >
                     {t('nav.logout')}
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/login" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                     {t('nav.login')}
                   </Link>
-                  <Link href="/signup" className="text-gray-700 hover:text-primary-600 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/signup" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                     {t('nav.signup')}
                   </Link>
                 </>
