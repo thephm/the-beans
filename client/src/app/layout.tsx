@@ -30,6 +30,20 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" sizes="192x192" />
         <meta name="theme-color" content="#a673ff" />
+        {/* Prevent white flash in dark mode: set dark class before hydration */}
+        <script dangerouslySetInnerHTML={{__html:`
+          (function() {
+            try {
+              var stored = localStorage.getItem('darkMode');
+              var isDark = stored === 'true' ? true : (stored === 'false' ? false : window.matchMedia('(prefers-color-scheme: dark)').matches);
+              if (isDark) {
+                document.documentElement.classList.add('dark');
+              } else {
+                document.documentElement.classList.remove('dark');
+              }
+            } catch (e) {}
+          })();
+        `}} />
       </head>
       <body className={`${inter.className} min-h-screen`}>
         <Providers>

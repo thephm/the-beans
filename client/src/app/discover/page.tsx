@@ -149,12 +149,12 @@ export default function DiscoverPage() {
             {loading ? (
               // Loading skeletons
               Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden animate-pulse">
-                  <div className="h-48 bg-gray-200"></div>
+                <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden animate-pulse border border-gray-200 dark:border-gray-700">
+                  <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
                   <div className="p-6">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3 mb-4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-2/3 mb-4"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-1/2"></div>
                   </div>
                 </div>
               ))
@@ -178,8 +178,8 @@ export default function DiscoverPage() {
                 <div className="mb-4">
                   <Coffee sx={{ fontSize: 96, color: '#6b7280' }} />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('roasters.noRoastersFound')}</h3>
-                <p className="text-gray-600">{t('discover.tryAdjusting')}</p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('roasters.noRoastersFound')}</h3>
+                <p className="text-gray-600 dark:text-gray-400">{t('discover.tryAdjusting')}</p>
               </div>
             )}
           </div>

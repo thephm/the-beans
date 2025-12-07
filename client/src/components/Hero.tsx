@@ -11,7 +11,7 @@ export function Hero() {
   const { user } = useAuth()
   
   return (
-    <section className={`pt-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-lavender-50 via-primary-50 to-orchid-50 ${user ? 'pb-0' : 'pb-16'}`}>
+    <section className={`pt-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-lavender-50 via-primary-50 to-orchid-50 dark:bg-gray-950 dark:bg-none ${user ? 'pb-0' : 'pb-16'}`}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
           <motion.div
@@ -23,7 +23,7 @@ export function Hero() {
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent mb-6 leading-relaxed pb-2">
               {t('hero.title')}
             </h1>
-            <p className={`text-xl text-gray-600 max-w-3xl mx-auto ${user ? 'mb-4' : 'mb-8'}`}>
+            <p className={`text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto ${user ? 'mb-4' : 'mb-8'}`}>
               {t('hero.subtitle')}
             </p>
           </motion.div>
@@ -59,30 +59,30 @@ export function Hero() {
               transition={{ duration: 1, delay: 0.4 }}
               className="relative opacity-100"
             >
-              <div className="bg-white rounded-2xl shadow-2xl p-8 mx-auto max-w-4xl">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 mx-auto max-w-4xl">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-violet-500 rounded-full flex items-center justify-center mx-auto mb-4">
                       <LocationOn sx={{ color: 'white', fontSize: 32 }} />
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">{t('hero.locationBased')}</h3>
-                    <p className="text-gray-600">{t('hero.locationDescription')}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('hero.locationBased')}</h3>
+                    <p className="text-gray-600 dark:text-gray-300">{t('hero.locationDescription')}</p>
                   </div>
                   
                   <div className="text-center">
                     <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-orchid-500 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Coffee sx={{ color: 'white', fontSize: 32 }} />
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">{t('hero.qualityBeans')}</h3>
-                    <p className="text-gray-600">{t('hero.qualityDescription')}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('hero.qualityBeans')}</h3>
+                    <p className="text-gray-600 dark:text-gray-300">{t('hero.qualityDescription')}</p>
                   </div>
                   
                   <div className="text-center">
                     <div className="w-16 h-16 bg-gradient-to-br from-orchid-500 to-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Favorite sx={{ color: 'white', fontSize: 32 }} />
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">{t('hero.community')}</h3>
-                    <p className="text-gray-600">{t('hero.communityDescription')}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('hero.community')}</h3>
+                    <p className="text-gray-600 dark:text-gray-300">{t('hero.communityDescription')}</p>
                   </div>
                 </div>
               </div>
