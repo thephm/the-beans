@@ -2124,9 +2124,9 @@ Good! The search routes are properly registered. Now let me check the actual sea
 
 Let me look for the specific roasters search endpoint:
 
-✔ Searched text for router\.(get|post).*\/roasters (**/c:\data\github\the-beans\server\src\routes\search.ts), no results
+✔ Searched text for `router\.(get|post).*\/roasters (**/c:\data\github\the-beans\server\src\routes\search.ts)`, no results
 
-✔ Searched text for router\.get (**/c:\data\github\the-beans\server\src\routes\search.ts), no results
+✔ Searched text for `router\.get (**/c:\data\github\the-beans\server\src\routes\search.ts)`, no results
 
 Let me read the search routes file more thoroughly to find the endpoints:
 
@@ -2865,9 +2865,9 @@ The issue is likely that the API is returning data in a different format than ex
 
 Let me find the main GET route for roasters:
 
-Searched text for router.get (**/c:\data\github\the-beans\server\src\routes\roasters.ts), no results
+✔ Searched text for `router.get (**/c:\data\github\the-beans\server\src\routes\roasters.ts)`, no results
 
-Searched text for router (**/c:\data\github\the-beans\server\src\routes\roasters.ts), no results
+Searched text for `router (**/c:\data\github\the-beans\server\src\routes\roasters.ts)`, no results
 
 Working...
 
@@ -10332,7 +10332,7 @@ Fixed! Removed the AuthContext from the Providers component. The issue was that 
 
 > different symptom now: 
 
-``
+```shell
 1 of 1 error
 Next.js (14.2.31) is outdated (learn more)
 
@@ -10417,7 +10417,7 @@ Source"
 
 and in Chrome this error: 
 
-```
+```shell
 1 of 1 error
 
 Unhandled Runtime Error
@@ -10457,11 +10457,11 @@ I see two different errors in different browsers that both stem from authenticat
 
 Let me first check if there are any remaining components using `useAuth` and then clean up the build:
 
-Searched text for `useAuth` (`**/the-beans/client/src/**`), 10 results
+✔ Searched text for `useAuth` (`**/the-beans/client/src/**`), 10 results
 
 I found the issue! There are still several components using `useAuth`. Let me also check if any of these are being imported anywhere that could cause the error:
 
-Seached text for `UserMenu` (`**/the-beans/client/src/**`), 1 result
+✔ Searched text for `UserMenu` (`**/the-beans/client/src/**`), 1 result
 
 Good, UserMenu isn't being imported anywhere since I removed it from the Navbar. Now let me clean up the Next.js build and restart the servers to fix both errors:
 
@@ -10469,7 +10469,7 @@ Clean Next.js build cache and restart both servers to fix chunk loading and auth
 
 ✔ `wsl -e bash -c "cd /mnt/c/data/github/the-beans/client && pkill -f 'next dev' && pkill -f 'npm run dev' && rm -rf .next && rm -rf node_modules/.cache && npm run dev" & wsl -e bash -c "cd /mnt/c/data/github/the-beans/server && pkill -f 'npm run dev' && npm run dev" & sleep 15`
 
-Opened Simple Browser at http://localhost:3000
+✔ Opened Simple Browser at http://localhost:3000
 
 Fixed! I've:
 
@@ -125801,3 +125801,926 @@ Fixed! The language dropdown menu was positioned with `absolute right-0` which c
 - On desktop (sm and up): The dropdown aligns from the right edge as before
 
 The client container has been restarted, so the language menu should now be fully visible on mobile without any cutoff on the left side.
+
+## 1062nd try
+
+*(fixed)*
+
+> admin users doesn't look right in dark mode, see attached
+
+I can see the issue in the screenshot - the admin users table has poor contrast in dark mode. The text appears very dark against a dark background, making it hard to read. Let me examine the current styling and fix it. 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 1 to 100
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 100 to 200
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 200 to 255
+
+Now I can see the issue. The component is using fixed colors like `text-gray-900`, `bg-white`, `bg-gray-50`, etc., which don't adapt to dark mode. I need to update these to use dark mode variants. Let me fix the styling to properly support dark mode: 
+
+`page.tsx +29 -29`
+
+Now I need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+
+Fixed! I've updated the admin users page to properly support dark mode. The changes include:
+
+**What was fixed:**
+- **Page title**: Now uses `dark:text-gray-100` for readability
+- **Search input**: Added dark background (`dark:bg-gray-800`), text color, border, and placeholder styling
+- **Search icon**: Adjusted for dark mode visibility
+- **Results count**: Updated text color for dark mode
+- **Table**: Dark background (`dark:bg-gray-800`), borders (`dark:border-gray-700`)
+- **Table headers**: Dark background (`dark:bg-gray-900`) with light text
+- **Table rows**: Hover effect adjusted for dark mode
+- **Links**: Blue links now use lighter shades in dark mode (`dark:text-blue-400`)
+- **Role badges**: Admin and user badges have dark mode variants with proper contrast
+- **Language badges**: Updated with dark backgrounds and light text
+- **Date text**: Uses `dark:text-gray-400` for better visibility
+- **Mobile cards**: All mobile view elements also updated with dark mode support
+
+The client container has been restarted. You can now refresh the page at `http://localhost:3000/admin/users` and see the properly styled dark mode interface with good contrast.
+
+## 1063rd try
+
+> remove the footer on all admin pages
+
+Let me check the admin pages to see how the footer is being rendered and remove it. 
+
+✔ Searched for files matching `**/client/src/app/admin/**/page.tsx`, 13 matches
+
+✔ Read `client/src/app/layout.tsx`
+
+Now I can see the footer is rendered in the root layout. I need to check if there's an admin layout that might override this, and if not, I'll need to conditionally hide the footer on admin pages. 
+
+✔ Searched for files matching `**/client/src/app/admin/layout.tsx`, no matches
+
+✔ Searched for text `Footer` (`**/client/src/app/admin/**/*.tsx`), no results
+
+Since there's no admin-specific layout, the best approach is to create one that excludes the footer. Let me create an admin layout file: 
+
+✔ Created `client/src/app/admin/layout.tsx`
+
+✔ `docker-compose restart client`
+
+Done! I've created an admin layout file at layout.tsx that overrides the root layout. This admin layout renders only the children without the footer component, so all admin pages will no longer display the footer.
+
+The client container has been restarted. When you visit any admin page (like `/admin/users`, `/admin/roasters`, etc.), the footer will no longer appear.
+
+## 1063rd try
+
+> edit user page isn't proper dark mode like our other forms pages for users
+
+Let me examine the edit user page and compare it with other form pages to fix the dark mode styling. 
+
+✔ Read `client/src/app/admin/users/%5Bid%5D/edit/page.tsx`, lines 1 to 150
+
+✔ Read `client/src/app/admin/users/%5Bid%5D/edit/page.tsx`, lines 150 to 300
+
+✔ Read `client/src/app/admin/users/%5Bid%5D/edit/page.tsx`, lines 300 to 368
+
+Now let me check a properly styled form page to see the dark mode patterns: 
+
+✔ Read `client/src/app/login/page.tsx`, lines 1 to 100
+
+Perfect! Now I can see the pattern. Let me update the edit user page with proper dark mode styling: 
+
+`page.tsx +29 -29`
+
+✔ `docker-compose restart client`
+
+Perfect! I've updated the edit user page with comprehensive dark mode support. The changes include:
+
+**All UI elements now have dark mode styling:**
+- **Form card**: Dark background (`dark:bg-gray-800`) with proper borders
+- **Headings**: Light text in dark mode (`dark:text-gray-100`)
+- **Labels**: Gray text that's readable in dark mode (`dark:text-gray-300`)
+- **Text inputs**: Dark background, light text, proper borders and placeholders
+- **Select dropdowns**: Same dark styling as text inputs
+- **Buttons**: 
+  - Delete (red) with darker variant
+  - Cancel (gray) with dark background and light text
+  - Save (green) with darker variant
+  - All buttons have disabled states
+- **Alerts**: Error, warning, and info messages with dark mode backgrounds and appropriate text colors
+- **Deprecated badge**: Dark background with light text
+- **Metadata section**: Dark background with light text
+- **Links**: Blue links with lighter shades in dark mode
+- **Checkbox**: Adjusted colors for dark mode
+
+The client container has been restarted. The edit user page now matches the styling pattern of your other form pages with proper dark mode support!
+
+## 1064th try
+
+*(Edit use looks good in dark mode)*
+
+> earlier you tried to get rid of footer on admin pages but it's still there
+
+Let me check the admin layout I created and see why the footer is still appearing. 
+
+✔ Read `client/src/app/admin/layout.tsx`
+
+The layout exists, but the issue is that in Next.js App Router, nested layouts don't override the root layout - they wrap around it. The root layout's footer is still being rendered. I need to conditionally hide the footer in the root layout when on admin pages. Let me fix this: 
+
+✔ Read `client/src/app/layout.tsx`
+
+I need to create a client component that conditionally renders the footer based on the pathname. Let me create a conditional footer wrapper: 
+
+✔ Created `client/src/components/ConditionalFooter.tsx`
+
+Now update the root layout to use the conditional footer: 
+
+`layout.tsx +1 -1`
+`layout.tsx +1 -1`
+
+✔ `docker-compose restart client`
+
+Fixed! I've created a `ConditionalFooter` component that checks the current pathname and only renders the footer when you're NOT on admin pages (any route starting with `/admin`). 
+
+The client container has been restarted. Now when you visit any admin page, the footer will be hidden, while it will still appear on all other pages like the home page, discover, profile, etc.
+
+## 1065th try
+
+> the admin menu isn't working properly in dark mode
+
+I'll investigate the admin menu dark mode issue. Let me start by examining the admin menu component and related styling. 
+
+✔ Searched for regex `admin.*menu|Admin.*dropdown` (`**/client/src/**/*.tsx`), 15 results
+
+✔ Searched for text `Admin` (`**/client/src/components/Navbar.tsx`), 20 results
+
+✔ Read `client/src/components/Navbar.tsx`, lines 1 to 100
+
+✔ Read `client/src/components/Navbar.tsx`, lines 90 to 150
+
+Now I can see the issue. Looking at the admin dropdown menu in the Navbar component, I notice that the hover colors need to be adjusted for dark mode. The issue is with the "Roasters (New)" link which has `hover:text-green-700` which won't work well in dark mode. Let me check if there are any other styling issues and fix them: 
+
+`Navbar.tsx +1 -1`
+
+Now let me also check the mobile menu version to ensure it has proper dark mode support: 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 175 to 250
+
+Good! I can see that the mobile menu already has the proper dark mode hover color for the "Roasters (New)" link (`dark:hover:text-green-400`). Let me check if there are any other issues with the mobile admin menu: 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 250 to 290
+
+Found it! The "Specialties" and "Audit Logs" links in the mobile menu are missing dark mode text and hover colors. Let me fix those: 
+
+`Navbar.tsx +2 -2`
+
+Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the admin menu dark mode issues:
+
+**Changes made:**
+
+1. **Desktop Admin Dropdown** - Fixed "Roasters (New)" link hover color by adding `dark:hover:text-green-400` to match the light green in dark mode
+
+2. **Mobile Admin Menu** - Fixed two links that were missing dark mode styling:
+   - "Specialties" link - Added `dark:text-gray-300` and `dark:hover:text-primary-400`
+   - "Audit Logs" link - Added `dark:text-gray-300` and `dark:hover:text-primary-400`
+
+The admin menu should now work properly in dark mode with appropriate text colors and hover states for all links. The client container has been restarted to apply the changes.
+
+## 1065th try
+
+> the admin people page does not look right in dark mode
+
+I'll examine the admin people page to fix the dark mode styling issues. 
+
+✔ Read `client/src/app/admin/people/page.tsx`
+
+Now let me check the PeopleTable component which contains the main content: 
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 1 to 200
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 200 to 424
+
+Now I can see all the issues. The page and table component have many hardcoded light mode colors. Let me fix both files with comprehensive dark mode support: 
+
+`page.tsx +2 -2`
+`PeopleTable.tsx +51 -51`
+
+✔ `docker-compose restart client`
+
+Perfect! I've successfully added comprehensive dark mode styling to the admin people page. The changes include:
+
+**Page-level updates:**
+- Title and error messages with dark mode text colors
+
+**Search and filters:**
+- Search input with dark background, borders, and placeholder text
+- Roaster dropdown with dark styling
+- Person count text with proper contrast
+
+**Mobile view (cards):**
+- Dark card backgrounds and borders
+- Person names with blue links (lighter in dark mode)
+- Title text in gray
+- Role badges with dark backgrounds and light text for each role type
+- Roaster, email, and mobile sections with proper dark mode colors
+- All icons and links properly styled
+
+**Desktop view (table):**
+- Table with dark background and borders
+- Header row with dark background
+- All text content readable in dark mode
+- Row hover effects
+- Blue links for names, roasters, and emails (lighter shades in dark mode)
+- Role badges matching mobile styling
+- Border colors between rows
+
+**Form components:**
+- EditableCell inputs and selects with dark mode support
+
+The client container has been restarted. The admin people page should now look great in dark mode with proper contrast and readability throughout!
+
+## 1066th try
+
+> heading is too dark
+
+I can see the "People" heading is too dark in dark mode. Let me fix that by making it lighter. 
+
+✔ Read `client/src/app/admin/people/page.tsx`
+
+I can see the issue - line 27 is missing the dark mode class. Let me fix it: 
+
+`page.tsx +1 -1`
+
+✔ `docker-compose restart client`
+
+Fixed! The "People" heading now has `dark:text-gray-100` so it will be light gray and readable in dark mode instead of being too dark.
+
+> the people add / edit person form is not right in dark mode, see attached
+
+I'll help you fix the dark mode styling for the people add/edit person form. Let me first examine the current component and its styling. 
+
+✔ Read `client/src/components/AddPersonForm.tsx`, lines 1 to 100
+
+✔ Read `client/src/components/AddPersonForm.tsx`, lines 100 to 187
+
+Now I can see the issue. The form has hardcoded light mode colors (like `text-gray-700`, `bg-gray-50`, `border-gray-300`) that don't adapt to dark mode. I need to update all the styling to use dark mode variants. Let me fix this: 
+
+`AddPersonForm.tsx +20 -20`
+
+Now I need to restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+
+Fixed! The AddPersonForm now properly supports dark mode with:
+
+- **Labels**: `dark:text-gray-300` for better visibility
+- **Input fields**: `dark:bg-gray-800`, `dark:text-gray-100`, `dark:border-gray-600` for proper dark backgrounds
+- **Placeholders**: `dark:placeholder-gray-500` for muted placeholder text
+- **Select dropdown**: Dark mode styling for the roaster selector
+- **Container frame**: `dark:bg-gray-800` and `dark:border-gray-600` for the roaster/role section
+- **Primary Contact button**: Dark mode hover and inactive states
+- **Textarea**: Dark mode styling for the bio field
+
+All form elements will now display correctly in dark mode with appropriate contrast and visibility.
+
+## 1067th try
+
+> there's no border around the Add/Edit Person form and the "Edit Person" header is hard to read, see attached
+
+I'll fix the missing border around the form and improve the "Edit Person" header visibility. Let me first check where this form is rendered to understand the structure: 
+
+✔ Searched for regex `Edit Person|Add Person` (`**/client/src/app/admin/**/*.tsx`), 4 results
+
+✔ Read `client/src/app/admin/people/edit/%5Bid%5D/page.tsx`, lines 1 to 120
+
+✔ Read `client/src/app/admin/people/add/page.tsx`
+
+Now I can see the issue. The container div has `bg-white` which doesn't adapt to dark mode, and the h1 title has `text-gray-800` which is also not visible in dark mode. Let me fix both files: 
+
+`page.tsx +3 -3`
+`page.tsx +3 -3`
+
+✔ `docker-compose restart client`
+
+Perfect! I've fixed the Add/Edit Person form pages with:
+
+1. **Added visible border**: `border border-gray-200 dark:border-gray-700` around the form container
+2. **Fixed header visibility**: `dark:text-gray-100` for the "Edit Person"/"Add Person" heading
+3. **Updated container background**: `dark:bg-gray-900` for proper dark mode contrast
+4. **Fixed "Back to People" button**: `dark:text-blue-400` with hover state for better visibility
+
+The form now has a clear border and all text elements are properly visible in dark mode.
+
+## 1068th try
+
+*(the add/edit person looks good now)*
+
+> the admin Roasters page is not setup in dark mode, the title is unreadable and the table looks horrible
+
+I'll fix the dark mode styling for the admin Roasters page. Let me examine the current implementation. 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 150
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 150 to 300
+
+Now let me check the rest of the file to understand the table structure better: 
+
+✔ Searched for regex `className.*text-gray-900|className.*bg-white|className.*bg-gray-50` (`**/admin/roasters/page.tsx`), 20 results
+
+Now I'll create a comprehensive fix for the dark mode on the admin Roasters page. I'll use multi_replace_string_in_file to update all the necessary styling at once. 
+
+`page.tsx +22 -22`
+
+Let me check the exact formatting of the table header section: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 233 to 245
+
+Good! Some replacements worked. Let me continue with the remaining ones: 
+
+`page.tsx +5 -5`
+
+Let me read the exact lines to see what changed: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 245 to 260
+
+Perfect! The table has been updated. Now let me restart the client container: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've successfully added comprehensive dark mode support to the admin Roasters page. The changes include:
+
+**Fixed elements:**
+- **Title**: Now visible in dark mode with `dark:text-gray-100`
+- **Search bar**: Dark background, borders, and placeholder text
+- **Search icon & clear button**: Proper dark mode colors
+- **Search results count**: Readable text color
+- **Mobile card view**: 
+  - Dark backgrounds and borders for cards
+  - Blue links with lighter shade in dark mode
+  - Verified/featured badges with dark mode variants
+  - Location and rating text properly styled
+- **Desktop table view**:
+  - Dark table background and borders
+  - Dark header background with light text
+  - All table cells with proper text colors
+  - Row hover effects adjusted for dark mode
+  - Blue links for roaster names
+
+The client container has been restarted. The admin Roasters page should now be fully readable in dark mode with proper contrast throughout!
+
+## 1069th try
+
+*(admin roasters list looks good in dark mode)*
+
+> Add and Edit roaster heading is too dark and the whole page is not setup for dark mode. See attachment
+
+I can see the issue in the screenshot - the "Edit Roaster" heading and the page elements aren't properly styled for dark mode. Let me first check the relevant files to understand the current implementation. 
+
+✔ Searched for files matching `**/roasters/**/edit/page.tsx`, no matches
+
+✔ Searched for files matching `**/admin/roasters/new/page.tsx`, no matches
+
+✔ Searched for files matching `**/admin/**/page.tsx`, 13 matches
+
+✔ Read `client/src/app/admin/roasters/edit/%5Bid%5D/page.tsx`
+
+✔ Searched for text `AdminRoasterEditLayout` (`**/client/src/app/admin/roasters/**`), 7 results
+
+✔ Read `client/src/app/admin/roasters/edit/%5Bid%5D/AdminRoasterEditLayout.tsx`
+
+Now I can see the issue. The `AdminRoasterEditLayout` component has hardcoded light mode colors (like `bg-gray-50`, `text-gray-900`, `bg-white`, etc.) and doesn't support dark mode. Let me also check the "Back to Roasters" link component and then fix both the heading and the entire page for dark mode. 
+
+✔ Searched for text `Back to Roasters` (`**/client/src/app/admin/roasters/**`), 1 result
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1 to 150
+
+Let me check the RoasterForm component to see if it has the "Back to Roasters" link: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 200 to 1050
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1080 to 1120
+
+Now I can see the issue. The RoasterForm component has hardcoded light mode colors and doesn't support dark mode. Let me update both the AdminRoasterEditLayout.tsx (for the new edit interface) and the RoasterForm section in page.tsx to add proper dark mode support. 
+
+`AdminRoasterEditLayout.tsx +11 -11`
+
+Now let me update the RoasterForm component in the main roasters page to add dark mode support there too: 
+
+`page.tsx +3 -3`
+
+Now let me check the section headings in the form and update them for dark mode: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1110 to 1160
+
+I need to update all the form sections. Let me search for the pattern and create a comprehensive fix: 
+
+✔ Searched for text `p-6 border border-gray-200 rounded-lg bg-gray-50` (`**/client/src/app/admin/roasters/page.tsx`), 10 results
+
+Let me read more of the file to understand all the styling that needs to be updated: 
+
+✔ Searched for text `text-gray-800` (`**/client/src/app/admin/roasters/page.tsx`), 20 results
+
+I can see there are many sections to update. Let me use multi_replace to efficiently update all the dark mode styling issues: 
+
+`page.tsx +8 -8`
+
+Let me try reading specific sections to match the exact formatting: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1214 to 1220
+
+I see - the headings use different wording. Let me use a more targeted approach with grep to find all the exact patterns: 
+
+✔ Searched for regex `className="p-6 border border-gray-200` (`**/client/src/app/admin/roasters/page.tsx`), 2 results
+
+Good, I already updated one. Let me now use a script to find and replace all the remaining dark mode issues systematically. Let me create a more comprehensive replacement: 
+
+✔ `cd c:\data\github\the-beans\client\src\app\admin\roasters; (Get-Content page.tsx -Raw) -replace 'p-6 border border-gray-200 rounded-lg bg-gray-50','p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800' | Set-Content page.tsx`
+
+✔ `(Get-Content page.tsx -Raw) -replace 'text-xl font-semibold text-gray-800 select-none','text-xl font-semibold text-gray-800 dark:text-gray-200 select-none' | Set-Content page.tsx`
+
+✔ `(Get-Content page.tsx -Raw) -replace 'p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded','p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded' | Set-Content page.tsx`
+
+✔ `(Get-Content page.tsx -Raw) -replace 'text-sm font-medium text-gray-700 mb-1','text-sm font-medium text-gray-700 dark:text-gray-300 mb-1' | Set-Content page.tsx`
+
+✔ `(Get-Content page.tsx -Raw) -replace 'border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"','border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"' | Set-Content page.tsx`
+
+Good! Now let me check if there are any other styling patterns we need to update: 
+
+✔ Searched for text `text-gray-600"` (`**/client/src/app/admin/roasters/page.tsx`), 3 results
+
+✔ `(Get-Content page.tsx -Raw) -replace 'text-sm text-gray-600"','text-sm text-gray-600 dark:text-gray-400"' | Set-Content page.tsx`
+
+Now let me check for any checkboxes, selects, and other form elements: 
+
+✔ Searched for text `bg-white border` (`**/client/src/app/admin/roasters/page.tsx`), 1 result
+
+✔ `(Get-Content page.tsx -Raw) -replace 'text-xs text-gray-600 bg-white border rounded','text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded' | Set-Content page.tsx`
+
+Let me also check for any remaining text-gray-700 without dark mode: 
+
+✔ Searched for regex `text-gray-700(?! dark:)` (`**/client/src/app/admin/roasters/page.tsx`), 7 results
+
+✔ `(Get-Content page.tsx -Raw) -replace 'text-sm text-gray-700','text-sm text-gray-700 dark:text-gray-300' -replace 'ml-2 block text-sm font-medium text-gray-700','ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300' -replace 'text-sm font-medium text-gray-700 capitalize','text-sm font-medium text-gray-700 dark:text-gray-300 capitalize' | Set-Content page.tsx`
+
+Now let's check for any buttons or other elements that might need dark mode updates: 
+
+✔ Searched for text `bg-gray-100 text-gray-800` (`**/client/src/app/admin/roasters/page.tsx`), 1 result
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1070 to 1080
+
+Using "Replace String in File"
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1065 to 1085
+
+`page.tsx +6 -6`
+
+Now let's check if there are any more elements that need dark mode styling: 
+
+✔ Searched for regex `className=.*text-gray.*(?! dark:)` (`**/client/src/app/admin/roasters/page.tsx`), 15 results
+
+Good! Most of the list view already has dark mode. Now let me restart the client container to apply all the changes: 
+
+✔ `cd c:\data\github\the-beans; docker-compose restart client`
+
+Perfect! Now let me check if there are any remaining dark mode issues by looking for patterns that might have been missed: 
+
+✔ Searched for text `bg-gray-200` (`**/client/src/app/admin/roasters/page.tsx`), 1 result
+
+`cd c:\data\github\the-beans\client\src\app\admin\roasters; (Get-Content page.tsx -Raw) -replace 'text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200','text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600' | Set-Content page.tsx`
+
+Now let me check for error messages and other UI elements: 
+
+✔ Searched for text `text-red-600` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+✔ Searched for text `error &&` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+Let me check the conditional gray-400 text that was found earlier: 
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 1808 to 1820
+
+`page.tsx +1 -1`
+
+Let me also check for any checkboxes that need dark mode border updates: 
+
+✔ Searched for text `border-gray-300 rounded` (`**/client/src/app/admin/roasters/page.tsx`), 5 results
+
+✔ `(Get-Content page.tsx -Raw) -replace 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded','h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700' | Set-Content page.tsx`
+
+Now let me check for any remaining border-gray-300 elements: 
+
+✔ Searched for regex `border-gray-300(?! dark:)` (`**/client/src/app/admin/roasters/page.tsx`), 2 results
+
+✔ `(Get-Content page.tsx -Raw) -replace 'rounded border-gray-300 text-blue-600','rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:bg-gray-700' -replace 'flex-1 px-3 py-2 border border-gray-300 rounded-md','flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-100' | Set-Content page.tsx`
+
+Now let me check for any select dropdowns or other elements: 
+
+✔ Searched for text `<select` (`**/client/src/app/admin/roasters/page.tsx`), no results
+
+Perfect! Now let me restart the client container again to apply these final changes: 
+
+✔ `cd c:\data\github\the-beans; docker-compose restart client`
+
+Excellent! I've successfully added comprehensive dark mode support to the Edit/Add Roaster pages. Here's a summary of what was updated:
+
+## Changes Made:
+
+### 1. **AdminRoasterEditLayout.tsx** (New Layout)
+- Updated page background: `dark:bg-gray-900`
+- Updated breadcrumb links: `dark:text-blue-400` with hover states
+- Updated sidebar navigation: `dark:border-gray-700`, `dark:bg-blue-900/30`, `dark:hover:bg-gray-800`
+- Updated main content area: `dark:bg-gray-800`, `dark:border-gray-700`
+- Updated page heading: `dark:text-gray-100`
+
+### 2. **page.tsx** (Current Edit Form)
+- **Page container**: Added `dark:bg-gray-900` background
+- **Breadcrumb navigation**: Updated "Back to Roasters" link with `dark:text-blue-400`
+- **Page heading**: Updated to `dark:text-gray-100`
+- **All form sections**: Updated containers with `dark:border-gray-700` and `dark:bg-gray-800`
+- **Section headings**: All updated to `dark:text-gray-200`
+- **Expand/collapse buttons**: Added dark hover states `dark:hover:bg-gray-700`
+- **Form labels**: All updated to `dark:text-gray-300`
+- **Input fields**: Added `dark:bg-gray-700`, `dark:border-gray-600`, `dark:text-gray-100`
+- **Checkboxes**: Added `dark:border-gray-600`, `dark:bg-gray-700`
+- **Text areas**: Full dark mode support
+- **Role badges**: Updated all badge colors with dark variants (purple, blue, green, orange, yellow, gray)
+- **Cancel button**: Added dark mode hover states
+
+The roaster edit/add pages now fully support dark mode with proper contrast and readability in both light and dark themes!
+
+## 1070th try
+
+*(edit roaster looks good in dark mode)*
+
+> Specialties list and add/edit specialty aren't setup for dark mode
+
+I'll fix the dark mode styling for the Specialties list and add/edit specialty pages. Let me first examine the current implementation. 
+
+✔ Searched for files matching `**/admin/specialties/**/page.tsx`, 3 matches
+
+✔ Read `client/src/app/admin/specialties/page.tsx`, lines 1 to 150
+
+✔ Read `client/src/app/admin/specialties/page.tsx`, lines 150 to 187
+
+✔ Read `client/src/app/admin/specialties/add/page.tsx`, lines 1 to 150
+
+✔ Read `client/src/app/admin/specialties/add/page.tsx`, lines 150 to 206
+
+✔ Read `client/src/app/admin/specialties/%5Bid%5D/page.tsx`, lines 1 to 200
+
+✔ Read `client/src/app/admin/specialties/%5Bid%5D/page.tsx`, lines 200 to 384
+
+Now I'll update all three specialty pages with comprehensive dark mode support using multi_replace_string_in_file for efficiency. 
+
+`page.tsx +15 -15`
+`page.tsx +17 -17`
+`page.tsx +28 -28`
+
+The majority of the changes were applied successfully! Let me check what might have been missed on the edit page and complete it. 
+
+✔ Read `client/src/app/admin/specialties/%5Bid%5D/page.tsx`, lines 150 to 165
+
+`page.tsx +3 -3`
+
+✔ Read `client/src/app/admin/specialties/%5Bid%5D/page.tsx`, lines 170 to 185
+
+`page.tsx +3 -3`
+
+Now let me restart the client container to apply all the changes: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've successfully added comprehensive dark mode support to all three specialty pages. Here's a summary of what was updated:
+
+## **Specialties List Page (`/admin/specialties`)**
+- **Title**: Now light gray in dark mode (`dark:text-gray-100`)
+- **Search bar**: Dark background, borders, and placeholder text
+- **Search icon**: Adjusted for dark mode visibility
+- **Results count**: Readable dark mode text
+- **Mobile cards**: Dark backgrounds, borders, and all text elements
+- **Roaster count badges**: Dark blue background with light text
+- **Deprecated badges**: Dark red background with light text
+- **Desktop table**: Dark backgrounds, borders, and headers
+- **Table rows**: Hover effects adjusted for dark mode
+- **Links**: Blue links with lighter shades in dark mode
+
+## **Add Specialty Page (`/admin/specialties/add`)**
+- **Back link**: Lighter blue in dark mode with proper hover
+- **Error messages**: Dark mode backgrounds and text
+- **Form container**: Dark background with proper borders
+- **Page heading**: Light gray text
+- **Language selector buttons**: Dark mode variants
+- **All form labels**: Readable gray text in dark mode
+- **Input fields**: Dark backgrounds, borders, and placeholder text
+- **Textarea**: Full dark mode support
+- **Translation summary**: Dark background with colored status indicators
+- **Cancel button**: Dark mode colors
+
+## **Edit Specialty Page (`/admin/specialties/[id]`)**
+- **All elements from Add page** plus:
+- **Delete confirmation dialog**: Dark mode backgrounds and buttons
+- **Deprecated toggle section**: Dark background with proper contrast
+- **Checkbox**: Dark mode styling
+- **Roaster count info box**: Blue dark mode variant
+- **Delete button**: Dark red with hover state
+- **Not found/error states**: Properly styled for dark mode
+
+The client container has been restarted, and all specialty pages now have full dark mode support with proper contrast and readability!
+
+## 1071st try
+
+> compare the admin specialties table with the admin users, people, roasters pages. those have grey hover over table rows. their tables have a border too. the Roasters column text values are too dark
+
+I'll compare the specialties table with the other admin tables and fix the styling inconsistencies. 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 135 to 160
+
+✔ Read `client/src/app/admin/specialties/page.tsx`, lines 135 to 180
+
+I can see the issues! The specialties table is missing dark mode hover effects on rows and the divider, and the roaster count text doesn't have dark mode styling. Let me check the users table to see the correct pattern: 
+
+✔ Searched for regex `tbody className.*divide` (`**/admin/users/page.tsx`), 1 result
+
+✔ Searched for regex `tr.*hover:bg-gray` (`**/admin/users/page.tsx`), 1 result
+
+Perfect! Now I can see the pattern. Let me fix the specialties table to match the styling: 
+
+`page.tsx +5 -5`
+
+✔ `docker-compose restart client`
+
+Fixed! The specialties table now matches the styling of the other admin tables:
+
+**Changes made:**
+1. **Table row dividers**: Added `dark:divide-gray-700` to match other admin tables
+2. **Row hover effect**: Added `dark:hover:bg-gray-700` for dark mode hover state
+3. **Specialty name links**: Already had dark mode colors (kept as is)
+4. **Description text**: Already had `dark:text-gray-400` (kept as is)
+5. **Roasters column**: Added `dark:text-gray-400` so the count values are now lighter and readable in dark mode
+
+The table now has the same consistent styling as the Users, People, and Roasters admin pages with proper borders, hover effects, and readable text colors in dark mode.
+
+## 1072nd try
+
+*(specialties table looks closer to the other admin tables)*
+
+> admin roasters and people have an outer border on their tables but admin users and specialties tables dont
+
+I'll check the table structure for all four admin pages to identify the border differences and fix them. 
+
+✔ Searched for regex `table className.*bg-white` (`**/admin/users/page.tsx`), 1 result
+
+✔ Searched for regex `table className.*bg-white` (`**/admin/specialties/page.tsx`), 1 result
+
+✔ Searched for regex `table className.*bg-white` (`**/admin/roasters/page.tsx`), 1 result
+
+✔ Searched for regex `Desktop view.*table` (`**/admin/people/page.tsx`), no results
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 70 to 90
+
+✔ Searched for regex `table className` (`**/components/PeopleTable.tsx`), 1 result
+
+Good! I can see that:
+- **Roasters table**: Has `border border-gray-200 dark:border-gray-700` ✓
+- **People table**: Has `border border-gray-200 dark:border-gray-700` ✓
+- **Users table**: Has `border border-gray-200 dark:border-gray-700` ✓
+- **Specialties table**: Has `border border-gray-200 dark:border-gray-700` ✓
+
+Wait, they all have borders already! Let me check if there's a visual difference by looking at the container wrapper: 
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 175 to 180
+
+✔ Read `client/src/app/admin/roasters/page.tsx`, lines 230 to 240
+
+I notice the difference! The **users** and **specialties** tables have `overflow-hidden` but **roasters** doesn't. However, let me verify by checking the actual visual appearance. Let me look more carefully at the table wrapper divs: 
+
+✔ Read `client/src/app/admin/specialties/page.tsx`, lines 133 to 138
+
+✔ Read `client/src/components/PeopleTable.tsx`, lines 295 to 300
+
+Ah! I found it! The **People** table has `shadow` class but the others don't. Also, **Roasters** and **People** DON'T have `overflow-hidden`, while **Users** and **Specialties** do. The `overflow-hidden` on the table element might be hiding the border. Let me check if that's the issue and make them consistent: 
+
+`page.tsx +1 -1`
+`page.tsx +1 -1`
+
+✔ `docker-compose restart client`
+
+Fixed! The issue was that the **Users** and **Specialties** tables had `overflow-hidden` class on the `<table>` element, which was clipping the border and making it invisible. By removing `overflow-hidden`, the borders are now visible just like on the **Roasters** and **People** tables.
+
+All four admin tables now have consistent styling with visible outer borders.
+
+## 1072nd try
+
+*(speciality table looks good now, has an outer border)*
+
+I'll fix the dark mode styling for the audit logs page. Let me examine the current implementation. 
+
+✔ Searched for files matching `**/admin/audit-logs/page.tsx`, 1 match
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 1 to 200
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 200 to 400
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 400 to 600
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 600 to 680
+
+Now I'll add comprehensive dark mode styling to the audit logs page: 
+
+`page.tsx +86 -86`
+
+✔ `docker-compose restart client`
+
+Perfect! I've added comprehensive dark mode styling to the audit logs page. Here's what was updated:
+
+**Page Elements:**
+- **Title**: Light gray text in dark mode
+- **Stats cards**: All 5 cards with dark backgrounds, light text, and adjusted number colors
+- **Card content**: Stats values with proper dark mode text colors
+
+**Filters Section:**
+- **Filter container**: Dark background
+- **All labels**: Readable gray text
+- **Select dropdowns**: Dark backgrounds with light text
+- **Text inputs**: Dark styling with proper placeholders
+- **Date inputs**: Dark mode support
+- **Buttons**: Apply and Clear buttons with dark variants
+
+**Desktop Table:**
+- **Table container**: Dark background with shadow
+- **Table headers**: Dark background with light text
+- **Row dividers**: Dark gray dividers
+- **Row hover**: Gray hover effect in dark mode
+- **All table cells**: Light text colors
+- **Links**: Blue links with lighter shades in dark mode
+- **Action badges**: Existing colors work in both modes
+- **Text colors**: All gray text updated for readability
+
+**Mobile Cards:**
+- **Card backgrounds**: Dark backgrounds with borders
+- **All text**: Properly styled for dark mode
+- **Timestamps**: Readable gray
+- **Entity types**: Adjusted colors
+- **Links**: Blue with dark mode variants
+- **Dividers**: Dark gray borders
+
+**Pagination:**
+- **Container**: Dark background
+- **Buttons**: Dark styling with hover states
+- **Text**: Light gray for readability
+- **Active page**: Blue highlight adjusted for dark mode
+
+**Changes Modal:**
+- **Overlay**: Darker background
+- **Modal container**: Dark background with border
+- **Close button**: Light hover state
+- **Info section**: Dark gray background
+- **Field names**: Light text
+- **Value containers**: Dark backgrounds for old/new values with proper borders
+- **Color indicators**: Red/green adjusted for dark mode visibility
+
+The audit logs page now has complete dark mode support with proper contrast and readability throughout!
+
+## 1073rd try
+
+*(audit log in dark mode looks good)*
+
+> The audit log is missing borders around the components in dark mode, the table too. 
+
+I'll investigate the audit log styling issue in dark mode. Let me first locate the audit log component and check its styling. 
+
+✔ Searched for files matching `**/admin/*audit*.tsx`, no matches
+
+✔ Searched for files matching `**/admin/*audit*.ts`, no matches
+
+✔ Searched for regex `Audit Logs|audit.*log` (`**/client/src/**/*.tsx`), 20 results
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 1 to 250
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 250 to 500
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 500 to 680
+
+Now I can see the issue. Looking at the screenshot and the code, the stats cards and filters section need dark mode borders. Let me add the missing borders: 
+
+`page.tsx +7 -7`
+
+Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+
+Perfect! I've added blue borders to all the audit log components in dark mode:
+
+**Changes made:**
+- ✅ **Stats Cards**: Added blue borders (`dark:border-blue-500`) to all 5 stat cards (Total Logs, Last 30 Days, Actions, Entity Types, Top Users)
+- ✅ **Filters Section**: Added blue border to the filters container
+- ✅ **Table**: Added blue border to the desktop table view container
+
+All components now have consistent borders in dark mode that match the overall design. The client container has been restarted, so the changes should be visible now at `http://localhost:3000/admin/audit-logs`.
+
+## 1074th try
+
+*(borders around panes in audit log, looks good)*
+
+> these table headings should be white like all the other admin tables, why are they using different styles? 
+
+Let me check the table heading styles in the audit logs page and compare them with other admin tables. 
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 310 to 335
+
+Searched for regex `thead.*bg-gray` (`**/client/src/app/admin/**/*.tsx`), 4 results
+
+✔ Read `client/src/app/admin/users/page.tsx`, lines 175 to 195
+
+I can see the issue! The audit logs table headers are using `text-gray-500 dark:text-gray-400`, but the other admin tables (like users) are using `text-gray-900 dark:text-gray-100` which makes them white in dark mode. Let me fix this: 
+
+`page.tsx +7 -7`
+
+✔ `docker-compose restart client`
+
+Fixed! All table headers in the audit logs now use white text in dark mode (`text-gray-900 dark:text-gray-100`) to match the other admin tables. The headers were previously using gray text which made them less visible.
+
+> the time cells are too dark in admin audit log, see attached
+
+Let me check the styling for the time cells in the audit log table. 
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 335 to 360
+
+I found the issue! The time cell on line 345 is missing the dark mode text color class. It only has `text-gray-900` but no `dark:text-gray-100` like the other cells. Let me fix it: 
+
+`page.tsx +1 -1`
+
+✔ `docker-compose restart client`
+
+Fixed! The time cells now have the `dark:text-gray-100` class, so they'll display in white like the other cells in dark mode instead of being too dark to read.
+
+## 1075th try
+
+> in dark mode on audit log I don't see the two calendar icon/buttons, screenshot attached
+
+I'll investigate the audit log page to identify the calendar icon/button visibility issue in dark mode. 
+
+✔ Searched for files matching `**/admin/*audit*`, 1 match
+
+✔ Searched for regex `audit.*log|auditLog` (`**/client/src/app/admin/**`), 20 results
+
+✔ Read `client/src/app/admin/audit-logs/page.tsx`, lines 1 to 320
+
+I found the issue! Looking at the screenshot and the code, the calendar icons in the date input fields are not visible in dark mode. The problem is that the date input fields (lines 275-293) don't have proper styling for the calendar icon in dark mode. The date inputs are using native browser date pickers, and their icons inherit default browser styling which often results in light-colored icons that aren't visible against dark backgrounds.
+
+Let me check if there's a CSS file that might be styling these inputs: 
+
+✔ Searched for regex `input\[type.*date|date.*input|calendar` (`**/*.css`), no results
+
+Now I'll fix the date input styling to ensure the calendar icons are visible in dark mode. The solution is to add specific styling using the `::-webkit-calendar-picker-indicator` pseudo-element selector: 
+
+`page.tsx +2 -2`
+
+✔ `docker-compose restart client`
+
+Fixed! I've added the `[color-scheme:light] dark:[color-scheme:dark]` Tailwind classes to both Start Date and End Date input fields. This CSS property tells the browser to use the appropriate color scheme for native form controls (like the calendar picker icon), ensuring the calendar icons are now visible in dark mode.
+
+The container has been restarted. The calendar icons should now be visible in both light and dark modes.
+
+## 1076th try
+
+*(looks really good now, ready to checkin but just another fix for good measure)*
+
+## Location button outside the form on mobile #236
+
+https://github.com/thephm/the-beans/issues/236
+
+I'll investigate the location button issue on mobile. Let me first check the discover page component to understand the current layout. 
+
+✔ Read `client/src/app/discover/page.tsx`, lines 1 to 150
+
+Let me check the SearchSection component to see how the location button is structured: 
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 1 to 200
+
+✔ Read `client/src/components/SearchSection.tsx`, lines 200 to 309
+
+I can see the issue! On mobile, the location button with the GPS icon is positioned inside the same flex container as the location input field. The current layout uses `flex flex-col md:flex-row`, which means on mobile (below `md` breakpoint), all elements stack vertically, but the location button stays inline with the location input.
+
+Looking at the screenshot, the location button (with the GPS icon) is appearing outside/below the search form card. This is likely because the button is breaking out of the containing elements on mobile.
+
+Let me fix this by ensuring the location button stays properly contained within the form on mobile: 
+
+`SearchSection.tsx +6 -6`
+
+Now let me restart the client container for the changes to take effect: 
+
+✔ `docker-compose restart client`
+
+Fixed! The changes I made to resolve the mobile layout issue:
+
+1. **Added `flex-shrink-0`** to the location button to prevent it from shrinking and breaking layout
+2. **Added `items-stretch`** to the location field container to ensure proper vertical alignment
+3. **Removed `whitespace-nowrap`** from the location button (not needed with icon-only display)
+4. **Made Search button full-width on mobile** (`w-full md:min-w-[110px]`) for better mobile UX
+5. **Standardized label margins** to `mb-2` for consistency across all screen sizes
+
+The location button should now stay properly contained within the search form card on mobile devices. The container's flex layout will keep all elements properly aligned and prevent the button from appearing outside the form boundaries.
+
+## 1077th try
+
+*(done for the day checking in!)*

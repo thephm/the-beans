@@ -115,7 +115,7 @@ const AdminRoastersPage: React.FC = () => {
   return (
     <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
       <div className="mb-6 max-w-6xl mx-auto flex justify-between items-center">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('adminSection.roasters', 'Roasters')}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roasters')}</h1>
         <button
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           onClick={() => setShowAddForm(true)}
@@ -132,10 +132,10 @@ const AdminRoastersPage: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
-            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           />
           <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -150,7 +150,7 @@ const AdminRoastersPage: React.FC = () => {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               aria-label={t('common.clear', 'Clear')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,14 +160,14 @@ const AdminRoastersPage: React.FC = () => {
           )}
         </div>
         {searchQuery && (
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {t('admin.roasters.searchResults', 'Found {{count}} roaster(s)', { count: filteredRoasters.length })}
           </div>
         )}
       </div>
       <div className="max-w-6xl mx-auto">
         {filteredRoasters.length === 0 ? (
-          <div className="text-gray-500 text-center py-12">
+          <div className="text-gray-500 dark:text-gray-400 text-center py-12">
             {searchQuery 
               ? t('admin.roasters.noSearchResults', 'No roasters match your search.')
               : t('admin.roasters.noRoasters', 'No roasters found.')
@@ -178,11 +178,11 @@ const AdminRoastersPage: React.FC = () => {
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
               {filteredRoasters.map((roaster) => (
-                <div key={roaster.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                <div key={roaster.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm dark:shadow-gray-900/50">
                   {/* Roaster Header */}
                   <div className="mb-3">
                     <button
-                      className="text-lg font-semibold text-blue-600 hover:text-blue-800 text-left"
+                      className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-left"
                       onClick={() => setEditingId(roaster.id)}
                     >
                       {roaster.name}
@@ -191,13 +191,13 @@ const AdminRoastersPage: React.FC = () => {
                     {/* Status Badges */}
                     <div className="flex flex-wrap gap-2 mt-2">
                       {roaster.verified && (
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                           <span className="mr-1">✔️</span>
                           {t('adminForms.roasters.verified', 'Verified')}
                         </span>
                       )}
                       {roaster.featured && (
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400">
                           <span className="mr-1">⭐</span>
                           {t('adminForms.roasters.featured', 'Featured')}
                         </span>
@@ -207,7 +207,7 @@ const AdminRoastersPage: React.FC = () => {
 
                   {/* Location */}
                   <div className="mb-3">
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                       <span className="mr-2">📍</span>
                       <span>
                         {[roaster.city, roaster.country].filter(Boolean).join(', ') || '-'}
@@ -218,7 +218,7 @@ const AdminRoastersPage: React.FC = () => {
                   {/* Rating */}
                   {showRatings && roaster.rating && (
                     <div className="mb-3">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <span className="mr-2">⭐</span>
                         <span>{roaster.rating}</span>
                       </div>
@@ -230,33 +230,33 @@ const AdminRoastersPage: React.FC = () => {
 
             {/* Desktop Table View */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                <thead className="bg-gray-50">
+              <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.name', 'Name')}</th>
-                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.city', 'City')}</th>
-                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.country', 'Country')}</th>
-                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.verified', 'Verified')}</th>
-                    <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.featured', 'Featured')}</th>
-                    {showRatings && <th className="px-4 py-2 border-b text-left">{t('adminForms.roasters.rating', 'Rating')}</th>}
+                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.name', 'Name')}</th>
+                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.city', 'City')}</th>
+                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.country', 'Country')}</th>
+                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.verified', 'Verified')}</th>
+                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.featured', 'Featured')}</th>
+                    {showRatings && <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.rating', 'Rating')}</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredRoasters.map((roaster) => (
-                    <tr key={roaster.id} className="border-b hover:bg-gray-50">
+                    <tr key={roaster.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-4 py-2 font-medium">
                         <button
-                          className="text-blue-600 hover:underline text-left"
+                          className="text-blue-600 dark:text-blue-400 hover:underline text-left"
                           onClick={() => setEditingId(roaster.id)}
                         >
                           {roaster.name}
                         </button>
                       </td>
-                      <td className="px-4 py-2">{roaster.city || '-'}</td>
-                      <td className="px-4 py-2">{roaster.country || '-'}</td>
-                      <td className="px-4 py-2">{roaster.verified ? '✔️' : ''}</td>
-                      <td className="px-4 py-2">{roaster.featured ? '⭐' : ''}</td>
-                      {showRatings && <td className="px-4 py-2">{roaster.rating || '-'}</td>}
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.country || '-'}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.verified ? '✔️' : ''}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.featured ? '⭐' : ''}</td>
+                      {showRatings && <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.rating || '-'}</td>}
                     </tr>
                   ))}
                 </tbody>
@@ -1065,28 +1065,28 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const getRoleBadgeColor = (role: PersonRole) => {
     switch (role) {
       case PersonRole.OWNER:
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
       case PersonRole.ADMIN:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
       case PersonRole.BILLING:
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
       case PersonRole.MARKETING:
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400';
       case PersonRole.SCOUT:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
     }
   };
 
   return (
-    <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
+    <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="mb-6 max-w-6xl mx-auto">
         {/* Breadcrumb Navigation */}
         <nav className="mb-4">
           <button
             onClick={onCancel}
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium"
+            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors font-medium"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1094,7 +1094,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             {t('admin.roasters.backToRoasters', 'Back to Roasters')}
           </button>
         </nav>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
           {roaster 
             ? t('adminForms.roasters.editRoaster', 'Edit Roaster') 
             : t('admin.roasters.addTitle', 'Add Roaster')
@@ -1106,15 +1106,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Information */}
-            <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+            <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.basicInformation', 'Basic Information')}
                 </h3>
                 <button
                   type="button"
                   onClick={() => setBasicInfoExpanded(!basicInfoExpanded)}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title={basicInfoExpanded ? 'Collapse section' : 'Expand section'}
                 >
                   <svg 
@@ -1132,7 +1132,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               {basicInfoExpanded && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.name', 'Name')} *
                     </label>
                     <input
@@ -1141,11 +1141,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.description', 'Description')}
                     </label>
                     <textarea
@@ -1153,11 +1153,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.description}
                       onChange={handleInputChange}
                       rows={5}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.email', 'Email')}
                     </label>
                     <input
@@ -1165,11 +1165,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.phone', 'Phone')}
                     </label>
                     <input
@@ -1177,11 +1177,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.website', 'Website')}
                     </label>
                     <input
@@ -1189,11 +1189,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       name="website"
                       value={formData.website}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.founded', 'Founded')}
                     </label>
                     <input
@@ -1205,7 +1205,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       min="1800"
                       max="2100"
                       step="1"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                 </>
@@ -1213,15 +1213,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             </div>
 
             {/* Location & Details */}
-            <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+            <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.locationDetails', 'Location & Details')}
                 </h3>
                 <button
                   type="button"
                   onClick={() => setLocationExpanded(!locationExpanded)}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title={locationExpanded ? 'Collapse section' : 'Expand section'}
                 >
                   <svg 
@@ -1239,7 +1239,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               {locationExpanded && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.address', 'Address')}
                     </label>
                     <input
@@ -1247,12 +1247,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       name="address"
                       value={formData.address}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t('adminForms.roasters.city', 'City')}
                       </label>
                       <input
@@ -1260,11 +1260,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         name="city"
                         value={formData.city}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t('adminForms.roasters.state', 'State')}
                       </label>
                       <input
@@ -1272,13 +1272,13 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         name="state"
                         value={formData.state}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t('admin.roasters.zipCode', 'Zip Code')}
                       </label>
                       <input
@@ -1286,11 +1286,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         name="zipCode"
                         value={formData.zipCode}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t('admin.roasters.country', 'Country')}
                       </label>
                       <input
@@ -1298,13 +1298,13 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         name="country"
                         value={formData.country}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t('admin.roasters.latitude', 'Latitude')}
                       </label>
                       <input
@@ -1313,11 +1313,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         name="latitude"
                         value={formData.latitude}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t('admin.roasters.longitude', 'Longitude')}
                       </label>
                       <input
@@ -1326,7 +1326,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                         name="longitude"
                         value={formData.longitude}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>
@@ -1336,15 +1336,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           </div>
 
           {/* Source Countries */}
-          <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+          <div className="mt-6 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-800 select-none">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                 {t('adminForms.roasters.sourceCountries', 'Source Countries')}
               </h3>
               <button
                 type="button"
                 onClick={() => setSourceCountriesExpanded(!sourceCountriesExpanded)}
-                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                 title={sourceCountriesExpanded ? 'Collapse section' : 'Expand section'}
               >
                 <svg 
@@ -1361,7 +1361,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             
             {sourceCountriesExpanded && (
               <>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   {t('adminForms.roasters.sourceCountriesDescription', 'Select the coffee origin countries that this roaster sources from.')}
                 </p>
                 
@@ -1385,7 +1385,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               setSelectedCountries(prev => prev.filter(id => id !== country.id));
                             }
                           }}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:bg-gray-700 focus:ring-blue-500 flex-shrink-0"
                         />
                         <div className="flex items-center space-x-1 min-w-0 overflow-hidden">
                           {country.flagSvg && (
@@ -1398,7 +1398,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               }}
                             />
                           )}
-                          <span className="text-sm text-gray-700 truncate block">{country.name}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300 truncate block">{country.name}</span>
                         </div>
                       </label>
                     ))}
@@ -1409,7 +1409,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                   </div>
                 )}
                 {selectedCountries.length > 0 && (
-                  <div className="mt-2 text-sm text-gray-600">
+                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                     {t('adminForms.roasters.selectedCountriesCount', 'Selected countries: {{count}}', { count: selectedCountries.length })}
                   </div>
                   )}
@@ -1420,15 +1420,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           </div>
 
           {/* Social Networks */}
-          <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+          <div className="mt-6 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-800 select-none">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                 {t('adminForms.roasters.socialNetworks', 'Social Networks')}
               </h3>
               <button
                 type="button"
                 onClick={() => setSocialNetworksExpanded(!socialNetworksExpanded)}
-                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                 title={socialNetworksExpanded ? 'Collapse section' : 'Expand section'}
               >
                 <svg 
@@ -1447,7 +1447,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.instagram', 'Instagram')}
                     </label>
                     <input
@@ -1456,11 +1456,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.instagram}
                       onChange={handleInputChange}
                       placeholder="https://instagram.com/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.tiktok', 'TikTok')}
                     </label>
                     <input
@@ -1469,11 +1469,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.tiktok}
                       onChange={handleInputChange}
                       placeholder="https://tiktok.com/@..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.facebook', 'Facebook')}
                     </label>
                     <input
@@ -1482,11 +1482,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.facebook}
                       onChange={handleInputChange}
                       placeholder="https://facebook.com/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.linkedin', 'LinkedIn')}
                     </label>
                     <input
@@ -1495,11 +1495,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.linkedin}
                       onChange={handleInputChange}
                       placeholder="https://linkedin.com/company/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.youtube', 'YouTube')}
                     </label>
                     <input
@@ -1508,11 +1508,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.youtube}
                       onChange={handleInputChange}
                       placeholder="https://youtube.com/@..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.threads', 'Threads')}
                     </label>
                     <input
@@ -1521,11 +1521,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.threads}
                       onChange={handleInputChange}
                       placeholder="https://threads.net/@..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.pinterest', 'Pinterest')}
                     </label>
                     <input
@@ -1534,11 +1534,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.pinterest}
                       onChange={handleInputChange}
                       placeholder="https://pinterest.com/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.bluesky', 'BlueSky')}
                     </label>
                     <input
@@ -1547,11 +1547,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.bluesky}
                       onChange={handleInputChange}
                       placeholder="https://bsky.app/profile/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.x', 'X (Twitter)')}
                     </label>
                     <input
@@ -1560,11 +1560,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.x}
                       onChange={handleInputChange}
                       placeholder="https://x.com/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('adminForms.roasters.reddit', 'Reddit')}
                     </label>
                     <input
@@ -1573,7 +1573,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       value={formData.reddit}
                       onChange={handleInputChange}
                       placeholder="https://reddit.com/r/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                 </div>
@@ -1582,9 +1582,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           </div>
 
           {/* Contacts Pane */}
-          <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50">
+          <div className="mt-6 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 select-none">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                 {roaster?.id ? t('adminForms.roasters.contacts', 'Contacts') : t('adminForms.roasters.contact', 'Contact')}
               </h3>
               <div className="flex items-center gap-2">
@@ -1600,7 +1600,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                 <button
                   type="button"
                   onClick={() => setContactsExpanded(!contactsExpanded)}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title={contactsExpanded ? 'Collapse section' : 'Expand section'}
                 >
                   <svg 
@@ -1649,7 +1649,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                                   {person.email}
                                 </a>
                               )}
-                              {person.mobile && <div className="text-sm text-gray-700">{person.mobile}</div>}
+                              {person.mobile && <div className="text-sm text-gray-700 dark:text-gray-300">{person.mobile}</div>}
                               {person.bio && <div className="text-xs text-gray-500 mt-1">{person.bio}</div>}
                             </div>
                             <div className="mt-2 sm:mt-0 flex gap-2">
@@ -1684,15 +1684,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             {/* ...existing code... */}
 
           {/* Specialties Pane */}
-          <div className="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50">
+          <div className="mt-6 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 select-none">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                 {t('adminForms.roasters.specialties', 'Specialties')}
               </h3>
               <button
                 type="button"
                 onClick={() => setSpecialtiesExpanded(!specialtiesExpanded)}
-                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                 title={specialtiesExpanded ? 'Collapse section' : 'Expand section'}
               >
                 <svg 
@@ -1717,15 +1717,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           </div>
 
           {/* Settings Pane - Online Only, Rating, Verified, Featured */}
-          <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+          <div className="mt-8 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 select-none">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                 {t('adminForms.roasters.settings', 'Settings')}
               </h3>
               <button
                 type="button"
                 onClick={() => setSettingsExpanded(!settingsExpanded)}
-                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                 title={settingsExpanded ? 'Collapse section' : 'Expand section'}
               >
                 <svg 
@@ -1746,7 +1746,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             <div className="space-y-4">
               {/* Rating */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('adminForms.roasters.rating', 'Rating')}
                 </label>
                 <input
@@ -1757,7 +1757,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                   name="rating"
                   value={formData.rating}
                   onChange={handleInputChange}
-                  className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </div>
 
@@ -1769,9 +1769,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     name="verified"
                     checked={formData.verified}
                     onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
                   />
-                  <label className="ml-2 block text-sm font-medium text-gray-700">
+                  <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t('adminForms.roasters.verified', 'Verified')}
                   </label>
                 </div>
@@ -1781,9 +1781,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     name="featured"
                     checked={formData.featured}
                     onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
                   />
-                  <label className="ml-2 block text-sm font-medium text-gray-700">
+                  <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t('adminForms.roasters.featured', 'Featured')}
                   </label>
                 </div>
@@ -1793,9 +1793,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     name="onlineOnly"
                     checked={formData.onlineOnly}
                     onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
                   />
-                  <label className="ml-2 block text-sm font-medium text-gray-700">
+                  <label className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {t('adminForms.roasters.onlineOnly', 'Online Only')}
                   </label>
                 </div>
@@ -1806,9 +1806,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     checked={formData.showHours}
                     onChange={handleInputChange}
                     disabled={formData.onlineOnly}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                  <label className={`ml-2 block text-sm font-medium ${formData.onlineOnly ? 'text-gray-400' : 'text-gray-700'}`}>
+                  <label className={`ml-2 block text-sm font-medium ${formData.onlineOnly ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}>
                     {t('adminForms.roasters.showHours', 'Show Hours')}
                   </label>
                 </div>
@@ -1820,15 +1820,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
         {/* Opening Hours Section - Only show if not online only AND showHours is enabled */}
         {!formData.onlineOnly && formData.showHours && (
-            <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="mt-8 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.hours.title', 'Opening Hours')}
                 </h3>
                 <button
                   type="button"
                   onClick={() => setHoursExpanded(!hoursExpanded)}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title={hoursExpanded ? 'Collapse section' : 'Expand section'}
                 >
                   <svg 
@@ -1850,7 +1850,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                   <div key={day} className="p-3 bg-white rounded-md space-y-2 border border-gray-200">
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                       <div className="w-full sm:w-24">
-                        <label className="text-sm font-medium text-gray-700 capitalize">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
                           {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
                         </label>
                       </div>
@@ -1859,9 +1859,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                           type="checkbox"
                           checked={dayHours?.closed || false}
                           onChange={(e) => handleHoursChange(day, 'closed', e.target.checked)}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
                         />
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
                           {t('adminForms.roasters.hours.closed', 'Closed')}
                         </span>
                       </div>
@@ -1876,7 +1876,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                             type="time"
                             value={dayHours?.open || '08:00'}
                             onChange={(e) => handleHoursChange(day, 'open', e.target.value)}
-                            className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div className="flex items-center space-x-2">
@@ -1887,7 +1887,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                             type="time"
                             value={dayHours?.close || '18:00'}
                             onChange={(e) => handleHoursChange(day, 'close', e.target.value)}
-                            className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           />
                         </div>
                       </div>
@@ -1902,15 +1902,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
           {/* Images Section - Only show when editing existing roaster and images are loaded */}
           {roaster?.id && imagesLoaded && (
-            <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="mt-8 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.uploadedImages', 'Uploaded Images')}
                 </h3>
                 <button
                   type="button"
                   onClick={() => setImagesExpanded(!imagesExpanded)}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title={imagesExpanded ? 'Collapse section' : 'Expand section'}
                 >
                   <svg 
@@ -1940,15 +1940,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
           {/* URL Images Section - Show when editing existing roaster with URL images */}
           {roaster?.id && (
-            <div className="mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="mt-8 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-800 select-none">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.urlImages', 'URL Images')} ({(formData.images || []).length})
                 </h3>
                 <button
                   type="button"
                   onClick={() => setUrlImagesExpanded(!urlImagesExpanded)}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title={urlImagesExpanded ? 'Collapse section' : 'Expand section'}
                 >
                   <svg 
@@ -2002,7 +2002,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                             newImages[index] = e.target.value;
                             setFormData({ ...formData, images: newImages });
                           }}
-                          className="text-xs text-gray-600 bg-white border rounded px-2 py-1 w-full mr-2"
+                          className="text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded px-2 py-1 w-full mr-2"
                           placeholder="Image URL"
                         />
                         <button
@@ -2028,7 +2028,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                   <input
                     type="text"
                     placeholder={t('adminForms.roasters.addImageUrl', 'Add image URL...')}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         const input = e.target as HTMLInputElement;
@@ -2107,7 +2107,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               <button
                 type="button"
                 onClick={onCancel}
-                className="min-w-[110px] px-5 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="min-w-[110px] px-5 py-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 {t('adminForms.roasters.cancel', 'Cancel')}
               </button>
@@ -2130,3 +2130,14 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 }
 
 export default AdminRoastersPage;
+
+
+
+
+
+
+
+
+
+
+

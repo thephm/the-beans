@@ -99,15 +99,15 @@ const EditPersonPage: React.FC = () => {
     <div className="max-w-3xl mx-auto pt-20">
       <div className="mb-8">
         <button
-          className="text-blue-700 hover:text-blue-900 text-base font-semibold flex items-center gap-2"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-base font-semibold flex items-center gap-2"
           onClick={handleCancel}
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           {t('admin.people.title', 'Back to People')}
         </button>
       </div>
-      <div className="w-full max-w-2xl bg-white rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">{t('admin.people.editTitle', 'Edit Person')}</h1>
+      <div className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-8">
+        <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">{t('admin.people.editTitle', 'Edit Person')}</h1>
         {showDeleteConfirm && (
           <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded">
             <div className="text-sm text-red-800 mb-3">
