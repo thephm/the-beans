@@ -151,7 +151,7 @@ const EditSpecialtyPage: React.FC = () => {
         <div className="mb-6">
           <Link
             href="/admin/specialties"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mb-4"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -159,8 +159,8 @@ const EditSpecialtyPage: React.FC = () => {
             {t('admin.specialties.backToSpecialties', 'Back to Specialties')}
           </Link>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">{t('error', 'Error')}: {error}</div>
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="text-red-800 dark:text-red-200">{t('error', 'Error')}: {error}</div>
         </div>
       </div>
     );
@@ -172,7 +172,7 @@ const EditSpecialtyPage: React.FC = () => {
         <div className="mb-6">
           <Link
             href="/admin/specialties"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mb-4"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -180,8 +180,8 @@ const EditSpecialtyPage: React.FC = () => {
             {t('admin.specialties.backToSpecialties', 'Back to Specialties')}
           </Link>
         </div>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="text-yellow-800">{t('admin.specialties.notFound', 'Specialty not found')}</div>
+        <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <div className="text-yellow-800 dark:text-yellow-200">{t('admin.specialties.notFound', 'Specialty not found')}</div>
         </div>
       </div>
     );
@@ -192,7 +192,7 @@ const EditSpecialtyPage: React.FC = () => {
       <div className="mb-8">
         <Link
           href="/admin/specialties"
-          className="inline-flex items-center text-blue-700 hover:text-blue-900 text-base font-semibold mb-4 gap-2"
+          className="inline-flex items-center text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-base font-semibold mb-4 gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -202,29 +202,29 @@ const EditSpecialtyPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">{t('error', 'Error')}: {error}</div>
+        <div className="mb-6 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="text-red-800 dark:text-red-200">{t('error', 'Error')}: {error}</div>
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-8">{t('admin.specialties.editTitle', 'Edit Specialty')}</h1>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-8">
+        <h1 className="text-2xl font-bold mb-8 dark:text-gray-100">{t('admin.specialties.editTitle', 'Edit Specialty')}</h1>
         
         {showDeleteConfirm && (
-          <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded">
-            <div className="text-sm text-red-800 mb-3">
+          <div className="mb-6 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-4 rounded">
+            <div className="text-sm text-red-800 dark:text-red-200 mb-3">
               {t('admin.specialties.confirmDelete', 'Are you sure you want to delete this specialty?')}
             </div>
             <div className="flex space-x-2">
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white text-sm rounded"
               >
                 {t('admin.specialties.deleteConfirm', 'Delete')}
               </button>
               <button
                 onClick={cancelDelete}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded"
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-sm rounded"
               >
                 {t('admin.specialties.deleteCancel', 'Cancel')}
               </button>
@@ -234,19 +234,19 @@ const EditSpecialtyPage: React.FC = () => {
         
         <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           {/* Deprecated Toggle */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={deprecated}
                 onChange={(e) => setDeprecated(e.target.checked)}
-                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-5 h-5 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-600"
               />
               <div>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {t('admin.specialties.deprecateToggle', 'Deprecate Specialty')}
                 </span>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {t('admin.specialties.deprecateHelp', 'Deprecated specialties are hidden from selection but remain visible on roasters that already use them.')}
                 </p>
               </div>
@@ -255,8 +255,8 @@ const EditSpecialtyPage: React.FC = () => {
 
           {/* Roaster Count Info */}
           {specialty.roasterCount > 0 && (
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
+            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
                 This specialty is currently used by <strong>{specialty.roasterCount}</strong> roaster{specialty.roasterCount !== 1 ? 's' : ''}.
               </p>
             </div>
@@ -264,7 +264,7 @@ const EditSpecialtyPage: React.FC = () => {
 
           {/* Language Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.specialties.languageLabel', 'Language')}
             </label>
             <div className="flex gap-2">
@@ -276,28 +276,28 @@ const EditSpecialtyPage: React.FC = () => {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     currentLanguage === lang
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   {lang.toUpperCase()}
                 </button>
               ))}
             </div>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               {t('admin.specialties.translationsHelp', 'Provide translations for each language. Switch between languages to edit each translation.')}
             </p>
           </div>
 
           {/* Name Field */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.specialties.nameLabel', 'Name')} ({currentLanguage.toUpperCase()}) *
             </label>
             <input
               type="text"
               value={translations[currentLanguage]?.name || ''}
               onChange={(e) => updateTranslation('name', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               placeholder={t('admin.specialties.namePlaceholder', 'Enter specialty name')}
               required
             />
@@ -305,28 +305,28 @@ const EditSpecialtyPage: React.FC = () => {
 
           {/* Description Field */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.specialties.descriptionLabel', 'Description')} ({currentLanguage.toUpperCase()})
             </label>
             <textarea
               value={translations[currentLanguage]?.description || ''}
               onChange={(e) => updateTranslation('description', e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               placeholder={t('admin.specialties.descriptionPlaceholder', 'Enter specialty description')}
             />
           </div>
 
           {/* Translation Summary */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">
+          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.specialties.translationsTitle', 'Translations')}
             </h3>
             <div className="space-y-2 text-sm">
               {LANGUAGES.map(lang => (
                 <div key={lang} className="flex items-center gap-2">
-                  <span className="font-medium text-gray-600 w-8">{lang.toUpperCase()}:</span>
-                  <span className={translations[lang]?.name ? 'text-green-600' : 'text-red-600'}>
+                  <span className="font-medium text-gray-600 dark:text-gray-400 w-8">{lang.toUpperCase()}:</span>
+                  <span className={translations[lang]?.name ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                     {translations[lang]?.name || t('admin.specialties.nameLabel', 'Name') + ' ' + t('required', 'required')}
                   </span>
                 </div>
@@ -341,7 +341,7 @@ const EditSpecialtyPage: React.FC = () => {
                 type="button" 
                 onClick={handleDelete}
                 disabled={saving}
-                className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700"
+                className="bg-red-600 dark:bg-red-700 text-white px-6 py-2 rounded hover:bg-red-700 dark:hover:bg-red-800"
               >
                 {t('admin.specialties.delete', 'Delete')}
               </button>
@@ -351,7 +351,7 @@ const EditSpecialtyPage: React.FC = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={saving}
-                className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400"
+                className="bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
               >
                 {t('admin.specialties.cancel', 'Cancel')}
               </button>

@@ -2,7 +2,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
-import { Footer } from '@/components/Footer'
+import { ConditionalFooter } from '@/components/ConditionalFooter'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -54,7 +54,7 @@ export default function RootLayout({
             <main className="flex-grow">
               {children}
             </main>
-            <Footer />
+            <ConditionalFooter />
           </div>
         </Providers>
       </body>

@@ -118,7 +118,7 @@ export function Navbar() {
                     {/* Only one 'Roasters (New)' link in Admin dropdown */}
                     <Link 
                       href="/admin/roasters/new-admin" 
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-green-700 transition-colors font-semibold"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-green-700 dark:hover:text-green-400 transition-colors font-semibold"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('adminSection.roastersNew', 'Roasters (New)')}
@@ -249,14 +249,14 @@ export function Navbar() {
                   </Link>
                   <Link 
                     href="/admin/specialties" 
-                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('admin.specialties.title', 'Specialties')}
                   </Link>
                   <Link 
                     href="/admin/audit-logs" 
-                    className="block pl-4 text-gray-600 hover:text-primary-600 py-1" 
+                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('adminSection.auditLogs', 'Audit Logs')}

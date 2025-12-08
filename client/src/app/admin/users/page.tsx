@@ -89,7 +89,7 @@ const AdminUsersPage: React.FC = () => {
     <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
       {/* Header with Search */}
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">{t('admin.users.title', 'Users')}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('admin.users.title', 'Users')}</h1>
         
         {/* Search Bar */}
         <div className="mb-4">
@@ -99,16 +99,16 @@ const AdminUsersPage: React.FC = () => {
               placeholder={t('admin.users.search', 'Search by username, email, or name...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
             />
-            <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
         </div>
 
         {/* Results Count */}
-        <div className="text-sm text-gray-600 mb-4">
+        <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           {filteredUsers.length === users.length 
             ? t('admin.users.total', { count: users.length })
             : t('admin.users.filtered', { filteredCount: filteredUsers.length, totalCount: users.length })
@@ -119,29 +119,29 @@ const AdminUsersPage: React.FC = () => {
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {filteredUsers.map((user) => (
-          <div key={user.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <div key={user.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
             {/* User Header */}
             <div className="flex justify-between items-start mb-3">
               <div>
                 <Link
                   href={`/admin/users/${user.id}/edit`}
-                  className="text-lg font-semibold text-blue-600 hover:text-blue-800 text-left"
+                  className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-left"
                 >
                   {user.username}
                 </Link>
                 <div className="flex items-center space-x-2 mt-1">
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                    user.role === 'admin' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                   }`}>
                     {user.role}
                   </span>
                   {user.language && (
-                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       {user.language.toUpperCase()}
                     </span>
                   )}
                   {user.isDeprecated && (
-                    <span className="px-2 py-1 text-xs font-semibold rounded bg-yellow-200 text-yellow-900">Deprecated</span>
+                    <span className="px-2 py-1 text-xs font-semibold rounded bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100">Deprecated</span>
                   )}
                 </div>
               </div>
@@ -149,16 +149,16 @@ const AdminUsersPage: React.FC = () => {
 
             {/* Email */}
             <div className="mb-3">
-              <div className="flex items-center text-sm text-gray-600">
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                 <span className="mr-2">📧</span>
-                <a href={`mailto:${user.email}`} className="text-blue-600 hover:text-blue-800">
+                <a href={`mailto:${user.email}`} className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                   {user.email}
                 </a>
               </div>
             </div>
 
             {/* Dates */}
-            <div className="mb-3 text-xs text-gray-500 space-y-1">
+            <div className="mb-3 text-xs text-gray-500 dark:text-gray-400 space-y-1">
               {user.lastLogin && (
                 <div>Last Login: {formatDateToYYYYMMDD(user.lastLogin)}</div>
               )}
@@ -175,69 +175,69 @@ const AdminUsersPage: React.FC = () => {
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <thead className="bg-gray-50">
+        <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th className="py-3 px-4 border-b text-left font-medium text-gray-900 w-1/5">
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/5">
                 {t('admin.users.username', 'Username')}
               </th>
-              <th className="py-3 px-4 border-b text-left font-medium text-gray-900 w-1/4">
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/4">
                 {t('admin.users.email', 'Email')}
               </th>
-              <th className="py-3 px-4 border-b text-left font-medium text-gray-900 w-1/6">
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/6">
                 {t('admin.users.role', 'Role')}
               </th>
-              <th className="py-3 px-4 border-b text-center font-medium text-gray-900 w-1/12">
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/12">
                 {t('admin.users.language', 'Language')}
               </th>
-              <th className="py-3 px-4 border-b text-center font-medium text-gray-900 w-1/5">
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5">
                 {t('admin.users.lastLogin', 'Last Login')}
               </th>
-              <th className="py-3 px-4 border-b text-center font-medium text-gray-900 w-1/5">
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5">
                 {t('admin.users.created', 'Created')}
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
+              <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td className="py-3 px-4 text-left">
                   <Link
                     href={`/admin/users/${user.id}/edit`}
-                    className="text-blue-600 hover:text-blue-800 font-medium"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                   >
                     {user.username}
                     {user.isDeprecated && (
-                      <span className="ml-2 px-2 py-1 text-xs font-semibold rounded bg-yellow-200 text-yellow-900">Deprecated</span>
+                      <span className="ml-2 px-2 py-1 text-xs font-semibold rounded bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100">Deprecated</span>
                     )}
                   </Link>
                 </td>
                 <td className="py-3 px-4 text-left">
                   <a
                     href={`mailto:${user.email}`}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   >
                     {user.email}
                   </a>
                 </td>
                 <td className="py-3 px-4 text-left">
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                    user.role === 'admin' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                   }`}>
                     {user.role}
                   </span>
                 </td>
                 <td className="py-3 px-4 text-center">
                   {user.language && (
-                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       {user.language.toUpperCase()}
                     </span>
                   )}
                 </td>
-                <td className="py-3 px-4 text-center text-sm text-gray-600">
+                <td className="py-3 px-4 text-center text-sm text-gray-600 dark:text-gray-400">
                   {user.lastLogin ? formatDateToYYYYMMDD(user.lastLogin) : '-'}
                 </td>
-                <td className="py-3 px-4 text-center text-sm text-gray-600">
+                <td className="py-3 px-4 text-center text-sm text-gray-600 dark:text-gray-400">
                   {user.createdAt ? formatDateToYYYYMMDD(user.createdAt) : ''}
                 </td>
               </tr>

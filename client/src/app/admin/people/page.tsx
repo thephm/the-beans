@@ -13,9 +13,9 @@ export default function PeopleAdminPage() {
       <div className="container mx-auto pt-20 sm:pt-28 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">{t('adminSection.people', 'People')}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('adminSection.people', 'People')}</h1>
           </div>
-          <div className="text-red-600">{t('admin.people.adminRequired', 'Admin access required.')}</div>
+          <div className="text-red-600 dark:text-red-400">{t('admin.people.adminRequired', 'Admin access required.')}</div>
         </div>
       </div>
     );
@@ -24,7 +24,7 @@ export default function PeopleAdminPage() {
     <div className="container mx-auto pt-20 sm:pt-28 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">{t('adminSection.people', 'People')}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('adminSection.people', 'People')}</h1>
         </div>
         <PeopleTable />
       </div>

@@ -230,7 +230,7 @@ export function SearchSection({
           <div className="flex flex-col md:flex-row gap-2 mt-4 items-stretch">
             {/* Search for roasters */}
             <div className="md:flex-1">
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2 md:mb-0">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
                 {t('search.searchLabel')}
               </label>
               <input
@@ -245,10 +245,10 @@ export function SearchSection({
             </div>
             {/* Location field */}
             <div className="md:flex-1">
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2 md:mb-0">
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
                 {t('search.locationLabel')}
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-stretch">
                 <input
                   type="text"
                   id="location"
@@ -261,7 +261,7 @@ export function SearchSection({
                 <button
                   onClick={detectLocation}
                   disabled={detectingLocation}
-                  className="px-4 py-3 bg-gradient-to-r from-lavender-500 to-orchid-500 text-white rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  className="flex-shrink-0 px-4 py-3 bg-gradient-to-r from-lavender-500 to-orchid-500 text-white rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   title={t('search.detectLocationTooltip') || 'Use my location'}
                 >
                   {detectingLocation ? (
@@ -273,10 +273,10 @@ export function SearchSection({
               </div>
             </div>
             {/* Search button */}
-            <div className="flex items-end md:items-end">
+            <div className="flex items-end">
               <button
                 onClick={handleSearch}
-                className="min-w-[110px] max-w-[140px] bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-3 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 whitespace-nowrap flex items-center justify-center gap-2"
+                className="w-full md:min-w-[110px] md:max-w-[140px] bg-gradient-to-r from-primary-500 to-orchid-500 text-white px-3 py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
               >
                 <Search sx={{ fontSize: 20 }} />
                 {t('search.searchButton')}

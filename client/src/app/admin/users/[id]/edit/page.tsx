@@ -154,7 +154,7 @@ const EditUserPage: React.FC = () => {
     return (
       <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
         <div className="flex justify-center items-center min-h-64">
-          <div className="text-lg">{t('loading', 'Loading...')}</div>
+          <div className="text-lg text-gray-900 dark:text-gray-100">{t('loading', 'Loading...')}</div>
         </div>
       </div>
     );
@@ -166,7 +166,7 @@ const EditUserPage: React.FC = () => {
         <div className="mb-6">
           <Link
             href="/admin/users"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mb-4"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -174,8 +174,8 @@ const EditUserPage: React.FC = () => {
             {t('admin.users.backToUsers', 'Back to Users')}
           </Link>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">{t('error', 'Error')}: {error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="text-red-800 dark:text-red-400">{t('error', 'Error')}: {error}</div>
         </div>
       </div>
     );
@@ -187,7 +187,7 @@ const EditUserPage: React.FC = () => {
         <div className="mb-6">
           <Link
             href="/admin/users"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mb-4"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -195,8 +195,8 @@ const EditUserPage: React.FC = () => {
             {t('admin.users.backToUsers', 'Back to Users')}
           </Link>
         </div>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="text-yellow-800">{t('admin.users.userNotFound', 'User not found')}</div>
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <div className="text-yellow-800 dark:text-yellow-400">{t('admin.users.userNotFound', 'User not found')}</div>
         </div>
       </div>
     );
@@ -207,7 +207,7 @@ const EditUserPage: React.FC = () => {
       <div className="mb-8">
         <Link
           href="/admin/users"
-          className="inline-flex items-center text-blue-700 hover:text-blue-900 text-base font-semibold mb-4 gap-2"
+          className="inline-flex items-center text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-base font-semibold mb-4 gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -217,20 +217,20 @@ const EditUserPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">{t('error', 'Error')}: {error}</div>
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="text-red-800 dark:text-red-400">{t('error', 'Error')}: {error}</div>
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
-  <h1 className="text-2xl font-bold mb-8">{t('admin.users.editUser', 'Edit User')}</h1>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow dark:shadow-xl p-8">
+  <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">{t('admin.users.editUser', 'Edit User')}</h1>
         {user?.isDeprecated && (
-          <span className="inline-block mb-4 px-3 py-1 text-sm font-semibold rounded bg-yellow-200 text-yellow-900">{t('admin.users.deprecated', 'Deprecated')}</span>
+          <span className="inline-block mb-4 px-3 py-1 text-sm font-semibold rounded bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100">{t('admin.users.deprecated', 'Deprecated')}</span>
         )}
         
         {showDeleteConfirm && (
-          <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded">
-            <div className="text-sm text-red-800 mb-3">
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded">
+            <div className="text-sm text-red-800 dark:text-red-400 mb-3">
               {t('admin.users.confirmDelete', 'Are you sure you want to delete this user?')}
             </div>
             <div className="flex space-x-2">
@@ -259,47 +259,47 @@ const EditUserPage: React.FC = () => {
                   type="checkbox"
                   checked={!!editData.isDeprecated}
                   onChange={e => setEditData(prev => ({ ...prev, isDeprecated: e.target.checked }))}
-                  className="form-checkbox h-4 w-4 text-yellow-600"
+                  className="form-checkbox h-4 w-4 text-yellow-600 dark:text-yellow-500"
                 />
-                <span className="ml-2 text-sm text-yellow-900 font-medium">{t('admin.users.deprecatedCheckbox', 'Deprecated')}</span>
+                <span className="ml-2 text-sm text-yellow-900 dark:text-yellow-400 font-medium">{t('admin.users.deprecatedCheckbox', 'Deprecated')}</span>
               </label>
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('admin.users.username', 'Username')}
               </label>
               <input
                 type="text"
                 value={editData.username || ''}
                 onChange={(e) => setEditData(prev => ({ ...prev, username: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                 placeholder={t('admin.users.usernamePlaceholder', 'Enter username')}
               />
             </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.users.email', 'Email')}
             </label>
             <input
               type="email"
               value={editData.email || ''}
               onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
               placeholder={t('admin.users.emailPlaceholder', 'Enter email address')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.users.role', 'Role')}
             </label>
             <select
               value={editData.role || ''}
               onChange={(e) => setEditData(prev => ({ ...prev, role: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               {ROLES.map(role => (
                 <option key={role} value={role}>
@@ -310,13 +310,13 @@ const EditUserPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.users.language', 'Language')}
             </label>
             <select
               value={editData.language || ''}
               onChange={(e) => setEditData(prev => ({ ...prev, language: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               {LANGUAGES.map(lang => (
                 <option key={lang} value={lang}>
@@ -332,14 +332,14 @@ const EditUserPage: React.FC = () => {
                 type="button" 
                 onClick={handleDelete}
                 disabled={saving}
-                className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700"
+                className="bg-red-600 dark:bg-red-700 text-white px-6 py-2 rounded hover:bg-red-700 dark:hover:bg-red-800 disabled:opacity-50"
               >
                 {t('admin.users.delete', 'Delete')}
               </button>
             </div>
             <div className="flex gap-4">
-              <button type="button" onClick={handleCancel} disabled={saving} className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">{t('admin.users.cancel', 'Cancel')}</button>
-              <button type="submit" disabled={saving} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+              <button type="button" onClick={handleCancel} disabled={saving} className="bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 disabled:opacity-50">{t('admin.users.cancel', 'Cancel')}</button>
+              <button type="submit" disabled={saving} className="bg-green-600 dark:bg-green-700 text-white px-6 py-2 rounded hover:bg-green-700 dark:hover:bg-green-800 disabled:opacity-50">
                 {saving ? (
                   <>
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -356,7 +356,7 @@ const EditUserPage: React.FC = () => {
           </div>
         </form>
         {(user.createdAt || user.updatedAt) && (
-          <div className="mt-6 text-sm text-gray-500 bg-gray-50 rounded p-3">
+          <div className="mt-6 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3">
               {user.createdAt && <span>{t('admin.users.createdOn', 'Created on')} {formatDateTimeToYYYYMMDD(user.createdAt)}.</span>} {user.updatedAt && <span>{t('admin.users.updatedOn', 'Updated on')} {formatDateTimeToYYYYMMDD(user.updatedAt)}.</span>}
           </div>
         )}
