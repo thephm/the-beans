@@ -487,6 +487,7 @@
   "roleBilling": "Facturation",
   "roleMarketing": "Marketing",
   "roleScout": "Découvreur",
+  "roleCustomer": "Client",
   "bio": "Biographie"
     },
     "roasters": {
@@ -614,6 +615,7 @@
       "roleBilling": "Facturation",
       "roleMarketing": "Marketing",
       "roleScout": "Découvreur",
+      "roleCustomer": "Client",
       "yes": "Oui",
       "no": "Non",
       "noContactsFound": "Aucun contact trouvé pour ce torréfacteur.",

@@ -488,6 +488,7 @@
   "roleBilling": "Billing",
   "roleMarketing": "Marketing",
   "roleScout": "Scout",
+  "roleCustomer": "Customer",
   "bio": "Bio"
     },
     "roasters": {
@@ -611,6 +612,7 @@
       "roleBilling": "Billing",
       "roleMarketing": "Marketing",
       "roleScout": "Scout",
+      "roleCustomer": "Customer",
       "yes": "Yes",
       "no": "No",
       "noContactsFound": "No contacts found for this roaster.",
