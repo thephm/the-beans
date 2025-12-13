@@ -127367,3 +127367,50 @@ Fixed! The location button on mobile was overflowing outside the form because th
 4. **Added `h-auto flex items-center justify-center`** - ensures the button height matches the input and icon is centered
 
 The location button now stays properly within the form boundaries on all screen sizes, including mobile devices.
+
+## 1084th try
+
+*(works locally)*
+
+## The language menu is no longer cut off and looks positioned properly on desktop but not on mobile #235
+
+https://github.com/thephm/the-beans/issues/235
+
+> The language menu is no longer cut off and looks positioned properly on desktop but not on mobile, see attached screenshot. It is floating to the right and down which looks odd
+
+I'll investigate the language menu positioning issue on mobile. Let me find the language selector component. 
+
+Searched for regex `Language|language.*menu|language.*selector|language.*dropdown` (`**/client/src/components/**/*.tsx`), 20 results
+
+Searched for regex `LanguageSelector|LanguageMenu|LanguageSwitcher` (`**/client/src/components/**/*.tsx`), 5 results
+
+Read `client/src/components/LanguageSelector.tsx`
+
+I can see the issue! On line 61, the dropdown has `left-0 sm:right-0 sm:left-auto` which means on mobile it aligns to the left, but on the screenshot it appears to be floating to the right and down. The problem is likely that the dropdown is positioned relative to its parent container, but on mobile the parent container might be too far to the right.
+
+Let me check where the LanguageSelector is placed in the Navbar: 
+
+Read `client/src/components/Navbar.tsx`, lines 150 to 165
+
+Read `client/src/components/Navbar.tsx`, lines 260 to 275
+
+I can see the LanguageSelector is used in both desktop (line 157) and mobile menu (line 268). The issue in the screenshot shows the dropdown floating awkwardly on mobile. The problem is that on mobile, the dropdown should either:
+1. Be right-aligned to stay within screen bounds
+2. Or be centered/full-width for better UX on mobile
+
+Let me fix the positioning to make it better for mobile: 
+
+`LanguageSelector.tsx +1 -1`
+
+`docker-compose restart client`
+
+Fixed! The language menu dropdown now uses `right-0` on all screen sizes (including mobile) instead of `left-0` on mobile. This means:
+
+- **Before**: The dropdown aligned to the left edge of the button on mobile, causing it to extend too far right and look awkwardly positioned
+- **After**: The dropdown is always right-aligned to the button, keeping it properly within screen bounds on both mobile and desktop
+
+The language menu will now stay properly positioned within the screen on mobile devices instead of floating awkwardly to the right.
+
+## 1085th try
+
+*(doesn't fail locally so deploying)*
