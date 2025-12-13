@@ -126823,3 +126823,16 @@ Ah, that's a Render-specific error. Render doesn't support `releaseCommand` - th
 `render.yaml +2 -2`
 
 Fixed! The correct field for Render is `preDeployCommand`, not `releaseCommand`. Now commit and push this change to trigger a new deployment on Render.
+
+## 1079th try
+
+> services[0]
+> pre-deploy command is not supported for free tier services
+
+The free tier doesn't support `preDeployCommand`. We need to run migrations as part of the `startCommand` instead: 
+
+`render.yaml +2 -4`
+
+Fixed! Now the migrations run as part of the start command, which works on the free tier. Commit and push this change.
+
+Made changes.
