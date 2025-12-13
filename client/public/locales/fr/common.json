@@ -478,6 +478,8 @@
   "linkedinUrlPlaceholder": "https://www.linkedin.com/in/nomutilisateur",
   "roaster": "Torréfacteur",
   "selectRoaster": "Sélectionner un torréfacteur",
+  "roasterRequired": "Veuillez sélectionner un torréfacteur",
+  "firstNameRequired": "Le prénom est requis",
   "primaryContact": "Contact principal",
   "role": "Rôle",
   "roleOwner": "Propriétaire",
