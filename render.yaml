@@ -1,13 +1,12 @@
 # Render.com deployment configuration for The Beans
 # This file defines the complete infrastructure for the coffee roaster discovery app
 
-# Database Service (PostgreSQL) - Must be created first
-databases:
-  - name: the-beans-db
-    databaseName: the_beans_production
-    region: oregon # Same region as services
-    plan: standard # Standard tier PostgreSQL (replaces legacy Basic-256mb)
-    postgresMajorVersion: 15
+# Database Service (PostgreSQL) - Already exists, commented out to avoid plan conflicts
+# databases:
+#   - name: the-beans-db
+#     databaseName: the_beans_production
+#     region: oregon
+#     postgresMajorVersion: 15
 
 services:
   # Backend API Service (Express.js + Prisma)
