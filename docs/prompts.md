@@ -126835,4 +126835,11 @@ The free tier doesn't support `preDeployCommand`. We need to run migrations as p
 
 Fixed! Now the migrations run as part of the start command, which works on the free tier. Commit and push this change.
 
-Made changes.
+> databases[0].plan
+> cannot downgrade database from Basic-256mb to Free
+
+Your database is already on the Basic-256mb plan and can't be downgraded to free. Let me update the render.yaml to match: 
+
+`render.yaml +1 -1`
+
+Updated the database plan to `starter` (which is Render's Basic-256mb tier). Commit and push this change.
