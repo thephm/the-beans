@@ -248,7 +248,7 @@ export function SearchSection({
               <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
                 {t('search.locationLabel')}
               </label>
-              <div className="flex gap-2 items-stretch">
+              <div className="flex gap-2 items-stretch w-full">
                 <input
                   type="text"
                   id="location"
@@ -256,12 +256,12 @@ export function SearchSection({
                   onChange={(e) => handleLocationChange(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={t('search.locationPlaceholder')}
-                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  className="flex-1 min-w-0 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 />
                 <button
                   onClick={detectLocation}
                   disabled={detectingLocation}
-                  className="flex-shrink-0 px-4 py-3 bg-gradient-to-r from-lavender-500 to-orchid-500 text-white rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-shrink-0 w-12 h-auto flex items-center justify-center bg-gradient-to-r from-lavender-500 to-orchid-500 text-white rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   title={t('search.detectLocationTooltip') || 'Use my location'}
                 >
                   {detectingLocation ? (
