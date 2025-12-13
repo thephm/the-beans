@@ -126802,12 +126802,16 @@ Now, after adding the environment variables to render.yaml, you need to:
 1. **Commit and push this change** to GitHub
 2. **In Render Dashboard** → **the-beans-api** → **Environment** tab:
    - Verify these variables are set with your actual values:
-     - `CONTACT_US_EMAIL=contactus@thebeans.ca`
-     - `SMTP_HOST=smtp.fastmail.com`
+     - `CONTACT_US_EMAIL=`
+     - `SMTP_HOST=`
      - `SMTP_PORT=587`
-     - `SMTP_USER=bjansen@ownmail.net`
-     - `SMTP_PASS=5863746j775g6w78`
+     - `SMTP_USER=`
+     - `SMTP_PASS=`
 3. **Click "Save Changes"** at the bottom
 4. **Manual Deploy** → Trigger a redeploy or wait for auto-deploy
 
 The key issue is that Render services need to be **restarted/redeployed** after adding environment variables for them to take effect. Simply adding them doesn't automatically restart the service.
+
+## 1078th try
+
+*(commit and sync to GitHub)*
