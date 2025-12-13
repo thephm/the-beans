@@ -62,8 +62,8 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - COMPLETELY HIDDEN ON MOBILE */}
+          <div className="hidden md:flex items-center space-x-8 flex-1 justify-end">
             <Link href="/discover" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               {t('nav.discover')}
             </Link>
@@ -176,19 +176,19 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile controls (Dark Mode & Menu button) */}
-          <div className="md:hidden flex items-center space-x-1 flex-shrink-0">
+          {/* Mobile controls (Dark Mode & Menu button) - ONLY VISIBLE ON MOBILE */}
+          <div className="md:hidden flex items-center space-x-2">
             <button
               onClick={toggleDarkMode}
               aria-label={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
-              className="p-1.5 rounded-lg hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200 flex-shrink-0"
+              className="p-2 rounded-lg hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200"
               title={darkMode ? t('nav.lightMode', 'Switch to light mode') : t('nav.darkMode', 'Switch to dark mode')}
             >
               {darkMode ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
             </button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-1.5 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0"
+              className="p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-lavender-100 dark:hover:bg-gray-800 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMobileMenuOpen ? (
