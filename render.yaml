@@ -18,9 +18,9 @@ services:
     plan: free # Free tier web service
     rootDir: server
     buildCommand: npm install && npx prisma generate && npm run build
-    # Run DB migrations and populate socialNetworks from legacy columns at release time.
+    # Run DB migrations and populate socialNetworks from legacy columns before the service starts.
     # This runs after the build and before the service starts.
-    releaseCommand: npx prisma migrate deploy && npx prisma generate && npm run migrate:socials && npm run verify:socials
+    preDeployCommand: npx prisma migrate deploy && npx prisma generate && npm run migrate:socials && npm run verify:socials
     startCommand: npm run start
     healthCheckPath: /health
     envVars:

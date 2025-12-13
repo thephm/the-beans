@@ -126815,3 +126815,11 @@ The key issue is that Render services need to be **restarted/redeployed** after 
 ## 1078th try
 
 *(commit and sync to GitHub)*
+
+> field releaseCommand not found in type file.Service (on Render)
+
+Ah, that's a Render-specific error. Render doesn't support `releaseCommand` - that's Heroku terminology. Render uses `preDeployCommand` instead. Let me fix that: 
+
+`render.yaml +2 -2`
+
+Fixed! The correct field for Render is `preDeployCommand`, not `releaseCommand`. Now commit and push this change to trigger a new deployment on Render.
