@@ -126843,3 +126843,12 @@ Your database is already on the Basic-256mb plan and can't be downgraded to free
 `render.yaml +1 -1`
 
 Updated the database plan to `starter` (which is Render's Basic-256mb tier). Commit and push this change.
+
+> databases[0].plan
+> Legacy Postgres plans, including 'starter', are no longer supported for new databases. Update your database instance to a new plan in your render.yaml
+
+Render has deprecated the legacy `starter` plan. Let me update it to use the modern plan naming: 
+
+`render.yaml +1 -1`
+
+Updated to `standard` which is the modern replacement for the legacy starter/basic plans. Commit and push this change.
