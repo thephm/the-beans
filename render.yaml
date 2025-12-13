@@ -14,7 +14,7 @@ services:
     name: the-beans-api
     runtime: node
     region: oregon # Choose region closest to your users
-    plan: free # Free tier web service
+    plan: starter # Starter tier web service
     rootDir: server
     buildCommand: npm install && npx prisma generate && npm run build
     # Run DB migrations as part of start command (free tier doesn't support preDeployCommand)
@@ -68,7 +68,7 @@ services:
     name: the-beans-frontend
     runtime: node
     region: oregon # Same region as backend for better performance
-    plan: free # Free tier web service
+    plan: starter # Starter tier web service
     rootDir: client
     buildCommand: npm install && npm run build
     startCommand: npm run start

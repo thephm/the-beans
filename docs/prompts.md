@@ -127306,3 +127306,23 @@ Perfect! Everything is working locally. The changes are successful:
 You're ready to commit and push. The deployment will now be cleaner and faster without the unnecessary legacy scripts.
 
 *(works locally, committing)*
+
+> My render says "Instance type changed from Starter to Free" is that a side effect of something you did?
+
+`render.yaml +2 -2`
+
+Updated render.yaml to use `plan: starter` for both services. To apply these changes:
+
+1. Commit and push to your repository:
+```bash
+git add render.yaml
+git commit -m "Change Render services to Starter tier"
+git push
+```
+
+2. Render will automatically redeploy both services with the Starter plan (if autoDeploy is enabled), or you can manually trigger deployment from the Render dashboard.
+
+The Starter tier provides:
+- No spin-down on inactivity
+- Better performance
+- More compute resources
