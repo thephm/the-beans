@@ -14,7 +14,8 @@ export enum PersonRole {
   ADMIN = 'admin',
   BILLING = 'billing',
   MARKETING = 'marketing',
-  SCOUT = 'scout'
+  SCOUT = 'scout',
+  CUSTOMER = 'customer'
 }
 
 // Permission helper functions

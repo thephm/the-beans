@@ -15,7 +15,8 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle }: Perso
     { value: PersonRole.ADMIN, label: t('admin.people.roleAdmin', 'Admin') },
     { value: PersonRole.BILLING, label: t('admin.people.roleBilling', 'Billing') },
     { value: PersonRole.MARKETING, label: t('admin.people.roleMarketing', 'Marketing') },
-    { value: PersonRole.SCOUT, label: t('admin.people.roleScout', 'Scout') }
+    { value: PersonRole.SCOUT, label: t('admin.people.roleScout', 'Scout') },
+    { value: PersonRole.CUSTOMER, label: t('admin.people.roleCustomer', 'Customer') }
   ];
 
   return (
