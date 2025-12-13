@@ -6,7 +6,7 @@ databases:
   - name: the-beans-db
     databaseName: the_beans_production
     region: oregon # Same region as services
-    plan: starter # Basic-256mb tier PostgreSQL
+    plan: standard # Standard tier PostgreSQL (replaces legacy Basic-256mb)
     postgresMajorVersion: 15
 
 services:
