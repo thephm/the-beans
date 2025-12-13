@@ -54,6 +54,16 @@ services:
         sync: false # Optional: Admin last name
       - key: ADMIN_LOCATION
         sync: false # Optional: Admin location
+      - key: CONTACT_US_EMAIL
+        sync: false # Set to the email address that receives contact form messages
+      - key: SMTP_HOST
+        sync: false # Set to your SMTP server (e.g., smtp.gmail.com, smtp.fastmail.com)
+      - key: SMTP_PORT
+        sync: false # Set to your SMTP port (usually 587 or 465)
+      - key: SMTP_USER
+        sync: false # Set to your SMTP username
+      - key: SMTP_PASS
+        sync: false # Set to your SMTP password or app password
     autoDeploy: true
     
   # Frontend Web Service (Next.js)
