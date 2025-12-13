@@ -479,6 +479,8 @@
   "linkedinUrlPlaceholder": "https://www.linkedin.com/in/username",
   "roaster": "Roaster",
   "selectRoaster": "Select a roaster",
+  "roasterRequired": "Please select a roaster",
+  "firstNameRequired": "First name is required",
   "primaryContact": "Primary Contact",
   "role": "Role",
   "roleOwner": "Owner",

@@ -14,9 +14,10 @@ interface AddPersonFormProps {
   onDelete?: () => void;
   mode?: 'add' | 'edit';
   initialPerson?: Partial<any>;
+  error?: string;
 }
 
-export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, onDelete, mode = 'add', initialPerson }: AddPersonFormProps) {
+export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, onDelete, mode = 'add', initialPerson, error }: AddPersonFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [form, setForm] = useState({
@@ -164,6 +165,11 @@ export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, o
           <textarea rows={4} placeholder={t('admin.people.bio', 'Bio')} value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
         </div>
       </div>
+      {error && (
+        <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
+        </div>
+      )}
       <div className="flex gap-4 mt-8 justify-between items-center">
         <div>
           {mode === 'edit' && onDelete && (

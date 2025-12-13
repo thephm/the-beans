@@ -11,6 +11,7 @@ import { Roaster, RoastersResponse } from "@/types";
 const AddPersonPage: React.FC = () => {
   const { t } = useTranslation();
   const [roasters, setRoasters] = useState<Roaster[]>([]);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchRoasters = async () => {
@@ -25,11 +26,26 @@ const AddPersonPage: React.FC = () => {
   }, []);
 
   const handleSave = async (person: any) => {
+    setError("");
+    
+    // Client-side validation
+    if (!person.roasterId) {
+      setError(t('admin.people.roasterRequired', 'Please select a roaster'));
+      return;
+    }
+    
+    if (!person.firstName || !person.firstName.trim()) {
+      setError(t('admin.people.firstNameRequired', 'First name is required'));
+      return;
+    }
+    
     try {
       await apiClient.createPerson(person);
       window.location.href = "/admin/people";
-    } catch (error) {
-      alert("Failed to save person. Please try again.");
+    } catch (error: any) {
+      // Handle API errors
+      const errorMessage = error?.message || "Failed to save person. Please try again.";
+      setError(errorMessage);
     }
   };
 
@@ -48,7 +64,7 @@ const AddPersonPage: React.FC = () => {
         <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
           {t("admin.people.addTitle", "Add Person")}
         </h1>
-        <AddPersonForm roasters={roasters} onSave={handleSave} onCancel={() => window.location.href = "/admin/people"} />
+        <AddPersonForm roasters={roasters} onSave={handleSave} onCancel={() => window.location.href = "/admin/people"} error={error} />
       </div>
     </div>
   );

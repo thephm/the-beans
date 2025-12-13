@@ -15,6 +15,7 @@ const EditPersonPage: React.FC = () => {
   const [roasters, setRoasters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     let isMounted = true;
@@ -63,11 +64,25 @@ const EditPersonPage: React.FC = () => {
   }, [personId]);
 
   const handleSave = async (updatedPerson: RoasterPerson) => {
+    setError("");
+    
+    // Client-side validation
+    if (!updatedPerson.roasterId) {
+      setError(t('admin.people.roasterRequired', 'Please select a roaster'));
+      return;
+    }
+    
+    if (!updatedPerson.firstName || !updatedPerson.firstName.trim()) {
+      setError(t('admin.people.firstNameRequired', 'First name is required'));
+      return;
+    }
+    
     try {
       await apiClient.updatePerson(personId, updatedPerson);
       window.location.href = "/admin/people";
-    } catch (error) {
-      alert("Failed to update person. Please try again.");
+    } catch (error: any) {
+      const errorMessage = error?.message || "Failed to update person. Please try again.";
+      setError(errorMessage);
     }
   };
 
@@ -136,6 +151,7 @@ const EditPersonPage: React.FC = () => {
           onSave={handleSave}
           onCancel={handleCancel}
           onDelete={handleDelete}
+          error={error}
         />
       </div>
     </div>

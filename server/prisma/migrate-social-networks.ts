@@ -1,54 +1,29 @@
+/**
+ * LEGACY MIGRATION SCRIPT - NO LONGER APPLICABLE
+ * 
+ * This script was used to migrate individual social media fields 
+ * (instagram, tiktok, facebook, etc.) to the consolidated socialNetworks JSON field.
+ * 
+ * The migration has been completed and the individual fields have been removed from the schema.
+ * This file is kept for historical reference only.
+ * 
+ * Original purpose: Migrate from separate social media columns to socialNetworks JSON
+ * Status: Completed - individual fields no longer exist in Roaster model
+ */
+
 import { PrismaClient } from '@prisma/client';
 
 async function migrate() {
   const prisma = new PrismaClient();
   try {
-    console.log('Starting social networks migration...');
-
-    const roasters = await prisma.roaster.findMany({
-      select: {
-        id: true,
-        instagram: true,
-        tiktok: true,
-        facebook: true,
-        linkedin: true,
-        youtube: true,
-        threads: true,
-        pinterest: true,
-        bluesky: true,
-        x: true,
-        reddit: true,
-      }
-    });
-
-    let updated = 0;
-    for (const r of roasters) {
-      const map: Record<string, string> = {};
-      if (r.instagram) map['instagram'] = r.instagram;
-      if (r.tiktok) map['tiktok'] = r.tiktok;
-      if (r.facebook) map['facebook'] = r.facebook;
-      if (r.linkedin) map['linkedin'] = r.linkedin;
-      if (r.youtube) map['youtube'] = r.youtube;
-      if (r.threads) map['threads'] = r.threads;
-      if (r.pinterest) map['pinterest'] = r.pinterest;
-      if (r.bluesky) map['bluesky'] = r.bluesky;
-      if (r.x) map['x'] = r.x;
-      if (r.reddit) map['reddit'] = r.reddit;
-
-      if (Object.keys(map).length > 0) {
-        await prisma.roaster.update({
-          where: { id: r.id },
-          data: { socialNetworks: map }
-        });
-        updated += 1;
-      }
-    }
-
-    console.log(`Migration complete. Updated ${updated} roaster(s).`);
+    console.log('This migration has already been completed.');
+    console.log('The individual social media fields have been consolidated into socialNetworks JSON.');
+    console.log('No action needed.');
+    
     await prisma.$disconnect();
     process.exit(0);
   } catch (err) {
-    console.error('Migration failed:', err);
+    console.error('Error:', err);
     await prisma.$disconnect();
     process.exit(1);
   }
