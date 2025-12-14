@@ -132336,3 +132336,74 @@ I can see the submitter email uses `#9333EA` (purple) and the admin email uses `
 Done! The admin notification email now uses the same purple color (`#9333EA`) for the "New Roaster Submission" heading as the submitter's thank you email.
 
 *(checking in)*
+
+```shell
+2025-12-14T20:23:41.943588428Z ==> Downloading cache...
+2025-12-14T20:23:41.988718269Z ==> Cloning from https://github.com/thephm/the-beans
+2025-12-14T20:23:42.979259101Z ==> Checking out commit 6f152faf2e2de5c244c4c88488639c9b3ff352ba in branch main
+2025-12-14T20:23:49.86817Z ==> Downloaded 244MB in 2s. Extraction took 6s.
+2025-12-14T20:24:15.96917188Z ==> Using Node.js version 22.16.0 (default)
+2025-12-14T20:24:16.007612903Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-12-14T20:24:16.159435783Z ==> Running build command 'npm install && npx prisma generate && npm run build'...
+2025-12-14T20:24:19.299654785Z 
+2025-12-14T20:24:19.299672396Z up to date, audited 286 packages in 3s
+2025-12-14T20:24:19.299693916Z 
+2025-12-14T20:24:19.299736307Z 23 packages are looking for funding
+2025-12-14T20:24:19.299740578Z   run `npm fund` for details
+2025-12-14T20:24:19.310481033Z 
+2025-12-14T20:24:19.310499544Z 6 vulnerabilities (2 moderate, 4 high)
+2025-12-14T20:24:19.310502454Z 
+2025-12-14T20:24:19.310505684Z To address issues that do not require attention, run:
+2025-12-14T20:24:19.310508294Z   npm audit fix
+2025-12-14T20:24:19.310510574Z 
+2025-12-14T20:24:19.310513084Z To address all issues (including breaking changes), run:
+2025-12-14T20:24:19.310515874Z   npm audit fix --force
+2025-12-14T20:24:19.310518104Z 
+2025-12-14T20:24:19.310543015Z Run `npm audit` for details.
+2025-12-14T20:24:21.753507631Z Prisma schema loaded from prisma/schema.prisma
+2025-12-14T20:24:23.115038606Z 
+2025-12-14T20:24:23.115091387Z ✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 601ms
+2025-12-14T20:24:23.115094527Z 
+2025-12-14T20:24:23.115096967Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+2025-12-14T20:24:23.115099378Z 
+2025-12-14T20:24:23.115102218Z Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+2025-12-14T20:24:23.115107098Z 
+2025-12-14T20:24:24.068547832Z 
+2025-12-14T20:24:24.068567413Z > the-beans-server@1.0.0 build
+2025-12-14T20:24:24.068571562Z > tsc
+2025-12-14T20:24:24.068574163Z 
+2025-12-14T20:24:29.464390324Z src/routes/suggestions.ts(238,33): error TS2345: Argument of type '{ roasterName: any; submitterFirstName: any; submitterLastName: any; submitterEmail: any; submitterRole: any; website: any; city: any; state: any; country: any; suggestionId: string; }' is not assignable to parameter of type 'SubmissionDetails'.
+2025-12-14T20:24:29.464432725Z   Types of property 'suggestionId' are incompatible.
+2025-12-14T20:24:29.464436175Z     Type 'string' is not assignable to type 'number'.
+2025-12-14T20:24:29.464535718Z src/routes/suggestions.ts(244,37): error TS2345: Argument of type '{ roasterName: any; submitterFirstName: any; submitterLastName: any; submitterEmail: any; submitterRole: any; website: any; city: any; state: any; country: any; suggestionId: string; }' is not assignable to parameter of type 'SubmissionDetails'.
+2025-12-14T20:24:29.464540288Z   Types of property 'suggestionId' are incompatible.
+2025-12-14T20:24:29.464542158Z     Type 'string' is not assignable to type 'number'.
+2025-12-14T20:24:29.562280169Z ==> Build failed 😞
+2025-12-14T20:24:29.56231052Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+```
+
+I can see the deployment is failing due to TypeScript errors in the suggestions route. The `suggestionId` is being passed as a string but `SubmissionDetails` expects a number. Let me examine the code to fix this. 
+
+✔ Read `server/src/routes/suggestions.ts`, lines 230 to 250
+
+✔ Searched for text `SubmissionDetails` (`**/server/src/**/*.ts`), 3 results
+
+✔ Read `server/src/lib/emailService.ts`, lines 56 to 71
+
+✔ Now I can see the issue. The `SubmissionDetails` interface expects `suggestionId` to be a `number`, but `suggestion.id` is a string (UUIDs are stored as strings in Prisma). Let me check what type `suggestion.id` actually is: 
+
+✔ Read `server/src/routes/suggestions.ts`, lines 200 to 240
+
+✔ Searched for text `model RoasterSuggestion` (`**/server/prisma/schema.prisma`), 1 result
+
+✔ Read `server/prisma/schema.prisma`, lines 343 to 364
+
+Perfect! I can see that `RoasterSuggestion.id` is a `String` (cuid()), so the `SubmissionDetails` interface should expect a `string`, not a `number`. Let me fix the type definition: 
+
+`emailService.ts +1 -1`
+
+Fixed! The TypeScript error was caused by a type mismatch in the `SubmissionDetails` interface. The `suggestionId` field was defined as `number`, but the database schema uses `String` (cuid) for the `RoasterSuggestion.id`. 
+
+Changed emailService.ts to expect `suggestionId: string` instead of `number`. The deployment should now build successfully.
+
+*(checking in)*
