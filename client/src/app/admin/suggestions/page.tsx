@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Suggestion {
   id: string;
@@ -27,6 +28,7 @@ interface Suggestion {
 
 const AdminSuggestionsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,8 +95,11 @@ const AdminSuggestionsPage: React.FC = () => {
   }, [filteredSuggestions]);
 
   useEffect(() => {
-    fetchSuggestions();
-  }, [statusFilter]);
+    // Only fetch if user is admin
+    if (user?.role === 'admin') {
+      fetchSuggestions();
+    }
+  }, [statusFilter, user]);
 
   if (loading) return <div className="container mx-auto pt-20 sm:pt-28 px-4">{t('loading')}</div>;
   if (error) return <div className="container mx-auto pt-20 sm:pt-28 px-4 text-red-600">{t('error')}: {error}</div>;
