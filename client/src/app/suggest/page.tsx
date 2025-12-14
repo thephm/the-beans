@@ -92,6 +92,11 @@ export default function SuggestRoaster() {
 
       if (!response.ok) {
         const data = await response.json();
+        // Handle validation errors array
+        if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+          const errorMessages = data.errors.map((err: any) => err.msg).join(', ');
+          throw new Error(errorMessages);
+        }
         throw new Error(data.error || 'Failed to submit suggestion');
       }
 

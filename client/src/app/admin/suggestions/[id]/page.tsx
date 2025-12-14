@@ -39,6 +39,15 @@ const AdminSuggestionDetailPage: React.FC = () => {
   
   const [status, setStatus] = useState<string>('pending');
   const [adminNotes, setAdminNotes] = useState<string>('');
+  const [roasterName, setRoasterName] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [state, setState] = useState<string>('');
+  const [country, setCountry] = useState<string>('');
+  const [website, setWebsite] = useState<string>('');
+  const [submitterFirstName, setSubmitterFirstName] = useState<string>('');
+  const [submitterLastName, setSubmitterLastName] = useState<string>('');
+  const [submitterEmail, setSubmitterEmail] = useState<string>('');
+  const [submitterRole, setSubmitterRole] = useState<string>('');
 
   const fetchSuggestion = async () => {
     setLoading(true);
@@ -52,6 +61,15 @@ const AdminSuggestionDetailPage: React.FC = () => {
       setSuggestion(found);
       setStatus(found.status);
       setAdminNotes(found.adminNotes || '');
+      setRoasterName(found.roasterName || '');
+      setCity(found.city || '');
+      setState(found.state || '');
+      setCountry(found.country || '');
+      setWebsite(found.website || '');
+      setSubmitterFirstName(found.submitterFirstName || '');
+      setSubmitterLastName(found.submitterLastName || '');
+      setSubmitterEmail(found.submitterEmail || '');
+      setSubmitterRole(found.submitterRole || '');
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -69,6 +87,15 @@ const AdminSuggestionDetailPage: React.FC = () => {
       await apiClient.updateSuggestion(suggestionId, {
         status,
         adminNotes,
+        roasterName,
+        city,
+        state,
+        country,
+        website,
+        submitterFirstName,
+        submitterLastName,
+        submitterEmail,
+        submitterRole,
       });
       
       router.push('/admin/suggestions');
@@ -113,9 +140,11 @@ const AdminSuggestionDetailPage: React.FC = () => {
       case 'pending':
         return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
       case 'approved':
-        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+        return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
       case 'rejected':
         return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+      case 'done':
+        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
       default:
         return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
     }
@@ -146,137 +175,148 @@ const AdminSuggestionDetailPage: React.FC = () => {
       </div>
 
       {/* Suggestion Details */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           {t('admin.suggestions.roasterInformation', 'Roaster Information')}
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="lg:col-span-3">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('admin.suggestions.roasterName', 'Roaster Name')}
             </label>
-            <p className="text-gray-900 dark:text-gray-100 font-semibold">{suggestion.roasterName}</p>
+            <input
+              type="text"
+              value={roasterName}
+              onChange={(e) => setRoasterName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('admin.suggestions.website', 'Website')}
-            </label>
-            <a 
-              href={suggestion.website} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              {suggestion.website}
-            </a>
-          </div>
-
-          <div>
+          <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('admin.suggestions.city', 'City')}
             </label>
-            <p className="text-gray-900 dark:text-gray-100">{suggestion.city}</p>
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            />
           </div>
-
-          {suggestion.state && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.suggestions.state', 'State/Province')}
-              </label>
-              <p className="text-gray-900 dark:text-gray-100">{suggestion.state}</p>
-            </div>
-          )}
-
-          <div>
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t('admin.suggestions.state', 'State/Province')}
+            </label>
+            <input
+              type="text"
+              value={state}
+              onChange={(e) => setState(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            />
+          </div>
+          <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('admin.suggestions.country', 'Country')}
             </label>
-            <p className="text-gray-900 dark:text-gray-100">{suggestion.country}</p>
+            <input
+              type="text"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            />
+          </div>
+          <div className="lg:col-span-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t('admin.suggestions.website', 'Website')}
+            </label>
+            <input
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            />
           </div>
         </div>
       </div>
 
       {/* Submitter Information */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           {t('admin.suggestions.submitterInformation', 'Submitter Information')}
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('admin.suggestions.name', 'Name')}
-            </label>
-            <p className="text-gray-900 dark:text-gray-100">
-              {suggestion.submitterFirstName} {suggestion.submitterLastName}
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('admin.suggestions.role', 'Role')}
-            </label>
-            <p className="text-gray-900 dark:text-gray-100">{suggestion.submitterRole}</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('admin.suggestions.email', 'Email')}
-            </label>
-            <a 
-              href={`mailto:${suggestion.submitterEmail}`}
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              {suggestion.submitterEmail}
-            </a>
-          </div>
-
-          {suggestion.submitterPhone && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.suggestions.phone', 'Phone')}
+                {t('admin.suggestions.firstName', 'First Name')}
               </label>
-              <a 
-                href={`tel:${suggestion.submitterPhone}`}
-                className="text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                {suggestion.submitterPhone}
-              </a>
+              <input
+                type="text"
+                value={submitterFirstName}
+                onChange={(e) => setSubmitterFirstName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              />
             </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('admin.suggestions.submitted', 'Submitted')}
-            </label>
-            <p className="text-gray-900 dark:text-gray-100">{formatDateToYYYYMMDD(suggestion.createdAt)}</p>
-          </div>
-
-          {suggestion.reviewedAt && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.suggestions.reviewed', 'Reviewed')}
+                {t('admin.suggestions.lastName', 'Last Name')}
               </label>
-              <p className="text-gray-900 dark:text-gray-100">{formatDateToYYYYMMDD(suggestion.reviewedAt)}</p>
+              <input
+                type="text"
+                value={submitterLastName}
+                onChange={(e) => setSubmitterLastName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              />
             </div>
-          )}
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('admin.suggestions.email', 'Email')}
+              </label>
+              <input
+                type="email"
+                value={submitterEmail}
+                onChange={(e) => setSubmitterEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+            <div>
+              <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.role', 'Role')}: </span>
+              <span className="text-gray-900 dark:text-gray-100">{submitterRole}</span>
+            </div>
+
+            <div>
+              <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.submitted', 'Submitted')}: </span>
+              <span className="text-gray-900 dark:text-gray-100">{formatDateToYYYYMMDD(suggestion.createdAt)}</span>
+            </div>
+
+            {suggestion.reviewedAt && (
+              <div>
+                <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.reviewed', 'Reviewed')}: </span>
+                <span className="text-gray-900 dark:text-gray-100">{formatDateToYYYYMMDD(suggestion.reviewedAt)}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Admin Review Form */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           {t('admin.suggestions.adminReview', 'Admin Review')}
         </h2>
         
-        <div className="space-y-4">
-          <div>
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="w-full lg:w-auto">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.suggestions.status', 'Status')}
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setStatus('pending')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -291,7 +331,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
                 onClick={() => setStatus('approved')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   status === 'approved'
-                    ? 'bg-green-600 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
@@ -307,10 +347,20 @@ const AdminSuggestionDetailPage: React.FC = () => {
               >
                 {t('admin.suggestions.rejected', 'Rejected')}
               </button>
+              <button
+                onClick={() => setStatus('done')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  status === 'done'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                {t('admin.suggestions.done', 'Done')}
+              </button>
             </div>
           </div>
 
-          <div>
+          <div className="flex-1 w-full">
             <label htmlFor="adminNotes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.suggestions.adminNotes', 'Admin Notes')}
             </label>
@@ -323,25 +373,24 @@ const AdminSuggestionDetailPage: React.FC = () => {
               placeholder={t('admin.suggestions.notesPlaceholder', 'Add internal notes about this suggestion...')}
             />
           </div>
-        </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-4">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-        >
-          {saving ? t('admin.suggestions.saving', 'Saving...') : t('admin.suggestions.save', 'Save Changes')}
-        </button>
-        
-        <button
-          onClick={() => router.push('/admin/suggestions')}
-          className="px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
-        >
-          {t('admin.suggestions.cancel', 'Cancel')}
-        </button>
+          <div className="flex lg:flex-col gap-2 lg:justify-end w-full lg:w-auto">
+            <button
+              onClick={() => router.push('/admin/suggestions')}
+              className="flex-1 lg:flex-none px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors whitespace-nowrap"
+            >
+              {t('admin.suggestions.cancel', 'Cancel')}
+            </button>
+            
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 lg:flex-none px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+            >
+              {saving ? t('admin.suggestions.saving', 'Saving...') : t('admin.suggestions.save', 'Save')}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
