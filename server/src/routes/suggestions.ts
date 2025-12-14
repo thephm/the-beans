@@ -71,22 +71,30 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
       },
     });
 
-    // Log audit trail
+    // Log audit trail - construct explicit object with all field values from request body
+    // Use || '' to ensure empty strings instead of undefined
+    const auditValues = {
+      roasterName: roasterName || '',
+      city: city || '',
+      state: state || '',
+      country: country || '',
+      website: website || '',
+      submitterRole: submitterRole || '',
+      submitterFirstName: submitterFirstName || '',
+      submitterLastName: submitterLastName || '',
+      submitterEmail: submitterEmail || '',
+      status: 'pending',
+    };
+
     await createAuditLog({
       action: 'CREATE',
       entityType: 'RoasterSuggestion',
       entityId: suggestion.id,
-      entityName: roasterName,
+      entityName: roasterName || 'Unknown',
       userId: (req as any).user?.id || null,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),
-      newValues: {
-        submitterEmail,
-        submitterRole,
-        city,
-        state,
-        country,
-      },
+      newValues: auditValues,
     });
 
     res.status(201).json(suggestion);
@@ -130,22 +138,76 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
 router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { status, adminNotes } = req.body;
+    
+    console.log('=== PATCH /api/suggestions/:id ===');
+    console.log('Suggestion ID:', id);
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    
+    const { 
+      status, 
+      adminNotes,
+      roasterName,
+      city,
+      state,
+      country,
+      website,
+      submitterFirstName,
+      submitterLastName,
+      submitterEmail,
+      submitterRole
+    } = req.body;
 
-    if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
+    console.log('Extracted fields:', {
+      status,
+      adminNotes,
+      roasterName,
+      city,
+      state,
+      country,
+      website,
+      submitterFirstName,
+      submitterLastName,
+      submitterEmail,
+      submitterRole
+    });
+
+    if (!status || !['pending', 'approved', 'rejected', 'done'].includes(status)) {
       return res.status(400).json({ error: 'Valid status is required' });
     }
 
-    const suggestion = await prisma.roasterSuggestion.update({
+    // Fetch the old suggestion before updating for audit log
+    const oldSuggestion = await prisma.roasterSuggestion.findUnique({
       where: { id },
-      data: {
-        status,
-        adminNotes,
-        reviewedAt: new Date(),
-      },
     });
 
-    // Log audit trail
+    if (!oldSuggestion) {
+      return res.status(404).json({ error: 'Suggestion not found' });
+    }
+
+    const updateData: any = {
+      status,
+      reviewedAt: new Date(),
+    };
+
+    if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
+    if (roasterName !== undefined) updateData.roasterName = roasterName;
+    if (city !== undefined) updateData.city = city;
+    if (state !== undefined) updateData.state = state;
+    if (country !== undefined) updateData.country = country;
+    if (website !== undefined) updateData.website = website;
+    if (submitterFirstName !== undefined) updateData.submitterFirstName = submitterFirstName;
+    if (submitterLastName !== undefined) updateData.submitterLastName = submitterLastName;
+    if (submitterEmail !== undefined) updateData.submitterEmail = submitterEmail;
+    if (submitterRole !== undefined) updateData.submitterRole = submitterRole;
+
+    console.log('Final updateData for Prisma:', JSON.stringify(updateData, null, 2));
+
+    const suggestion = await prisma.roasterSuggestion.update({
+      where: { id },
+      data: updateData,
+    });
+
+    // Log audit trail with old and new values for proper change tracking
     await createAuditLog({
       action: 'UPDATE',
       entityType: 'RoasterSuggestion',
@@ -154,10 +216,8 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
       userId: (req as any).user?.id || null,
       ipAddress: getClientIP(req),
       userAgent: getUserAgent(req),
-      newValues: {
-        status,
-        adminNotes,
-      },
+      oldValues: oldSuggestion as Record<string, any>,
+      newValues: suggestion as Record<string, any>,
     });
 
     res.json(suggestion);

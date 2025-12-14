@@ -154,9 +154,31 @@ export default function AuditLogsPage() {
         return `/admin/users/${log.entityId}/edit`;
       case 'person':
         return `/admin/people/edit/${log.entityId}`;
+      case 'RoasterSuggestion':
+        return `/admin/suggestions/${log.entityId}`;
       default:
         return '#';
     }
+  };
+
+  // Extract roaster suggestion details from changes
+  const getRoasterSuggestionDetails = (log: AuditLog) => {
+    if (log.entityType !== 'RoasterSuggestion' || !log.changes) {
+      return null;
+    }
+    
+    const details = {
+      roasterName: log.changes.roasterName?.new || log.entityName || null,
+      city: log.changes.city?.new || null,
+      country: log.changes.country?.new || null,
+      website: log.changes.website?.new || null,
+      submitterFirstName: log.changes.submitterFirstName?.new || null,
+      submitterLastName: log.changes.submitterLastName?.new || null,
+      submitterRole: log.changes.submitterRole?.new || null,
+      submitterEmail: log.changes.submitterEmail?.new || null,
+    };
+    
+    return details;
   };
 
   if (loading) {
@@ -388,13 +410,24 @@ export default function AuditLogsPage() {
                       <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
                         {log.entityName || log.entityId}
                       </div>
+                      {log.entityType === 'RoasterSuggestion' && (() => {
+                        const details = getRoasterSuggestionDetails(log);
+                        return details?.website ? (
+                          <div className="text-xs text-blue-600 dark:text-blue-400 truncate max-w-xs">
+                            {details.website}
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                     <div>
-                      {log.city && log.country && log.city !== 'Unknown' && log.country !== 'Unknown' ? 
-                        `${log.city}, ${log.country}` : 
-                        (log.city && log.city !== 'Unknown') || (log.country && log.country !== 'Unknown') || 'Unknown'}
+                      {log.ipAddress ? log.ipAddress : 'Unknown'}
+                      {log.city && log.country && log.city !== 'Unknown' && log.country !== 'Unknown' && (
+                        <div className="text-xs text-gray-400 dark:text-gray-500">
+                          {log.city}, {log.country}
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -471,13 +504,30 @@ export default function AuditLogsPage() {
                 )}
               </div>
               
+              {log.entityType === 'RoasterSuggestion' && log.action === 'CREATE' && (() => {
+                const details = getRoasterSuggestionDetails(log);
+                return details ? (
+                  <div className="flex justify-between">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Roaster:</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[180px]">
+                      {details.city && details.country ? `${details.city}, ${details.country}` : 'N/A'}
+                    </span>
+                  </div>
+                ) : null;
+              })()}
+              
               <div className="flex justify-between">
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Location:</span>
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {log.city && log.country && log.city !== 'Unknown' && log.country !== 'Unknown' ? 
-                    `${log.city}, ${log.country}` : 
-                    (log.city && log.city !== 'Unknown') || (log.country && log.country !== 'Unknown') || 'Unknown'}
-                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">IP/Location:</span>
+                <div className="text-right">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                    {log.ipAddress || 'Unknown'}
+                  </div>
+                  {log.city && log.country && log.city !== 'Unknown' && log.country !== 'Unknown' && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {log.city}, {log.country}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">

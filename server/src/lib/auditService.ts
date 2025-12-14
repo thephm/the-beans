@@ -70,7 +70,7 @@ function calculateChanges(oldValues: Record<string, any>, newValues: Record<stri
   const changes: Record<string, any> = {};
 
   // Skip these fields from change tracking
-  const skipFields = ['id', 'createdAt', 'updatedAt', 'createdById', 'updatedById'];
+  const skipFields = ['id', 'createdAt', 'updatedAt', 'createdById', 'updatedById', 'reviewedAt'];
 
   // Helper to normalize null/undefined values for comparison
   const normalizeValue = (value: any) => {
@@ -96,10 +96,19 @@ function calculateChanges(oldValues: Record<string, any>, newValues: Record<stri
         changes[key] = { old: normalizedOld, new: normalizedNew };
       }
     }
+    // Handle Date objects specially
+    else if (normalizedOld instanceof Date && normalizedNew instanceof Date) {
+      if (normalizedOld.getTime() !== normalizedNew.getTime()) {
+        changes[key] = { old: normalizedOld, new: normalizedNew };
+      }
+    }
     // Handle objects/JSON specially  
     else if (typeof normalizedOld === 'object' && typeof normalizedNew === 'object' && normalizedOld !== null && normalizedNew !== null) {
-      if (JSON.stringify(normalizedOld) !== JSON.stringify(normalizedNew)) {
-        changes[key] = { old: normalizedOld, new: normalizedNew };
+      // Skip Date objects (already handled above)
+      if (!(normalizedOld instanceof Date || normalizedNew instanceof Date)) {
+        if (JSON.stringify(normalizedOld) !== JSON.stringify(normalizedNew)) {
+          changes[key] = { old: normalizedOld, new: normalizedNew };
+        }
       }
     }
     // Handle primitive values
@@ -141,19 +150,17 @@ export async function createAuditLog(data: AuditLogData): Promise<void> {
       }
     }
 
-    // For CREATE actions, show only fields with actual values (excluding sensitive fields and blanks)
+    // For CREATE actions, show only fields with actual values (excluding sensitive/system fields and nulls)
     if (data.action === 'CREATE' && data.newValues) {
       const createChanges: Record<string, any> = {};
-      const sensitiveFields = ['password', 'hashedPassword', 'token', 'secret', 'createdAt', 'updatedAt'];
-      // Only include fields that are not blank, undefined, or null
+      const skipFields = ['password', 'hashedPassword', 'token', 'secret', 'createdAt', 'updatedAt', 'id'];
+      // Include fields with meaningful values
       Object.entries(data.newValues).forEach(([key, value]) => {
-        if (sensitiveFields.includes(key)) return;
-        if (value === undefined || value === null) return;
-        if (typeof value === 'string' && value.trim() === '') return;
-        if (Array.isArray(value) && value.length === 0) return;
-        if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) return;
-        if (typeof value === 'boolean' && value === false) return;
-        if (typeof value === 'number' && (value === 0 || Number.isNaN(value))) return;
+        if (skipFields.includes(key)) return;
+        // Skip only null and undefined (allow empty strings, false, 0, etc.)
+        if (value === undefined || value === null) {
+          return;
+        }
         createChanges[key] = {
           old: null,
           new: value

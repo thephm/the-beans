@@ -97,9 +97,11 @@ const AdminSuggestionsPage: React.FC = () => {
       case 'pending':
         return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
       case 'approved':
-        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+        return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
       case 'rejected':
         return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+      case 'done':
+        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
       default:
         return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
     }
@@ -158,7 +160,7 @@ const AdminSuggestionsPage: React.FC = () => {
               onClick={() => setStatusFilter('approved')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 statusFilter === 'approved'
-                  ? 'bg-green-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
@@ -173,6 +175,16 @@ const AdminSuggestionsPage: React.FC = () => {
               }`}
             >
               {t('admin.suggestions.rejected', 'Rejected')}
+            </button>
+            <button
+              onClick={() => setStatusFilter('done')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                statusFilter === 'done'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              {t('admin.suggestions.done', 'Done')}
             </button>
           </div>
 

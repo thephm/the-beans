@@ -285,7 +285,19 @@ class ApiClient {
     return this.request(endpoint);
   }
 
-  async updateSuggestion(id: string, data: { status: string; adminNotes?: string }) {
+  async updateSuggestion(id: string, data: { 
+    status: string; 
+    adminNotes?: string;
+    roasterName?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    website?: string;
+    submitterFirstName?: string;
+    submitterLastName?: string;
+    submitterEmail?: string;
+    submitterRole?: string;
+  }) {
     return this.request(`/suggestions/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
