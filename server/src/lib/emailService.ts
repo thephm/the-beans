@@ -63,7 +63,7 @@ interface SubmissionDetails {
   city?: string;
   state?: string;
   country?: string;
-  suggestionId: number;
+  suggestionId: string;
 }
 
 /**
