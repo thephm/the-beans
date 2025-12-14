@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function SuggestRoaster() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { user } = useAuth();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,6 +24,13 @@ export default function SuggestRoaster() {
     submitterLastName: '',
     submitterEmail: '',
   });
+
+  // Pre-fill email if user is logged in
+  useEffect(() => {
+    if (user?.email && !formData.submitterEmail) {
+      setFormData((prev) => ({ ...prev, submitterEmail: user.email }));
+    }
+  }, [user]);
 
   const roles = ['customer', 'rando', 'scout', 'owner', 'admin', 'marketing'];
 
