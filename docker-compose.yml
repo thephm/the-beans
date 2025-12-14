@@ -28,6 +28,7 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://beans_user:2w3E4r%T@database:5432/the_beans_db
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
       - database
     networks:
