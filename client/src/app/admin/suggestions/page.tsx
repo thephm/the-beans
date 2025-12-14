@@ -50,6 +50,13 @@ const AdminSuggestionsPage: React.FC = () => {
       const res = await fetch(url, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
+      
+      // Redirect to 404 if unauthorized
+      if (res.status === 403 || res.status === 401) {
+        window.location.href = '/not-found';
+        return;
+      }
+      
       if (!res.ok) throw new Error('Failed to fetch suggestions');
       const data = await res.json();
       setSuggestions(data);

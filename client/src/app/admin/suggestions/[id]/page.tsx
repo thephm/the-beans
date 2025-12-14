@@ -71,6 +71,11 @@ const AdminSuggestionDetailPage: React.FC = () => {
       setSubmitterEmail(found.submitterEmail || '');
       setSubmitterRole(found.submitterRole || '');
     } catch (err: any) {
+      // Redirect to 404 if unauthorized
+      if (err.message?.includes('403') || err.message?.includes('401') || err.message?.includes('Forbidden')) {
+        router.replace('/not-found');
+        return;
+      }
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
