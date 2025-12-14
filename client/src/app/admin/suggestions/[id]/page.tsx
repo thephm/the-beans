@@ -44,7 +44,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const suggestions: Suggestion[] = await apiClient.getSuggestions();
+      const suggestions = await apiClient.getSuggestions() as Suggestion[];
       
       const found = suggestions.find(s => s.id === suggestionId);
       if (!found) throw new Error('Suggestion not found');
