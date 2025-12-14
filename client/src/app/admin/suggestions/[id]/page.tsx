@@ -5,26 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useRouter } from 'next/navigation';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
 import { apiClient } from '@/lib/api';
-
-interface Suggestion {
-  id: string;
-  roasterName: string;
-  city: string;
-  state?: string;
-  country: string;
-  website: string;
-  submitterRole: string;
-  submitterFirstName: string;
-  submitterLastName?: string;
-  submitterEmail: string;
-  submitterPhone?: string;
-  status: string;
-  adminNotes?: string;
-  createdAt: string;
-  updatedAt: string;
-  reviewedAt?: string;
-  reviewedById?: string;
-}
+import { Suggestion } from '@/types';
 
 const AdminSuggestionDetailPage: React.FC = () => {
   const { t } = useTranslation();

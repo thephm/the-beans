@@ -334,3 +334,23 @@ export interface SpecialtyListItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Suggestion {
+  id: string;
+  roasterName: string;
+  city: string;
+  state?: string;
+  country: string;
+  website: string;
+  submitterRole: string;
+  submitterFirstName: string;
+  submitterLastName?: string;
+  submitterEmail: string;
+  submitterPhone?: string;
+  status: string;
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+  reviewedAt?: string;
+  reviewedById?: string;
+}
