@@ -1,3 +1,4 @@
+import { Suggestion } from '@/types';
 
 // Determine API base URL with fallback for production
 const getApiBaseUrl = () => {
@@ -280,9 +281,9 @@ class ApiClient {
   }
 
   // Suggestions methods
-  async getSuggestions(status?: string) {
+  async getSuggestions(status?: string): Promise<Suggestion[]> {
     const endpoint = status ? `/suggestions?status=${status}` : '/suggestions';
-    return this.request(endpoint);
+    return this.request<Suggestion[]>(endpoint);
   }
 
   async updateSuggestion(id: string, data: { status: string; adminNotes?: string }) {
