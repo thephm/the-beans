@@ -131382,3 +131382,41 @@ Perfect! Now please create ONE MORE roaster suggestion with all fields filled in
 ✔ `docker-compose build server ; docker-compose restart server`
 
 Debug code removed and server restarted. The audit logging should now work correctly without all the console.log statements cluttering the logs.
+
+*(deployed)*
+
+## Don't see Suggestions in admin menu on mobile #248
+
+https://github.com/thephm/the-beans/issues/248
+
+I'll help you investigate why the Suggestions menu item isn't showing in the admin menu on mobile. Let me check the admin navigation components. 
+
+✔ Searched for regex `admin.*menu|suggestions` (`**/client/src/components/**/*.tsx`), 18 results
+
+✔ Searched for files matching `**/AdminNav*.tsx`, no matches
+
+✔ Searched for files matching `**/Header*.tsx`, no matches
+
+Let me read the Navbar component to see the admin menu structure: 
+
+✔ Read `client/src/components/Navbar.tsx`, lines 1 to 200
+
+✔ Read `client/src/components/Navbar.tsx`, lines 200 to 319
+
+I found the issue! In the mobile menu section (lines 214-277), the "Suggestions" link is missing. The desktop admin dropdown has it (line 137-141), but it's not included in the mobile admin menu section.
+
+Let me add the Suggestions link to the mobile admin menu: 
+
+`Navbar.tsx +7 -0`
+
+Now let me restart the client container to apply the changes: 
+
+✔ `docker-compose restart client`
+
+Fixed! I've added the "Suggestions" link to the mobile admin menu in Navbar.tsx. It was present in the desktop dropdown but missing from the mobile menu section. The link now appears between "Specialties" and "Audit Logs" on mobile, matching the desktop layout.
+
+The client container has been restarted, so the changes should be live now.
+
+## 1165th try
+
+*(see the Admin Suggestions menu on mobile)*
