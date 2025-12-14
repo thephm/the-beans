@@ -4,13 +4,13 @@ import { Coffee } from '@mui/icons-material'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender-50 via-white to-orchid-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="text-center">
         <div className="mb-4">
-          <Coffee sx={{ fontSize: 96, color: '#6b7280' }} />
+          <Coffee sx={{ fontSize: 96 }} className="text-gray-500 dark:text-gray-400" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Page Not Found</h2>
-        <p className="text-gray-600 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Page Not Found</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
           The page you're looking for doesn't exist.
         </p>
         <a
