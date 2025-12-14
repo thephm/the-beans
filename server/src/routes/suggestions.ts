@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
+import { requireAuth } from '../middleware/requireAuth';
 
 const router = express.Router();
 
@@ -99,7 +100,7 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
  * GET /api/suggestions
  * Get all roaster suggestions (admin only)
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
   try {
     const { status } = req.query;
 
@@ -126,7 +127,7 @@ router.get('/', async (req: Request, res: Response) => {
  * PATCH /api/suggestions/:id
  * Update a roaster suggestion status (admin only)
  */
-router.patch('/:id', async (req: Request, res: Response) => {
+router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status, adminNotes } = req.body;

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useRouter } from 'next/navigation';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
+import { apiClient } from '@/lib/api';
 
 interface Suggestion {
   id: string;
@@ -43,15 +44,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      
-      const res = await fetch(`${apiUrl}/api/suggestions`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-      });
-      
-      if (!res.ok) throw new Error('Failed to fetch suggestions');
-      const suggestions: Suggestion[] = await res.json();
+      const suggestions: Suggestion[] = await apiClient.getSuggestions();
       
       const found = suggestions.find(s => s.id === suggestionId);
       if (!found) throw new Error('Suggestion not found');
@@ -73,27 +66,11 @@ const AdminSuggestionDetailPage: React.FC = () => {
     setError(null);
     
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      
-      const res = await fetch(`${apiUrl}/api/suggestions/${suggestionId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          status,
-          adminNotes,
-        }),
+      await apiClient.updateSuggestion(suggestionId, {
+        status,
+        adminNotes,
       });
       
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to update suggestion');
-      }
-      
-      alert(t('admin.suggestions.updateSuccess', 'Suggestion updated successfully'));
       router.push('/admin/suggestions');
     } catch (err: any) {
       setError(err.message || 'Unknown error');
