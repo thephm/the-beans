@@ -121,6 +121,11 @@ class ApiClient {
       throw new Error('HTTP 401: Unauthorized');
     }
 
+    if (response.status === 403) {
+      // Forbidden: Access denied
+      throw new Error('HTTP 403: Forbidden');
+    }
+
     // Handle other error status codes
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'An error occurred' }));
