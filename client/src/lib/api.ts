@@ -95,13 +95,16 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}/api${endpoint}`;
     
+    // Always get fresh token from localStorage
+    const currentToken = typeof window !== 'undefined' ? localStorage.getItem('token') : this.token;
+    
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
     };
 
-    if (this.token) {
-      headers.Authorization = `Bearer ${this.token}`;
+    if (currentToken) {
+      headers.Authorization = `Bearer ${currentToken}`;
     }
 
     const response = await fetch(url, {
@@ -273,6 +276,19 @@ class ApiClient {
   async removeFavorite(roasterId: string) {
     return this.request(`/favorites/${roasterId}`, {
       method: 'DELETE',
+    });
+  }
+
+  // Suggestions methods
+  async getSuggestions(status?: string) {
+    const endpoint = status ? `/suggestions?status=${status}` : '/suggestions';
+    return this.request(endpoint);
+  }
+
+  async updateSuggestion(id: string, data: { status: string; adminNotes?: string }) {
+    return this.request(`/suggestions/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
     });
   }
 }
