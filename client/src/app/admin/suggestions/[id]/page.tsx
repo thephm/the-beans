@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useRouter } from 'next/navigation';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
 import { apiClient } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Suggestion {
   id: string;
@@ -28,6 +29,7 @@ interface Suggestion {
 
 const AdminSuggestionDetailPage: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const params = useParams();
   const router = useRouter();
   const suggestionId = params?.id as string;
@@ -113,10 +115,11 @@ const AdminSuggestionDetailPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (suggestionId) {
+    // Only fetch if user is admin
+    if (suggestionId && user?.role === 'admin') {
       fetchSuggestion();
     }
-  }, [suggestionId]);
+  }, [suggestionId, user]);
 
   if (loading) {
     return (
