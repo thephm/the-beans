@@ -268,6 +268,13 @@ export function Navbar() {
                     {t('admin.specialties.title', 'Specialties')}
                   </Link>
                   <Link 
+                    href="/admin/suggestions" 
+                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t('admin.suggestions.title', 'Suggestions')}
+                  </Link>
+                  <Link 
                     href="/admin/audit-logs" 
                     className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                     onClick={() => setIsMobileMenuOpen(false)}
