@@ -63,6 +63,7 @@ interface SubmissionDetails {
   city?: string;
   state?: string;
   country?: string;
+  suggestionId: number;
 }
 
 /**
@@ -133,10 +134,13 @@ export const sendAdminSubmissionNotification = async (details: SubmissionDetails
     city,
     state,
     country,
+    suggestionId,
   } = details;
 
   const submitterName = [submitterFirstName, submitterLastName].filter(Boolean).join(' ') || 'Anonymous';
   const location = [city, state, country].filter(Boolean).join(', ') || 'Location not provided';
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const adminPanelUrl = `${frontendUrl}/admin/suggestions?id=${suggestionId}`;
 
   const subject = `New Roaster Submission: ${roasterName}`;
   const text = `
@@ -152,12 +156,13 @@ Submitter Information:
 - Email: ${submitterEmail || 'Not provided'}
 - Role: ${submitterRole}
 
-Please review and approve this submission in the admin panel.
+Please review and approve this submission in the admin panel:
+${adminPanelUrl}
   `.trim();
 
   const html = `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-  <h2 style="color: #6F4E37;">New Roaster Submission</h2>
+  <h2 style="color: #9333EA;">New Roaster Submission</h2>
   
   <h3>Roaster Details:</h3>
   <ul>
@@ -174,7 +179,7 @@ Please review and approve this submission in the admin panel.
   </ul>
 
   <p style="margin-top: 20px;">
-    Please review and approve this submission in the admin panel.
+    Please review and approve this submission in the <a href="${adminPanelUrl}" style="color: #6F4E37; font-weight: bold;">admin panel</a>.
   </p>
 </div>
   `.trim();

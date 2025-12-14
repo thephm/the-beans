@@ -132132,3 +132132,207 @@ The server has been rebuilt and restarted. The logs now show clean startup witho
 ## 1171th try
 
 *(app sanity test pass, checking in)*
+
+## Email to admin for new suggestion should deep link to edit suggestion #249
+
+https://github.com/thephm/the-beans/issues/249
+
+> the email to the admin for new submissions should have "Please review and approve this submission in the admin panel." -- set "admin panel" to the URL deep link to edit the submission
+
+I'll help you add a deep link to the admin panel in the email notification for new roaster submissions. Let me first find where this email is being sent. 
+
+✔ Searched for text `Please review and approve this submission`, 3 results
+
+✔ Searched for regex `sendMail.*new.*roaster|roaster.*submission.*email` (`**/server/src/**/*.ts`), no results
+
+Let me read the email service file to see the full context: 
+
+✔ Read `server/src/lib/emailService.ts`, lines 140 to 189
+
+Now let me check the function signature to see what parameters are available: 
+
+✔ Read `server/src/lib/emailService.ts`, lines 120 to 145
+
+Let me check the function signature and see if there's a roaster ID parameter: 
+
+✔ Read `server/src/lib/emailService.ts`, lines 100 to 125
+
+Let me check the SubmissionDetails type and find where this function is called to see if we have a roaster ID: 
+
+✔ Searched for text `sendAdminSubmissionNotification` (`**/server/src/**/*.ts`), 3 results
+
+✔ Read `server/src/lib/emailService.ts`, lines 1 to 50
+
+Now let me check the suggestions route to see if we have access to the roaster ID: 
+
+✔ Read `server/src/routes/suggestions.ts`, lines 80 to 130
+
+Perfect! Now I can see that the suggestion is created and has an ID. Let me check what the suggestion object looks like: 
+
+✔ Read `server/src/routes/suggestions.ts`, lines 40 to 80
+
+Great! Now I can see the suggestion object has an ID. Let me also check the SubmissionDetails type: 
+
+✔ Read `server/src/lib/emailService.ts`, lines 50 to 70
+
+Now I need to:
+1. Update the `SubmissionDetails` interface to include `suggestionId`
+2. Update the email template to include a hyperlinked "admin panel" URL
+3. Update the route to pass the suggestion ID to the email function
+
+Let me also check what the frontend URL is: 
+
+✔ Searched for regex `FRONTEND_URL|CLIENT_URL|process\.env\.(NEXT_PUBLIC_)?APP_URL` (`**/server/src/**/*.ts`), no results
+
+Let me check the docker-compose file for the frontend URL: 
+
+✔ Read `docker-compose.yml`, lines 1 to 50
+
+Perfect! The frontend URL is `http://localhost:3000` for local development. Now let me implement the changes. I'll need to update:
+
+1. The `SubmissionDetails` interface to include `suggestionId`
+2. The email service to include the deep link
+3. The suggestions route to pass the suggestion ID 
+
+`emailService.ts +7 -2`
+`suggestions.ts +1 -0`
+
+Perfect! Now let me restart the server to apply these changes: 
+
+✔ `docker-compose restart server`
+
+Done! I've updated the admin notification email to include a hyperlinked "admin panel" that deep links directly to the submission. The changes include:
+
+1. **Updated the `SubmissionDetails` interface** to include `suggestionId`
+2. **Modified the email service** to:
+   - Extract the suggestion ID from the details
+   - Construct the admin panel URL: `{FRONTEND_URL}/admin/suggestions?id={suggestionId}`
+   - Update both text and HTML email templates to include the link
+3. **Updated the suggestions route** to pass the suggestion ID when sending the email
+
+The email now displays "Please review and approve this submission in the **admin panel**" where "admin panel" is a clickable link that takes the admin directly to the edit page for that specific submission. The URL uses the `FRONTEND_URL` environment variable (defaulting to `http://localhost:3000` for local development).
+
+The server has been restarted to apply these changes.
+
+## 1172nd try
+
+*(didn't test, on to the next item)*
+
+## Add API endpoints for CRUD on suggestions #250
+
+https://github.com/thephm/the-beans/issues/250
+
+> are there API endpoints for CRUD on suggestions? I didn't see it in the Swagger
+
+✔ Read `server/src/routes/suggestions.ts`, lines 1 to 237
+
+✔ Searched for text `swagger` (`**/server/src/**/*.ts`), 20 results
+
+You're right! The suggestions routes exist with CRUD operations but are **not documented in Swagger**. Here's what's available:
+
+**Existing Suggestions API Endpoints:**
+
+1. **POST /api/suggestions** - Create a new suggestion (public)
+2. **GET /api/suggestions** - List all suggestions with optional status filter (requires auth)
+3. **PATCH /api/suggestions/:id** - Update suggestion status and fields (requires auth)
+
+**Missing:**
+- DELETE endpoint
+- GET single suggestion by ID
+- **No Swagger documentation for any of these endpoints**
+
+The suggestions routes have authentication (`requireAuth`) but don't explicitly check for admin role like they should. Other routes in the codebase use Swagger JSDoc comments (like `@swagger`) to document their endpoints, but suggestions.ts has none of that documentation.
+
+Would you like me to:
+1. Add Swagger documentation for the existing suggestions endpoints?
+2. Add a DELETE endpoint?
+3. Add a GET endpoint for a single suggestion by ID?
+4. Add explicit admin role checks to the GET/PATCH endpoints?
+
+> all of the above yes
+
+✔ Read `server/src/routes/roasters.ts`, lines 45 to 130
+
+✔ Read `server/src/middleware/requireAuth.ts`
+
+✔ Searched for text `requireAdmin` (`**/server/src/middleware/**/*.ts`), no results
+
+✔ Read `server/src/routes/auditLogs.ts`, lines 45 to 100
+
+✔ Searched for files matching `**/requireAdmin.ts`, no matches
+
+✔ Searched for regex `import.*requireAdmin|const requireAdmin` (`**/server/src/**/*.ts`), 2 results
+
+✔ Read `server/src/routes/auditLogs.ts`, lines 30 to 45
+
+Now let me check how the user object is populated with role information: 
+
+✔ Searched for regex `req\.user.*=.*role|user:.*role` (`**/server/src/**/*.ts`), no results
+
+✔ Read `server/src/routes/auditLogs.ts`, lines 1 to 50
+
+Perfect! Now I can see that the audit logs route has its own `requireAuth` middleware that fetches the full user object. Let me now implement all the requested changes to the suggestions route: 
+
+`suggestions.ts +292 -7`
+
+Let me check what went wrong and try again with more careful context: 
+
+✔ Read `server/src/routes/suggestions.ts`, lines 230 to 238
+
+The file has already been partially updated. Let me read the entire file to see its current state: 
+
+✔ Read `server/src/routes/suggestions.ts`
+
+Great! The file is almost complete. I just need to add the Swagger schema component at the top. Let me do that: 
+
+`suggestions.ts +44 -0`
+
+Perfect! Now let me restart the server to apply all the changes: 
+
+✔ `docker-compose restart server`
+
+Perfect! All changes have been implemented and the server has been restarted. Here's what was added:
+
+## ✅ Complete Suggestions API with Swagger Documentation
+
+**New Endpoints:**
+1. **GET /api/suggestions/:id** - Get a single suggestion by ID (admin only)
+2. **DELETE /api/suggestions/:id** - Delete a suggestion (admin only)
+
+**Enhanced Security:**
+- Added `requireAdmin` middleware that properly checks user role
+- All GET/PATCH/DELETE endpoints now require admin access
+- POST endpoint remains public for submissions
+
+**Swagger Documentation Added:**
+- ✅ Schema definition for `RoasterSuggestion`
+- ✅ POST /api/suggestions - Submit new suggestion
+- ✅ GET /api/suggestions - List all suggestions with status filter
+- ✅ GET /api/suggestions/:id - Get single suggestion
+- ✅ PATCH /api/suggestions/:id - Update suggestion
+- ✅ DELETE /api/suggestions/:id - Delete suggestion
+
+**Audit Logging:**
+- DELETE endpoint includes audit trail logging
+
+You can now view all the suggestions endpoints in the Swagger UI at `http://localhost:5000/api-docs` under the **Suggestions** tag!
+
+## 1173rd try
+
+*(Swagger docs are there for Submissions)*
+
+> "New Roaster Submission" in the email to the admin should be the same color purple as the one to the submitter
+
+✔ Read `server/src/lib/emailService.ts`, lines 70 to 115
+
+✔ Read `server/src/lib/emailService.ts`, lines 155 to 180
+
+I can see the submitter email uses `#9333EA` (purple) and the admin email uses `#6F4E37` (brown). Let me update the admin email to match: 
+
+`emailService.ts +1 -1`
+
+✔ `docker-compose restart server`
+
+Done! The admin notification email now uses the same purple color (`#9333EA`) for the "New Roaster Submission" heading as the submitter's thank you email.
+
+*(checking in)*
