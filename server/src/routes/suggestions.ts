@@ -7,6 +7,82 @@ import { sendSubmissionThankYouEmail, sendAdminSubmissionNotification } from '..
 
 const router = express.Router();
 
+// Admin only middleware
+const requireAdmin = async (req: any, res: any, next: any) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: string };
+    
+    // Get user to check role
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId }
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    req.userId = decoded.userId;
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     RoasterSuggestion:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         roasterName:
+ *           type: string
+ *         city:
+ *           type: string
+ *         state:
+ *           type: string
+ *         country:
+ *           type: string
+ *         website:
+ *           type: string
+ *         submitterRole:
+ *           type: string
+ *           enum: [customer, rando, scout, owner, admin, marketing]
+ *         submitterFirstName:
+ *           type: string
+ *         submitterLastName:
+ *           type: string
+ *         submitterEmail:
+ *           type: string
+ *         status:
+ *           type: string
+ *           enum: [pending, approved, rejected, done]
+ *         adminNotes:
+ *           type: string
+ *         reviewedAt:
+ *           type: string
+ *           format: date-time
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ */
+
 // Validation rules for creating a suggestion
 const createSuggestionValidation = [
   body('roasterName').trim().notEmpty().withMessage('Roaster name is required'),
@@ -35,8 +111,54 @@ const createSuggestionValidation = [
 ];
 
 /**
- * POST /api/suggestions
- * Create a new roaster suggestion
+ * @swagger
+ * /api/suggestions:
+ *   post:
+ *     summary: Submit a new roaster suggestion
+ *     tags: [Suggestions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - roasterName
+ *               - website
+ *               - submitterRole
+ *             properties:
+ *               roasterName:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               website:
+ *                 type: string
+ *               submitterRole:
+ *                 type: string
+ *                 enum: [customer, rando, scout, owner, admin, marketing]
+ *               submitterFirstName:
+ *                 type: string
+ *               submitterLastName:
+ *                 type: string
+ *               submitterEmail:
+ *                 type: string
+ *               submitterPhone:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Suggestion created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RoasterSuggestion'
+ *       400:
+ *         description: Validation error
+ *       500:
+ *         description: Server error
  */
 router.post('/', createSuggestionValidation, async (req: Request, res: Response) => {
   try {
@@ -109,6 +231,7 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
       city,
       state,
       country,
+      suggestionId: suggestion.id,
     };
 
     // Send thank you email to submitter
@@ -131,10 +254,37 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
 });
 
 /**
- * GET /api/suggestions
- * Get all roaster suggestions (admin only)
+ * @swagger
+ * /api/suggestions:
+ *   get:
+ *     summary: Get all roaster suggestions (Admin only)
+ *     tags: [Suggestions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, approved, rejected, done]
+ *         description: Filter by status
+ *     responses:
+ *       200:
+ *         description: List of suggestions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/RoasterSuggestion'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       500:
+ *         description: Server error
  */
-router.get('/', requireAuth, async (req: Request, res: Response) => {
+router.get('/', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { status } = req.query;
 
@@ -158,10 +308,126 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
 });
 
 /**
+ * @swagger
+ * /api/suggestions/{id}:
+ *   get:
+ *     summary: Get a single roaster suggestion by ID (Admin only)
+ *     tags: [Suggestions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Suggestion ID
+ *     responses:
+ *       200:
+ *         description: Suggestion details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RoasterSuggestion'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Suggestion not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/:id', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const suggestion = await prisma.roasterSuggestion.findUnique({
+      where: { id },
+    });
+
+    if (!suggestion) {
+      return res.status(404).json({ error: 'Suggestion not found' });
+    }
+
+    res.json(suggestion);
+  } catch (error) {
+    console.error('Error fetching suggestion:', error);
+    res.status(500).json({ error: 'Failed to fetch suggestion' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/suggestions/{id}:
+ *   patch:
+ *     summary: Update a roaster suggestion (Admin only)
+ *     tags: [Suggestions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Suggestion ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, approved, rejected, done]
+ *               adminNotes:
+ *                 type: string
+ *               roasterName:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               website:
+ *                 type: string
+ *               submitterFirstName:
+ *                 type: string
+ *               submitterLastName:
+ *                 type: string
+ *               submitterEmail:
+ *                 type: string
+ *               submitterRole:
+ *                 type: string
+ *                 enum: [customer, rando, scout, owner, admin, marketing]
+ *     responses:
+ *       200:
+ *         description: Suggestion updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RoasterSuggestion'
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Suggestion not found
+ *       500:
+ *         description: Server error
+ */
+/**
  * PATCH /api/suggestions/:id
  * Update a roaster suggestion status (admin only)
  */
-router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
+router.patch('/:id', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
@@ -230,6 +496,70 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error updating suggestion:', error);
     res.status(500).json({ error: 'Failed to update suggestion' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/suggestions/{id}:
+ *   delete:
+ *     summary: Delete a roaster suggestion (Admin only)
+ *     tags: [Suggestions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Suggestion ID
+ *     responses:
+ *       200:
+ *         description: Suggestion deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Suggestion not found
+ *       500:
+ *         description: Server error
+ */
+router.delete('/:id', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Check if suggestion exists
+    const existingSuggestion = await prisma.roasterSuggestion.findUnique({
+      where: { id },
+    });
+
+    if (!existingSuggestion) {
+      return res.status(404).json({ error: 'Suggestion not found' });
+    }
+
+    // Delete the suggestion
+    await prisma.roasterSuggestion.delete({
+      where: { id },
+    });
+
+    // Log audit trail
+    await createAuditLog({
+      action: 'DELETE',
+      entityType: 'RoasterSuggestion',
+      entityId: id,
+      entityName: existingSuggestion.roasterName,
+      userId: (req as any).user?.id || null,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      oldValues: existingSuggestion as Record<string, any>,
+    });
+
+    res.json({ message: 'Suggestion deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting suggestion:', error);
+    res.status(500).json({ error: 'Failed to delete suggestion' });
   }
 });
 
