@@ -142,11 +142,19 @@ CLOUDINARY_CLOUD_NAME="your_cloud_name"
 CLOUDINARY_API_KEY="your_api_key"  
 CLOUDINARY_API_SECRET="your_api_secret"
 
-# Email (Optional - for notifications)
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT="587"
-SMTP_USER="your-email@gmail.com"
-SMTP_PASS="your-app-password"
+# Email Configuration (for notifications and contact form)
+CONTACT_US_EMAIL="your_contact_email@example.com"  # Email address that receives Contact Us form submissions
+ADMIN_EMAIL="admin@example.com"                    # Admin email for notifications
+SMTP_HOST="smtp.gmail.com"                         # SMTP server hostname
+SMTP_PORT="587"                                     # SMTP server port (typically 587 for TLS)
+SMTP_USER="your-email@gmail.com"                   # SMTP authentication username
+SMTP_PASS="your-app-password"                      # SMTP authentication password
+
+# URLs
+CLIENT_URL="http://localhost:3000"                 # Frontend URL (for CORS)
+FRONTEND_URL="http://localhost:3000"               # Frontend URL (for email links)
+API_URL="http://localhost:5000"                    # Backend API URL (for Swagger docs)
+CORS_ORIGIN="http://localhost:3000"                # Allowed CORS origins (comma-separated)
 
 # Server Configuration
 PORT="5000"
@@ -205,6 +213,42 @@ DATABASE_URL="postgresql://beans_user:secure_password_here@localhost:5432/the_be
 ```
 
 ## 🔑 External API Keys Setup
+
+### 📧 Email Configuration (Required for Contact Form & Notifications)
+
+The application uses SMTP for sending emails via the Contact Us form and user notifications. You'll need:
+
+1. **Choose an Email Provider**:
+   - **Gmail**: Use [App Passwords](https://support.google.com/accounts/answer/185833)
+   - **Fastmail**: Generate an app-specific password
+   - **SendGrid/Mailgun**: Use their SMTP credentials
+   - **Other providers**: Use your SMTP server details
+
+2. **Configure Environment Variables in `server/.env`**:
+   ```env
+   CONTACT_US_EMAIL="contact@yourdomain.com"  # Where contact form emails go
+   ADMIN_EMAIL="admin@yourdomain.com"         # For admin notifications
+   SMTP_HOST="smtp.gmail.com"                 # Your SMTP server
+   SMTP_PORT=587                              # Usually 587 (TLS) or 465 (SSL)
+   SMTP_USER="your-email@gmail.com"           # Your email/username
+   SMTP_PASS="your-app-password"              # App password or SMTP password
+   ```
+
+3. **Gmail-Specific Setup**:
+   - Enable 2-factor authentication in your Google account
+   - Go to [App Passwords](https://myaccount.google.com/apppasswords)
+   - Generate a new app password for "Mail"
+   - Use this generated password as `SMTP_PASS`
+
+4. **Test Email Configuration**:
+   ```bash
+   # After configuring, restart the server
+   docker-compose restart server
+   
+   # Test by submitting the Contact Us form
+   # Or check server logs for email-related errors
+   docker logs the-beans-server-1
+   ```
 
 ### Cloudinary (Image Storage)
 1. **Sign up** at [cloudinary.com](https://cloudinary.com)

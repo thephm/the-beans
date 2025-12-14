@@ -132491,3 +132491,153 @@ I've already added it to:
 The frontend doesn't need this variable because it already knows its own URL. The backend/API is what sends emails with links pointing back to the frontend.
 
 **For production (Render.com)**, you'll add `FRONTEND_URL` as an environment variable in your backend service settings, pointing to your frontend URL (e.g., `https://the-beans.onrender.com`).
+
+> Do I include the last stash https://thebeans.ca/
+
+**No trailing slash** - use `https://thebeans.ca`
+
+The code adds the slash for you:
+```typescript
+const adminPanelUrl = `${frontendUrl}/admin/suggestions?id=${suggestionId}`;
+```
+
+With trailing slash: `https://thebeans.ca//admin/suggestions` ❌ (double slash)  
+Without trailing slash: `https://thebeans.ca/admin/suggestions` ✅ (correct)
+
+> you should update the documentation with this new variable and the CONTACT_US_EMAIL and other environment variables if not already there
+
+I'll help you update the documentation with the environment variables. Let me first check what environment variables exist and what's currently documented. 
+
+✔ Searched for regex `CONTACT_US_EMAIL|EMAIL_|SMTP_` (`**/*.{md,env,example,ts,js}`), 20 results
+
+✔ Searched for files matching `**/.env*`, 2 matches
+
+✔ Searched for text `environment variables|Environment Variables` (`**/docs/**/*.md`), 20 results
+
+Let me check the README and SETUP documentation files, and the .env.example files to see what's currently documented: 
+
+✔ Read `README.md#1-1`, lines 1 to 150
+
+✔ Read `server/.env.example`
+
+✔ Read `docs/SETUP.md`, lines 120 to 200
+
+Now let me check what other environment variables exist in the actual source code: 
+
+✔ Read `server/src/index.ts`, lines 1 to 50
+
+✔ Searched for regex `process\.env\.\w+` (`**/server/src/**/*.ts`), 47 results
+
+Now let me check what's in the SETUP.md file regarding environment variables and also check the deployment docs: 
+
+✔ Read `docs/SETUP.md`, lines 120 to 280
+
+✔ Read `docs/deployment/RENDER_DEPLOYMENT.md`, lines 20 to 120
+
+Perfect! Now I can see what needs to be updated. Based on the code inspection, I can see that the following environment variables are used but not fully documented:
+
+1. **CONTACT_US_EMAIL** - Used in emailService and contact route
+2. **SMTP_HOST** - Email server host
+3. **SMTP_PORT** - Email server port (default 587)
+4. **SMTP_USER** - Email authentication username
+5. **SMTP_PASS** - Email authentication password
+6. **ADMIN_EMAIL** - Used in emailService for admin notifications
+7. **FRONTEND_URL** - Used in emailService for email links
+8. **CORS_ORIGIN** - Used for CORS configuration
+9. **API_URL** - Used for API documentation
+
+Let me update the relevant documentation files: 
+
+`SETUP.md +13 -5`
+`RENDER_DEPLOYMENT.md +11 -0`
+`.env.example +15 -17`
+
+Now let me also add a dedicated section about email configuration to make it more prominent in the documentation: 
+
+✔ Read `docs/SETUP.md`, lines 200 to 250
+
+`SETUP.md +36 -0`
+
+Now let me create a dedicated documentation file for email configuration to provide even more detail: 
+
+✔ Created `docs/EMAIL_CONFIGURATION.md`
+
+Now let me update the main documentation index to reference this new email configuration guide: 
+
+✔ Read `docs/README.md`
+
+`README.md +1 -2`
+
+Perfect! Now let me also update the main README to reference the comprehensive email configuration guide: 
+
+`README.md +16 -17`
+
+Excellent! Now let me create a summary document to show what was updated:
+
+Perfect! I've successfully updated all the documentation with comprehensive environment variable information. Here's what was done:
+
+## Updated Documentation
+
+### 1. **SETUP.md**
+- Added detailed comments for all email-related environment variables
+- Added `CONTACT_US_EMAIL`, `ADMIN_EMAIL`, and complete SMTP configuration
+- Added `CLIENT_URL`, `FRONTEND_URL`, `API_URL`, and `CORS_ORIGIN`
+- Created a new dedicated section "📧 Email Configuration" with step-by-step setup instructions for:
+  - Choosing email providers (Gmail, Fastmail, SendGrid, Mailgun)
+  - Configuring environment variables
+  - Gmail-specific setup with App Passwords
+  - Testing email configuration
+
+### 2. **.env.example**
+- Updated with inline comments describing each environment variable
+- Added proper grouping by category (Authentication, URLs, Cloudinary, Email)
+- Included all newly documented variables with descriptions
+
+### 3. **RENDER_DEPLOYMENT.md**
+- Added complete email configuration section
+- Added `CLIENT_URL`, `FRONTEND_URL`, `API_URL` for production deployment
+- Updated environment variables section with detailed email setup
+
+### 4. **README.md** 
+- Enhanced email setup section with better formatting
+- Added references to the comprehensive Email Configuration Guide
+- Included both `CONTACT_US_EMAIL` and `ADMIN_EMAIL` variables
+
+### 5. **EMAIL_CONFIGURATION.md** (NEW)
+Created a comprehensive email configuration guide covering:
+- Overview of email features
+- Complete environment variable reference
+- Provider-specific setup (Gmail, Fastmail, SendGrid, Mailgun)
+- Docker configuration steps
+- Testing methods (via form and command line)
+- Troubleshooting common issues
+- Production considerations (security, deliverability, rate limiting)
+- Reference table of all email-related variables
+
+### 6. **README.md**
+- Added link to the new Email Configuration guide
+
+## Complete Environment Variables Now Documented
+
+**Email Configuration:**
+- `CONTACT_US_EMAIL` - Receives Contact Us form submissions
+- `ADMIN_EMAIL` - Receives admin notifications  
+- `SMTP_HOST` - SMTP server hostname
+- `SMTP_PORT` - SMTP server port (default: 587)
+- `SMTP_USER` - SMTP authentication username
+- `SMTP_PASS` - SMTP authentication password
+
+**URLs:**
+- `CLIENT_URL` - Frontend URL for CORS
+- `FRONTEND_URL` - Frontend URL for email links
+- `API_URL` - Backend API URL for Swagger docs
+- `CORS_ORIGIN` - Allowed CORS origins
+
+**Other Variables Already Documented:**
+- Database, JWT, Cloudinary, Node environment, and port configuration
+
+All documentation now provides clear descriptions, examples, and setup instructions for every environment variable used in the application! 🎉
+
+## 1176th try
+
+*(committing)*

@@ -51,5 +51,4 @@ This project uses a **Docker-first development approach**. Key points:
 
 - 🏠 [**Back to Main README**](../README.md)
 - ⚙️ [**Setup Guide**](SETUP.md)  
-- 🐳 [**Docker Documentation**](DOCKER.md)
-- 📋 [**Project Summary**](PROJECT_SUMMARY.md)
+- 🐳 [**Docker Documentation**](DOCKER.md)- 📧 [**Email Configuration**](EMAIL_CONFIGURATION.md)- 📋 [**Project Summary**](PROJECT_SUMMARY.md)
