@@ -73,6 +73,9 @@ export function Navbar() {
             <Link href="/favorites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               {t('nav.favorites')}
             </Link>
+            <Link href="/suggest" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              {t('nav.suggest')}
+            </Link>
             {user?.role === 'admin' && (
               <div className="relative" ref={adminMenuRef}>
                 <button
@@ -129,6 +132,13 @@ export function Navbar() {
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('admin.specialties.title', 'Specialties')}
+                    </Link>
+                    <Link 
+                      href="/admin/suggestions" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.suggestions.title', 'Suggestions')}
                     </Link>
                     <Link 
                       href="/admin/audit-logs" 
@@ -212,6 +222,9 @@ export function Navbar() {
               </Link>
               <Link href="/favorites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.favorites')}
+              </Link>
+              <Link href="/suggest" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                {t('nav.suggest')}
               </Link>
               {user?.role === 'admin' && (
                 <div className="py-2">

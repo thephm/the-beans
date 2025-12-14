@@ -339,3 +339,25 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+model RoasterSuggestion {
+  id                String   @id @default(cuid())
+  roasterName       String
+  city              String
+  state             String?
+  country           String
+  website           String
+  submitterRole     String
+  submitterFirstName String
+  submitterLastName String?
+  submitterEmail    String
+  submitterPhone    String?
+  status            String   @default("pending") // pending, approved, rejected
+  adminNotes        String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  reviewedAt        DateTime?
+  reviewedById      String?
+
+  @@map("roaster_suggestions")
+}
