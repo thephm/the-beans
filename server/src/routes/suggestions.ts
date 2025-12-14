@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 import { requireAuth } from '../middleware/requireAuth';
+import { sendSubmissionThankYouEmail, sendAdminSubmissionNotification } from '../lib/emailService';
 
 const router = express.Router();
 
@@ -97,6 +98,31 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
       newValues: auditValues,
     });
 
+    // Send emails asynchronously (don't block response)
+    const emailDetails = {
+      roasterName,
+      submitterFirstName,
+      submitterLastName,
+      submitterEmail,
+      submitterRole,
+      website,
+      city,
+      state,
+      country,
+    };
+
+    // Send thank you email to submitter
+    sendSubmissionThankYouEmail(emailDetails)
+      .catch((error) => {
+        console.error('❌ Failed to send thank you email:', error);
+      });
+
+    // Send notification to admin
+    sendAdminSubmissionNotification(emailDetails)
+      .catch((error) => {
+        console.error('❌ Failed to send admin notification email:', error);
+      });
+
     res.status(201).json(suggestion);
   } catch (error) {
     console.error('Error creating roaster suggestion:', error);
@@ -139,10 +165,6 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
-    console.log('=== PATCH /api/suggestions/:id ===');
-    console.log('Suggestion ID:', id);
-    console.log('Request body:', JSON.stringify(req.body, null, 2));
-    
     const { 
       status, 
       adminNotes,
@@ -156,20 +178,6 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
       submitterEmail,
       submitterRole
     } = req.body;
-
-    console.log('Extracted fields:', {
-      status,
-      adminNotes,
-      roasterName,
-      city,
-      state,
-      country,
-      website,
-      submitterFirstName,
-      submitterLastName,
-      submitterEmail,
-      submitterRole
-    });
 
     if (!status || !['pending', 'approved', 'rejected', 'done'].includes(status)) {
       return res.status(400).json({ error: 'Valid status is required' });
@@ -199,8 +207,6 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
     if (submitterLastName !== undefined) updateData.submitterLastName = submitterLastName;
     if (submitterEmail !== undefined) updateData.submitterEmail = submitterEmail;
     if (submitterRole !== undefined) updateData.submitterRole = submitterRole;
-
-    console.log('Final updateData for Prisma:', JSON.stringify(updateData, null, 2));
 
     const suggestion = await prisma.roasterSuggestion.update({
       where: { id },
