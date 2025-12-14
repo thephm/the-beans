@@ -100,25 +100,24 @@ docker-compose exec server npx prisma migrate reset
 
 To enable the Contact Us form and email notifications, configure the following environment variables in `server/.env`:
 
+```env
+# Email Recipients
+CONTACT_US_EMAIL=your-contact-email@example.com  # Receives Contact Us form submissions
+ADMIN_EMAIL=admin@example.com                    # Receives admin notifications
+
+# SMTP Server Configuration
+SMTP_HOST=smtp.yourprovider.com                  # e.g., smtp.gmail.com, smtp.fastmail.com
+SMTP_PORT=587                                    # 587 for TLS, 465 for SSL
+SMTP_USER=your-smtp-username                     # Usually your email address
+SMTP_PASS=your-smtp-password                     # App-specific password or API key
 ```
-# Contact Us email recipient
-CONTACT_US_EMAIL=your-contact-email@example.com
 
-# SMTP server settings
-SMTP_HOST=smtp.yourprovider.com
-SMTP_PORT=587
-SMTP_USER=your-smtp-username
-SMTP_PASS=your-smtp-password
+**After updating `.env`, restart the server container**:
+```bash
+docker-compose restart server
 ```
 
-- The `CONTACT_US_EMAIL` is the address that will receive messages from the Contact Us form.
-- The SMTP settings must match your email provider's requirements.
-- After updating `.env`, restart the server container:
-  ```bash
-  docker-compose restart server
-  ```
-
-If you need to test email delivery, use a service like [Mailtrap](https://mailtrap.io/) or your own SMTP credentials.
+For detailed setup instructions including Gmail, Fastmail, SendGrid, and troubleshooting, see the [📧 Email Configuration Guide](./docs/EMAIL_CONFIGURATION.md).
 
 ---
 

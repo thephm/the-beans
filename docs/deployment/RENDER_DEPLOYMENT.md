@@ -36,7 +36,18 @@ CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
+# Email Configuration (for notifications and contact form)
+CONTACT_US_EMAIL=your_contact_email@example.com
+ADMIN_EMAIL=admin@example.com
+SMTP_HOST=smtp.yourprovider.com
+SMTP_PORT=587
+SMTP_USER=your-smtp-username
+SMTP_PASS=your-smtp-password
+
 # Custom Domain Configuration
+CLIENT_URL=https://yourdomain.com
+FRONTEND_URL=https://yourdomain.com
+API_URL=https://api.yourdomain.com
 CORS_ORIGIN=https://yourdomain.com
 NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 ```
