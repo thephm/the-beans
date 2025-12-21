@@ -611,6 +611,20 @@
       "cancel": "Annuler",
       "updateSuccess": "Suggestion mise à jour avec succès",
       "updateError": "Échec de la mise à jour de la suggestion : "
+    },
+    "backup": {
+      "title": "Sauvegarde",
+      "description": "Créer une Sauvegarde",
+      "info": "Cela créera un vidage de la base de données PostgreSQL et le téléchargera sur le serveur WebDAV configuré avec un horodatage.",
+      "start": "Démarrer la Sauvegarde",
+      "running": "Sauvegarde en Cours...",
+      "testWebdav": "Tester la Connexion WebDAV",
+      "progress": "Progression de la Sauvegarde",
+      "success": "Succès",
+      "failed": "Échec",
+      "filename": "Nom du fichier de sauvegarde",
+      "configuration": "Configuration Requise",
+      "configInfo": "Assurez-vous que les variables d'environnement suivantes sont définies dans la configuration de votre serveur :"
     }
   },
   "adminForms": {

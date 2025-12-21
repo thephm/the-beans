@@ -23,6 +23,13 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 - Monitor user activities and system changes
 - IP geolocation and security monitoring
 
+### Database Backup
+- Create PostgreSQL database dumps
+- Automatic upload to WebDAV storage
+- Timestamped backup files
+- Admin-only access via API endpoint
+- See [Database Backup Configuration](database-backup.md) for setup
+
 All admin actions are restricted to users with the `admin` role.
 
 ## Access
@@ -31,6 +38,7 @@ The Admin Dashboard is accessible via the main navigation bar (visible only to a
 - **User Management**: `/admin/users`
 - **Roaster Management**: `/admin/roasters`  
 - **Audit Logs**: `/admin/audit-logs`
+- **Database Backup**: API endpoint only (`POST /api/backup/database`)
 
 ## API Endpoints
 
@@ -53,6 +61,9 @@ The Admin Dashboard is accessible via the main navigation bar (visible only to a
 - `GET /api/admin/audit-logs/stats` — Get audit statistics (admin only)
 - `GET /api/admin/audit-logs/:id` — Get specific audit log entry (admin only)
 
+### Database Backup
+- `POST /api/backup/database` — Create database backup and upload to WebDAV (admin only)
+
 ## UI
 
 - Inline editing for user role and language
@@ -60,4 +71,6 @@ The Admin Dashboard is accessible via the main navigation bar (visible only to a
 
 ---
 
+- [Database Backup Configuration](database-backup.md) - WebDAV setup and backup procedures
+- [Audit Logging](audit-logging.md) - Activity tracking documentation
 See also: [API](api.md), [Design](design.md), [Requirements](requirements.md), [Test Cases](test.md)

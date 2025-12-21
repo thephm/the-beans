@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
 export interface AuthenticatedRequest extends Request {
-  user?: { id: string };
+  user?: { 
+    id: string;
+    email: string;
+    role: string;
+    username?: string;
+  };
   body: any;
   params: any;
 }
