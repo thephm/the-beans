@@ -133960,7 +133960,7 @@ I'll help you configure the WebDAV connection. Let me first check your current s
 Good news! I can see that your WebDAV environment variables are already configured in .env. The configuration shows:
 
 - **WEBDAV_URL**: `https://myfiles.fastmail.com`
-- **WEBDAV_USER**: `bjansen@ownmail.net`
+- **WEBDAV_USER**: `*****`
 - **WEBDAV_PASS**: (configured)
 
 The "User not found" error suggests that the WebDAV credentials may be incorrect or the user doesn't exist on the FastMail WebDAV server. Let me check the WebDAV implementation to see how it's being used: 
@@ -133988,7 +133988,7 @@ The environment variables are loaded correctly. The "User not found" error is co
 
 Let me test the connection to get more details: 
 
-✔ `curl -u "bjansen@ownmail.net:77938y6w8w2r5c58" -X PROPFIND https://myfiles.fastmail.com -v 2>&1 | Select-String -Pattern "User not found|401|403|200 OK"`
+✔ `curl -u "*****@ownmail.net:*****" -X PROPFIND https://myfiles.fastmail.com -v 2>&1 | Select-String -Pattern "User not found|401|403|200 OK"`
 
 Excellent! The curl test shows `HTTP/1.1 200 OK` responses, which means the WebDAV credentials are working properly from a direct connection. The issue is that the error message "User not found" you're seeing might be from a different WebDAV library behavior or error handling. 
 
@@ -134023,8 +134023,8 @@ Your WebDAV configuration is **correctly set up** in .env:
 
 ```env
 WEBDAV_URL="https://myfiles.fastmail.com"
-WEBDAV_USER="bjansen@ownmail.net"  
-WEBDAV_PASS="77938y6w8w2r5c58"
+WEBDAV_USER="*****@ownmail.net"  
+WEBDAV_PASS="*****"
 ```
 
 The WebDAV credentials are **working correctly** (verified with curl test showing HTTP 200 OK).
@@ -134048,7 +134048,7 @@ The 401 errors in your server logs confirm that you're trying to access the admi
 
 ```shell
 Create database dump
-Database dump failed: Command failed: pg_dump "postgresql://beans_user:2w3E4r%25T@database:5432/the_beans_db" > /tmp/the-beans-backup_2025-12-21_15-53-49.sql pg_dump: error: aborting because of server version mismatch pg_dump: detail: server version: 18.1 (Debian 18.1-1.pgdg13+2); pg_dump version: 15.14 (Debian 15.14-0+deb12u1)
+Database dump failed: Command failed: pg_dump "postgresql://beans_user:*****@database:5432/the_beans_db" > /tmp/the-beans-backup_2025-12-21_15-53-49.sql pg_dump: error: aborting because of server version mismatch pg_dump: detail: server version: 18.1 (Debian 18.1-1.pgdg13+2); pg_dump version: 15.14 (Debian 15.14-0+deb12u1)
 ```
 
 The server restart didn't pick up the changes properly. Let me verify the current state of the backup file and check if there's a caching issue: 
@@ -134071,7 +134071,7 @@ The backup feature should now successfully create database dumps from the admin 
 ## 1195th try 
 
 ```shell
-Database dump failed: Command failed: pg_dump "postgresql://beans_user:2w3E4r%25T@database:5432/the_beans_db" > /tmp/the-beans-backup_2025-12-21_15-56-10.sql pg_dump: error: aborting because of server version mismatch pg_dump: detail: server version: 18.1 (Debian 18.1-1.pgdg13+2); pg_dump version: 15.14 (Debian 15.14-0+deb12u1)
+Database dump failed: Command failed: pg_dump "postgresql://beans_user:****@database:5432/the_beans_db" > /tmp/the-beans-backup_2025-12-21_15-56-10.sql pg_dump: error: aborting because of server version mismatch pg_dump: detail: server version: 18.1 (Debian 18.1-1.pgdg13+2); pg_dump version: 15.14 (Debian 15.14-0+deb12u1)
 ```
 
 ## 1196th try 
