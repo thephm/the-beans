@@ -614,6 +614,20 @@
       "cancel": "Cancel",
       "updateSuccess": "Suggestion updated successfully",
       "updateError": "Failed to update suggestion: "
+    },
+    "backup": {
+      "title": "Backup",
+      "description": "Create Backup",
+      "info": "This will create a PostgreSQL database dump and upload it to the configured WebDAV server with a timestamp.",
+      "start": "Start Backup",
+      "running": "Backup in Progress...",
+      "testWebdav": "Test WebDAV Connection",
+      "progress": "Backup Progress",
+      "success": "Success",
+      "failed": "Failed",
+      "filename": "Backup filename",
+      "configuration": "Configuration Required",
+      "configInfo": "Ensure the following environment variables are set in your server configuration:"
     }
   },
   "adminForms": {

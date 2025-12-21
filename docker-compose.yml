@@ -1,15 +1,15 @@
 services:
   # PostgreSQL Database (Development Only)
   database:
-    image: postgres:15
+    image: postgres:18
     environment:
       POSTGRES_DB: the_beans_db
       POSTGRES_USER: beans_user
-      POSTGRES_PASSWORD: 2w3E4r%T
+      POSTGRES_PASSWORD: "2w3E4r%T"
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
       - ./server/prisma/schema.prisma:/docker-entrypoint-initdb.d/schema.prisma
     networks:
       - coffee-network
@@ -23,12 +23,16 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - ./server/.env
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://beans_user:2w3E4r%T@database:5432/the_beans_db
+      - DATABASE_URL=postgresql://beans_user:2w3E4r%25T@database:5432/the_beans_db
       - FRONTEND_URL=http://localhost:3000
+      - DB_NAME=the_beans_db
+      - DB_USER=beans_user
+      - DB_CONTAINER_NAME=the-beans-database-1
     depends_on:
       - database
     networks:
