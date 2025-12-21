@@ -3,7 +3,7 @@ FROM node:18-slim
 
 # Install required packages for Prisma and database connectivity
 RUN apt-get update && \
-    apt-get install -y netcat-openbsd openssl ca-certificates curl postgresql-client && \
+    apt-get install -y openssl ca-certificates curl postgresql-client && \
     # Install Docker CLI
     curl -fsSL https://get.docker.com -o get-docker.sh && \
     sh get-docker.sh && \
