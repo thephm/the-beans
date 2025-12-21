@@ -7,9 +7,43 @@ import { ConditionalFooter } from '@/components/ConditionalFooter'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'The Beans - Coffee Roaster Discovery',
-  description: 'Discover fresh coffee roasters near you',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://thebeans.onrender.com'),
+  title: {
+    default: 'The Beans - Coffee Roaster Discovery',
+    template: '%s | The Beans',
+  },
+  description: 'Discover fresh coffee roasters near you. Find local coffee shops, read reviews, and explore specialty coffee roasters in your area.',
+  keywords: ['coffee', 'roasters', 'coffee shops', 'specialty coffee', 'local coffee', 'coffee discovery'],
+  authors: [{ name: 'The Beans' }],
+  creator: 'The Beans',
+  publisher: 'The Beans',
   manifest: '/manifest.json',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    title: 'The Beans - Coffee Roaster Discovery',
+    description: 'Discover fresh coffee roasters near you',
+    siteName: 'The Beans',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'The Beans - Coffee Roaster Discovery',
+    description: 'Discover fresh coffee roasters near you',
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+  },
 }
 
 
