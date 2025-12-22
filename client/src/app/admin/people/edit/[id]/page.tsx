@@ -11,11 +11,11 @@ const EditPersonPage: React.FC = () => {
   const { t } = useTranslation();
   const params = useParams();
   const personId = params?.id as string;
-  const [person, setPerson] = useState<RoasterPerson | null>(null);
+  const [personAssociations, setPersonAssociations] = useState<RoasterPerson[]>([]);
   const [roasters, setRoasters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     let isMounted = true;
@@ -24,7 +24,7 @@ const EditPersonPage: React.FC = () => {
       try {
         if (!personId) {
           if (isMounted) {
-            setPerson(null);
+            setPersonAssociations([]);
             setLoading(false);
           }
           return;
@@ -35,8 +35,33 @@ const EditPersonPage: React.FC = () => {
         
         // API returns { person: {...} }, extract the person object
         const personObj = (personData as any)?.person || personData;
-        setPerson(personObj as RoasterPerson);
-        const roasterData = await apiClient.getRoasters();
+        
+        // Start with at least the current person
+        let associations = [personObj];
+        
+        console.log('Edit page - Initial person:', personObj);
+        
+        // Try to fetch all roaster associations for this person by email
+        if (personObj.email) {
+          try {
+            const allPeopleResponse = await apiClient.getPeopleByEmail(personObj.email);
+            console.log('Edit page - getPeopleByEmail response:', allPeopleResponse);
+            
+            const peopleList = Array.isArray((allPeopleResponse as any).data) ? (allPeopleResponse as any).data : [];
+            console.log('Edit page - People list count:', peopleList.length);
+            
+            if (peopleList.length > 0) {
+              associations = peopleList;
+              console.log('Edit page - Using', associations.length, 'associations for', personObj.email);
+            }
+          } catch (peopleErr) {
+            console.warn('Could not fetch people by email, showing single person only:', peopleErr);
+          }
+        }
+        
+        setPersonAssociations(associations);
+        
+        const roasterData = await apiClient.getRoasters({ limit: 100 });
         
         if (!isMounted) return;
         
@@ -46,8 +71,9 @@ const EditPersonPage: React.FC = () => {
           : [];
         setRoasters(roastersList);
       } catch (err) {
+        console.error('Error fetching person data:', err);
         if (isMounted) {
-          setPerson(null);
+          // Don't clear associations if we have at least the main person
           setRoasters([]);
         }
       } finally {
@@ -63,26 +89,43 @@ const EditPersonPage: React.FC = () => {
     };
   }, [personId]);
 
-  const handleSave = async (updatedPerson: RoasterPerson) => {
-    setError("");
+  const handleSave = async (updatedPerson: any) => {
+    setErrors({});
     
     // Client-side validation
-    if (!updatedPerson.roasterId) {
-      setError(t('admin.people.roasterRequired', 'Please select a roaster'));
-      return;
-    }
-    
     if (!updatedPerson.firstName || !updatedPerson.firstName.trim()) {
-      setError(t('admin.people.firstNameRequired', 'First name is required'));
+      setErrors({ general: t('admin.people.firstNameRequired', 'First name is required') });
       return;
     }
     
     try {
-      await apiClient.updatePerson(personId, updatedPerson);
+      // Update each roaster association
+      if (updatedPerson.associations && updatedPerson.associations.length > 0) {
+        await Promise.all(
+          updatedPerson.associations.map((association: any) =>
+            apiClient.updatePerson(association.id, {
+              firstName: updatedPerson.firstName,
+              lastName: updatedPerson.lastName,
+              title: updatedPerson.title,
+              email: updatedPerson.email,
+              mobile: updatedPerson.mobile,
+              linkedinUrl: updatedPerson.linkedinUrl,
+              bio: updatedPerson.bio,
+              roasterId: association.roasterId,
+              roles: association.roles,
+              isPrimary: association.isPrimary,
+            })
+          )
+        );
+      } else {
+        // Fallback: update just the main person record
+        await apiClient.updatePerson(personId, updatedPerson);
+      }
+      // Go back to people list after successful save
       window.location.href = "/admin/people";
     } catch (error: any) {
       const errorMessage = error?.message || "Failed to update person. Please try again.";
-      setError(errorMessage);
+      setErrors({ general: errorMessage });
     }
   };
 
@@ -91,12 +134,13 @@ const EditPersonPage: React.FC = () => {
   };
 
   const handleDelete = () => {
-    setShowDeleteConfirm(true);
+    setDeleteConfirmId(personId);
   };
 
   const confirmDelete = async () => {
+    if (!deleteConfirmId) return;
     try {
-      await apiClient.deletePerson(personId);
+      await apiClient.deletePerson(deleteConfirmId);
       window.location.href = "/admin/people";
     } catch (error) {
       alert("Failed to delete person. Please try again.");
@@ -104,11 +148,13 @@ const EditPersonPage: React.FC = () => {
   };
 
   const cancelDelete = () => {
-    setShowDeleteConfirm(false);
+    setDeleteConfirmId(null);
   };
 
-  if (loading) return <div>{t('common.loading', 'Loading...')}</div>;
-  if (!person) return <div>{t('people.noPeopleFound', 'Person not found.')}</div>;
+  if (loading) return <div className="max-w-3xl mx-auto pt-20">{t('common.loading', 'Loading...')}</div>;
+  if (personAssociations.length === 0) return <div className="max-w-3xl mx-auto pt-20">{t('people.noPeopleFound', 'Person not found.')}</div>;
+
+  const mainPerson = personAssociations[0];
 
   return (
     <div className="max-w-3xl mx-auto pt-20">
@@ -121,11 +167,12 @@ const EditPersonPage: React.FC = () => {
           {t('admin.people.title', 'Back to People')}
         </button>
       </div>
-      <div className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-8">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">{t('admin.people.editTitle', 'Edit Person')}</h1>
-        {showDeleteConfirm && (
-          <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded">
-            <div className="text-sm text-red-800 mb-3">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">{t('admin.people.editTitle', 'Edit Person')}</h1>
+      
+      <div className="w-full bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-8">
+        {deleteConfirmId && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-4 rounded">
+            <div className="text-sm text-red-800 dark:text-red-200 mb-3">
               {t('admin.people.confirmDelete', 'Are you sure you want to delete this person?')}
             </div>
             <div className="flex space-x-2">
@@ -146,12 +193,13 @@ const EditPersonPage: React.FC = () => {
         )}
         <AddPersonForm
           mode="edit"
-          initialPerson={person}
+          initialPerson={mainPerson}
           roasters={roasters}
+          roasterAssociations={personAssociations}
           onSave={handleSave}
           onCancel={handleCancel}
           onDelete={handleDelete}
-          error={error}
+          error={errors.general}
         />
       </div>
     </div>

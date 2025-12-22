@@ -266,7 +266,7 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
  *         name: status
  *         schema:
  *           type: string
- *           enum: [pending, approved, rejected, done]
+ *           enum: [pending, approved, in_progress, rejected, done]
  *         description: Filter by status
  *     responses:
  *       200:
@@ -383,7 +383,7 @@ router.get('/:id', requireAdmin, async (req: Request, res: Response) => {
  *             properties:
  *               status:
  *                 type: string
- *                 enum: [pending, approved, rejected, done]
+ *                 enum: [pending, approved, in_progress, rejected, done]
  *               adminNotes:
  *                 type: string
  *               roasterName:
@@ -445,7 +445,7 @@ router.patch('/:id', requireAdmin, async (req: Request, res: Response) => {
       submitterRole
     } = req.body;
 
-    if (!status || !['pending', 'approved', 'rejected', 'done'].includes(status)) {
+    if (!status || !['pending', 'approved', 'in_progress', 'rejected', 'done'].includes(status)) {
       return res.status(400).json({ error: 'Valid status is required' });
     }
 
@@ -560,6 +560,209 @@ router.delete('/:id', requireAdmin, async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting suggestion:', error);
     res.status(500).json({ error: 'Failed to delete suggestion' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/suggestions/{id}/create-roaster:
+ *   post:
+ *     summary: Create a roaster from a suggestion (Admin only)
+ *     tags: [Suggestions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Suggestion ID
+ *     responses:
+ *       200:
+ *         description: Roaster created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 roaster:
+ *                   $ref: '#/components/schemas/Roaster'
+ *                 contact:
+ *                   type: object
+ *                 suggestion:
+ *                   $ref: '#/components/schemas/RoasterSuggestion'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Suggestion not found
+ *       500:
+ *         description: Server error
+ */
+router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch the suggestion
+    const suggestion = await prisma.roasterSuggestion.findUnique({
+      where: { id },
+    });
+
+    if (!suggestion) {
+      return res.status(404).json({ error: 'Suggestion not found' });
+    }
+
+    // Check if a roaster was already created from this suggestion
+    if (suggestion.roasterId) {
+      return res.status(400).json({ 
+        error: 'Roaster already created from this suggestion',
+        roasterId: suggestion.roasterId
+      });
+    }
+
+    // Find or create the submitter user based on email
+    let submitterUser = await prisma.user.findUnique({
+      where: { email: suggestion.submitterEmail }
+    });
+
+    // Create the roaster
+    const roaster = await prisma.roaster.create({
+      data: {
+        name: suggestion.roasterName,
+        city: suggestion.city,
+        state: suggestion.state || undefined,
+        country: suggestion.country,
+        website: suggestion.website,
+        ownerId: submitterUser?.id,
+        createdById: (req as any).user?.id,
+        verified: false,
+        sourceType: 'Other',
+        sourceDetails: `Created from suggestion ${id}`,
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          }
+        }
+      }
+    });
+
+    // Check if a contact person with this email already exists
+    let contact;
+    let nameChanged = false;
+    const existingContact = await prisma.roasterPerson.findFirst({
+      where: { email: suggestion.submitterEmail },
+    });
+
+    if (existingContact) {
+      // Check if name is different
+      const existingName = `${existingContact.firstName} ${existingContact.lastName || ''}`.trim();
+      const newName = `${suggestion.submitterFirstName} ${suggestion.submitterLastName || ''}`.trim();
+      nameChanged = existingName.toLowerCase() !== newName.toLowerCase();
+
+      // Create a new link for this existing person to the new roaster
+      contact = await prisma.roasterPerson.create({
+        data: {
+          roasterId: roaster.id,
+          firstName: existingContact.firstName,
+          lastName: existingContact.lastName,
+          email: existingContact.email,
+          mobile: suggestion.submitterPhone || existingContact.mobile,
+          userId: submitterUser?.id || existingContact.userId,
+          roles: ['scout'],
+          isPrimary: false,
+          isActive: true,
+          createdById: (req as any).user?.id,
+        }
+      });
+    } else {
+      // Create new contact person for the roaster
+      contact = await prisma.roasterPerson.create({
+        data: {
+          roasterId: roaster.id,
+          firstName: suggestion.submitterFirstName,
+          lastName: suggestion.submitterLastName || undefined,
+          email: suggestion.submitterEmail,
+          mobile: suggestion.submitterPhone || undefined,
+          userId: submitterUser?.id,
+          roles: ['scout'],
+          isPrimary: false,
+          isActive: true,
+          createdById: (req as any).user?.id,
+        }
+      });
+    }
+
+    // Update the suggestion with the roaster ID
+    const updatedSuggestion = await prisma.roasterSuggestion.update({
+      where: { id },
+      data: {
+        roasterId: roaster.id,
+        status: 'in_progress',
+      },
+      include: {
+        roaster: true
+      }
+    });
+
+    // Log audit trails
+    await createAuditLog({
+      action: 'CREATE',
+      entityType: 'Roaster',
+      entityId: roaster.id,
+      entityName: roaster.name,
+      userId: (req as any).user?.id || null,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      newValues: roaster as Record<string, any>,
+    });
+
+    await createAuditLog({
+      action: 'CREATE',
+      entityType: 'RoasterPerson',
+      entityId: contact.id,
+      entityName: `${contact.firstName} ${contact.lastName || ''}`.trim(),
+      userId: (req as any).user?.id || null,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      newValues: contact as Record<string, any>,
+    });
+
+    await createAuditLog({
+      action: 'UPDATE',
+      entityType: 'RoasterSuggestion',
+      entityId: suggestion.id,
+      entityName: suggestion.roasterName,
+      userId: (req as any).user?.id || null,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      oldValues: suggestion as Record<string, any>,
+      newValues: updatedSuggestion as Record<string, any>,
+    });
+
+    res.json({ 
+      roaster, 
+      contact, 
+      suggestion: updatedSuggestion,
+      nameChanged: nameChanged,
+      existingContactUsed: !!existingContact
+    });
+  } catch (error: any) {
+    console.error('Error creating roaster from suggestion:', error);
+    
+    // Handle duplicate roaster name error
+    if (error.code === 'P2002' && error.meta?.target?.includes('name')) {
+      return res.status(400).json({ 
+        error: 'A roaster with this name already exists. Please modify the name before creating.' 
+      });
+    }
+    
+    res.status(500).json({ error: 'Failed to create roaster from suggestion' });
   }
 });
 

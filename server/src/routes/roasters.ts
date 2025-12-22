@@ -263,9 +263,14 @@ router.get('/', [
       }
     }
     
+    console.log('GET /api/roasters - userId:', req.userId, 'userRole:', userRole);
+    
     // Only show verified roasters to non-admin users
     if (userRole !== 'admin') {
       where.verified = true;
+      console.log('Non-admin user, filtering to verified roasters only');
+    } else {
+      console.log('Admin user, showing all roasters (verified and unverified)');
     }
     
     if (search) {
@@ -694,6 +699,13 @@ router.post('/', [
       ownerId = ownerUser.id;
     }
 
+    // Check if current user is admin to auto-verify roaster
+    const currentUser = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+    const isAdmin = currentUser?.role === 'admin';
+
     // Consolidate social network fields into socialNetworks object
     const socialKeys = ['instagram','tiktok','facebook','linkedin','youtube','threads','pinterest','bluesky','x','reddit'];
     const socialNetworks: Record<string, string> = {};
@@ -713,6 +725,7 @@ router.post('/', [
       sourceType: req.body.sourceType,
       sourceDetails: req.body.sourceDetails,
       socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined,
+      verified: isAdmin ? true : false, // Auto-verify if admin creates roaster
     };
     // Remove fields that aren't part of the Roaster schema
     delete roasterData.ownerEmail;

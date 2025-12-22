@@ -110,6 +110,8 @@ const AdminSuggestionsPage: React.FC = () => {
         return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
       case 'approved':
         return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+      case 'in_progress':
+        return 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200';
       case 'rejected':
         return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
       case 'done':
@@ -177,6 +179,16 @@ const AdminSuggestionsPage: React.FC = () => {
               }`}
             >
               {t('admin.suggestions.approved', 'Approved')}
+            </button>
+            <button
+              onClick={() => setStatusFilter('in_progress')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                statusFilter === 'in_progress'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              {t('admin.suggestions.inProgress', 'In Progress')}
             </button>
             <button
               onClick={() => setStatusFilter('rejected')}

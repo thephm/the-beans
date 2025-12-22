@@ -17,14 +17,17 @@ This project **requires Docker container restarts** for most code changes to tak
 # After making frontend changes
 docker-compose restart client
 
-# After making backend changes  
+# After making backend changes (TypeScript is recompiled on startup)
 docker-compose restart server
 
-# Start/rebuild everything
-docker-compose up --build
+# Start/rebuild everything (use --build to rebuild Docker images)
+docker-compose up --build -d
 ```
 
-**Key Point**: Never assume hot reload will work. Always restart containers after code changes.
+**Key Point**: 
+- Backend: TypeScript is automatically recompiled on container startup, so `docker-compose restart server` is sufficient
+- Frontend: Requires container restart for Next.js changes to take effect
+- Never assume hot reload will work. Always restart containers after code changes.
 
 ## Essential Commands & Database Access
 

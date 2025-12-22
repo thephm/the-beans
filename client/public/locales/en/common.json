@@ -613,7 +613,12 @@
       "saving": "Saving...",
       "cancel": "Cancel",
       "updateSuccess": "Suggestion updated successfully",
-      "updateError": "Failed to update suggestion: "
+      "updateError": "Failed to update suggestion: ",
+      "createRoaster": "Create Roaster",
+      "creating": "Creating...",
+      "createRoasterError": "Failed to create roaster: ",
+      "roasterId": "Roaster ID",
+      "editRoaster": "Edit Roaster"
     },
     "backup": {
       "title": "Backup",

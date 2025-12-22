@@ -5,9 +5,10 @@ import { PersonRole } from '../types';
 interface PersonRoleButtonsProps {
   selectedRoles: PersonRole[];
   onRoleToggle: (role: PersonRole) => void;
+  disabled?: boolean;
 }
 
-export default function PersonRoleButtons({ selectedRoles, onRoleToggle }: PersonRoleButtonsProps) {
+export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disabled = false }: PersonRoleButtonsProps) {
   const { t } = useTranslation();
   
   const roles = [
@@ -29,8 +30,9 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle }: Perso
             selectedRoles.includes(role.value) 
               ? 'bg-blue-600 text-white border-blue-600' 
               : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'
-          }`}
-          onClick={() => onRoleToggle(role.value)}
+          } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+          onClick={() => !disabled && onRoleToggle(role.value)}
+          disabled={disabled}
         >
           {role.label}
         </button>

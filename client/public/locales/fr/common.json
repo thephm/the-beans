@@ -610,7 +610,12 @@
       "saving": "Enregistrement...",
       "cancel": "Annuler",
       "updateSuccess": "Suggestion mise à jour avec succès",
-      "updateError": "Échec de la mise à jour de la suggestion : "
+      "updateError": "Échec de la mise à jour de la suggestion : ",
+      "createRoaster": "Créer un Torréfacteur",
+      "creating": "Création...",
+      "createRoasterError": "Échec de la création du torréfacteur : ",
+      "roasterId": "ID du Torréfacteur",
+      "editRoaster": "Modifier le Torréfacteur"
     },
     "backup": {
       "title": "Sauvegarde",
