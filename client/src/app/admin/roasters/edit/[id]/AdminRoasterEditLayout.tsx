@@ -47,7 +47,11 @@ export default function AdminRoasterEditLayout({ roasterName = "[Roaster Name]" 
                 >
                   <span>{section.label}</span>
                   {typeof section.count === "number" && (
-                    <span className="ml-2 bg-gray-200 dark:bg-gray-700 rounded-full px-2 py-0.5 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                      selected === section.key
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        : 'bg-blue-600 text-white'
+                    }`}>
                       {section.count}
                     </span>
                   )}

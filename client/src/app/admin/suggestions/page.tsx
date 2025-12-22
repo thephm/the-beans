@@ -29,12 +29,13 @@ interface Suggestion {
 const AdminSuggestionsPage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [allSuggestions, setAllSuggestions] = useState<Suggestion[]>([]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('pending');
+  const [statusFilter, setStatusFilter] = useState<string>('new');
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null);
 
   const fetchSuggestions = async () => {
@@ -44,10 +45,8 @@ const AdminSuggestionsPage: React.FC = () => {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
+      // Always fetch all suggestions for accurate counts
       let url = `${apiUrl}/api/suggestions`;
-      if (statusFilter !== 'all') {
-        url += `?status=${statusFilter}`;
-      }
       
       const res = await fetch(url, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
@@ -61,8 +60,14 @@ const AdminSuggestionsPage: React.FC = () => {
       
       if (!res.ok) throw new Error('Failed to fetch suggestions');
       const data = await res.json();
-      setSuggestions(data);
-      setFilteredSuggestions(data);
+      setAllSuggestions(data);
+      
+      // Filter by status locally
+      const filtered = statusFilter === 'all' 
+        ? data 
+        : data.filter((s: Suggestion) => s.status === statusFilter);
+      setSuggestions(filtered);
+      setFilteredSuggestions(filtered);
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -101,12 +106,18 @@ const AdminSuggestionsPage: React.FC = () => {
     }
   }, [statusFilter, user]);
 
+  // Calculate counts for each status from ALL suggestions
+  const getStatusCount = (status: string) => {
+    if (status === 'all') return allSuggestions.length;
+    return allSuggestions.filter(s => s.status === status).length;
+  };
+
   if (loading) return <div className="container mx-auto pt-20 sm:pt-28 px-4">{t('loading')}</div>;
   if (error) return <div className="container mx-auto pt-20 sm:pt-28 px-4 text-red-600">{t('error')}: {error}</div>;
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case 'pending':
+      case 'new':
         return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
       case 'approved':
         return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
@@ -151,64 +162,106 @@ const AdminSuggestionsPage: React.FC = () => {
           {/* Status Filter Buttons */}
           <div className="flex flex-wrap gap-2 mb-4">
             <button
-              onClick={() => setStatusFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                statusFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              {t('admin.suggestions.all', 'All')}
-            </button>
-            <button
-              onClick={() => setStatusFilter('pending')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                statusFilter === 'pending'
+              onClick={() => setStatusFilter('new')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                statusFilter === 'new'
                   ? 'bg-yellow-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
-              {t('admin.suggestions.pending', 'Pending')}
+              <span>{t('admin.suggestions.new', 'New')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                statusFilter === 'new' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-yellow-600 text-white'
+              }`}>
+                {getStatusCount('new')}
+              </span>
             </button>
             <button
               onClick={() => setStatusFilter('approved')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 statusFilter === 'approved'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
-              {t('admin.suggestions.approved', 'Approved')}
+              <span>{t('admin.suggestions.approved', 'Approved')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                statusFilter === 'approved' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-blue-600 text-white'
+              }`}>
+                {getStatusCount('approved')}
+              </span>
             </button>
             <button
               onClick={() => setStatusFilter('in_progress')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 statusFilter === 'in_progress'
                   ? 'bg-purple-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
-              {t('admin.suggestions.inProgress', 'In Progress')}
+              <span>{t('admin.suggestions.inProgress', 'In Progress')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                statusFilter === 'in_progress' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-purple-600 text-white'
+              }`}>
+                {getStatusCount('in_progress')}
+              </span>
             </button>
             <button
               onClick={() => setStatusFilter('rejected')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 statusFilter === 'rejected'
                   ? 'bg-red-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
-              {t('admin.suggestions.rejected', 'Rejected')}
+              <span>{t('admin.suggestions.rejected', 'Rejected')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                statusFilter === 'rejected' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-red-600 text-white'
+              }`}>
+                {getStatusCount('rejected')}
+              </span>
             </button>
             <button
               onClick={() => setStatusFilter('done')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 statusFilter === 'done'
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
-              {t('admin.suggestions.done', 'Done')}
+              <span>{t('admin.suggestions.done', 'Done')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                statusFilter === 'done' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-green-600 text-white'
+              }`}>
+                {getStatusCount('done')}
+              </span>
+            </button>
+            <button
+              onClick={() => setStatusFilter('all')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                statusFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span>{t('admin.suggestions.all', 'All')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                statusFilter === 'all' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-blue-600 text-white'
+              }`}>
+                {getStatusCount('all')}
+              </span>
             </button>
           </div>
 
