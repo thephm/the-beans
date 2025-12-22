@@ -69,7 +69,7 @@ const requireAdmin = async (req: any, res: any, next: any) => {
  *           type: string
  *         status:
  *           type: string
- *           enum: [pending, approved, rejected, done]
+ *           enum: [new, approved, rejected, done]
  *         adminNotes:
  *           type: string
  *         reviewedAt:
@@ -190,7 +190,7 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
         submitterFirstName,
         submitterLastName,
         submitterEmail,
-        status: 'pending',
+        status: 'new',
       },
     });
 
@@ -206,7 +206,7 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
       submitterFirstName: submitterFirstName || '',
       submitterLastName: submitterLastName || '',
       submitterEmail: submitterEmail || '',
-      status: 'pending',
+      status: 'new',
     };
 
     await createAuditLog({
@@ -266,7 +266,7 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
  *         name: status
  *         schema:
  *           type: string
- *           enum: [pending, approved, in_progress, rejected, done]
+ *           enum: [new, approved, in_progress, rejected, done]
  *         description: Filter by status
  *     responses:
  *       200:
@@ -383,7 +383,7 @@ router.get('/:id', requireAdmin, async (req: Request, res: Response) => {
  *             properties:
  *               status:
  *                 type: string
- *                 enum: [pending, approved, in_progress, rejected, done]
+ *                 enum: [new, approved, in_progress, rejected, done]
  *               adminNotes:
  *                 type: string
  *               roasterName:
@@ -445,7 +445,7 @@ router.patch('/:id', requireAdmin, async (req: Request, res: Response) => {
       submitterRole
     } = req.body;
 
-    if (!status || !['pending', 'approved', 'in_progress', 'rejected', 'done'].includes(status)) {
+    if (!status || !['new', 'approved', 'in_progress', 'rejected', 'done'].includes(status)) {
       return res.status(400).json({ error: 'Valid status is required' });
     }
 

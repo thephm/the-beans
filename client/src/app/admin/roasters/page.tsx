@@ -80,7 +80,7 @@ const AdminRoastersPage: React.FC = () => {
       const totalPages = data.pagination?.pages || 1;
       
       if (totalPages > 1) {
-        const additionalFetches = [];
+        const additionalFetches: Promise<any>[] = [];
         for (let page = 2; page <= totalPages; page++) {
           additionalFetches.push(
             fetch(`${apiUrl}/api/roasters?limit=100&page=${page}&_t=${Date.now()}`, {

@@ -41,7 +41,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   
-  const [status, setStatus] = useState<string>('pending');
+  const [status, setStatus] = useState<string>('new');
   const [adminNotes, setAdminNotes] = useState<string>('');
   const [roasterName, setRoasterName] = useState<string>('');
   const [city, setCity] = useState<string>('');
@@ -177,7 +177,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case 'pending':
+      case 'new':
         return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
       case 'approved':
         return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
@@ -390,14 +390,14 @@ const AdminSuggestionDetailPage: React.FC = () => {
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setStatus('pending')}
+                onClick={() => setStatus('new')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  status === 'pending'
+                  status === 'new'
                     ? 'bg-yellow-600 text-white'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
-                {t('admin.suggestions.pending', 'Pending')}
+                {t('admin.suggestions.new', 'New')}
               </button>
               <button
                 onClick={() => setStatus('approved')}

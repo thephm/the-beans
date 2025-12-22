@@ -353,7 +353,7 @@ model RoasterSuggestion {
   submitterLastName String?
   submitterEmail    String
   submitterPhone    String?
-  status            String   @default("pending") // pending, approved, in_progress, rejected, done
+  status            String   @default("new") // new, approved, in_progress, rejected, done
   adminNotes        String?
   roasterId         String?  // ID of the created roaster
   createdAt         DateTime @default(now())
