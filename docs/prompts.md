@@ -134354,3 +134354,199 @@ The container has been restarted and changes are now live on your local environm
 
 ## 1197th try
 
+I'll help you troubleshoot the WebDAV backup issue on Render. Let me first examine the backup route code and then check the deployment configuration. 
+
+✔ Read `server/src/routes/backup.ts`, lines 1 to 150
+
+✔ Searched for regex `WEBDAV_URL|WEBDAV_USER|WEBDAV_PASS` (`**/server/**`), 20 results
+
+✔ Read `render.yaml`, lines 1 to 100
+
+Now let me read more of the backup.ts file to see how WebDAV authentication is handled: 
+
+✔ Read `server/src/routes/backup.ts`, lines 150 to 250
+
+✔ Read `server/src/routes/backup.ts`, lines 250 to 284
+
+Now let me check the deployment documentation for environment variable configuration: 
+
+✔ Searched for regex `WEBDAV|environment variable|env var` (`**/docs/deployment/**`), 20 results
+
+✔ Searched for files matching `**/docs/admin/database-backup.md`, 1 match
+
+✔ Read `docs/admin/database-backup.md`, lines 1 to 200
+
+Now I see the issue! The error "Invalid token" from WebDAV suggests that the environment variables are properly set on Render, but there might be an authentication issue with the WebDAV credentials. Let me check if there's any documentation about Render-specific environment variable configuration and then provide you with a solution.
+
+Based on my analysis, here's what's causing the issue and how to fix it:
+
+## Problem Analysis
+
+The "Invalid token" error indicates that:
+1. The environment variables (WEBDAV_URL, WEBDAV_USER, WEBDAV_PASS) **are set** on Render (otherwise you'd get "Configuration Required")
+2. The WebDAV authentication is **failing** - likely the credentials are incorrect or need to be re-entered
+
+## Solutions
+
+### 1. **Update render.yaml to Include WebDAV Environment Variables**
+
+First, let's add the WebDAV variables to your render.yaml so they're properly configured: 
+
+`render.yaml +6 -0`
+
+### 2. **Configure Environment Variables in Render Dashboard**
+
+Now go to your Render dashboard and add these environment variables:
+
+1. **Log into Render Dashboard**: https://dashboard.render.com
+2. **Navigate to your backend service** (`the-beans-api`)
+3. **Go to Environment tab**
+4. **Add the following variables**:
+
+```
+WEBDAV_URL=https://myfiles.fastmail.com
+WEBDAV_USER=*****@ownmail.net
+WEBDAV_PASS=*****
+```
+
+**Important Notes**:
+- ⚠️ **DO NOT include quotes** around the values in Render dashboard (unlike .env files)
+- The values should be entered as plain text
+- Make sure there are no extra spaces before/after the values
+
+### 3. **Fastmail-Specific Troubleshooting**
+
+Since you're using Fastmail, the "Invalid token" error often occurs when:
+
+**Option A: Using Account Password (Not Recommended)**
+- If you're using your main Fastmail account password, this may not work with WebDAV
+- Solution: Create an **App Password** instead
+
+**Option B: App Password Issues**
+- The app password might have been regenerated or revoked
+- Solution: Generate a new app password in Fastmail
+
+### 4. **Generate New Fastmail App Password**
+
+1. Log into Fastmail
+2. Go to **Settings** → **Privacy & Security** → **App Passwords**
+3. Click **New App Password**
+4. Name it "The Beans Backup - Render"
+5. Copy the generated password
+6. Update `WEBDAV_PASS` in Render dashboard with the new app password
+
+### 5. **Verify WebDAV URL Format**
+
+Make sure your WEBDAV_URL is exactly:
+```
+https://myfiles.fastmail.com
+```
+
+**NOT**:
+- `https://myfiles.fastmail.com/` (no trailing slash)
+- `https://myfiles.fastmail.com/backups` (no subdirectory)
+
+### 6. **Trigger Redeploy**
+
+After updating the environment variables in Render:
+
+1. Go to your service in Render dashboard
+2. Click **Manual Deploy** → **Deploy latest commit**
+3. Wait for the deployment to complete
+4. Test the backup feature again
+
+### 7. **Test WebDAV Connection**
+
+Once redeployed, test the connection using the test endpoint:
+
+```bash
+# Replace with your actual Render API URL and admin JWT token
+curl -X GET https://the-beans-api.onrender.com/api/backup/test-webdav \
+  -H "Authorization: Bearer YOUR_ADMIN_JWT_TOKEN"
+```
+
+You should see:
+```json
+{
+  "success": true,
+  "message": "WebDAV connection successful",
+  "url": "https://myfiles.fastmail.com"
+}
+```
+
+---
+
+## Most Likely Fix
+
+Based on the error message, I suspect **the app password needs to be regenerated**. Here's the quickest solution:
+
+1. ✅ Generate a **new** Fastmail app password
+2. ✅ Update `WEBDAV_PASS` in Render dashboard (no quotes, plain text)
+3. ✅ Ensure `WEBDAV_URL=https://myfiles.fastmail.com` (no trailing slash)
+4. ✅ Ensure `WEBDAV_USER=*****@ownmail.net` (your full Fastmail email)
+5. ✅ Redeploy the service in Render
+6. ✅ Test again
+
+This should resolve the "Invalid token" error. Let me know if you need help with any of these steps!
+
+## Two conflicting errors when running a backup #255
+
+https://github.com/thephm/the-beans/issues/255
+
+2025-12-22
+
+> why is it showing both errors on render, it would either not be configured or not connecting but not both at the same time, see screenshot
+
+You're absolutely right! That's a logic error in the frontend - it shouldn't show both errors simultaneously. Let me find the backup page component to fix this: 
+
+✔ Searched for files matching `**/admin/**/backup**`, no matches
+
+✔ Searched for text `WebDAV Connection Failed|Invalid token|Configuration Required` (`**/client/src/**`), 3 results
+
+✔ Read `client/src/app/admin/backup/page.tsx`, lines 1 to 300
+
+Perfect! I found the issue. Look at line 275 - the configuration warning is shown whenever `testResult` is not successful, but it should ONLY show if the error is specifically about missing configuration, not for authentication failures like "Invalid token".
+
+The problem is that the backend returns different error messages:
+- **Missing config**: `"WebDAV credentials not configured"`
+- **Auth failure**: `"Invalid token"` or other WebDAV errors
+
+But the frontend treats ALL failures the same way. Let me fix this: 
+
+`page.tsx +3 -2`
+
+Now let's rebuild and restart the client container to apply the fix: 
+
+✔ `docker-compose restart client`
+
+Perfect! Now the issue is fixed. Here's what was happening and what I changed:
+
+## The Problem
+The frontend was showing **both** errors because it displayed the "Configuration Required" warning whenever ANY WebDAV test failed, regardless of the specific error type.
+
+## The Fix
+Changed the condition from:
+```tsx
+{configChecked && testResult && !testResult.success && !backupResult && (
+```
+
+To:
+```tsx
+{configChecked && testResult && !testResult.success && !backupResult && 
+ testResult.message?.toLowerCase().includes('not configured') && (
+```
+
+Now the "Configuration Required" warning **only shows** when the error message contains "not configured" (meaning the env vars are missing), not when there's an authentication failure like "Invalid token".
+
+## What This Means for Your Render Issue
+Since you're seeing "Invalid token" on Render, it confirms:
+- ✅ Environment variables **ARE set** on Render
+- ❌ The credentials are **incorrect** or the app password needs regeneration
+
+**Next steps for Render**:
+1. Generate a fresh Fastmail app password
+2. Update `WEBDAV_PASS` in Render dashboard with the new password (no quotes)
+3. Redeploy the service
+4. The UI will now correctly show only the "Invalid token" error, not the configuration warning
+
+The container has been restarted - refresh your local page and you should see the configuration warning disappear if you test the connection again.
