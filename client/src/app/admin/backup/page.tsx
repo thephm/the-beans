@@ -97,6 +97,9 @@ export default function BackupPage() {
   };
 
   const handleTestWebDAV = async () => {
+    setTestResult(null); // Clear previous result
+    setConfigChecked(false);
+    
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/api/backup/test-webdav`, {
@@ -105,7 +108,20 @@ export default function BackupPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        cache: 'no-cache', // Prevent 304 responses
       });
+
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        setTestResult({
+          success: false,
+          message: errorData.message || errorData.error || `Server error: ${response.status}`,
+          configMissing: errorData.configMissing || false,
+        });
+        setConfigChecked(true);
+        return;
+      }
 
       const data = await response.json();
       
