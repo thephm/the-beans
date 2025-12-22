@@ -96,21 +96,33 @@ router.post('/database', async (req: AuthRequest, res: Response) => {
       // Parse DATABASE_URL to extract database connection details
       const dbUrl = process.env.DATABASE_URL || '';
       
-      // Format: postgresql://user:password@host:port/database
-      const urlMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+      // Format: postgresql://user:password@host:port/database?params
+      // Handle both postgres:// and postgresql:// schemes
+      // Strip query parameters if present
+      const cleanUrl = dbUrl.split('?')[0];
+      const urlMatch = cleanUrl.match(/postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:\/]+):?(\d+)?\/(.+)/);
       
       if (!urlMatch) {
-        throw new Error('Invalid DATABASE_URL format');
+        throw new Error(`Invalid DATABASE_URL format. Expected postgresql://user:pass@host:port/db but got: ${cleanUrl.substring(0, 50)}...`);
       }
       
-      const [, dbUser, dbPassword, dbHost, dbPort, dbName] = urlMatch;
+      const [, dbUser, dbPassword, dbHost, dbPort = '5432', dbName] = urlMatch;
       
-      // Use docker exec to run pg_dump inside the database container
-      // This ensures version compatibility between pg_dump and PostgreSQL server
-      const containerName = 'the-beans-database-1';
+      // Check if we're running in Docker (local dev) or directly (production like Render)
+      const isDocker = process.env.DOCKER_ENV === 'true';
       
-      // Execute pg_dump inside the database container and redirect output to file
-      const dumpCommand = `docker exec ${containerName} pg_dump -U ${dbUser} -d ${dbName}`;
+      let dumpCommand: string;
+      if (isDocker) {
+        // Use docker exec to run pg_dump inside the database container
+        // This ensures version compatibility between pg_dump and PostgreSQL server
+        const containerName = 'the-beans-database-1';
+        dumpCommand = `docker exec ${containerName} pg_dump -U ${dbUser} -d ${dbName}`;
+      } else {
+        // Use pg_dump directly on production (Render, etc.)
+        // Set PGPASSWORD environment variable for authentication
+        dumpCommand = `PGPASSWORD="${dbPassword}" pg_dump -h ${dbHost} -p ${dbPort} -U ${dbUser} -d ${dbName} --no-password`;
+      }
+      
       const { stdout } = await execAsync(dumpCommand, { 
         maxBuffer: 50 * 1024 * 1024 // 50MB buffer for large databases
       });

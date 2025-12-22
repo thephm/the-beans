@@ -28,6 +28,7 @@ services:
       - ./server/.env
     environment:
       - NODE_ENV=development
+      - DOCKER_ENV=true
       - DATABASE_URL=postgresql://beans_user:2w3E4r%25T@database:5432/the_beans_db
       - FRONTEND_URL=http://localhost:3000
       - DB_NAME=the_beans_db
