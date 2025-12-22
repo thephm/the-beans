@@ -92,9 +92,16 @@ const AdminSuggestionsPage: React.FC = () => {
 
   // Select first suggestion by default, clear if no results
   useEffect(() => {
-    if (filteredSuggestions.length > 0 && !selectedSuggestion) {
-      setSelectedSuggestion(filteredSuggestions[0]);
-    } else if (filteredSuggestions.length === 0) {
+    if (filteredSuggestions.length > 0) {
+      // Check if current selection is still in the filtered list
+      const isCurrentSelectionInList = selectedSuggestion && 
+        filteredSuggestions.some(s => s.id === selectedSuggestion.id);
+      
+      // If not in list or no selection, select the first item
+      if (!isCurrentSelectionInList) {
+        setSelectedSuggestion(filteredSuggestions[0]);
+      }
+    } else {
       setSelectedSuggestion(null);
     }
   }, [filteredSuggestions]);

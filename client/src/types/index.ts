@@ -334,3 +334,11 @@ export interface SpecialtyListItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateRoasterFromSuggestionResponse {
+  roaster: Roaster;
+  contact: RoasterPerson;
+  suggestion: any; // RoasterSuggestion type
+  nameChanged: boolean;
+  existingContactUsed: boolean;
+}

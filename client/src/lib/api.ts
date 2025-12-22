@@ -1,3 +1,4 @@
+import { CreateRoasterFromSuggestionResponse } from '../types';
 
 // Determine API base URL with fallback for production
 const getApiBaseUrl = () => {
@@ -313,10 +314,10 @@ class ApiClient {
     });
   }
 
-  async createRoasterFromSuggestion(id: string) {
+  async createRoasterFromSuggestion(id: string): Promise<CreateRoasterFromSuggestionResponse> {
     return this.request(`/suggestions/${id}/create-roaster`, {
       method: 'POST',
-    });
+    }) as Promise<CreateRoasterFromSuggestionResponse>;
   }
 }
 
