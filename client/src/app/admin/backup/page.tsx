@@ -15,11 +15,17 @@ interface BackupResult {
   filename?: string;
 }
 
+interface TestResult {
+  success: boolean;
+  message?: string;
+  configMissing?: boolean;
+}
+
 export default function BackupPage() {
   const { t } = useTranslation();
   const [isBackupRunning, setIsBackupRunning] = useState(false);
   const [backupResult, setBackupResult] = useState<BackupResult | null>(null);
-  const [testResult, setTestResult] = useState<{ success: boolean; message?: string } | null>(null);
+  const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [configChecked, setConfigChecked] = useState(false);
 
   // Check WebDAV configuration on page load
@@ -87,20 +93,18 @@ export default function BackupPage() {
 
       const data = await response.json();
       
-      // Ensure data has proper structure
-      if (!data.success && !data.message) {
-        setTestResult({
-          success: false,
-          message: data.error || 'WebDAV test failed',
-        });
-      } else {
-        setTestResult(data);
-      }
+      // Store result with configMissing flag
+      setTestResult({
+        success: data.success || false,
+        message: data.message || data.error || 'WebDAV test failed',
+        configMissing: data.configMissing || false,
+      });
       setConfigChecked(true);
     } catch (error: any) {
       setTestResult({
         success: false,
         message: error.message || 'Failed to connect to server',
+        configMissing: false,
       });
       setConfigChecked(true);
     }
@@ -268,10 +272,9 @@ export default function BackupPage() {
         </div>
       )}
 
-      {/* Only show configuration warning if WebDAV credentials are specifically not configured */}
-      {configChecked && testResult && !testResult.success && !backupResult && 
-       testResult.message?.toLowerCase().includes('not configured') && (
-        <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+      {/* Only show configuration warning if WebDAV credentials are missing */}
+      {configChecked && testResult && !testResult.success && testResult.configMissing && !backupResult && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg shadow-md p-6 mb-6">
           <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
             ⚠️ {t('admin.backup.configuration', 'Configuration Required')}
           </h3>
