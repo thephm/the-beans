@@ -149,10 +149,18 @@ router.post('/database', async (req: AuthRequest, res: Response) => {
       // Using eval to prevent TypeScript from converting import() to require()
       const webdavModule = await (eval('import("webdav")') as Promise<any>);
       const createClient = webdavModule.createClient;
+      const { AuthType } = webdavModule;
+      
+      // Create auth token manually to ensure proper encoding
+      const authToken = Buffer.from(`${webdavUser}:${webdavPass}`).toString('base64');
       
       const client = createClient(webdavUrl, {
         username: webdavUser,
         password: webdavPass,
+        authType: AuthType.Password,
+        headers: {
+          'Authorization': `Basic ${authToken}`
+        }
       });
 
       // Read the backup file
@@ -204,6 +212,57 @@ router.post('/database', async (req: AuthRequest, res: Response) => {
 
 /**
  * @swagger
+ * /api/backup/debug-webdav:
+ *   get:
+ *     summary: Debug WebDAV configuration
+ *     description: Shows WebDAV environment variable status (NOT the actual values). Admin only.
+ *     tags: [Backup]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Configuration status
+ *       403:
+ *         description: Admin access required
+ */
+router.get('/debug-webdav', async (req: AuthRequest, res: Response) => {
+  try {
+    // Check if user is admin
+    const user = req.user;
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const webdavUrl = process.env.WEBDAV_URL;
+    const webdavUser = process.env.WEBDAV_USER;
+    const webdavPass = process.env.WEBDAV_PASS;
+
+    res.json({
+      urlConfigured: !!webdavUrl,
+      urlLength: webdavUrl?.length || 0,
+      urlHasTrailingSlash: webdavUrl?.endsWith('/'),
+      urlPreview: webdavUrl ? `${webdavUrl.substring(0, 20)}...` : 'NOT SET',
+      userConfigured: !!webdavUser,
+      userLength: webdavUser?.length || 0,
+      userHasSpaces: webdavUser ? /\s/.test(webdavUser) : false,
+      userPreview: webdavUser ? `${webdavUser.substring(0, 5)}...@...` : 'NOT SET',
+      passConfigured: !!webdavPass,
+      passLength: webdavPass?.length || 0,
+      passHasSpaces: webdavPass ? /\s/.test(webdavPass) : false,
+      passFirstChar: webdavPass ? webdavPass[0] : 'NOT SET',
+      passLastChar: webdavPass ? webdavPass[webdavPass.length - 1] : 'NOT SET',
+      passHasSpecialChars: webdavPass ? /[^a-zA-Z0-9]/.test(webdavPass) : false,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Debug failed',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * @swagger
  * /api/backup/test-webdav:
  *   get:
  *     summary: Test WebDAV connection
@@ -245,10 +304,18 @@ router.get('/test-webdav', async (req: AuthRequest, res: Response) => {
     // Using eval to prevent TypeScript from converting import() to require()
     const webdavModule = await (eval('import("webdav")') as Promise<any>);
     const createClient = webdavModule.createClient;
+    const { AuthType } = webdavModule;
+    
+    // Create auth token manually to ensure proper encoding
+    const authToken = Buffer.from(`${webdavUser}:${webdavPass}`).toString('base64');
     
     const client = createClient(webdavUrl, {
       username: webdavUser,
       password: webdavPass,
+      authType: AuthType.Password,
+      headers: {
+        'Authorization': `Basic ${authToken}`
+      }
     });
 
     // Test connection and ensure /backups directory exists
