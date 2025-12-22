@@ -21,6 +21,7 @@ interface Suggestion {
   submitterPhone?: string;
   status: string;
   adminNotes?: string;
+  roasterId?: string;
   createdAt: string;
   updatedAt: string;
   reviewedAt?: string;
@@ -38,6 +39,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [creating, setCreating] = useState(false);
   
   const [status, setStatus] = useState<string>('pending');
   const [adminNotes, setAdminNotes] = useState<string>('');
@@ -114,6 +116,36 @@ const AdminSuggestionDetailPage: React.FC = () => {
     }
   };
 
+  const handleCreateRoaster = async () => {
+    if (!suggestion) return;
+    
+    setCreating(true);
+    setError(null);
+    
+    try {
+      const response = await apiClient.createRoasterFromSuggestion(suggestionId);
+      const roasterId = response.roaster?.id;
+      
+      // Check for name differences
+      if (response.existingContactUsed && response.nameChanged) {
+        alert(t('admin.suggestions.nameWarning', 'Warning: Contact with this email already exists with a different name. Using existing contact details.'));
+      }
+      
+      if (roasterId) {
+        // Update local state with the roaster ID
+        setSuggestion(prev => prev ? { ...prev, roasterId } : null);
+        
+        // Navigate to the roaster edit page
+        router.push(`/admin/roasters/edit/${roasterId}`);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Unknown error');
+      alert(t('admin.suggestions.createRoasterError', 'Failed to create roaster: ') + (err.message || 'Unknown error'));
+    } finally {
+      setCreating(false);
+    }
+  };
+
   useEffect(() => {
     // Only fetch if user is admin
     if (suggestionId && user?.role === 'admin') {
@@ -149,6 +181,8 @@ const AdminSuggestionDetailPage: React.FC = () => {
         return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
       case 'approved':
         return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+      case 'in_progress':
+        return 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200';
       case 'rejected':
         return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
       case 'done':
@@ -184,9 +218,39 @@ const AdminSuggestionDetailPage: React.FC = () => {
 
       {/* Suggestion Details */}
       <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          {t('admin.suggestions.roasterInformation', 'Roaster Information')}
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            {t('admin.suggestions.roasterInformation', 'Roaster Information')}
+          </h2>
+          {!suggestion.roasterId && (
+            <button
+              onClick={handleCreateRoaster}
+              disabled={creating}
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {creating ? t('admin.suggestions.creating', 'Creating...') : t('admin.suggestions.createRoaster', 'Create Roaster')}
+            </button>
+          )}
+        </div>
+        
+        {suggestion.roasterId && (
+          <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t('admin.suggestions.roasterId', 'Roaster ID')}
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-mono text-sm">
+                {suggestion.roasterId}
+              </div>
+              <button
+                onClick={() => router.push(`/admin/roasters/edit/${suggestion.roasterId}`)}
+                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {t('admin.suggestions.editRoaster', 'Edit Roaster')}
+              </button>
+            </div>
+          </div>
+        )}
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <div className="lg:col-span-3">
@@ -344,6 +408,16 @@ const AdminSuggestionDetailPage: React.FC = () => {
                 }`}
               >
                 {t('admin.suggestions.approved', 'Approved')}
+              </button>
+              <button
+                onClick={() => setStatus('in_progress')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  status === 'in_progress'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                {t('admin.suggestions.inProgress', 'In Progress')}
               </button>
               <button
                 onClick={() => setStatus('rejected')}

@@ -9,6 +9,7 @@ import PersonRoleButtons from './PersonRoleButtons';
 interface AddPersonFormProps {
   roasters?: Roaster[];
   roasterId?: string; // If provided, roaster selector is hidden and this is used
+  roasterAssociations?: any[]; // List of roaster associations for this person
   onSave: (person: any) => void;
   onCancel: () => void;
   onDelete?: () => void;
@@ -17,7 +18,7 @@ interface AddPersonFormProps {
   error?: string;
 }
 
-export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, onDelete, mode = 'add', initialPerson, error }: AddPersonFormProps) {
+export default function AddPersonForm({ roasters, roasterId, roasterAssociations, onSave, onCancel, onDelete, mode = 'add', initialPerson, error }: AddPersonFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [form, setForm] = useState({
@@ -32,6 +33,17 @@ export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, o
     roasterId: roasterId || initialPerson?.roasterId || '',
     isPrimary: initialPerson?.isPrimary || false,
   });
+
+  // State for managing editable roaster associations
+  const [editableAssociations, setEditableAssociations] = useState<any[]>(
+    roasterAssociations || []
+  );
+
+  useEffect(() => {
+    if (roasterAssociations) {
+      setEditableAssociations(roasterAssociations);
+    }
+  }, [roasterAssociations]);
 
   useEffect(() => {
     if (initialPerson) {
@@ -61,9 +73,34 @@ export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, o
         : [...f.roles, role as PersonRole],
     }));
   };
+
+  // Handlers for editing roaster associations
+  const handleAssociationChange = (index: number, field: string, value: any) => {
+    setEditableAssociations(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleAssociationRoleToggle = (index: number, role: PersonRole) => {
+    setEditableAssociations(prev => {
+      const updated = [...prev];
+      const currentRoles = updated[index].roles || [];
+      updated[index] = {
+        ...updated[index],
+        roles: currentRoles.includes(role)
+          ? currentRoles.filter((r: PersonRole) => r !== role)
+          : [...currentRoles, role],
+      };
+      return updated;
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(form);
+    // Include updated associations in the save
+    onSave({ ...form, associations: editableAssociations });
   };
   return (
     <div>
@@ -116,46 +153,95 @@ export default function AddPersonForm({ roasters, roasterId, onSave, onCancel, o
           <input type="url" placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')} value={form.linkedinUrl} onChange={e => handleChange('linkedinUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
         </div>
 
-        {/* Roaster, Primary, and Role - grouped in a frame */}
-        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+        {/* Roaster associations - stacked */}
+        {editableAssociations && editableAssociations.length > 0 ? (
           <div className="space-y-4">
-            {/* Roaster and Primary */}
-            <div className="flex flex-col sm:flex-row items-end gap-4">
-              {!roasterId && roasters && (
-                <div className="flex-1 w-full">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
-                    <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
-                    {safeRoasters.map(roaster => (
-                      <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-                    ))}
-                  </select>
+            {editableAssociations.map((association, index) => (
+              <div key={association.id} className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                <div className="space-y-4">
+                  {/* Roaster and Primary */}
+                  <div className="flex flex-col sm:flex-row items-end gap-4">
+                    <div className="flex-1 w-full">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
+                      <select 
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" 
+                        value={association.roasterId}
+                        onChange={e => handleAssociationChange(index, 'roasterId', e.target.value)}
+                      >
+                        <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
+                        {safeRoasters.map(roaster => (
+                          <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="w-full sm:w-auto">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.primaryContact', 'Primary Contact')}</label>
+                      <button
+                        type="button"
+                        className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${association.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                        onClick={() => handleAssociationChange(index, 'isPrimary', !association.isPrimary)}
+                      >
+                        {association.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Role */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {t('admin.people.role', 'Role')}
+                    </label>
+                    <PersonRoleButtons 
+                      selectedRoles={association.roles || []} 
+                      onRoleToggle={(role) => handleAssociationRoleToggle(index, role)}
+                    />
+                  </div>
                 </div>
-              )}
-              <div className={`w-full ${!roasterId && roasters ? 'sm:w-auto' : ''}`}>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.primaryContact', 'Primary Contact')}</label>
-                <button
-                  type="button"
-                  className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700'}`}
-                  onClick={() => handleChange('isPrimary', !form.isPrimary)}
-                >
-                  {form.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
-                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Single Roaster Selection for Add Mode or No Associations */
+          <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+            <div className="space-y-4">
+              {/* Roaster and Primary */}
+              <div className="flex flex-col sm:flex-row items-end gap-4">
+                {!roasterId && roasters && (
+                  <div className="flex-1 w-full">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
+                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
+                      <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
+                      {safeRoasters.map(roaster => (
+                        <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <div className={`w-full ${!roasterId && roasters ? 'sm:w-auto' : ''}`}>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.primaryContact', 'Primary Contact')}</label>
+                  <button
+                    type="button"
+                    className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                    onClick={() => handleChange('isPrimary', !form.isPrimary)}
+                  >
+                    {form.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                  </button>
+                </div>
+              </div>
+
+              {/* Role */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t('admin.people.role', 'Role')}
+                </label>
+                <PersonRoleButtons 
+                  selectedRoles={form.roles} 
+                  onRoleToggle={handleRoleToggle} 
+                />
               </div>
             </div>
-
-            {/* Role */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('admin.people.role', 'Role')}
-              </label>
-              <PersonRoleButtons 
-                selectedRoles={form.roles} 
-                onRoleToggle={handleRoleToggle} 
-              />
-            </div>
           </div>
-        </div>
+        )}
 
         {/* Bio - full width, moved below roaster section */}
         <div>

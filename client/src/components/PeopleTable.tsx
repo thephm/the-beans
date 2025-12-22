@@ -10,99 +10,41 @@ export default function PeopleTable() {
   const { t } = useTranslation();
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [roasters, setRoasters] = useState<Roaster[]>([]);
-  const [selectedRoasterId, setSelectedRoasterId] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
-  const [allPeopleCount, setAllPeopleCount] = useState<number>(0); // filtered count
-  const [totalAcrossAllRoasters, setTotalAcrossAllRoasters] = useState<number>(0); // always total
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredPeople, setFilteredPeople] = useState<RoasterPerson[]>([]);
 
   useEffect(() => {
-    async function fetchRoasters() {
+    async function fetchRoastersAndPeople() {
       setLoading(true);
       try {
-        const roastersData = await apiClient.getRoasters();
+        // Fetch all roasters (including unverified) - backend max limit is 100
+        const roastersData = await apiClient.getRoasters({ limit: 100 });
         const roastersList = (roastersData && Array.isArray((roastersData as any).roasters)) ? (roastersData as any).roasters : [];
-        // Sort roasters alphabetically by name
-        const sortedRoasters = roastersList.sort((a: Roaster, b: Roaster) => 
-          a.name.localeCompare(b.name)
-        );
-        setRoasters(sortedRoasters);
-      } finally {
-        setLoading(false);
-    }
-    }
-    fetchRoasters();
-  }, []);
+        console.log('Fetched roasters:', roastersList.length);
+        setRoasters(roastersList);
 
-  useEffect(() => {
-    async function fetchPeople() {
-      setLoading(true);
-      try {
-        // Always calculate total across all roasters
-        let totalAll = 0;
-        for (const roaster of Array.isArray(roasters) ? roasters : []) {
-          try {
-            const result = await apiClient.getPeopleForRoaster(roaster.id);
-            let count = 0;
-            if (result && typeof result === 'object' && 'count' in result) {
-              count = Number((result as any).count);
-            } else if (Array.isArray(result)) {
-              count = result.length;
-            } else if (result && Array.isArray((result as any).data)) {
-              count = (result as any).count || (result as any).data.length;
-            }
-            totalAll += count;
-          } catch (err) {
-            // Ignore errors for individual roasters
-          }
-        }
-        setTotalAcrossAllRoasters(totalAll);
-
-        if (selectedRoasterId === 'all') {
-          // Fetch people for all roasters and combine
-          const allPeople: RoasterPerson[] = [];
-          for (const roaster of Array.isArray(roasters) ? roasters : []) {
-            try {
-              const result = await apiClient.getPeopleForRoaster(roaster.id);
-              if (result && Array.isArray((result as any).data)) {
-                allPeople.push(...(result as any).data);
-              } else if (Array.isArray(result)) {
-                allPeople.push(...result);
-              }
-            } catch (err) {
-              // Ignore errors for individual roasters
-            }
-          }
-          setPeople(allPeople);
-          setAllPeopleCount(allPeople.length);
-        } else {
-          const result = await apiClient.getPeopleForRoaster(selectedRoasterId);
-          if (result && Array.isArray((result as any).data)) {
-            setPeople((result as any).data);
-            setAllPeopleCount((result as any).data.length);
-          } else if (Array.isArray(result)) {
-            setPeople(result);
-            setAllPeopleCount(result.length);
-          } else {
-            setPeople([]);
-            setAllPeopleCount(0);
-          }
-        }
+        // Fetch all people in a single request (admin endpoint)
+        const peopleData = await apiClient.getPeople();
+        const allPeople = (peopleData && Array.isArray((peopleData as any).data)) ? (peopleData as any).data : [];
+        
+        console.log('Total people fetched:', allPeople.length);
+        // Sort people alphabetically by first name, then last name
+        allPeople.sort((a: RoasterPerson, b: RoasterPerson) => {
+          const nameA = `${a.firstName} ${a.lastName || ''}`.trim().toLowerCase();
+          const nameB = `${b.firstName} ${b.lastName || ''}`.trim().toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+        setPeople(allPeople);
       } catch (err) {
+        console.error('Error fetching roasters and people:', err);
         setPeople([]);
-        setAllPeopleCount(0);
-        setTotalAcrossAllRoasters(0);
       } finally {
         setLoading(false);
       }
     }
-    fetchPeople();
-  }, [selectedRoasterId, roasters]);
-
-  const handleRoasterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedRoasterId(e.target.value);
-  }
+    fetchRoastersAndPeople();
+  }, []);
 
   // Filter people based on search term
   useEffect(() => {
@@ -169,27 +111,11 @@ export default function PeopleTable() {
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 mb-4">
-        {/* Roaster dropdown */}
-        <div className="flex items-center">
-          <label htmlFor="roaster-select" className="mr-2 font-medium text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roaster')}:</label>
-          <select
-            id="roaster-select"
-            value={selectedRoasterId}
-            onChange={handleRoasterChange}
-            className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            <option value="all">{t('admin.people.allRoasters', 'All roasters')}</option>
-            {roasters.map(roaster => (
-              <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-            ))}
-          </select>
-        </div>
-        
         {/* Person count */}
-        <span className="text-gray-500 dark:text-gray-400 text-sm sm:ml-6">
+        <span className="text-gray-500 dark:text-gray-400 text-sm">
           {filteredPeople.length === people.length 
-            ? `${filteredPeople.length} ${t('admin.people.of', 'of')} ${totalAcrossAllRoasters} ${t('admin.people.title', 'People')}`
-            : `${filteredPeople.length} ${t('admin.people.of', 'of')} ${people.length} ${t('admin.people.title', 'People')} (${totalAcrossAllRoasters} ${t('admin.people.total', 'total')})`
+            ? `${filteredPeople.length} ${t('admin.people.title', 'People')}`
+            : `${filteredPeople.length} ${t('admin.people.of', 'of')} ${people.length} ${t('admin.people.title', 'People')}`
           }
         </span>
         
@@ -259,6 +185,12 @@ export default function PeopleTable() {
                       >
                         {person.roaster.name}
                       </a>
+                      {/* Show if person has same email in multiple roasters */}
+                      {person.email && people.filter(p => p.email === person.email && p.id !== person.id).length > 0 && (
+                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                          (+{people.filter(p => p.email === person.email && p.id !== person.id).length} more)
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}
@@ -331,12 +263,20 @@ export default function PeopleTable() {
                     </td>
                     <td className="px-8 py-2 border-b border-gray-200 dark:border-gray-700">
                       {person.roaster ? (
-                        <a
-                          href={`/admin/roasters/edit/${person.roaster.id}`}
-                          className="text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 underline cursor-pointer"
-                        >
-                          {person.roaster.name}
-                        </a>
+                        <div>
+                          <a
+                            href={`/admin/roasters/edit/${person.roaster.id}`}
+                            className="text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 underline cursor-pointer"
+                          >
+                            {person.roaster.name}
+                          </a>
+                          {/* Show if person has same email in multiple roasters */}
+                          {person.email && people.filter(p => p.email === person.email && p.id !== person.id).length > 0 && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              +{people.filter(p => p.email === person.email && p.id !== person.id).length} more roaster(s)
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-gray-400 dark:text-gray-500">-</span>
                       )}

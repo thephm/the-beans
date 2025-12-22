@@ -329,7 +329,6 @@ export default function RoasterDetail() {
       }
     } catch (err) {
       // User cancelled the share or an error occurred
-      console.log('Share cancelled or failed:', err)
     }
   }
 

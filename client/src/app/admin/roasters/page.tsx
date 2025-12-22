@@ -61,15 +61,45 @@ const AdminRoastersPage: React.FC = () => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/roasters`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      
+      // Fetch all roasters by requesting with max limit
+      const res = await fetch(`${apiUrl}/api/roasters?limit=100&_t=${Date.now()}`, {
+        headers: token ? { 
+          'Authorization': `Bearer ${token}`,
+        } : {},
       });
+      
+      if (!res.ok) {
+        throw new Error(`API returned ${res.status}: ${res.statusText}`);
+      }
+      
       const data = await res.json();
-      const sortedRoasters = (data.roasters || []).sort((a: Roaster, b: Roaster) => 
+      
+      // If there are more pages, fetch them all
+      let allRoasters = data.roasters || [];
+      const totalPages = data.pagination?.pages || 1;
+      
+      if (totalPages > 1) {
+        const additionalFetches = [];
+        for (let page = 2; page <= totalPages; page++) {
+          additionalFetches.push(
+            fetch(`${apiUrl}/api/roasters?limit=100&page=${page}&_t=${Date.now()}`, {
+              headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            }).then(r => r.json())
+          );
+        }
+        const additionalPages = await Promise.all(additionalFetches);
+        additionalPages.forEach(pageData => {
+          allRoasters = [...allRoasters, ...(pageData.roasters || [])];
+        });
+      }
+      
+      const sortedRoasters = allRoasters.sort((a: Roaster, b: Roaster) => 
         a.name.localeCompare(b.name)
       );
       setRoasters(sortedRoasters);
     } catch (err: any) {
+      console.error('Fetch roasters error:', err);
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
@@ -276,10 +306,30 @@ interface RoasterFormProps {
 }
 
 const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel }) => {
+  // Fetch suggestions for this roaster
+  const fetchSuggestions = async () => {
+    if (!roaster?.id) return;
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/suggestions`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const allSuggestions = await res.json();
+        const roasterSuggestions = allSuggestions.filter((s: any) => s.roasterId === roaster.id);
+        setSuggestions(roasterSuggestions);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  };
+
   // Fetch and set selected source countries when editing a roaster
   useEffect(() => {
     if (roaster?.id) {
       fetchSourceCountries();
+      fetchSuggestions();
     }
   }, [roaster?.id]);
   // Fetch available countries when form mounts
@@ -470,6 +520,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [countriesLoading, setCountriesLoading] = useState(false);
   const [sourceCountriesExpanded, setSourceCountriesExpanded] = useState(false);
+  
+  // Suggestions state
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   
   // Section expand/collapse state
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
@@ -1208,6 +1261,26 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
+                  {roaster?.id && suggestions.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {t('adminForms.roasters.suggestions', 'Suggestions')}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {suggestions.map((suggestion) => (
+                          <a
+                            key={suggestion.id}
+                            href={`/admin/suggestions/${suggestion.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-3 py-1 text-sm font-mono bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                          >
+                            {suggestion.id.substring(0, 8)}...
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
             </div>

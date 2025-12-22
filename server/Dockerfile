@@ -29,8 +29,6 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Build TypeScript before starting
-RUN npm run build
-
-# Start production server with Prisma migration
-CMD ["sh", "-c", "sleep 10 && npx prisma migrate deploy && npm start"]
+# Build TypeScript at startup to always use fresh code
+# This ensures changes are compiled even if Docker cache is used
+CMD ["sh", "-c", "sleep 10 && npx prisma migrate deploy && npm run build && npm start"]

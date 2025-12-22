@@ -82,6 +82,62 @@ async function canManagePeople(userId: string, roasterId: string): Promise<boole
   }
 }
 
+// GET /api/people - Get all people (admin only, for people management page)
+router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    // Only admin users can get all people
+    const userId = req.user?.id;
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (user?.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Get all people across all roasters
+    const people = await prisma.roasterPerson.findMany({
+      where: {
+        isActive: true
+      },
+      include: {
+        roaster: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true
+          }
+        }
+      },
+      orderBy: [
+        { firstName: 'asc' },
+        { lastName: 'asc' }
+      ]
+    });
+
+    // Add permissions to each person
+    const peopleWithPermissions = people.map((person: any) => ({
+      ...person,
+      permissions: getPersonPermissions(person.roles)
+    }));
+
+    res.json({
+      data: peopleWithPermissions,
+      count: people.length
+    });
+
+  } catch (error) {
+    console.error('Get all people error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/people/:id - Get a single person by ID
 router.get('/:id', [
   param('id').isString().notEmpty().withMessage('Person ID is required')
@@ -187,6 +243,61 @@ router.get('/roaster/:roasterId', [
 
   } catch (error) {
     console.error('Get people error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/people/email/:email - Get all roaster associations for a person by email
+router.get('/email/:email', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { email } = req.params;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find all people with this email across all roasters
+    const people = await prisma.roasterPerson.findMany({
+      where: {
+        email: {
+          equals: email,
+          mode: 'insensitive'
+        }
+      },
+      include: {
+        roaster: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true
+          }
+        }
+      },
+      orderBy: {
+        roaster: {
+          name: 'asc'
+        }
+      }
+    });
+
+    const peopleWithPermissions = people.map(person => ({
+      ...person,
+      permissions: getPersonPermissions(person.roles)
+    }));
+
+    res.json({
+      data: peopleWithPermissions,
+      count: people.length
+    });
+
+  } catch (error) {
+    console.error('Get people by email error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

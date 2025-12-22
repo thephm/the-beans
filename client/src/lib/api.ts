@@ -54,6 +54,10 @@ class ApiClient {
     return this.request(`/people/${id}`);
   }
 
+  async getPeopleByEmail(email: string) {
+    return this.request(`/people/email/${encodeURIComponent(email)}`);
+  }
+
   async createPerson(personData: any) {
     return this.request('/people', {
       method: 'POST',
@@ -306,6 +310,12 @@ class ApiClient {
     return this.request(`/suggestions/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
+    });
+  }
+
+  async createRoasterFromSuggestion(id: string) {
+    return this.request(`/suggestions/${id}/create-roaster`, {
+      method: 'POST',
     });
   }
 }
