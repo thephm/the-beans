@@ -157,3 +157,5 @@ uploads/
 test.json
 failed_posts*
 test-image.txt
+
+docs/prompts.md

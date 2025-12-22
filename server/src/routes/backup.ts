@@ -231,10 +231,13 @@ router.get('/test-webdav', async (req: AuthRequest, res: Response) => {
     const webdavUser = process.env.WEBDAV_USER;
     const webdavPass = process.env.WEBDAV_PASS;
 
+    // Check configuration first - return 400 for missing config
     if (!webdavUrl || !webdavUser || !webdavPass) {
-      return res.status(500).json({
+      return res.status(400).json({
         success: false,
-        error: 'WebDAV credentials not configured',
+        error: 'Configuration missing',
+        message: 'WebDAV credentials not configured (WEBDAV_URL, WEBDAV_USER, WEBDAV_PASS required)',
+        configMissing: true,
       });
     }
 
@@ -272,10 +275,12 @@ router.get('/test-webdav', async (req: AuthRequest, res: Response) => {
       url: webdavUrl,
     });
   } catch (error: any) {
+    // Connection errors are 500, but with clear structure
     res.status(500).json({
       success: false,
       error: 'WebDAV connection failed',
       message: error.message,
+      configMissing: false,
     });
   }
 });
