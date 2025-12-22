@@ -61,6 +61,12 @@ services:
         sync: false # Set to your SMTP username
       - key: SMTP_PASS
         sync: false # Set to your SMTP password or app password
+      - key: WEBDAV_URL
+        sync: false # Set to your WebDAV server URL (e.g., https://myfiles.fastmail.com)
+      - key: WEBDAV_USER
+        sync: false # Set to your WebDAV username
+      - key: WEBDAV_PASS
+        sync: false # Set to your WebDAV password or app password
     autoDeploy: true
     
   # Frontend Web Service (Next.js)
