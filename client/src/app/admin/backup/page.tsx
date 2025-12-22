@@ -3,6 +3,22 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+// Determine API base URL with fallback for production
+const getApiBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://the-beans-api.onrender.com';
+  }
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return 'https://the-beans-api.onrender.com';
+  }
+  return 'http://localhost:5000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
 interface BackupStep {
   step: string;
   status: 'pending' | 'in-progress' | 'success' | 'error';
@@ -39,7 +55,7 @@ export default function BackupPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/backup/database', {
+      const response = await fetch(`${API_BASE_URL}/api/backup/database`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +99,7 @@ export default function BackupPage() {
   const handleTestWebDAV = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/backup/test-webdav', {
+      const response = await fetch(`${API_BASE_URL}/api/backup/test-webdav`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

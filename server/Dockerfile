@@ -29,7 +29,6 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-
 # Build TypeScript before starting
 RUN npm run build
 
