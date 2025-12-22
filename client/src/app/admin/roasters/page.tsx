@@ -30,6 +30,8 @@ const AdminRoastersPage: React.FC = () => {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('verified');
+  const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
 
   // person management state
   const [people, setPeople] = useState<RoasterPerson[]>([]);
@@ -121,6 +123,18 @@ const AdminRoastersPage: React.FC = () => {
     router.push('/admin/roasters');
   };
 
+  // Calculate counts for filters
+  const getVerifiedCount = (type: 'all' | 'verified' | 'unverified') => {
+    if (type === 'all') return roasters.length;
+    if (type === 'verified') return roasters.filter(r => r.verified).length;
+    return roasters.filter(r => !r.verified).length;
+  };
+
+  const getFeaturedCount = (type: 'all' | 'featured') => {
+    if (type === 'all') return roasters.length;
+    return roasters.filter(r => r.featured).length;
+  };
+
   if (editingId || showAddForm) {
     const roaster = editingId ? roasters.find(r => r.id === editingId) : undefined;
     return <RoasterForm roaster={roaster} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
@@ -130,15 +144,26 @@ const AdminRoastersPage: React.FC = () => {
 
   // ...existing code...
   const filteredRoasters = roasters.filter(roaster => {
-    if (!searchQuery.trim()) return true;
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = (
+        roaster.name.toLowerCase().includes(query) ||
+        roaster.description?.toLowerCase().includes(query) ||
+        roaster.city?.toLowerCase().includes(query) ||
+        roaster.country?.toLowerCase().includes(query)
+      );
+      if (!matchesSearch) return false;
+    }
     
-    const query = searchQuery.toLowerCase();
-    return (
-      roaster.name.toLowerCase().includes(query) ||
-      roaster.description?.toLowerCase().includes(query) ||
-      roaster.city?.toLowerCase().includes(query) ||
-      roaster.country?.toLowerCase().includes(query)
-    );
+    // Apply verified filter
+    if (verifiedFilter === 'verified' && !roaster.verified) return false;
+    if (verifiedFilter === 'unverified' && roaster.verified) return false;
+    
+    // Apply featured filter
+    if (featuredFilter === 'featured' && !roaster.featured) return false;
+    
+    return true;
   });
 
   // Render the list of roasters
@@ -154,47 +179,113 @@ const AdminRoastersPage: React.FC = () => {
         </button>
       </div>
       
-      {/* Search bar */}
+      {/* Search bar and Filter Buttons */}
       <div className="mb-6 max-w-6xl mx-auto">
-        <div className="relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
-            className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-          />
-          <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-              aria-label={t('common.clear', 'Clear')}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <div className="flex flex-col lg:flex-row gap-3">
+          {/* Search Input */}
+          <div className="flex-1 lg:max-w-md">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
+                className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+              />
+              <svg
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                  aria-label={t('common.clear', 'Clear')}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-2">
+            {/* Verified Filters */}
+            <button
+              onClick={() => setVerifiedFilter('verified')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                verifiedFilter === 'verified'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span>{t('adminForms.roasters.verified', 'Verified')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                verifiedFilter === 'verified' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-green-600 text-white'
+              }`}>
+                {getVerifiedCount('verified')}
+              </span>
             </button>
-          )}
+            <button
+              onClick={() => setVerifiedFilter('unverified')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                verifiedFilter === 'unverified'
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span>{t('admin.roasters.unverified', 'Unverified')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                verifiedFilter === 'unverified' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-orange-600 text-white'
+              }`}>
+                {getVerifiedCount('unverified')}
+              </span>
+            </button>
+            
+            {/* Featured Filter */}
+            <button
+              onClick={() => setFeaturedFilter(featuredFilter === 'featured' ? 'all' : 'featured')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                featuredFilter === 'featured'
+                  ? 'bg-yellow-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span>{t('adminForms.roasters.featured', 'Featured')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                featuredFilter === 'featured' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-yellow-600 text-white'
+              }`}>
+                {getFeaturedCount('featured')}
+              </span>
+            </button>
+          </div>
         </div>
+
+        {/* Search Results Count */}
         {searchQuery && (
           <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {t('admin.roasters.searchResults', 'Found {{count}} roaster(s)', { count: filteredRoasters.length })}
           </div>
         )}
       </div>
+
       <div className="max-w-6xl mx-auto">
         {filteredRoasters.length === 0 ? (
           <div className="text-gray-500 dark:text-gray-400 text-center py-12">

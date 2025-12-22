@@ -139,6 +139,23 @@ const AdminSuggestionsPage: React.FC = () => {
     }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'new':
+        return t('admin.suggestions.new', 'New');
+      case 'approved':
+        return t('admin.suggestions.approved', 'Approved');
+      case 'in_progress':
+        return t('admin.suggestions.inProgress', 'In Progress');
+      case 'rejected':
+        return t('admin.suggestions.rejected', 'Rejected');
+      case 'done':
+        return t('admin.suggestions.done', 'Done');
+      default:
+        return status;
+    }
+  };
+
   return (
     <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
       {/* Header */}
@@ -296,7 +313,7 @@ const AdminSuggestionsPage: React.FC = () => {
                       {suggestion.roasterName}
                     </div>
                     <span className={`inline-flex ml-2 px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(suggestion.status)}`}>
-                      {suggestion.status}
+                      {getStatusText(suggestion.status)}
                     </span>
                   </div>
                 </div>
@@ -388,7 +405,7 @@ const AdminSuggestionsPage: React.FC = () => {
                     {selectedSuggestion.roasterName}
                   </h3>
                   <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeClass(selectedSuggestion.status)}`}>
-                    {selectedSuggestion.status}
+                    {getStatusText(selectedSuggestion.status)}
                   </span>
                 </div>
 

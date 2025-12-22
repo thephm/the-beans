@@ -367,10 +367,12 @@ router.post('/', [
     }
 
     // If email is provided, check if user exists
+    // Normalize empty string to null to avoid unique constraint issues
+    const normalizedEmail = email && email.trim() !== '' ? email : null;
     let linkedUserId = null;
-    if (email) {
+    if (normalizedEmail) {
       const existingUser = await prisma.user.findUnique({
-        where: { email }
+        where: { email: normalizedEmail }
       });
       linkedUserId = existingUser?.id || null;
     }
@@ -383,7 +385,7 @@ router.post('/', [
         firstName,
         lastName,
         title,
-        email,
+        email: normalizedEmail,
         mobile,
         linkedinUrl,
         bio,
@@ -551,11 +553,14 @@ router.put('/:id', [
     }
 
     // If email is provided, check if user exists
+    // Normalize empty string to null to avoid unique constraint issues
     let linkedUserId = existingperson.userId;
+    let normalizedEmail = undefined;
     if (email !== undefined) {
-      if (email) {
+      normalizedEmail = email && email.trim() !== '' ? email : null;
+      if (normalizedEmail) {
         const existingUser = await prisma.user.findUnique({
-          where: { email }
+          where: { email: normalizedEmail }
         });
         linkedUserId = existingUser?.id || null;
       } else {
@@ -571,7 +576,7 @@ router.put('/:id', [
         ...(firstName !== undefined && { firstName }),
         ...(lastName !== undefined && { lastName }),
         ...(title !== undefined && { title }),
-        ...(email !== undefined && { email }),
+        ...(email !== undefined && { email: normalizedEmail }),
         ...(mobile !== undefined && { mobile }),
         ...(linkedinUrl !== undefined && { linkedinUrl }),
         ...(bio !== undefined && { bio }),
