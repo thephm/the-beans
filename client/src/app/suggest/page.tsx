@@ -74,7 +74,8 @@ export default function SuggestRoaster() {
     // 2. Check for duplicate domain
     try {
       const { apiClient } = await import('@/lib/api');
-      const allRoasters = await apiClient.getRoasters({ limit: 1000 });
+      // Explicitly cast to RoastersResponse to satisfy TypeScript
+      const allRoasters = await apiClient.getRoasters({ limit: 1000 }) as import('@/types').RoastersResponse;
       const domain = extractDomain(website);
       const duplicate = allRoasters.roasters?.find((r: any) => extractDomain(r.website || '') === domain);
       if (duplicate) {
