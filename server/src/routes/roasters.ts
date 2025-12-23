@@ -725,7 +725,7 @@ router.post('/', [
       sourceType: req.body.sourceType,
       sourceDetails: req.body.sourceDetails,
       socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined,
-      verified: isAdmin ? true : false, // Auto-verify if admin creates roaster
+      verified: false, // Always set verified to false by default
     };
     // Remove fields that aren't part of the Roaster schema
     delete roasterData.ownerEmail;
