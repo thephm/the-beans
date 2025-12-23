@@ -2,7 +2,7 @@ import { apiClient } from '@/lib/api';
 import type { Roaster } from '@/types';
 import { Metadata } from 'next';
 
-  // Fetch the roaster data to get the name
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
     const roaster = await apiClient.getRoaster(params.id) as Roaster;
     if (roaster && roaster.name) {
@@ -17,9 +17,4 @@ import { Metadata } from 'next';
   return {
     title: 'Roaster',
   };
-}
-
-export default function Head() {
-  // This file only exports metadata, no component needed
-  return null;
 }
