@@ -1,10 +1,10 @@
 import { apiClient } from '@/lib/api';
+import type { Roaster } from '@/types';
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   // Fetch the roaster data to get the name
   try {
-    const roaster = await apiClient.getRoaster(params.id);
+    const roaster = await apiClient.getRoaster(params.id) as Roaster;
     if (roaster && roaster.name) {
       return {
         title: roaster.name,
