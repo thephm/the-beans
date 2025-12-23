@@ -34,10 +34,76 @@ export default function SuggestRoaster() {
 
   const roles = ['customer', 'rando', 'scout', 'owner', 'admin', 'marketing'];
 
+  // Helper to extract domain from URL
+  function extractDomain(url: string) {
+    try {
+      const u = new URL(url);
+      return u.hostname.replace(/^www\./, '');
+    } catch {
+      return '';
+    }
+  }
+
+  // State for duplicate domain and url existence
+  const [websiteError, setWebsiteError] = useState('');
+  const [websiteChecking, setWebsiteChecking] = useState(false);
+  const [websiteFieldClass, setWebsiteFieldClass] = useState('');
+
+  // Check if URL exists and is not a duplicate
+  const checkWebsite = async (website: string) => {
+    setWebsiteError('');
+    setWebsiteFieldClass('');
+    if (!website.trim()) return;
+    setWebsiteChecking(true);
+    // 1. Check if URL exists (HEAD request)
+    let urlExists = false;
+    try {
+      // Use a CORS proxy for client-side check (best effort, not 100% reliable)
+      const proxyUrl = 'https://corsproxy.io/?';
+      const res = await fetch(proxyUrl + encodeURIComponent(website), { method: 'HEAD' });
+      urlExists = res.ok;
+    } catch {
+      urlExists = false;
+    }
+    if (!urlExists) {
+      setWebsiteError(t('suggest.errors.websiteNotReachable', 'Website could not be reached'));
+      setWebsiteFieldClass('border-red-500');
+      setWebsiteChecking(false);
+      return;
+    }
+    // 2. Check for duplicate domain
+    try {
+      const { apiClient } = await import('@/lib/api');
+      const allRoasters = await apiClient.getRoasters({ limit: 1000 });
+      const domain = extractDomain(website);
+      const duplicate = allRoasters.roasters?.find((r: any) => extractDomain(r.website || '') === domain);
+      if (duplicate) {
+        setWebsiteError(t('suggest.errors.duplicateDomain', 'This roaster is already in the system'));
+        setWebsiteFieldClass('border-red-500');
+        setWebsiteChecking(false);
+        return;
+      }
+    } catch {
+      // Ignore API errors for duplicate check
+    }
+    setWebsiteError('');
+    setWebsiteFieldClass('');
+    setWebsiteChecking(false);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError('');
+    if (name === 'website') {
+      // Debounce checkWebsite
+      setWebsiteError('');
+      setWebsiteFieldClass('');
+      if (value && value.startsWith('http')) {
+        // Short debounce
+        setTimeout(() => checkWebsite(value), 400);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -216,9 +282,16 @@ export default function SuggestRoaster() {
                     value={formData.website}
                     onChange={handleChange}
                     placeholder="https://example.com"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className={`w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${websiteFieldClass}`}
                     required
+                    onBlur={() => formData.website && checkWebsite(formData.website)}
                   />
+                  {websiteChecking && (
+                    <div className="text-xs text-gray-500 mt-1">{t('suggest.checkingWebsite', 'Checking website...')}</div>
+                  )}
+                  {websiteError && (
+                    <div className="text-xs text-red-600 mt-1">{websiteError}</div>
+                  )}
                 </div>
 
                 <div>

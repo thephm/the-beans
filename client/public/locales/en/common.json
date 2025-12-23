@@ -197,7 +197,10 @@
       "emailRequired": "Email is required",
       "invalidEmail": "Please enter a valid email",
       "phoneRequired": "Phone number is required for Scout, Owner, Admin, and Marketing roles",
-      "submitFailed": "Failed to submit suggestion"
+      "submitFailed": "Failed to submit suggestion",
+      "websiteNotReachable": "Website could not be reached",
+      "duplicateDomain": "This roaster is already in the system",
+      "checkingWebsite": "Checking website..."
     }
   },
   "profile": {

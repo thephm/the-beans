@@ -30,10 +30,8 @@ interface RoasterSourceFieldsProps {
 const SOURCE_OPTIONS: RoasterSourceType[] = [
   'Suggestion',
   'Google',
-  'GoogleMaps',
   'Reddit',
   'ChatGPT',
-  'Claude',
   'YouTube',
   'Instagram',
   'TikTok',
