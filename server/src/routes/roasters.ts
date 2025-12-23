@@ -674,7 +674,7 @@ router.post('/', [
     return true;
   }).withMessage('socialNetworks must be an object mapping network->url'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
-  body('sourceType').optional().isIn(['Scout','Google','Reddit','ChatGPT','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
+  body('sourceType').optional().isIn(['Suggestion','Google','Reddit','ChatGPT','Claude','GoogleMaps','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
   body('sourceDetails').optional().isString().isLength({ max: 1000 }).withMessage('Source details must be less than 1000 characters'),
 ], requireAuth, auditBefore('roaster', 'CREATE'), async (req: any, res: any) => {
   try {
@@ -931,7 +931,7 @@ router.put('/:id', [
     return true;
   }).withMessage('socialNetworks must be an object mapping network->url'),
   // Removed legacy ownerName, ownerBio, ownerMobile validation
-  body('sourceType').optional().isIn(['Scout','Google','Reddit','ChatGPT','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
+  body('sourceType').optional().isIn(['Suggestion','Google','Reddit','ChatGPT','Claude','GoogleMaps','YouTube','Instagram','TikTok','API','Other']).withMessage('Invalid sourceType'),
   body('sourceDetails').optional().isString().isLength({ max: 1000 }).withMessage('Source details must be less than 1000 characters'),
 ], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {

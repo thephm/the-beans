@@ -107,10 +107,12 @@ model Roaster {
   @@map("roasters")
 }
   enum RoasterSourceType {
-    Scout
+    Suggestion
     Google
+    GoogleMaps
     Reddit
     ChatGPT
+    Claude
     YouTube
     Instagram
     TikTok
