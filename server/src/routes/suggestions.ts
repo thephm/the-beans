@@ -638,7 +638,7 @@ router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Respo
         ownerId: submitterUser?.id,
         createdById: (req as any).user?.id,
         verified: false,
-        sourceType: 'Other',
+        sourceType: 'Suggestion',
         sourceDetails: `Created from suggestion ${id}`,
       },
       include: {
