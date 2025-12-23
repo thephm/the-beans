@@ -207,7 +207,10 @@
       "emailRequired": "Le courriel est requis",
       "invalidEmail": "Veuillez entrer un courriel valide",
       "phoneRequired": "Le numéro de téléphone est requis pour les rôles Scout, Propriétaire, Admin et Marketing",
-      "submitFailed": "Échec de la soumission de la suggestion"
+      "submitFailed": "Échec de la soumission de la suggestion",
+      "websiteNotReachable": "Le site web n'a pas pu être atteint",
+      "duplicateDomain": "Ce torréfacteur est déjà dans le système",
+      "checkingWebsite": "Vérification du site web..."
     }
   },  "profile": {
     "title": "Votre profil",
