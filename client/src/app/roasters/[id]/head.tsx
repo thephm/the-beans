@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   // Fetch the roaster data to get the name
   try {
-    const roaster = await apiClient.getRoaster(params.id);
+    const roaster = await apiClient.getRoaster<import('@/types').Roaster>(params.id);
     if (roaster && roaster.name) {
       return {
         title: roaster.name,
