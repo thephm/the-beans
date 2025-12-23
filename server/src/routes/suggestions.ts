@@ -640,6 +640,7 @@ router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Respo
         verified: false,
         sourceType: 'Suggestion',
         sourceDetails: `Created from suggestion ${id}`,
+        showHours: false, // Disable show hours by default when converting from suggestion
       },
       include: {
         owner: {
