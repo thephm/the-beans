@@ -306,6 +306,9 @@ export function Navbar() {
                 <div className="w-6 h-6 animate-spin rounded-full border-2 border-primary-600 border-t-transparent mx-auto"></div>
               ) : user ? (
                 <>
+                  <Link href="/profile" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                    {t('nav.profile', 'Profile')}
+                  </Link>
                   <Link href="/settings" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                     {t('nav.settings')}
                   </Link>
@@ -314,7 +317,7 @@ export function Navbar() {
                       logout()
                       setIsMobileMenuOpen(false)
                     }}
-                    className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2 text-left"
+                    className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2 text-left w-full text-left"
                   >
                     {t('nav.logout')}
                   </button>
