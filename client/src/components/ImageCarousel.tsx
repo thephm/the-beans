@@ -170,7 +170,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
       {/* Image Counter */}
       {showNavigation && (
-        <div className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-medium z-[15]">
+        <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-medium z-[15]">
           {currentIndex + 1} / {displayImages.length}
         </div>
       )}
