@@ -276,17 +276,6 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
           height={192}
           className="w-full h-full object-cover"
         />
-        <button
-          onClick={() => toggleFavorite(roaster.id)}
-          className={`absolute bottom-4 right-4 p-2 rounded-full z-20 pointer-events-auto ${
-            isFavorited
-              ? 'bg-red-500 text-white' 
-              : 'bg-white text-red-500 hover:bg-red-50'
-          } shadow-lg transition-all transform hover:scale-110`}
-          aria-label={isFavorited ? t('roasterDetail.removeFromFavorites') : t('roasterDetail.addToFavorites')}
-        >
-          {isFavorited ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
-        </button>
       </div>
       <div className="px-6 pt-6 pb-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">

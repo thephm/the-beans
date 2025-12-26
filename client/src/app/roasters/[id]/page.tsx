@@ -470,7 +470,7 @@ export default function RoasterDetail() {
                 </p>
               )}
             </div>
-            <div className="absolute bottom-6 right-6 flex gap-3 z-20">
+            <div className="absolute top-6 right-6 flex gap-3 z-20">
               <button
                 onClick={handleShare}
                 className="bg-white text-gray-700 hover:bg-gray-50 p-3 rounded-full shadow-lg transition-all transform hover:scale-110 pointer-events-auto"
