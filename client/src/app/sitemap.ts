@@ -74,7 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const response = await fetch(`${apiUrl}/api/roasters`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
-    
     if (response.ok) {
       const data = await response.json();
       roasterRoutes = (data.roasters || []).map((roaster: { id: string; updatedAt: string }) => ({
