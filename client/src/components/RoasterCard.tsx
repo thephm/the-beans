@@ -266,7 +266,7 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col border border-gray-200 dark:border-gray-700 ${
-      user?.role === 'admin' && !roaster.verified ? 'border-4 border-red-500' : ''
+      user?.role === 'admin' && !roaster.verified ? 'border-4 border-red-500 dark:border-red-500' : ''
     }`}>
       <div className="relative h-48">
         <RoasterImage
