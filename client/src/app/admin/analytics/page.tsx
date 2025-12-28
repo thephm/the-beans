@@ -4,6 +4,11 @@ import Select, { components } from 'react-select';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import enCommon from '../../../../public/locales/en/common.json';
 import frCommon from '../../../../public/locales/fr/common.json';
 
@@ -74,12 +79,13 @@ export default function AnalyticsDashboard() {
 		'/admin/suggestions',
 		'/admin/users',
 	];
-	const adminOptions = pagesList.map(p => ({ value: p, label: p }));
+	const adminOptions = pagesList.map(p => ({ value: p, label: p && String(p).startsWith('/') ? String(p).slice(1) : p }));
 	const [selectedPages, setSelectedPages] = useState([] as string[]);
 	const [startDateFilter, setStartDateFilter] = useState('');
 	const [endDateFilter, setEndDateFilter] = useState('');
 	const [searchFilter, setSearchFilter] = useState('');
 	const [filtersCollapsed, setFiltersCollapsed] = useState(false);
+	const [isDarkMode, setIsDarkMode] = useState(false);
 	const [eventType, setEventType] = useState('page_view');
 	const [exportScope, setExportScope] = useState('all' as 'all' | 'page');
 	const [currentPage, setCurrentPage] = useState(1);
@@ -89,6 +95,14 @@ export default function AnalyticsDashboard() {
 	const [displayRows, setDisplayRows] = useState([] as any[]);
 
 	useEffect(() => {
+		// detect light/dark mode on client and keep a simple state for react-select styles
+		try {
+			const el = typeof document !== 'undefined' ? document.documentElement : null;
+			// Respect the app's explicit Tailwind 'dark' class on <html> for theme
+			// Do not rely on the system-level prefers-color-scheme here, because
+			// the app's theme is controlled via the 'dark' class.
+			if (el) setIsDarkMode(el.classList.contains('dark'));
+		} catch (e) {}
 		let mounted = true;
 		async function ensureTranslations() {
 			try {
@@ -221,20 +235,6 @@ export default function AnalyticsDashboard() {
 	};
 
 	if (!user || user.role !== 'admin') return <div>{tr('admin.analytics.adminRequired', 'Admin access required.')}</div>;
-	if (loading) return <div>{tr('admin.analytics.loading', 'Loading analytics...')}</div>;
-	if (error) return <div>{error}</div>;
-	if (!stats || stats.length === 0) {
-		return (
-			<div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
-				<div className="mb-6">
-					<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{tr('admin.analytics.title', 'Analytics')}</h1>
-				</div>
-				<div className="text-gray-600 dark:text-gray-400 mb-4">
-					{tr('admin.analytics.noRows', 'No analytics rows returned. Count: {{count}}').replace('{{count}}', String(stats ? stats.length : 0))}
-				</div>
-			</div>
-		);
-	}
 
 	const hasPage = true;
 
@@ -249,18 +249,45 @@ export default function AnalyticsDashboard() {
 		return eventTypeLabels[key] || eventTypeLabels.unknown || s;
 	};
 
+	// react-select colors depending on theme
+	const rsColors = isDarkMode ? {
+		controlBg: '#1f2937',
+		controlBgFocused: '#111827',
+		border: '#4b5563',
+		focusRing: 'rgba(59,130,246,0.2)',
+		text: '#f9fafb',
+		menuBg: '#0f172a',
+		optionHover: '#1f2937',
+		multiBg: '#374151',
+		placeholder: '#9ca3af'
+	} : {
+		controlBg: '#ffffff',
+		controlBgFocused: '#ffffff',
+		border: '#d1d5db',
+		focusRing: 'rgba(59,130,246,0.15)',
+		text: '#0f172a',
+		menuBg: '#ffffff',
+		optionHover: '#f3f4f6',
+		multiBg: '#eef2f7',
+		placeholder: '#6b7280'
+	};
+
 	return (
 		<div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
 			<div className="mb-6">
 				<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{tr('admin.analytics.title', 'Analytics')}</h1>
 			</div>
+			{loading && <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">{tr('admin.analytics.loading', 'Loading analytics...')}</div>}
+			{error && <div className="text-sm text-red-600 dark:text-red-400 mb-4">{error}</div>}
 			<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-6 border border-gray-200 dark:border-blue-500">
 				<div className="flex items-center justify-between mb-4">
 					<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{tr('admin.analytics.filters.title', 'Filters')}</h2>
 					<div className="flex items-center space-x-3">
-						<button aria-expanded={!filtersCollapsed} onClick={() => setFiltersCollapsed(!filtersCollapsed)} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-							{filtersCollapsed ? tr('admin.analytics.filters.show', 'Show') : tr('admin.analytics.filters.hide', 'Hide')}
-						</button>
+						<Tooltip title={filtersCollapsed ? tr('admin.analytics.filters.show', 'Show') : tr('admin.analytics.filters.hide', 'Hide')}>
+							<IconButton aria-expanded={!filtersCollapsed} onClick={() => setFiltersCollapsed(!filtersCollapsed)} size="small" className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+								{filtersCollapsed ? <ExpandMoreIcon fontSize="small" /> : <ExpandLessIcon fontSize="small" />}
+							</IconButton>
+						</Tooltip>
 					</div>
 				</div>
 				{!filtersCollapsed && (
@@ -292,7 +319,7 @@ export default function AnalyticsDashboard() {
 														return (
 															<components.ValueContainer {...props}>
 																{visible.map((v: any, i: number) => (
-																	<div key={v.value || v.label || i} className="react-select__multi-value bg-gray-700 text-gray-100 px-2 py-0.5 rounded mr-2 text-sm inline-flex items-center">
+																	<div key={v.value || v.label || i} className={`react-select__multi-value px-2 py-0.5 rounded mr-2 text-sm inline-flex items-center ${isDarkMode ? 'bg-gray-700 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
 																		<div className="react-select__multi-value__label">{v.label}</div>
 																	</div>
 																))}
@@ -303,8 +330,9 @@ export default function AnalyticsDashboard() {
 													}
 												}}
 												isMulti
+												formatOptionLabel={(opt: any) => (opt && opt.label !== undefined && opt.label !== null && opt.label !== '' ? opt.label : (opt && opt.value ? (String(opt.value).startsWith('/') ? String(opt.value).slice(1) : opt.value) : ''))}
 												options={adminOptions}
-												value={selectedPages.map(p => ({ value: p, label: p }))}
+												value={selectedPages.map(p => ({ value: p, label: p && String(p).startsWith('/') ? String(p).slice(1) : p }))}
 												onChange={(vals: any) => {
 													const v = vals || [];
 													setSelectedPages(v.map((it: any) => it.value));
@@ -313,26 +341,26 @@ export default function AnalyticsDashboard() {
 												className="react-select-container"
 												classNamePrefix="react-select"
 												styles={{
-													control: (base, state) => ({
+													control: (base: any, state: any) => ({
 														...base,
-														background: state.isFocused ? '#1f2937' : '#1f2937',
-														borderColor: state.isFocused ? '#3b82f6' : '#4b5563',
-														boxShadow: state.isFocused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
-														color: '#f9fafb',
+														background: state.isFocused ? rsColors.controlBgFocused : rsColors.controlBg,
+														borderColor: state.isFocused ? '#3b82f6' : rsColors.border,
+														boxShadow: state.isFocused ? `0 0 0 2px ${rsColors.focusRing}` : 'none',
+														color: rsColors.text,
 														minHeight: '40px',
 														minWidth: '200px',
 														width: '100%'
 													}),
-													menu: (base) => ({ ...base, background: '#0f172a', color: '#f9fafb', minWidth: '220px', zIndex: 9999 }),
-													menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-													option: (base, state) => ({
+													menu: (base: any) => ({ ...base, background: rsColors.menuBg, color: rsColors.text, minWidth: '220px', zIndex: 9999 }),
+													menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
+													option: (base: any, state: any) => ({
 														...base,
-														background: state.isFocused ? '#1f2937' : 'transparent',
-														color: '#f9fafb',
+														background: state.isFocused ? rsColors.optionHover : 'transparent',
+														color: rsColors.text,
 													}),
-													multiValue: (base) => ({ ...base, background: '#374151', color: '#f9fafb' }),
-													placeholder: (base) => ({ ...base, color: '#9ca3af' }),
-													singleValue: (base) => ({ ...base, color: '#f9fafb' }),
+													multiValue: (base: any) => ({ ...base, background: rsColors.multiBg, color: rsColors.text }),
+													placeholder: (base: any) => ({ ...base, color: rsColors.placeholder }),
+													singleValue: (base: any) => ({ ...base, color: rsColors.text }),
 												}
 												}
 												menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
@@ -361,17 +389,16 @@ export default function AnalyticsDashboard() {
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.search', 'Search')}</label>
 							<div className="flex items-center">
 								<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
-								<button type="button" onClick={resetFilters} title={tr('admin.analytics.filters.resetTooltip', 'Reset filters to defaults')} className="ml-2 px-3 py-2 bg-gray-300 dark:bg-gray-600 text-sm text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">{tr('admin.analytics.filters.reset', 'Reset')}</button>
+									<Tooltip title={tr('admin.analytics.filters.resetTooltip', 'Reset filters to defaults')}>
+										<IconButton type="button" onClick={resetFilters} size="small" aria-label={tr('admin.analytics.filters.reset', 'Reset')} className="ml-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">
+											<RefreshIcon fontSize="small" />
+										</IconButton>
+									</Tooltip>
 							</div>
 						</div>
 						<div className="md:col-span-12 flex flex-col md:flex-row items-end md:items-center justify-end space-y-2 md:space-y-0 md:space-x-2">
-							<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
-								<button onClick={() => fetchStats()} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{tr('admin.analytics.filters.apply', 'Apply')}</button>
-								<button onClick={() => { setPageFilter(''); setSelectedPages([]); setStartDateFilter(''); setEndDateFilter(''); setSearchFilter(''); setEventType('page_view'); fetchStats(); }} className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">{tr('admin.analytics.filters.clear', 'Clear')}</button>
-							</div>
 							{/* Export controls moved to table header row */}
 							{/* rows count moved below filter pane so it updates with client-side filters */}
-					
 						</div>
 					</div>
 				)}
@@ -401,10 +428,15 @@ export default function AnalyticsDashboard() {
 							<tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.period}</td>
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{getEventLabel(row.event_type)}</td>
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.page || ''}</td>
+								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{(row.page || '').toString().replace(/^\//, '')}</td>
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.count}</td>
 							</tr>
 						))}
+						{displayRows.length === 0 && (
+							<tr>
+								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100" colSpan={4}>{tr('admin.analytics.noResults', 'No results found')}</td>
+							</tr>
+						)}
 					</tbody>
 				</table>
 			</div>

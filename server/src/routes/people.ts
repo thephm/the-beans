@@ -327,7 +327,7 @@ router.post('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-  const roasterId = req.body.roasterId;
+  const roasterId = req.body.roasterId as string;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const title = req.body.title;
@@ -474,7 +474,7 @@ router.put('/:id', [
     }
 
   const id = req.params.id;
-  const roasterId = req.body.roasterId;
+  const roasterId = req.body.roasterId as string | undefined;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const title = req.body.title;
@@ -511,7 +511,7 @@ router.put('/:id', [
     if (roasterId !== undefined && roasterId !== existingperson.roasterId) {
       // Check if new roaster exists
       const newRoaster = await prisma.roaster.findUnique({
-        where: { id: roasterId }
+        where: { id: roasterId as string }
       });
 
       if (!newRoaster) {
@@ -519,12 +519,12 @@ router.put('/:id', [
       }
 
       // Check if user can manage people for the new roaster
-      const canManageNewRoaster = await canManagePeople(userId, roasterId);
+      const canManageNewRoaster = await canManagePeople(userId, roasterId as string);
       if (!canManageNewRoaster) {
         return res.status(403).json({ error: 'Permission denied. You cannot move people to a roaster you do not manage.' });
       }
 
-      newRoasterId = roasterId;
+      newRoasterId = roasterId as string;
     }
 
     // Prevent removing the last owner
