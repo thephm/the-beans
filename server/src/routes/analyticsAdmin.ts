@@ -37,10 +37,27 @@ router.get('/stats', requireAuth, async (req: Request, res: Response) => {
         normalizedPages.push(p);
       }
     }
+    // Validate `from` and `to` date query parameters to avoid creating
+    // invalid Date objects which can cause server-side query failures.
+    let fromDate: Date | undefined;
+    let toDate: Date | undefined;
+    if (from) {
+      fromDate = new Date(String(from));
+      if (isNaN(fromDate.getTime())) {
+        return res.status(400).json({ error: 'Invalid from date' });
+      }
+    }
+    if (to) {
+      toDate = new Date(String(to));
+      if (isNaN(toDate.getTime())) {
+        return res.status(400).json({ error: 'Invalid to date' });
+      }
+    }
+
     const stats = await getEventStats({
       eventType: eventType as string,
-      from: from ? new Date(from as string) : undefined,
-      to: to ? new Date(to as string) : undefined,
+      from: fromDate,
+      to: toDate,
       groupBy: (groupBy as 'day' | 'hour') || 'day',
       page: normalizedPages as any,
     });

@@ -62,10 +62,29 @@ class ApiClient {
         sessionStorage.setItem('analyticsSessionId', sessionId);
       }
     }
-    return this.request('/analytics', {
-      method: 'POST',
-      body: JSON.stringify({ eventType, eventData, sessionId }),
-    });
+    // Fire-and-forget analytics to avoid crashing the UI when backend is down.
+    try {
+      const url = `${this.baseURL}/api/analytics`;
+      const payload = JSON.stringify({ eventType, eventData, sessionId });
+      // Prefer sendBeacon for reliability, fall back to fetch without awaiting
+      if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+        try {
+          navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+          return;
+        } catch (_) {
+          /* ignore and fall back to fetch */
+        }
+      }
+      // Fire-and-forget fetch; intentionally not awaited and errors are swallowed
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}) },
+        body: payload,
+      }).catch(() => {});
+    } catch (_) {
+      // Swallow any client-side errors to keep UI stable
+    }
+    return;
   }
 
   // ...existing code...
@@ -182,8 +201,18 @@ class ApiClient {
     } catch (err: any) {
       // Log helpful debugging info for both browser and SSR (server-side)
       // eslint-disable-next-line no-console
-      console.error('ApiClient fetch network error:', { url, options, err });
-      throw new Error(`Network error contacting ${url}: ${err?.message || err}`);
+      console.error('ApiClient fetch error:', { url, options, err });
+
+      const message = err?.message || String(err);
+
+      // If this error is the server-provided message (thrown above when response.ok === false),
+      // preserve it so UI can show the exact server validation text (e.g. duplicate name).
+      // Only treat as a network failure for low-level fetch/network problems.
+      if (message && !message.includes('Failed to fetch') && !message.includes('NetworkError')) {
+        throw new Error(message);
+      }
+
+      throw new Error(`Network error contacting ${url}: ${message}`);
     }
 
   }
@@ -245,6 +274,11 @@ class ApiClient {
     const searchParams = new URLSearchParams(params).toString();
     const endpoint = searchParams ? `/roasters?${searchParams}` : '/roasters';
     return this.request(endpoint);
+  }
+
+  async checkRoasterDomain(domain: string) {
+    const params = new URLSearchParams({ domain }).toString();
+    return this.request(`/roasters/domain-exists?${params}`);
   }
 
   async getRoaster(id: string) {

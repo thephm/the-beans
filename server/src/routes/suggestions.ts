@@ -211,7 +211,7 @@ router.post('/', createSuggestionValidation, async (req: Request, res: Response)
 
     await createAuditLog({
       action: 'CREATE',
-      entityType: 'RoasterSuggestion',
+      entityType: 'roasterSuggestion',
       entityId: suggestion.id,
       entityName: roasterName || 'Unknown',
       userId: (req as any).user?.id || null,
@@ -482,7 +482,7 @@ router.patch('/:id', requireAdmin, async (req: Request, res: Response) => {
     // Log audit trail with old and new values for proper change tracking
     await createAuditLog({
       action: 'UPDATE',
-      entityType: 'RoasterSuggestion',
+      entityType: 'roasterSuggestion',
       entityId: suggestion.id,
       entityName: suggestion.roasterName,
       userId: (req as any).user?.id || null,
@@ -547,7 +547,7 @@ router.delete('/:id', requireAdmin, async (req: Request, res: Response) => {
     // Log audit trail
     await createAuditLog({
       action: 'DELETE',
-      entityType: 'RoasterSuggestion',
+      entityType: 'roasterSuggestion',
       entityId: id,
       entityName: existingSuggestion.roasterName,
       userId: (req as any).user?.id || null,
@@ -666,37 +666,87 @@ router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Respo
       const newName = `${suggestion.submitterFirstName} ${suggestion.submitterLastName || ''}`.trim();
       nameChanged = existingName.toLowerCase() !== newName.toLowerCase();
 
-      // Create a new link for this existing person to the new roaster
-      contact = await prisma.roasterPerson.create({
-        data: {
-          roasterId: roaster.id,
-          firstName: existingContact.firstName,
-          lastName: existingContact.lastName,
-          email: existingContact.email,
-          mobile: suggestion.submitterPhone || existingContact.mobile,
-          userId: submitterUser?.id || existingContact.userId,
-          roles: ['scout'],
-          isPrimary: false,
-          isActive: true,
-          createdById: (req as any).user?.id,
+      // Try to create a new link for this existing person to the new roaster.
+      // If a unique constraint occurs (unlikely for a newly-created roaster),
+      // fall back to finding and reusing the existing roasterPerson record.
+      try {
+        contact = await prisma.roasterPerson.create({
+          data: {
+            roasterId: roaster.id,
+            firstName: existingContact.firstName,
+            lastName: existingContact.lastName,
+            email: existingContact.email,
+            mobile: suggestion.submitterPhone || existingContact.mobile,
+            userId: submitterUser?.id || existingContact.userId,
+            roles: ['scout'],
+            isPrimary: false,
+            isActive: true,
+            createdById: (req as any).user?.id,
+          }
+        });
+      } catch (err: any) {
+        console.error('Error creating roasterPerson link for existingContact:', err);
+        if (err.code === 'P2002') {
+          // Find the existing person for this roaster/email and reuse it
+          const existingLink = await prisma.roasterPerson.findFirst({
+            where: {
+              roasterId: roaster.id,
+              email: existingContact.email
+            },
+            include: {
+              user: true,
+              roaster: true
+            }
+          });
+          if (existingLink) {
+            contact = existingLink;
+          } else {
+            throw err;
+          }
+        } else {
+          throw err;
         }
-      });
+      }
     } else {
       // Create new contact person for the roaster
-      contact = await prisma.roasterPerson.create({
-        data: {
-          roasterId: roaster.id,
-          firstName: suggestion.submitterFirstName,
-          lastName: suggestion.submitterLastName || undefined,
-          email: suggestion.submitterEmail,
-          mobile: suggestion.submitterPhone || undefined,
-          userId: submitterUser?.id,
-          roles: ['scout'],
-          isPrimary: false,
-          isActive: true,
-          createdById: (req as any).user?.id,
+      try {
+        contact = await prisma.roasterPerson.create({
+          data: {
+            roasterId: roaster.id,
+            firstName: suggestion.submitterFirstName,
+            lastName: suggestion.submitterLastName || undefined,
+            email: suggestion.submitterEmail,
+            mobile: suggestion.submitterPhone || undefined,
+            userId: submitterUser?.id,
+            roles: ['scout'],
+            isPrimary: false,
+            isActive: true,
+            createdById: (req as any).user?.id,
+          }
+        });
+      } catch (err: any) {
+        console.error('Error creating new roasterPerson for suggestion:', err);
+        if (err.code === 'P2002') {
+          // Another process created the same person concurrently; find and reuse it
+          const existingLink = await prisma.roasterPerson.findFirst({
+            where: {
+              roasterId: roaster.id,
+              email: suggestion.submitterEmail
+            },
+            include: {
+              user: true,
+              roaster: true
+            }
+          });
+          if (existingLink) {
+            contact = existingLink;
+          } else {
+            throw err;
+          }
+        } else {
+          throw err;
         }
-      });
+      }
     }
 
     // Update the suggestion with the roaster ID
@@ -714,7 +764,7 @@ router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Respo
     // Log audit trails
     await createAuditLog({
       action: 'CREATE',
-      entityType: 'Roaster',
+      entityType: 'roaster',
       entityId: roaster.id,
       entityName: roaster.name,
       userId: (req as any).user?.id || null,
@@ -725,7 +775,7 @@ router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Respo
 
     await createAuditLog({
       action: 'CREATE',
-      entityType: 'RoasterPerson',
+      entityType: 'roasterPerson',
       entityId: contact.id,
       entityName: `${contact.firstName} ${contact.lastName || ''}`.trim(),
       userId: (req as any).user?.id || null,
@@ -736,7 +786,7 @@ router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Respo
 
     await createAuditLog({
       action: 'UPDATE',
-      entityType: 'RoasterSuggestion',
+      entityType: 'roasterSuggestion',
       entityId: suggestion.id,
       entityName: suggestion.roasterName,
       userId: (req as any).user?.id || null,

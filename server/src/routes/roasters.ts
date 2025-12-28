@@ -448,6 +448,35 @@ router.get('/', [
 });
 
 /**
+ * GET /api/roasters/domain-exists
+ * Check whether a roaster exists with the given domain (case-insensitive substring match).
+ * Query: ?domain=example.com
+ */
+router.get('/domain-exists', optionalAuth, async (req: any, res: any) => {
+  try {
+    const domain = (req.query.domain || '').toString().trim();
+    if (!domain) return res.status(400).json({ error: 'Domain query parameter is required' });
+
+    // Simple substring match against website field to find matching domain
+    const existing = await prisma.roaster.findFirst({
+      where: {
+        website: { contains: domain, mode: 'insensitive' },
+      },
+      select: {
+        id: true,
+        name: true,
+        website: true,
+      }
+    });
+
+    res.json({ exists: !!existing, roaster: existing || null });
+  } catch (error) {
+    console.error('Domain exists check error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * @swagger
  * /api/roasters/{id}:
  *   get:

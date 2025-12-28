@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useRouter } from 'next/navigation';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
@@ -38,8 +38,13 @@ const AdminSuggestionDetailPage: React.FC = () => {
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ type: 'error' | 'warning' | 'info' | 'success'; text: string } | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ roasterName?: string }>({});
+  const [websiteError, setWebsiteError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
+  const roasterNameRef = useRef<HTMLInputElement | null>(null);
+  const websiteRef = useRef<HTMLInputElement | null>(null);
   
   const [status, setStatus] = useState<string>('new');
   const [adminNotes, setAdminNotes] = useState<string>('');
@@ -91,6 +96,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
     
     setSaving(true);
     setError(null);
+    setActionMessage(null);
     
     try {
       await apiClient.updateSuggestion(suggestionId, {
@@ -109,8 +115,14 @@ const AdminSuggestionDetailPage: React.FC = () => {
       
       router.push('/admin/suggestions');
     } catch (err: any) {
-      setError(err.message || 'Unknown error');
-      alert(t('admin.suggestions.updateError', 'Failed to update suggestion: ') + err.message);
+      const msg = err.message || 'Unknown error';
+      setError(msg);
+      const lower = msg.toLowerCase();
+      if (lower.includes('already exists') || lower.includes('roaster with this name')) {
+        setFieldErrors({ roasterName: msg });
+        setTimeout(() => roasterNameRef.current?.focus(), 50);
+      }
+      setActionMessage({ type: 'error', text: t('admin.suggestions.updateError', 'Failed to update suggestion: ') + msg });
     } finally {
       setSaving(false);
     }
@@ -121,14 +133,44 @@ const AdminSuggestionDetailPage: React.FC = () => {
     
     setCreating(true);
     setError(null);
-    
+    setActionMessage(null);
+    setWebsiteError(null);
+    setFieldErrors({});
+
+    // Validate website domain before creating roaster
+    try {
+      if (website) {
+        // extract domain
+        let domain = website;
+        try {
+          const u = new URL(website);
+          domain = u.hostname.replace(/^www\./i, '');
+        } catch (_) {
+          // if parsing fails, try to strip protocol
+          domain = website.replace(/^https?:\/\//i, '').split('/')[0].replace(/^www\./i, '');
+        }
+
+        const domainCheck: any = await apiClient.checkRoasterDomain(domain);
+        if (domainCheck?.exists) {
+          const msg = `A roaster already exists with domain ${domain}`;
+          setWebsiteError(msg);
+          setActionMessage({ type: 'error', text: t('admin.suggestions.websiteExists', 'A roaster with this website domain already exists.') + ` (${domain})` });
+          setTimeout(() => websiteRef.current?.focus(), 50);
+          setCreating(false);
+          return;
+        }
+      }
+    } catch (err) {
+      // ignore domain check failures and proceed to creation; still log
+      console.error('Domain check failed', err);
+    }
     try {
       const response = await apiClient.createRoasterFromSuggestion(suggestionId);
       const roasterId = response.roaster?.id;
       
       // Check for name differences
       if (response.existingContactUsed && response.nameChanged) {
-        alert(t('admin.suggestions.nameWarning', 'Warning: Contact with this email already exists with a different name. Using existing contact details.'));
+        setActionMessage({ type: 'warning', text: t('admin.suggestions.nameWarning', 'Warning: Contact with this email already exists with a different name. Using existing contact details.') });
       }
       
       if (roasterId) {
@@ -139,8 +181,16 @@ const AdminSuggestionDetailPage: React.FC = () => {
         router.push(`/admin/roasters/edit/${roasterId}`);
       }
     } catch (err: any) {
-      setError(err.message || 'Unknown error');
-      alert(t('admin.suggestions.createRoasterError', 'Failed to create roaster: ') + (err.message || 'Unknown error'));
+      const msg = err.message || 'Unknown error';
+      setError(msg);
+      // If server indicates duplicate roaster name, highlight the roaster name field
+      const lower = msg.toLowerCase();
+      if (lower.includes('already exists') || lower.includes('roaster with this name')) {
+        setFieldErrors({ roasterName: msg });
+        // focus the input
+        setTimeout(() => roasterNameRef.current?.focus(), 50);
+      }
+      setActionMessage({ type: 'error', text: t('admin.suggestions.createRoasterError', 'Failed to create roaster: ') + msg });
     } finally {
       setCreating(false);
     }
@@ -231,6 +281,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
             {getStatusText(suggestion.status)}
           </span>
         </div>
+        
       </div>
 
       {/* Suggestion Details */}
@@ -276,10 +327,18 @@ const AdminSuggestionDetailPage: React.FC = () => {
             </label>
             <input
               type="text"
+              ref={roasterNameRef}
               value={roasterName}
-              onChange={(e) => setRoasterName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              onChange={(e) => {
+                setRoasterName(e.target.value);
+                if (fieldErrors.roasterName) setFieldErrors({});
+                if (actionMessage) setActionMessage(null);
+              }}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none ${fieldErrors.roasterName ? 'border-red-500 dark:border-red-400 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
             />
+            {fieldErrors.roasterName && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.roasterName}</p>
+            )}
           </div>
           <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -319,11 +378,40 @@ const AdminSuggestionDetailPage: React.FC = () => {
               {t('admin.suggestions.website', 'Website')}
             </label>
             <input
+              ref={websiteRef}
               type="url"
               value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              onChange={(e) => {
+                setWebsite(e.target.value);
+                if (websiteError) setWebsiteError(null);
+                if (actionMessage) setActionMessage(null);
+              }}
+              onBlur={async () => {
+                if (!website) return;
+                try {
+                  let domain = website;
+                  try {
+                    const u = new URL(website);
+                    domain = u.hostname.replace(/^www\./i, '');
+                  } catch (_) {
+                    domain = website.replace(/^https?:\/\//i, '').split('/')[0].replace(/^www\./i, '');
+                  }
+                  const domainCheck: any = await apiClient.checkRoasterDomain(domain);
+                  if (domainCheck?.exists) {
+                    const msg = `A roaster already exists with domain ${domain}`;
+                    setWebsiteError(msg);
+                    setActionMessage({ type: 'error', text: t('admin.suggestions.websiteExists', 'A roaster with this website domain already exists.') + ` (${domain})` });
+                    setTimeout(() => websiteRef.current?.focus(), 50);
+                  }
+                } catch (err) {
+                  // ignore errors from check
+                }
+              }}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none ${websiteError ? 'border-red-500 dark:border-red-400 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent'} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
             />
+            {websiteError && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{websiteError}</p>
+            )}
           </div>
         </div>
       </div>
@@ -472,6 +560,12 @@ const AdminSuggestionDetailPage: React.FC = () => {
               placeholder={t('admin.suggestions.notesPlaceholder', 'Add internal notes about this suggestion...')}
             />
           </div>
+
+          {actionMessage && (
+            <div className={`w-full mb-4 p-3 rounded-md border ${actionMessage.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : actionMessage.type === 'warning' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' : actionMessage.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+              {actionMessage.text}
+            </div>
+          )}
 
           <div className="flex lg:flex-col gap-2 lg:justify-end w-full lg:w-auto">
             <button
