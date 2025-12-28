@@ -247,7 +247,7 @@ export default function AnalyticsDashboard() {
 					<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{tr('admin.analytics.filters.title', 'Filters')}</h2>
 					<div className="flex items-center space-x-3">
 						<button aria-expanded={!filtersCollapsed} onClick={() => setFiltersCollapsed(!filtersCollapsed)} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-							{filtersCollapsed ? tr('admin.analytics.filters.show', 'Show filters') : tr('admin.analytics.filters.hide', 'Hide filters')}
+							{filtersCollapsed ? tr('admin.analytics.filters.show', 'Show') : tr('admin.analytics.filters.hide', 'Hide')}
 						</button>
 					</div>
 				</div>
@@ -264,70 +264,70 @@ export default function AnalyticsDashboard() {
 							</select>
 						</div>
 						{eventType === 'page_view' && (
-							<div className="md:col-span-3">
+							<div className="md:col-span-2">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.page', 'Page')}</label>
 								<div className="mt-1">
-									<div className="flex items-center space-x-2 mb-2">
+									<div className="flex items-center space-x-2">
+										<div className="flex-1 min-w-0">
+											<Select
+												components={{
+													ValueContainer: ({ children, ...props }: any) => {
+														const maxVisible = 3;
+														const values = props.getValue ? props.getValue() : [];
+														const visible = (values || []).slice(0, maxVisible);
+														const rest = Math.max(0, (values || []).length - visible.length);
+														const input = children && Array.isArray(children) ? children.find((c: any) => c && c.props && String(c.props.className).includes('input')) || children[children.length - 1] : null;
+														return (
+															<components.ValueContainer {...props}>
+																{visible.map((v: any, i: number) => (
+																	<div key={v.value || v.label || i} className="react-select__multi-value bg-gray-700 text-gray-100 px-2 py-0.5 rounded mr-2 text-sm inline-flex items-center">
+																		<div className="react-select__multi-value__label">{v.label}</div>
+																	</div>
+																))}
+																{rest > 0 && <div className="ml-2 text-sm text-gray-400">{tr('admin.analytics.filters.more', '+{{count}} more').replace('{{count}}', String(rest))}</div>}
+																{input}
+															</components.ValueContainer>
+														);
+													}
+												}}
+												isMulti
+												options={adminOptions}
+												value={selectedPages.map(p => ({ value: p, label: p }))}
+												onChange={(vals: any) => {
+													const v = vals || [];
+													setSelectedPages(v.map((it: any) => it.value));
+												}}
+												placeholder={tr('admin.analytics.filters.selectPagesPlaceholder', 'Select pages...')}
+												className="react-select-container"
+												classNamePrefix="react-select"
+												styles={{
+													control: (base, state) => ({
+														...base,
+														background: state.isFocused ? '#1f2937' : '#1f2937',
+														borderColor: state.isFocused ? '#3b82f6' : '#4b5563',
+														boxShadow: state.isFocused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
+														color: '#f9fafb',
+														minHeight: '40px',
+													}),
+													menu: (base) => ({ ...base, background: '#0f172a', color: '#f9fafb' }),
+													option: (base, state) => ({
+														...base,
+														background: state.isFocused ? '#1f2937' : 'transparent',
+														color: '#f9fafb',
+													}),
+													multiValue: (base) => ({ ...base, background: '#374151', color: '#f9fafb' }),
+													placeholder: (base) => ({ ...base, color: '#9ca3af' }),
+													singleValue: (base) => ({ ...base, color: '#f9fafb' }),
+												}}
+											/>
+										</div>
 										<label className="inline-flex items-center text-sm text-gray-700 dark:text-gray-200">
-											<input type="checkbox" className="mr-2" checked={selectedPages.length === pagesList.length} onChange={(e) => {
+											<input type="checkbox" className="ml-2" checked={selectedPages.length === pagesList.length} onChange={(e) => {
 												if (e.target.checked) setSelectedPages(pagesList.slice());
 												else setSelectedPages([]);
 											}} />
-											{tr('admin.analytics.filters.selectAll', 'Select all pages')}
+											<span className="ml-2">{tr('admin.analytics.filters.selectAll', 'all')}</span>
 										</label>
-									</div>
-									<div className="mt-1">
-										<Select
-											components={{
-												ValueContainer: ({ children, ...props }: any) => {
-													const maxVisible = 3;
-													const values = props.getValue ? props.getValue() : [];
-													const visible = (values || []).slice(0, maxVisible);
-													const rest = Math.max(0, (values || []).length - visible.length);
-													const input = children && Array.isArray(children) ? children.find((c: any) => c && c.props && String(c.props.className).includes('input')) || children[children.length - 1] : null;
-													return (
-														<components.ValueContainer {...props}>
-															{visible.map((v: any, i: number) => (
-																<div key={v.value || v.label || i} className="react-select__multi-value bg-gray-700 text-gray-100 px-2 py-0.5 rounded mr-2 text-sm inline-flex items-center">
-																	<div className="react-select__multi-value__label">{v.label}</div>
-																</div>
-															))}
-															{rest > 0 && <div className="ml-2 text-sm text-gray-400">{tr('admin.analytics.filters.more', '+{{count}} more').replace('{{count}}', String(rest))}</div>}
-															{input}
-														</components.ValueContainer>
-													);
-												}
-											}}
-											isMulti
-											options={adminOptions}
-											value={selectedPages.map(p => ({ value: p, label: p }))}
-											onChange={(vals: any) => {
-												const v = vals || [];
-												setSelectedPages(v.map((it: any) => it.value));
-											}}
-                                            			placeholder={tr('admin.analytics.filters.selectPagesPlaceholder', 'Select pages...')}
-											className="react-select-container"
-											classNamePrefix="react-select"
-											styles={{
-												control: (base, state) => ({
-													...base,
-													background: state.isFocused ? '#1f2937' : '#1f2937',
-													borderColor: state.isFocused ? '#3b82f6' : '#4b5563',
-													boxShadow: state.isFocused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
-													color: '#f9fafb',
-													minHeight: '40px',
-												}),
-												menu: (base) => ({ ...base, background: '#0f172a', color: '#f9fafb' }),
-												option: (base, state) => ({
-													...base,
-													background: state.isFocused ? '#1f2937' : 'transparent',
-													color: '#f9fafb',
-												}),
-												multiValue: (base) => ({ ...base, background: '#374151', color: '#f9fafb' }),
-												placeholder: (base) => ({ ...base, color: '#9ca3af' }),
-												singleValue: (base) => ({ ...base, color: '#f9fafb' }),
-											}}
-										/>
 									</div>
 								</div>
 							</div>
@@ -340,11 +340,11 @@ export default function AnalyticsDashboard() {
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.endDate', 'End Date')}</label>
 							<input type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
 						</div>
-						<div className="md:col-span-3">
+						<div className="md:col-span-2">
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.search', 'Search')}</label>
 							<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
 						</div>
-						<div className="md:col-span-12 lg:col-span-3 flex flex-col md:flex-row items-end md:items-center justify-end space-y-2 md:space-y-0 md:space-x-2">
+						<div className="md:col-span-12 flex flex-col md:flex-row items-end md:items-center justify-end space-y-2 md:space-y-0 md:space-x-2">
 							<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
 								<button onClick={() => fetchStats()} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{tr('admin.analytics.filters.apply', 'Apply')}</button>
 								<button onClick={() => { setPageFilter(''); setSelectedPages([]); setStartDateFilter(''); setEndDateFilter(''); setSearchFilter(''); setEventType('page_view'); fetchStats(); }} className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">{tr('admin.analytics.filters.clear', 'Clear')}</button>
