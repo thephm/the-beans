@@ -431,8 +431,8 @@
       "page": "Page",
       "filters": {
         "title": "Filtres",
-        "show": "Afficher les filtres",
-        "hide": "Masquer les filtres",
+        "show": "Afficher",
+        "hide": "Masquer",
         "eventType": "Type d'événement",
         "page": "Page",
         "selectAll": "Sélectionner toutes les pages",
