@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useMemo } from 'react';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,22 @@ export default function AnalyticsDashboard() {
 	const [translationsReady, setTranslationsReady] = useState(false);
 	const [pageFilter, setPageFilter] = useState('');
 
-	const adminPages = [
+	// Full list of site pages (includes admin pages so they can be selected)
+	const pagesList = [
+		'/',
+		'/discover',
+		'/about',
+		'/favorites',
+		'/suggest',
+		'/profile',
+		'/roasters',
+		'/settings',
+		'/login',
+		'/signup',
+		'/contact',
+		'/cookies',
+		'/privacy',
+		'/terms',
 		'/admin/analytics',
 		'/admin/audit-logs',
 		'/admin/backup',
@@ -59,7 +74,7 @@ export default function AnalyticsDashboard() {
 		'/admin/suggestions',
 		'/admin/users',
 	];
-	const adminOptions = adminPages.map(p => ({ value: p, label: p }));
+	const adminOptions = pagesList.map(p => ({ value: p, label: p }));
 	const [selectedPages, setSelectedPages] = useState([] as string[]);
 	const [startDateFilter, setStartDateFilter] = useState('');
 	const [endDateFilter, setEndDateFilter] = useState('');
@@ -127,6 +142,12 @@ export default function AnalyticsDashboard() {
 				const rp = (r.page || '').toString();
 				return selectedPages.some(sp => rp === sp || rp.startsWith(sp + '/') || rp.startsWith(sp));
 			});
+		} else {
+			// By default, exclude admin pages from results unless specific pages are selected
+			filtered = filtered.filter((r: any) => {
+				const rp = (r.page || '').toString();
+				return !rp.startsWith('/admin');
+			});
 		}
 		if (searchFilter) {
 			const q = searchFilter.toLowerCase();
@@ -149,6 +170,12 @@ export default function AnalyticsDashboard() {
 				filtered = filtered.filter((r: any) => {
 					const rp = (r.page || '').toString();
 					return selectedPages.some(sp => rp === sp || rp.startsWith(sp + '/') || rp.startsWith(sp));
+				});
+			} else {
+				// Default export should also exclude admin pages
+				filtered = filtered.filter((r: any) => {
+					const rp = (r.page || '').toString();
+					return !rp.startsWith('/admin');
 				});
 			}
 			if (searchFilter) {
@@ -225,8 +252,8 @@ export default function AnalyticsDashboard() {
 					</div>
 				</div>
 				{!filtersCollapsed && (
-					<div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-						<div>
+					<div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+						<div className="md:col-span-2">
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.eventType', 'Event Type')}</label>
 							<select value={eventType} onChange={(e) => setEventType(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
 								<option value="page_view">{tr('admin.analytics.eventTypes.page_view', 'Page View')}</option>
@@ -237,20 +264,40 @@ export default function AnalyticsDashboard() {
 							</select>
 						</div>
 						{eventType === 'page_view' && (
-							<div>
+							<div className="md:col-span-3">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.page', 'Page')}</label>
 								<div className="mt-1">
 									<div className="flex items-center space-x-2 mb-2">
 										<label className="inline-flex items-center text-sm text-gray-700 dark:text-gray-200">
-											<input type="checkbox" className="mr-2" checked={selectedPages.length === adminPages.length} onChange={(e) => {
-												if (e.target.checked) setSelectedPages(adminPages.slice());
+											<input type="checkbox" className="mr-2" checked={selectedPages.length === pagesList.length} onChange={(e) => {
+												if (e.target.checked) setSelectedPages(pagesList.slice());
 												else setSelectedPages([]);
 											}} />
-											{tr('admin.analytics.filters.selectAll', 'Select all admin pages')}
+											{tr('admin.analytics.filters.selectAll', 'Select all pages')}
 										</label>
 									</div>
 									<div className="mt-1">
 										<Select
+											components={{
+												ValueContainer: ({ children, ...props }: any) => {
+													const maxVisible = 3;
+													const values = props.getValue ? props.getValue() : [];
+													const visible = (values || []).slice(0, maxVisible);
+													const rest = Math.max(0, (values || []).length - visible.length);
+													const input = children && Array.isArray(children) ? children.find((c: any) => c && c.props && String(c.props.className).includes('input')) || children[children.length - 1] : null;
+													return (
+														<components.ValueContainer {...props}>
+															{visible.map((v: any, i: number) => (
+																<div key={v.value || v.label || i} className="react-select__multi-value bg-gray-700 text-gray-100 px-2 py-0.5 rounded mr-2 text-sm inline-flex items-center">
+																	<div className="react-select__multi-value__label">{v.label}</div>
+																</div>
+															))}
+															{rest > 0 && <div className="ml-2 text-sm text-gray-400">{tr('admin.analytics.filters.more', '+{{count}} more').replace('{{count}}', String(rest))}</div>}
+															{input}
+														</components.ValueContainer>
+													);
+												}
+											}}
 											isMulti
 											options={adminOptions}
 											value={selectedPages.map(p => ({ value: p, label: p }))}
@@ -258,7 +305,7 @@ export default function AnalyticsDashboard() {
 												const v = vals || [];
 												setSelectedPages(v.map((it: any) => it.value));
 											}}
-											placeholder={tr('admin.analytics.filters.selectPagesPlaceholder', 'Select admin pages...')}
+                                            			placeholder={tr('admin.analytics.filters.selectPagesPlaceholder', 'Select pages...')}
 											className="react-select-container"
 											classNamePrefix="react-select"
 											styles={{
@@ -285,31 +332,31 @@ export default function AnalyticsDashboard() {
 								</div>
 							</div>
 						)}
-						<div>
+						<div className="md:col-span-2">
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.startDate', 'Start Date')}</label>
 							<input type="date" value={startDateFilter} onChange={(e) => setStartDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
 						</div>
-						<div>
+						<div className="md:col-span-2">
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.endDate', 'End Date')}</label>
 							<input type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
 						</div>
-						<div>
+						<div className="md:col-span-3">
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.search', 'Search')}</label>
 							<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
 						</div>
-						<div className="flex items-end justify-end space-x-2">
-							<div className="flex items-center space-x-2">
+						<div className="md:col-span-12 lg:col-span-3 flex flex-col md:flex-row items-end md:items-center justify-end space-y-2 md:space-y-0 md:space-x-2">
+							<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
 								<button onClick={() => fetchStats()} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{tr('admin.analytics.filters.apply', 'Apply')}</button>
 								<button onClick={() => { setPageFilter(''); setSelectedPages([]); setStartDateFilter(''); setEndDateFilter(''); setSearchFilter(''); setEventType('page_view'); fetchStats(); }} className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">{tr('admin.analytics.filters.clear', 'Clear')}</button>
 							</div>
-							<div className="flex items-center space-x-2">
+							<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
 								<select value={exportScope} onChange={(e) => setExportScope(e.target.value as 'all' | 'page')} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
 									<option value="all">{tr('admin.analytics.exportAll', 'Export All')}</option>
 									<option value="page">{tr('admin.analytics.exportPage', 'Export Current Page')}</option>
 								</select>
 								<button onClick={() => { exportFilteredCSV(exportScope === 'page'); }} className="px-3 py-2 bg-green-600 text-white rounded-md">{tr('admin.analytics.exportCSV', 'Export CSV')}</button>
 							</div>
-							<div className="ml-4 text-sm text-gray-600 dark:text-gray-300">{tr('admin.analytics.rowsCount', 'Rows: {{count}}').replace('{{count}}', String(stats.length))}</div>
+							<div className="mt-2 md:mt-0 ml-0 md:ml-4 text-sm text-gray-600 dark:text-gray-300">{tr('admin.analytics.rowsCount', 'Rows: {{count}}').replace('{{count}}', String(stats.length))}</div>
 						</div>
 					</div>
 				)}
@@ -339,7 +386,7 @@ export default function AnalyticsDashboard() {
 			<div className="mt-4 flex items-center justify-between">
 				<div className="text-sm text-gray-700 dark:text-gray-300">{tr('admin.analytics.page', 'Page')} <span className="font-medium">{currentPage}</span> {tr('admin.analytics.of', 'of')} <span className="font-medium">{totalPages}</span></div>
 				<div className="inline-flex items-center space-x-1">
-					<button onClick={() => { if (currentPage > 1) applyClientFilters(undefined, currentPage - 1); }} disabled={currentPage <= 1} className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700">Prev</button>
+					<button onClick={() => { if (currentPage > 1) applyClientFilters(undefined, currentPage - 1); }} disabled={currentPage <= 1} className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700">{tr('common.previous', 'Prev')}</button>
 					{Array.from({ length: Math.min(5, totalPages) }).map((_, idx) => {
 						const base = Math.max(1, Math.min(currentPage - 2, Math.max(1, totalPages - 4)));
 						const p = base + idx;
@@ -348,7 +395,7 @@ export default function AnalyticsDashboard() {
 							<button key={p} onClick={() => applyClientFilters(undefined, p)} className={`px-3 py-1 rounded ${p === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}>{p}</button>
 						);
 					})}
-					<button onClick={() => { if (currentPage < totalPages) applyClientFilters(undefined, currentPage + 1); }} disabled={currentPage >= totalPages} className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700">Next</button>
+					<button onClick={() => { if (currentPage < totalPages) applyClientFilters(undefined, currentPage + 1); }} disabled={currentPage >= totalPages} className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700">{tr('common.next', 'Next')}</button>
 				</div>
 			</div>
 		</div>

@@ -14,6 +14,7 @@ import {
   Favorite, 
   FavoriteBorder,
   Star,
+  Share,
   Instagram,
   Facebook,
   LinkedIn,
@@ -83,9 +84,10 @@ interface RoasterCardProps {
   userLocation?: { lat: number; lng: number } | null
   onSpecialtyClick?: (specialtyName: string) => void
   returnTo?: string
+  showActions?: boolean
 }
 
-export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo = '/' }: RoasterCardProps) {
+export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo = '/', showActions = false }: RoasterCardProps) {
   const { t } = useTranslation()
   const { user } = useAuth()
   const { showRatings } = useFeatureFlags()
@@ -264,6 +266,26 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
 
   const roasterIdStr = roaster.id.toString()
 
+  const handleShare = async () => {
+    const url = (typeof window !== 'undefined' ? window.location.origin : '') + `/roasters/${roaster.id}`
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: roaster.name, url })
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url)
+        alert('Link copied to clipboard')
+      } else {
+        const a = document.createElement('a')
+        a.href = url
+        a.target = '_blank'
+        a.rel = 'noopener noreferrer'
+        a.click()
+      }
+    } catch (err) {
+      console.error('Share failed', err)
+    }
+  }
+
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col border border-gray-200 dark:border-gray-700 ${
       user?.role === 'admin' && !roaster.verified ? 'border-4 border-red-500 dark:border-red-500' : ''
@@ -276,6 +298,28 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
           height={192}
           className="w-full h-full object-cover"
         />
+        {showActions && (
+          <div className="absolute top-3 right-3 flex gap-3 z-30">
+            <button
+              onClick={handleShare}
+              className="bg-white text-gray-700 hover:bg-gray-50 p-3 rounded-full shadow-lg transition-all transform hover:scale-110 pointer-events-auto"
+              aria-label="Share roaster"
+            >
+              <Share sx={{ fontSize: 20 }} />
+            </button>
+            <button
+              onClick={() => toggleFavorite(roaster.id)}
+              className={`p-3 rounded-full pointer-events-auto ${
+                isFavorited
+                  ? 'bg-red-500 text-white'
+                  : 'bg-white text-red-500 hover:bg-red-50'
+              } shadow-lg transition-all transform hover:scale-110`}
+              aria-label={isFavorited ? 'Unfavorite' : 'Favorite'}
+            >
+              {isFavorited ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
+            </button>
+          </div>
+        )}
       </div>
       <div className="px-6 pt-6 pb-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">
