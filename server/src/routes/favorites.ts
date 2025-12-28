@@ -1,14 +1,16 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
+import { requireAuth } from '../middleware/requireAuth';
 
 const router = express.Router();
 // Use shared Prisma client
 
 // Get current user's favorites
-router.get('/', requireAuth, async (req: any, res: any) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+
   try {
-    const userId = req.user?.id;
+    const userId = authReq.user?.id;
 
     const favorites = await prisma.favorite.findMany({
       where: { userId },
@@ -84,20 +86,22 @@ router.get('/', requireAuth, async (req: any, res: any) => {
 });
 
 // Add a roaster to favorites
-router.post('/:roasterId', requireAuth, async (req: any, res: any) => {
-  try {
-    const userId = req.user?.id;
-    const { roasterId } = req.params;
+router.post('/:roasterId', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
 
+  try {
+    const userId = authReq.user?.id;
+    const { roasterId } = authReq.params;
+    if (!userId || !roasterId) {
+      return res.status(400).json({ error: 'Missing userId or roasterId' });
+    }
     // Check if roaster exists
     const roaster = await prisma.roaster.findUnique({
       where: { id: roasterId }
     });
-
     if (!roaster) {
       return res.status(404).json({ error: 'Roaster not found' });
     }
-
     // Check if already favorited
     const existing = await prisma.favorite.findUnique({
       where: {
@@ -107,11 +111,9 @@ router.post('/:roasterId', requireAuth, async (req: any, res: any) => {
         }
       }
     });
-
     if (existing) {
       return res.status(400).json({ error: 'Already favorited' });
     }
-
     // Create favorite
     const favorite = await prisma.favorite.create({
       data: {
@@ -119,7 +121,6 @@ router.post('/:roasterId', requireAuth, async (req: any, res: any) => {
         roasterId
       }
     });
-
     res.status(201).json({ message: 'Added to favorites', favorite });
   } catch (error) {
     console.error('Add favorite error:', error);
@@ -128,11 +129,15 @@ router.post('/:roasterId', requireAuth, async (req: any, res: any) => {
 });
 
 // Remove a roaster from favorites
-router.delete('/:roasterId', requireAuth, async (req: any, res: any) => {
-  try {
-    const userId = req.user?.id;
-    const { roasterId } = req.params;
+router.delete('/:roasterId', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
 
+  try {
+    const userId = authReq.user?.id;
+    const { roasterId } = authReq.params;
+    if (!userId || !roasterId) {
+      return res.status(400).json({ error: 'Missing userId or roasterId' });
+    }
     // Check if favorite exists
     const existing = await prisma.favorite.findUnique({
       where: {
@@ -142,11 +147,9 @@ router.delete('/:roasterId', requireAuth, async (req: any, res: any) => {
         }
       }
     });
-
     if (!existing) {
       return res.status(404).json({ error: 'Favorite not found' });
     }
-
     // Delete favorite
     await prisma.favorite.delete({
       where: {
@@ -156,7 +159,6 @@ router.delete('/:roasterId', requireAuth, async (req: any, res: any) => {
         }
       }
     });
-
     res.json({ message: 'Removed from favorites' });
   } catch (error) {
     console.error('Remove favorite error:', error);

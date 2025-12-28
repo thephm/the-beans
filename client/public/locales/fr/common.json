@@ -411,6 +411,25 @@
   },
   "admin": {
     "title": "Admin",
+    "analytics": {
+      "title": "Statistiques",
+      "adminRequired": "Accès administrateur requis.",
+      "loading": "Chargement des statistiques...",
+      "loadFailed": "Échec du chargement des statistiques",
+      "noRows": "Aucune ligne de statistiques. Nombre : {{count}}",
+      "period": "Période",
+      "eventType": "Type d'événement",
+      "count": "Nombre",
+      "eventTypes": {
+        "page_view": "Vue de page",
+        "signup": "Inscription",
+        "login": "Connexion",
+        "favorite": "Favori",
+        "review": "Avis",
+        "unknown": "Événement inconnu"
+      },
+      "page": "Page"
+    },
     "users": {
       "title": "Utilisateurs",
       "username": "Nom d'utilisateur",
@@ -638,7 +657,13 @@
       "failed": "Échec",
       "filename": "Nom du fichier de sauvegarde",
       "configuration": "Configuration Requise",
-      "configInfo": "Assurez-vous que les variables d'environnement suivantes sont définies dans la configuration de votre serveur :"
+      "configInfo": "Assurez-vous que les variables d'environnement suivantes sont définies dans la configuration de votre serveur :",
+      "testSuccess": "✅ Connexion WebDAV réussie",
+      "testFailed": "❌ Échec de la connexion WebDAV"
+      ,
+      "invalidResponse401": "Réponse invalide : 401 Non autorisé",
+      "connectionRefused": "Connexion refusée",
+      "timedOut": "Délai de connexion dépassé"
     }
   },
   "adminForms": {
@@ -733,6 +758,7 @@
   },
   "adminSection": {
     "users": "Utilisateurs",
+    "analytics": "Statistiques",
     "role": "Rôle",
     "people": "Personnes",
     "roasters": "Torréfacteurs",

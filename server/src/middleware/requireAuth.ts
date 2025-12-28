@@ -8,10 +8,11 @@ export { AuthenticatedRequest };
 const prisma = new PrismaClient();
 
 export const requireAuth = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const authReq = req as AuthenticatedRequest;
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
@@ -29,14 +30,14 @@ export const requireAuth = async (
       return res.status(401).json({ error: 'User not found' });
     }
     
-    req.user = {
+    authReq.user = {
       id: user.id,
       email: user.email,
       role: user.role,
       username: user.username
     };
     // Some middleware (audit, logging) expect `req.userId` directly — set it for compatibility
-    (req as any).userId = decoded.userId;
+    (authReq as any).userId = decoded.userId;
     next();
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });

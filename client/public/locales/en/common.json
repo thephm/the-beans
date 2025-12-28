@@ -414,6 +414,25 @@
   },
   "admin": {
     "title": "Admin",
+    "analytics": {
+      "title": "Analytics",
+      "adminRequired": "Admin access required.",
+      "loading": "Loading analytics...",
+      "loadFailed": "Failed to load analytics",
+      "noRows": "No analytics rows returned. Count: {{count}}",
+      "period": "Period",
+      "eventType": "Event Type",
+      "count": "Count",
+      "eventTypes": {
+        "page_view": "Page View",
+        "signup": "Signup",
+        "login": "Login",
+        "favorite": "Favorite",
+        "review": "Review",
+        "unknown": "Unknown Event"
+      },
+      "page": "Page"
+    },
     "users": {
       "title": "Users",
       "username": "Username",
@@ -641,7 +660,13 @@
       "failed": "Failed",
       "filename": "Backup filename",
       "configuration": "Configuration Required",
-      "configInfo": "Ensure the following environment variables are set in your server configuration:"
+      "configInfo": "Ensure the following environment variables are set in your server configuration:",
+      "testSuccess": "✅ WebDAV Connection Successful",
+      "testFailed": "❌ WebDAV Connection Failed"
+      ,
+      "invalidResponse401": "Invalid response: 401 Unauthorized",
+      "connectionRefused": "Connection refused",
+      "timedOut": "Connection timed out"
     }
   },
   "adminForms": {
@@ -732,6 +757,7 @@
   },
   "adminSection": {
   "users": "Users",
+  "analytics": "Analytics",
   "role": "Role",
   "people": "People",
     "roasters": "Roasters",

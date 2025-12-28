@@ -17,6 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
+  token?: string | null
   login: (token: string, user: User) => void
   logout: () => void
   refreshUser: () => Promise<void>
@@ -28,6 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
     // Only run on client side
@@ -44,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const parsedUser = JSON.parse(userData)
         setUser(parsedUser)
+        setToken(token)
         // Ensure the API client has the token
         apiClient.setToken(token)
       } catch (error) {
@@ -60,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
+    setToken(token)
     // Ensure the API client has the token
     apiClient.setToken(token)
   }
@@ -68,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
+    setToken(null)
     // Clear the token from API client
     apiClient.clearToken()
   }
@@ -90,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     isAuthenticated: !!user,
+    token,
     login,
     logout,
     refreshUser,

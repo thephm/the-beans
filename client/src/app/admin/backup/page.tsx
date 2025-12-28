@@ -172,6 +172,22 @@ export default function BackupPage() {
     }
   };
 
+  const mapBackendMessage = (message?: string) => {
+    if (!message) return '';
+    const m = message.toLowerCase();
+    if (m.includes('401') || m.includes('unauthorized')) {
+      return t('admin.backup.invalidResponse401', 'Invalid response: 401 Unauthorized');
+    }
+    if (m.includes('ecoff') || m.includes('econnrefused') || m.includes('connection refused')) {
+      return t('admin.backup.connectionRefused', 'Connection refused');
+    }
+    if (m.includes('timed out') || m.includes('timeout')) {
+      return t('admin.backup.timedOut', 'Connection timed out');
+    }
+    // Fallback to the raw message when no mapping exists
+    return message;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
       <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
@@ -229,7 +245,9 @@ export default function BackupPage() {
                 : 'text-red-800 dark:text-red-300'
             }`}
           >
-            {testResult.success ? '✅ WebDAV Connection Successful' : '❌ WebDAV Connection Failed'}
+            {testResult.success
+              ? t('admin.backup.testSuccess', '✅ WebDAV Connection Successful')
+              : t('admin.backup.testFailed', '❌ WebDAV Connection Failed')}
           </h3>
           {testResult.message && (
             <p
@@ -239,7 +257,7 @@ export default function BackupPage() {
                   : 'text-red-700 dark:text-red-400'
               }
             >
-              {testResult.message}
+              {mapBackendMessage(testResult.message)}
             </p>
           )}
         </div>

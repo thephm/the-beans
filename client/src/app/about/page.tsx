@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext'
 export default function AboutPage() {
   const { t } = useTranslation()
   const { user } = useAuth()
+
+  
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">

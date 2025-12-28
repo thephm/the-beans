@@ -2,7 +2,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
-import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
+import { requireAuth } from '../middleware/requireAuth';
+
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit, auditDelete } from '../middleware/auditMiddleware';
 import { createAuditLog } from '../lib/auditService';
 
@@ -11,10 +12,12 @@ const router = Router();
 // Admin: Get all users
 
 // Admin: Get all users
-router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+
   try {
     // Only allow admin users
-    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: authReq.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
@@ -50,17 +53,18 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
 
 // ...existing code...
 
+
 // Update user settings
-router.put('/settings', requireAuth, auditBefore('user', 'UPDATE'), async (req: any, res: any) => {
+router.put('/settings', requireAuth, auditBefore('user', 'UPDATE'), async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+
   try {
     // Ensure we know who's updating settings
-    const userId = req.user?.id;
+    const userId = authReq.user?.id;
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // ...existing code...
-    // ...existing code...
     // Admin: Update user by ID
     const settings = req.body;
 
@@ -79,7 +83,6 @@ router.put('/settings', requireAuth, auditBefore('user', 'UPDATE'), async (req: 
     // Store entity for audit logging
     res.locals.auditEntity = updatedUser;
 
-
     res.json({ 
       message: 'Settings updated successfully',
       settings
@@ -91,11 +94,14 @@ router.put('/settings', requireAuth, auditBefore('user', 'UPDATE'), async (req: 
 });
 
 
+
 // Admin: Delete user by ID (with audit logging)
-router.delete('/:id', requireAuth, auditDelete('user', prisma.user), async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/:id', requireAuth, auditDelete('user', prisma.user), async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+
   try {
     // Only allow admin users
-    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: authReq.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
@@ -161,11 +167,43 @@ router.delete('/:id', requireAuth, auditDelete('user', prisma.user), async (req:
 
 // ...existing code...
 
+// Update current user's language preference
+router.put('/language', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+  try {
+    const userId = authReq.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { language } = req.body;
+    if (!language || typeof language !== 'string') {
+      return res.status(400).json({ error: 'Invalid language value' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { language, updatedById: userId },
+      select: { id: true, email: true, username: true, language: true }
+    });
+
+    res.json({ message: 'Language updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user language:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
 // Admin: Update user by ID
-router.put('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/:id', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+  // If a literal path segment like 'language' is passed, skip this dynamic handler
+  // so a more specific route (e.g. /language) can handle it.
+  if (req.params.id === 'language') return next();
+
   try {
     // Only allow admin users
-    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: authReq.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
@@ -200,12 +238,15 @@ router.put('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response)
     res.status(500).json({ error: 'Failed to update user' });
   }
 });
+  
 
 // Admin: Get user by ID
-router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/:id', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+
   try {
     // Only allow admin users
-    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: authReq.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
@@ -240,10 +281,12 @@ router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res: Response)
 // This is intended for admin use when removing a user that has many related
 // records. It does NOT attempt to delete everything in the DB that may
 // reference the user — extend as needed for your data model.
-router.post('/:id/cascade-delete', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/:id/cascade-delete', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+
   try {
     // Only allow admin users
-    const me = await prisma.user.findUnique({ where: { id: req.user?.id }, select: { role: true } });
+    const me = await prisma.user.findUnique({ where: { id: authReq.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
@@ -298,4 +341,31 @@ router.post('/:id/cascade-delete', requireAuth, async (req: AuthenticatedRequest
   }
 });
 
-  export default router;
+// Update current user's language preference
+router.put('/language', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+  try {
+    const userId = authReq.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { language } = req.body;
+    if (!language || typeof language !== 'string') {
+      return res.status(400).json({ error: 'Invalid language value' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { language, updatedById: userId },
+      select: { id: true, email: true, username: true, language: true }
+    });
+
+    res.json({ message: 'Language updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user language:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+export default router;

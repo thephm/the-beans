@@ -84,6 +84,11 @@ export default function AuditLogsPage() {
       if (filters.endDate) params.endDate = filters.endDate;
 
       const data = await apiClient.getAuditLogs(params) as AuditLogResponse;
+      // Debug: log received audit logs
+      if (typeof window !== 'undefined') {
+        // eslint-disable-next-line no-console
+        console.log('Received auditLogs:', data.auditLogs);
+      }
       setAuditLogs(data.auditLogs);
       setCurrentPage(data.pagination.page);
       setTotalPages(data.pagination.totalPages);
@@ -362,10 +367,10 @@ export default function AuditLogsPage() {
               {auditLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {formatDate(log.createdAt)}
+                    {log.createdAt ? formatDate(log.createdAt) : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {formatTime(log.createdAt)}
+                    {log.createdAt ? formatTime(log.createdAt) : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
