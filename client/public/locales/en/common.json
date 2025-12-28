@@ -450,7 +450,7 @@
       },
       "exportAll": "Export All",
       "exportPage": "Export Current Page",
-      "exportCSV": "Export CSV",
+      "exportCSV": "Export",
       "rowsCount": "Rows: {{count}}",
       "of": "of"
     },

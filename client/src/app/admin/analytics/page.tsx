@@ -163,6 +163,16 @@ export default function AnalyticsDashboard() {
 		setDisplayRows(filtered.slice(start, start + limit));
 	};
 
+	const resetFilters = () => {
+		setPageFilter('');
+		setSelectedPages([]);
+		setStartDateFilter('');
+		setEndDateFilter('');
+		setSearchFilter('');
+		setEventType('page_view');
+		fetchStats();
+	};
+
 	const exportFilteredCSV = (currentPageOnly = false) => {
 		let rowsToExport: any[] = [];
 		if (currentPageOnly) rowsToExport = displayRows.slice();
@@ -326,7 +336,7 @@ export default function AnalyticsDashboard() {
 												}
 												}
 												menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
-												menuPosition="fixed"
+												menuPosition="fixed" />
 										</div>
 										<label className="inline-flex items-center text-sm text-gray-700 dark:text-gray-200">
 											<input type="checkbox" className="ml-2" checked={selectedPages.length === pagesList.length} onChange={(e) => {
@@ -349,28 +359,32 @@ export default function AnalyticsDashboard() {
 						</div>
 						<div className="md:col-span-2">
 							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.search', 'Search')}</label>
-							<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+							<div className="flex items-center">
+								<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+								<button type="button" onClick={resetFilters} title={tr('admin.analytics.filters.resetTooltip', 'Reset filters to defaults')} className="ml-2 px-3 py-2 bg-gray-300 dark:bg-gray-600 text-sm text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">{tr('admin.analytics.filters.reset', 'Reset')}</button>
+							</div>
 						</div>
 						<div className="md:col-span-12 flex flex-col md:flex-row items-end md:items-center justify-end space-y-2 md:space-y-0 md:space-x-2">
 							<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
 								<button onClick={() => fetchStats()} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{tr('admin.analytics.filters.apply', 'Apply')}</button>
 								<button onClick={() => { setPageFilter(''); setSelectedPages([]); setStartDateFilter(''); setEndDateFilter(''); setSearchFilter(''); setEventType('page_view'); fetchStats(); }} className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">{tr('admin.analytics.filters.clear', 'Clear')}</button>
 							</div>
-							<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
-								<select value={exportScope} onChange={(e) => setExportScope(e.target.value as 'all' | 'page')} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-									<option value="all">{tr('admin.analytics.exportAll', 'Export All')}</option>
-									<option value="page">{tr('admin.analytics.exportPage', 'Export Current Page')}</option>
-								</select>
-								<button onClick={() => { exportFilteredCSV(exportScope === 'page'); }} className="px-3 py-2 bg-green-600 text-white rounded-md">{tr('admin.analytics.exportCSV', 'Export CSV')}</button>
-							</div>
+							{/* Export controls moved to table header row */}
 							{/* rows count moved below filter pane so it updates with client-side filters */}
 					
 						</div>
 					</div>
 				)}
 			</div>
-			<div className="flex items-center justify-end mb-4">
+			<div className="flex items-center justify-between mb-4">
 				<div className="text-sm text-gray-600 dark:text-gray-300">{tr('admin.analytics.rowsCount', 'Rows: {{count}}').replace('{{count}}', String(filteredCount))}</div>
+				<div className="flex items-center space-x-2">
+					<select value={exportScope} onChange={(e) => setExportScope(e.target.value as 'all' | 'page')} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+						<option value="all">{tr('admin.analytics.exportAll', 'Export All')}</option>
+						<option value="page">{tr('admin.analytics.exportPage', 'Export Current Page')}</option>
+					</select>
+					<button onClick={() => { exportFilteredCSV(exportScope === 'page'); }} className="px-3 py-2 bg-green-600 text-white rounded-md">{tr('admin.analytics.exportCSV', 'Export')}</button>
+				</div>
 			</div>
 			<div className="overflow-x-auto">
 				<table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">

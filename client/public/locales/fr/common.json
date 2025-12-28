@@ -447,7 +447,7 @@
       },
       "exportAll": "Exporter tout",
       "exportPage": "Exporter la page actuelle",
-      "exportCSV": "Exporter CSV",
+      "exportCSV": "Exporter",
       "rowsCount": "Lignes : {{count}}",
       "of": "de"
     },
