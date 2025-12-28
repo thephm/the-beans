@@ -428,7 +428,28 @@
         "review": "Avis",
         "unknown": "Événement inconnu"
       },
-      "page": "Page"
+      "page": "Page",
+      "filters": {
+        "title": "Filtres",
+        "show": "Afficher les filtres",
+        "hide": "Masquer les filtres",
+        "eventType": "Type d'événement",
+        "page": "Page",
+        "selectAll": "Sélectionner toutes les pages",
+        "selectPagesPlaceholder": "Sélectionnez les pages...",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "search": "Recherche",
+        "searchPlaceholder": "terme de recherche...",
+        "apply": "Appliquer",
+        "clear": "Effacer",
+        "more": "+{{count}} de plus"
+      },
+      "exportAll": "Exporter tout",
+      "exportPage": "Exporter la page actuelle",
+      "exportCSV": "Exporter CSV",
+      "rowsCount": "Lignes : {{count}}",
+      "of": "de"
     },
     "users": {
       "title": "Utilisateurs",

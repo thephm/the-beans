@@ -431,7 +431,28 @@
         "review": "Review",
         "unknown": "Unknown Event"
       },
-      "page": "Page"
+      "page": "Page",
+      "filters": {
+        "title": "Filters",
+        "show": "Show filters",
+        "hide": "Hide filters",
+        "eventType": "Event Type",
+        "page": "Page",
+        "selectAll": "Select all pages",
+        "selectPagesPlaceholder": "Select pages...",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "search": "Search",
+        "searchPlaceholder": "search term...",
+        "apply": "Apply",
+        "clear": "Clear",
+        "more": "+{{count}} more"
+      },
+      "exportAll": "Export All",
+      "exportPage": "Export Current Page",
+      "exportCSV": "Export CSV",
+      "rowsCount": "Rows: {{count}}",
+      "of": "of"
     },
     "users": {
       "title": "Users",

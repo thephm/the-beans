@@ -128,6 +128,7 @@ export default function FavoritesPage() {
                       roaster={roaster}
                       userLocation={userLocation}
                       returnTo="/favorites"
+                      showActions={true}
                       onSpecialtyClick={(specialtyName) => {
                         if (specialtyName) {
                           router.push(`/discover?specialty=${encodeURIComponent(specialtyName)}`);
