@@ -76,12 +76,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
     if (response.ok) {
       const data = await response.json();
-      roasterRoutes = (data.roasters || []).map((roaster: { id: string; updatedAt: string }) => ({
-        url: `${baseUrl}/roasters/${roaster.id}`,
-        lastModified: new Date(roaster.updatedAt),
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-      }));
+      roasterRoutes = (data.roasters || []).map((roaster: { id: string; updatedAt?: string | null }) => {
+        const updated = roaster.updatedAt ? new Date(roaster.updatedAt) : undefined;
+        const hasValidDate = updated instanceof Date && !isNaN(updated.getTime());
+        return {
+          url: `${baseUrl}/roasters/${roaster.id}`,
+          ...(hasValidDate ? { lastModified: updated } : {}),
+          changeFrequency: 'weekly' as const,
+          priority: 0.8,
+        };
+      });
     }
   } catch (error) {
     console.error('Failed to fetch roasters for sitemap:', error);

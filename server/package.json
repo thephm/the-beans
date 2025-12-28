@@ -11,12 +11,13 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "ts-node src/seed.ts"
+    "db:seed": "ts-node src/seed.ts",
+    "test:analytics": "ts-node --transpile-only test/testAnalytics.ts",
+    "test:dateutils": "ts-node --transpile-only test/testDateUtils.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"
   },
-    "test:analytics": "ts-node --transpile-only test/testAnalytics.ts",
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@types/bcryptjs": "^2.4.6",

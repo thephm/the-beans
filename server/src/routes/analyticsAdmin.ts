@@ -9,6 +9,7 @@ declare global {
   }
 }
 import { getEventStats } from '../lib/analyticsService';
+import { parseFromDate, parseToDate } from '../lib/dateUtils';
 import { requireAuth } from '../middleware/requireAuth';
 
 const router = Router();
@@ -42,14 +43,14 @@ router.get('/stats', requireAuth, async (req: Request, res: Response) => {
     let fromDate: Date | undefined;
     let toDate: Date | undefined;
     if (from) {
-      fromDate = new Date(String(from));
-      if (isNaN(fromDate.getTime())) {
+      fromDate = parseFromDate(String(from));
+      if (fromDate && isNaN(fromDate.getTime())) {
         return res.status(400).json({ error: 'Invalid from date' });
       }
     }
     if (to) {
-      toDate = new Date(String(to));
-      if (isNaN(toDate.getTime())) {
+      toDate = parseToDate(String(to));
+      if (toDate && isNaN(toDate.getTime())) {
         return res.status(400).json({ error: 'Invalid to date' });
       }
     }
