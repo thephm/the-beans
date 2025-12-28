@@ -438,7 +438,7 @@
         "hide": "Hide",
         "eventType": "Event Type",
         "page": "Page",
-        "selectAll": "Select all pages",
+        "selectAll": "all",
         "selectPagesPlaceholder": "Select pages...",
         "startDate": "Start Date",
         "endDate": "End Date",
