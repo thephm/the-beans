@@ -406,7 +406,7 @@ router.put('/profile', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, username } = req.body;
+    const { email, username, language } = req.body;
     const userId = decoded.userId;
 
     // Set up audit context
@@ -448,6 +448,7 @@ router.put('/profile', [
     const updateData: any = { updatedById: userId };
     if (email) updateData.email = email;
     if (username) updateData.username = username;
+    if (language && typeof language === 'string') updateData.language = language;
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },

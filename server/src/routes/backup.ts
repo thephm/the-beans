@@ -11,13 +11,7 @@ const execAsync = promisify(exec);
 // Apply authentication middleware to all backup routes
 router.use(requireAuth);
 
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-    email: string;
-  };
-}
+
 
 interface BackupProgress {
   step: string;
@@ -62,10 +56,10 @@ interface BackupProgress {
  *       500:
  *         description: Backup failed
  */
-router.post('/database', async (req: AuthRequest, res: Response) => {
+router.post('/database', async (req: Request, res: Response) => {
   try {
     // Check if user is admin
-    const user = req.user;
+    const user = (req as any).user;
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });
     }
@@ -237,10 +231,10 @@ router.post('/database', async (req: AuthRequest, res: Response) => {
  *       403:
  *         description: Admin access required
  */
-router.get('/debug-webdav', async (req: AuthRequest, res: Response) => {
+router.get('/debug-webdav', async (req: Request, res: Response) => {
   try {
     // Check if user is admin
-    const user = req.user;
+    const user = (req as any).user;
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });
     }
@@ -290,10 +284,10 @@ router.get('/debug-webdav', async (req: AuthRequest, res: Response) => {
  *       500:
  *         description: WebDAV connection failed
  */
-router.get('/test-webdav', async (req: AuthRequest, res: Response) => {
+router.get('/test-webdav', async (req: Request, res: Response) => {
   try {
     // Check if user is admin
-    const user = req.user;
+    const user = (req as any).user;
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });
     }

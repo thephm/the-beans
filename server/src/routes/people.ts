@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
-import { AuthenticatedRequest } from '../types';
+
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 
 const router = Router();
@@ -83,7 +83,8 @@ async function canManagePeople(userId: string, roasterId: string): Promise<boole
 }
 
 // GET /api/people - Get all people (admin only, for people management page)
-router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
+
   try {
     // Only admin users can get all people
     const userId = req.user?.id;
@@ -141,7 +142,8 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
 // GET /api/people/:id - Get a single person by ID
 router.get('/:id', [
   param('id').isString().notEmpty().withMessage('Person ID is required')
-], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+], requireAuth, async (req: Request, res: Response) => {
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -185,7 +187,8 @@ router.get('/:id', [
 // GET /api/people/roaster/:roasterId - Get all people for a roaster
 router.get('/roaster/:roasterId', [
   param('roasterId').isString().notEmpty().withMessage('Roaster ID is required')
-], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+], requireAuth, async (req: Request, res: Response) => {
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -248,7 +251,8 @@ router.get('/roaster/:roasterId', [
 });
 
 // GET /api/people/email/:email - Get all roaster associations for a person by email
-router.get('/email/:email', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/email/:email', requireAuth, async (req: Request, res: Response) => {
+
   try {
     const { email } = req.params;
     
@@ -315,7 +319,8 @@ router.post('/', [
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
   body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean')
-], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+], requireAuth, async (req: Request, res: Response) => {
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -460,7 +465,8 @@ router.put('/:id', [
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
   body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean'),
   body('isActive').optional().isBoolean().withMessage('isActive must be a boolean')
-], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+], requireAuth, async (req: Request, res: Response) => {
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -647,7 +653,8 @@ router.put('/:id', [
 // DELETE /api/people/:id - Delete a person
 router.delete('/:id', [
   param('id').isString().notEmpty().withMessage('person ID is required')
-], requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+], requireAuth, async (req: Request, res: Response) => {
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

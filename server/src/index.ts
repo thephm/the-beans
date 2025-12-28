@@ -10,12 +10,16 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import bigintSerializer from './middleware/bigintSerializer';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 
 // Import routes
+
 import authRoutes from './routes/auth';
+import analyticsRouter from './routes/analytics';
+import analyticsAdminRouter from './routes/analyticsAdmin';
 import userRoutes from './routes/users';
 import roasterRoutes from './routes/roasters';
 import peopleRoutes from './routes/people';
@@ -74,6 +78,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+// Convert BigInt values returned by raw SQL queries to safe JSON types
+app.use(bigintSerializer);
 app.use(morgan('combined'));
 app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
@@ -129,6 +135,7 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
+
 // API routes
 app.use('/api/auth', authLimiter, authRoutes); // Apply stricter rate limiting to auth endpoints
 app.use('/api/users', userRoutes);
@@ -145,7 +152,10 @@ app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 app.use('/api/debug', debugRoutes); // Debug authentication routes
-app.use('/api/admin/users', adminUsersRoutes);
+// Analytics event capture route
+app.use('/api/analytics', analyticsRouter);
+// Analytics admin stats route
+app.use('/api/admin/analytics', analyticsAdminRouter);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

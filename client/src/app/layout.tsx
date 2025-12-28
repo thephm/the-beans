@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
 import { ConditionalFooter } from '@/components/ConditionalFooter'
+import { AnalyticsTracker } from '@/components/AnalyticsTracker'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -85,6 +86,7 @@ export default function RootLayout({
           <DarkModeScript />
           <div className="flex flex-col min-h-screen">
             <Navbar />
+            <AnalyticsTracker />
             <main className="flex-grow">
               {children}
             </main>

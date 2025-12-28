@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
-import { requireAuth, AuthenticatedRequest } from '../middleware/requireAuth';
+import { requireAuth } from '../middleware/requireAuth';
+
 import { auditBefore, auditAfter } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
 
@@ -122,7 +123,8 @@ router.post('/',
     body('translations.fr.name').notEmpty().withMessage('French name is required'),
   ],
   auditBefore('specialty', 'CREATE'),
-  async (req: any, res: Response) => {
+  async (req: Request, res: Response) => {
+
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -130,7 +132,7 @@ router.post('/',
       }
 
       const { translations, deprecated = false } = req.body;
-      req.userId = req.user?.id;
+      req.userId = typeof req.user?.id === 'string' ? req.user.id : undefined;
 
       // Create specialty with translations
       const translationsData = Object.entries(translations).map(([language, data]: [string, any]) => ({
@@ -172,7 +174,8 @@ router.put('/:id',
     body('deprecated').optional().isBoolean().withMessage('Deprecated must be a boolean'),
   ],
   auditBefore('specialty', 'UPDATE'),
-  async (req: any, res: Response) => {
+  async (req: Request, res: Response) => {
+
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -181,7 +184,7 @@ router.put('/:id',
 
       const { id } = req.params;
       const { translations, deprecated } = req.body;
-      req.userId = req.user?.id;
+      req.userId = typeof req.user?.id === 'string' ? req.user.id : undefined;
 
       // Capture old values for audit (including translations)
       const oldSpecialty = await prisma.specialty.findUnique({
@@ -239,6 +242,9 @@ router.put('/:id',
 
       // Create audit log directly to ensure translation changes are captured
       if (updatedSpecialty) {
+        if (typeof req.userId !== 'string') {
+          return res.status(400).json({ error: 'Missing or invalid userId' });
+        }
         await createAuditLog({
           action: 'UPDATE',
           entityType: 'specialty',
@@ -265,10 +271,11 @@ router.delete('/:id',
   requireAuth,
   requireAdmin,
   auditBefore('specialty', 'DELETE'),
-  async (req: any, res: Response) => {
+  async (req: Request, res: Response) => {
+
     try {
       const { id } = req.params;
-      req.userId = req.user?.id;
+      req.userId = typeof req.user?.id === 'string' ? req.user.id : undefined;
 
       // Check if specialty exists and get it for audit
       const specialty = await prisma.specialty.findUnique({

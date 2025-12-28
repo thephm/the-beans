@@ -366,3 +366,18 @@ model RoasterSuggestion {
 
   @@map("roaster_suggestions")
 }
+
+model AnalyticsEvent {
+  id         Int      @id @default(autoincrement())
+  eventType  String   @db.VarChar(50)
+  eventData  Json?
+  timestamp  DateTime @default(now())
+  sessionId  String?  @db.VarChar(100)
+  userAgent  String?
+  ipHash     String?  @db.VarChar(64)
+
+  @@index([eventType], name: "idx_event_type")
+  @@index([timestamp], name: "idx_timestamp")
+  @@index([sessionId], name: "idx_session_id")
+  @@map("analytics_events")
+}

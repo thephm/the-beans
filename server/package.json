@@ -16,6 +16,7 @@
   "prisma": {
     "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"
   },
+    "test:analytics": "ts-node --transpile-only test/testAnalytics.ts",
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@types/bcryptjs": "^2.4.6",

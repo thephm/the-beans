@@ -1,21 +1,41 @@
 import { CreateRoasterFromSuggestionResponse } from '../types';
 
+
 // Determine API base URL with fallback for production
 const getApiBaseUrl = () => {
-  // First, check for explicitly set environment variable
+  // Determine base URL with precedence: env var -> production -> defaults
+  let url: string;
+
   if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+    url = process.env.NEXT_PUBLIC_API_URL;
+    // If running SSR inside Docker and env var points to localhost,
+    // rewrite to the backend service hostname so container-to-container
+    // networking works.
+    if (typeof window === 'undefined' && url.includes('localhost')) {
+      return url.replace('localhost', 'server');
+    }
+    return url;
   }
-  // Check if we're in production environment
+
   if (process.env.NODE_ENV === 'production') {
-    return 'https://the-beans-api.onrender.com';
+    url = 'https://the-beans-api.onrender.com';
+    return url;
   }
-  // If in production and no env var set, use the Render backend URL
+
   if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
-    return 'https://the-beans-api.onrender.com';
+    url = 'https://the-beans-api.onrender.com';
+    return url;
   }
-  // Default to localhost for development
-  return 'http://localhost:5000';
+
+  // Default to localhost for development, but when executing server-side
+  // (Next SSR in Docker), localhost refers to the container itself —
+  // rewrite to the backend service host so server-side requests reach
+  // the backend container.
+  url = 'http://localhost:5000';
+  if (typeof window === 'undefined' && url.includes('localhost')) {
+    return url.replace('localhost', 'server');
+  }
+  return url;
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -29,6 +49,23 @@ class ApiClient {
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('token');
     }
+  }
+
+  // Analytics event tracking
+
+  async trackEvent(eventType: string, eventData?: any) {
+    let sessionId = '';
+    if (typeof window !== 'undefined') {
+      sessionId = sessionStorage.getItem('analyticsSessionId') || '';
+      if (!sessionId) {
+        sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+        sessionStorage.setItem('analyticsSessionId', sessionId);
+      }
+    }
+    return this.request('/analytics', {
+      method: 'POST',
+      body: JSON.stringify({ eventType, eventData, sessionId }),
+    });
   }
 
   // ...existing code...
@@ -98,7 +135,10 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseURL}/api${endpoint}`;
+    // Only prefix /api if endpoint does not already start with /api
+    const url = endpoint.startsWith('/api')
+      ? `${this.baseURL}${endpoint}`
+      : `${this.baseURL}/api${endpoint}`;
     
     // Always get fresh token from localStorage
     const currentToken = typeof window !== 'undefined' ? localStorage.getItem('token') : this.token;
@@ -112,12 +152,13 @@ class ApiClient {
       headers.Authorization = `Bearer ${currentToken}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
 
-    if (response.status === 401) {
+      if (response.status === 401) {
       // Unauthorized: clear token and redirect to login
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
@@ -137,11 +178,17 @@ class ApiClient {
       const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
       throw new Error(errorMessage);
     }
+      return response.json();
+    } catch (err: any) {
+      // Log helpful debugging info for both browser and SSR (server-side)
+      // eslint-disable-next-line no-console
+      console.error('ApiClient fetch network error:', { url, options, err });
+      throw new Error(`Network error contacting ${url}: ${err?.message || err}`);
+    }
 
-    return response.json();
   }
-
   // Authentication
+  
   async register(userData: {
     email: string;
     username: string;
@@ -186,7 +233,8 @@ class ApiClient {
   }
 
   async updateUserLanguage(language: string) {
-    return this.request('/users/language', {
+    // Use the auth profile endpoint to update the authenticated user's language
+    return this.request('/auth/profile', {
       method: 'PUT',
       body: JSON.stringify({ language }),
     });
@@ -270,6 +318,23 @@ class ApiClient {
 
   async getAuditLogById(id: string) {
     return this.request(`/admin/audit-logs/${id}`);
+  }
+
+  // Admin analytics
+  async getAdminAnalyticsStats(params?: Record<string, any>) {
+    const sp = new URLSearchParams();
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        if (v === undefined || v === null) continue;
+        if (Array.isArray(v)) {
+          v.forEach((item) => sp.append(k, String(item)));
+        } else {
+          sp.append(k, String(v));
+        }
+      }
+    }
+    const searchParams = sp.toString() ? `?${sp.toString()}` : '';
+    return this.request(`/admin/analytics/stats${searchParams}`);
   }
 
   // Favorites methods

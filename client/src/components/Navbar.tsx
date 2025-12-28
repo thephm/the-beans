@@ -101,13 +101,13 @@ export function Navbar() {
                     >
                       {t('adminSection.users', 'Users')}
                     </Link>
-                      <Link 
-                        href="/admin/people" 
-                        className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
-                        onClick={() => setIsAdminMenuOpen(false)}
-                      >
-                        {t('adminSection.people', 'People')}
-                      </Link>
+                    <Link 
+                      href="/admin/people" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('adminSection.people', 'People')}
+                    </Link>
                     <Link 
                       href="/admin/roasters" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
@@ -118,7 +118,14 @@ export function Navbar() {
                     >
                       {t('adminSection.roasters', 'Roasters')}
                     </Link>
-                    {/* Only one 'Roasters (New)' link in Admin dropdown */}
+                    {/* Add Analytics link here */}
+                    <Link 
+                      href="/admin/analytics" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors font-semibold"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('adminSection.analytics', 'Analytics')}
+                    </Link>
                     <Link 
                       href="/admin/roasters/new-admin" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-green-700 dark:hover:text-green-400 transition-colors font-semibold"

@@ -172,8 +172,12 @@ router.get('/audit-logs',
         'Surrogate-Control': 'no-store'
       });
 
+      // Ensure createdAt is always an ISO string for frontend compatibility
       res.json({
-        auditLogs,
+        auditLogs: auditLogs.map(log => ({
+          ...log,
+          createdAt: log.createdAt instanceof Date ? log.createdAt.toISOString() : log.createdAt
+        })),
         pagination: {
           page,
           limit,
