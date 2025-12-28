@@ -85,6 +85,7 @@ export default function AnalyticsDashboard() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [limit] = useState(20);
 	const [totalPages, setTotalPages] = useState(1);
+	const [filteredCount, setFilteredCount] = useState(0);
 	const [displayRows, setDisplayRows] = useState([] as any[]);
 
 	useEffect(() => {
@@ -154,6 +155,7 @@ export default function AnalyticsDashboard() {
 			filtered = filtered.filter((r: any) => JSON.stringify(r).toLowerCase().includes(q));
 		}
 		const tp = Math.max(1, Math.ceil(filtered.length / limit));
+		setFilteredCount(filtered.length);
 		setTotalPages(tp);
 		const p = Math.max(1, Math.min(page, tp));
 		setCurrentPage(p);
@@ -264,7 +266,7 @@ export default function AnalyticsDashboard() {
 							</select>
 						</div>
 						{eventType === 'page_view' && (
-							<div className="md:col-span-2">
+							<div className="md:col-span-3">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.page', 'Page')}</label>
 								<div className="mt-1">
 									<div className="flex items-center space-x-2">
@@ -308,8 +310,11 @@ export default function AnalyticsDashboard() {
 														boxShadow: state.isFocused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
 														color: '#f9fafb',
 														minHeight: '40px',
+														minWidth: '200px',
+														width: '100%'
 													}),
-													menu: (base) => ({ ...base, background: '#0f172a', color: '#f9fafb' }),
+													menu: (base) => ({ ...base, background: '#0f172a', color: '#f9fafb', minWidth: '220px', zIndex: 9999 }),
+													menuPortal: (base) => ({ ...base, zIndex: 9999 }),
 													option: (base, state) => ({
 														...base,
 														background: state.isFocused ? '#1f2937' : 'transparent',
@@ -318,8 +323,10 @@ export default function AnalyticsDashboard() {
 													multiValue: (base) => ({ ...base, background: '#374151', color: '#f9fafb' }),
 													placeholder: (base) => ({ ...base, color: '#9ca3af' }),
 													singleValue: (base) => ({ ...base, color: '#f9fafb' }),
-												}}
-											/>
+												}
+												}
+												menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
+												menuPosition="fixed"
 										</div>
 										<label className="inline-flex items-center text-sm text-gray-700 dark:text-gray-200">
 											<input type="checkbox" className="ml-2" checked={selectedPages.length === pagesList.length} onChange={(e) => {
@@ -356,10 +363,14 @@ export default function AnalyticsDashboard() {
 								</select>
 								<button onClick={() => { exportFilteredCSV(exportScope === 'page'); }} className="px-3 py-2 bg-green-600 text-white rounded-md">{tr('admin.analytics.exportCSV', 'Export CSV')}</button>
 							</div>
-							<div className="mt-2 md:mt-0 ml-0 md:ml-4 text-sm text-gray-600 dark:text-gray-300">{tr('admin.analytics.rowsCount', 'Rows: {{count}}').replace('{{count}}', String(stats.length))}</div>
+							{/* rows count moved below filter pane so it updates with client-side filters */}
+					
 						</div>
 					</div>
 				)}
+			</div>
+			<div className="flex items-center justify-end mb-4">
+				<div className="text-sm text-gray-600 dark:text-gray-300">{tr('admin.analytics.rowsCount', 'Rows: {{count}}').replace('{{count}}', String(filteredCount))}</div>
 			</div>
 			<div className="overflow-x-auto">
 				<table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
