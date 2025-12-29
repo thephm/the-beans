@@ -137,3 +137,35 @@ html.dark body {
     transform: translate(24px, 0);
   }
 }
+
+/* react-select dark-mode overrides: ensure the control, input and menu
+   are dark when the app is in dark mode. These are placed here so Tailwind
+   base rules don't accidentally make react-select look light in dark theme. */
+html.dark .react-select__control,
+html.dark .react-select-container .react-select__control {
+  background-color: #0f172a !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+html.dark .react-select__value-container,
+html.dark .react-select-container .react-select__value-container {
+  color: #f9fafb !important;
+}
+html.dark .react-select__input > input,
+html.dark .react-select-container .react-select__input > input {
+  background: transparent !important;
+  color: #f9fafb !important;
+}
+html.dark .react-select__single-value,
+html.dark .react-select-container .react-select__single-value {
+  color: #f9fafb !important;
+}
+html.dark .react-select__placeholder,
+html.dark .react-select-container .react-select__placeholder {
+  color: #9ca3af !important;
+}
+html.dark .react-select__menu,
+html.dark .react-select-container .react-select__menu {
+  background-color: #0f172a !important;
+  color: #f9fafb !important;
+}
