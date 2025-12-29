@@ -15,6 +15,7 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
+  const [isAdminMobileOpen, setIsAdminMobileOpen] = useState(false)
   const { user, logout, loading } = useAuth()
   const { t } = useTranslation()
   const adminMenuRef = useRef<HTMLDivElement>(null)
@@ -242,66 +243,86 @@ export function Navbar() {
               </Link>
               {user?.role === 'admin' && (
                 <div className="py-2">
-                  <div className="text-gray-700 dark:text-gray-200 font-semibold mb-2">{t('admin.title', 'Admin')}</div>
-                  <Link 
-                    href="/admin/users" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                    onClick={() => setIsMobileMenuOpen(false)}
+                  <button
+                    onClick={() => setIsAdminMobileOpen(!isAdminMobileOpen)}
+                    className="w-full flex items-center justify-between text-gray-700 dark:text-gray-200 font-semibold mb-2"
                   >
-                    {t('adminSection.users', 'Users')}
-                  </Link>
-                  <Link 
-                    href="/admin/roasters" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      window.location.href = '/admin/roasters';
-                    }}
-                  >
-                    {t('adminSection.roasters', 'Roasters')}
-                  </Link>
-                  <Link 
-                    href="/admin/roasters/new-admin" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-green-700 dark:hover:text-green-400 py-1 font-semibold" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('adminSection.roastersNew', 'Roasters (New)')}
-                  </Link>
-                  <Link 
-                    href="/admin/people" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('adminSection.people', 'People')}
-                  </Link>
-                  <Link 
-                    href="/admin/specialties" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('admin.specialties.title', 'Specialties')}
-                  </Link>
-                  <Link 
-                    href="/admin/suggestions" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('admin.suggestions.title', 'Suggestions')}
-                  </Link>
-                  <Link 
-                    href="/admin/backup" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('admin.backup.title', 'Backup')}
-                  </Link>
-                  <Link 
-                    href="/admin/audit-logs" 
-                    className="block pl-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('adminSection.auditLogs', 'Audit Logs')}
-                  </Link>
+                    <span>{t('admin.title', 'Admin')}</span>
+                    <svg className={`w-4 h-4 transform transition-transform ${isAdminMobileOpen ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {isAdminMobileOpen && (
+                    <div className="pl-4">
+                      <Link 
+                        href="/admin/users" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.users', 'Users')}
+                      </Link>
+                      <Link 
+                        href="/admin/roasters" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          window.location.href = '/admin/roasters';
+                        }}
+                      >
+                        {t('adminSection.roasters', 'Roasters')}
+                      </Link>
+                      <Link 
+                        href="/admin/roasters/new-admin" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-green-700 dark:hover:text-green-400 py-1 font-semibold" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.roastersNew', 'Roasters (New)')}
+                      </Link>
+                      <Link 
+                        href="/admin/people" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.people', 'People')}
+                      </Link>
+                      <Link 
+                        href="/admin/specialties" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('admin.specialties.title', 'Specialties')}
+                      </Link>
+                      <Link 
+                        href="/admin/suggestions" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('admin.suggestions.title', 'Suggestions')}
+                      </Link>
+                      <Link 
+                        href="/admin/backup" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('admin.backup.title', 'Backup')}
+                      </Link>
+                      <Link 
+                        href="/admin/analytics" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 py-1 font-semibold"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.analytics', 'Analytics')}
+                      </Link>
+                      <Link 
+                        href="/admin/audit-logs" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.auditLogs', 'Audit Logs')}
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
               {/* Mobile Language Selector */}
