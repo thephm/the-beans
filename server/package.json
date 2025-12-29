@@ -14,6 +14,7 @@
     "db:seed": "ts-node src/seed.ts",
     "test:analytics": "ts-node --transpile-only test/testAnalytics.ts",
     "test:dateutils": "ts-node --transpile-only test/testDateUtils.ts"
+    ,"test:audit-date": "ts-node --transpile-only test/testAuditDateFilter.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"

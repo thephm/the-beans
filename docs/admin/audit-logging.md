@@ -154,6 +154,8 @@ GET /api/admin/audit-logs
 - `startDate`: Filter from date (ISO format)
 - `endDate`: Filter to date (ISO format)
 
+Note: When `startDate`/`endDate` are provided as date-only values in `YYYY-MM-DD` form, the server interprets them as the full local-day range — i.e. `startDate` becomes `00:00:00.000` local time and `endDate` becomes `23:59:59.999` local time. This ensures filtering by calendar date matches users' expectations across timezones.
+
 **Response:**
 ```json
 {

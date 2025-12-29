@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
+import { parseDateOnlyStart, parseDateOnlyEnd } from '../lib/dateUtils';
 
 const router = Router();
 // Use shared Prisma client
@@ -131,10 +132,10 @@ router.get('/audit-logs',
       if (req.query.startDate || req.query.endDate) {
         where.createdAt = {};
         if (req.query.startDate) {
-          where.createdAt.gte = new Date(req.query.startDate);
+          where.createdAt.gte = parseDateOnlyStart(req.query.startDate);
         }
         if (req.query.endDate) {
-          where.createdAt.lte = new Date(req.query.endDate);
+          where.createdAt.lte = parseDateOnlyEnd(req.query.endDate);
         }
       }
 
