@@ -461,7 +461,7 @@ export default function AnalyticsDashboard() {
 							<tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.period}</td>
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{getEventLabel(row.event_type)}</td>
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{(row.page || '').toString().replace(/^\//, '')}</td>
+								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100 max-w-[14rem] sm:max-w-none break-words whitespace-normal">{(row.page || '').toString().replace(/^\//, '')}</td>
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.count}</td>
 							</tr>
 						))}
