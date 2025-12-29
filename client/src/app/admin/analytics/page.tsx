@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
 import Select, { components } from 'react-select';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -79,7 +80,7 @@ export default function AnalyticsDashboard() {
 		'/admin/suggestions',
 		'/admin/users',
 	];
-	const adminOptions = pagesList.map(p => ({ value: p, label: p && String(p).startsWith('/') ? String(p).slice(1) : p }));
+	const adminOptions = pagesList.map(p => ({ value: p, label: p === '/' ? 'home' : (p && String(p).startsWith('/') ? String(p).slice(1) : p) }));
 	const [selectedPages, setSelectedPages] = useState([] as string[]);
 	const [startDateFilter, setStartDateFilter] = useState('');
 	const [endDateFilter, setEndDateFilter] = useState('');
@@ -94,17 +95,31 @@ export default function AnalyticsDashboard() {
 	const [filteredCount, setFilteredCount] = useState(0);
 	const [displayRows, setDisplayRows] = useState([] as any[]);
 	const [totals, setTotals] = useState({ totalPageViews: 0, discover: 0, about: 0, roasters: 0 });
+	const [topPages, setTopPages] = useState([] as Array<{ label: string; page: string; count: number }>);
+	const [topPagesDays, setTopPagesDays] = useState(30);
 
 	useEffect(() => {
 		// detect light/dark mode on client and keep a simple state for react-select styles
+		// Also observe changes to the <html> class so toggling theme updates the state
+		let mounted = true;
 		try {
 			const el = typeof document !== 'undefined' ? document.documentElement : null;
-			// Respect the app's explicit Tailwind 'dark' class on <html> for theme
-			// Do not rely on the system-level prefers-color-scheme here, because
-			// the app's theme is controlled via the 'dark' class.
-			if (el) setIsDarkMode(el.classList.contains('dark'));
+			if (el && mounted) setIsDarkMode(el.classList.contains('dark'));
+			if (el) {
+				const mo = new MutationObserver(() => {
+					if (!mounted) return;
+					setIsDarkMode(el.classList.contains('dark'));
+				});
+				mo.observe(el, { attributes: true, attributeFilter: ['class'] });
+				// ensure we disconnect on cleanup
+				const disconnect = () => mo.disconnect();
+				// attach to closure cleanup below
+				// store on element so cleanup can find it if needed (defensive)
+				// @ts-ignore
+				el.__analyticsThemeObserverDisconnect = disconnect;
+			}
 		} catch (e) {}
-		let mounted = true;
+
 		async function ensureTranslations() {
 			try {
 				const lang = i18n?.language || 'en';
@@ -120,7 +135,16 @@ export default function AnalyticsDashboard() {
 			}
 		}
 		ensureTranslations();
-		return () => { mounted = false; };
+		return () => {
+			mounted = false;
+			try {
+				const el = typeof document !== 'undefined' ? document.documentElement : null;
+				if (el) {
+					// @ts-ignore
+					if (el.__analyticsThemeObserverDisconnect) el.__analyticsThemeObserverDisconnect();
+				}
+			} catch (e) {}
+		};
 	}, [i18n?.language]);
 
 	const fetchStats = async (overrideParams?: Record<string, string>) => {
@@ -148,7 +172,7 @@ export default function AnalyticsDashboard() {
 	};
 
 	useEffect(() => { fetchStats(); }, [user, token, eventType, startDateFilter, endDateFilter]);
-	useEffect(() => { applyClientFilters(undefined, 1); }, [selectedPages, searchFilter, stats]);
+	useEffect(() => { applyClientFilters(undefined, 1); }, [selectedPages, searchFilter, stats, topPagesDays]);
 
 	const applyClientFilters = (rowsParam?: any[], page = 1) => {
 		const rows = rowsParam || stats || [];
@@ -156,7 +180,10 @@ export default function AnalyticsDashboard() {
 		if (selectedPages && selectedPages.length > 0) {
 			filtered = filtered.filter((r: any) => {
 				const rp = (r.page || '').toString();
-				return selectedPages.some(sp => rp === sp || rp.startsWith(sp + '/') || rp.startsWith(sp));
+				return selectedPages.some(sp => {
+					if (sp === '/') return rp === '/' || rp === '';
+					return rp === sp || rp.startsWith(sp + '/') || rp.startsWith(sp);
+				});
 			});
 		} else {
 			// By default, exclude admin pages from results unless specific pages are selected
@@ -178,7 +205,50 @@ export default function AnalyticsDashboard() {
 			const discover = filtered.filter((r: any) => (r.page || '').toString() === '/discover' && String(r.event_type) === 'page_view').reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
 			const about = filtered.filter((r: any) => (r.page || '').toString() === '/about' && String(r.event_type) === 'page_view').reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
 			const roasters = filtered.filter((r: any) => { const p = (r.page || '').toString(); return (p === '/roasters' || p.startsWith('/roasters/')) && String(r.event_type) === 'page_view'; }).reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
-			setTotals({ totalPageViews, discover, about, roasters });
+				setTotals({ totalPageViews, discover, about, roasters });
+
+				// compute top pages
+				try {
+					const pageCounts: Record<string, number> = {};
+					const cutoff = new Date();
+					cutoff.setUTCDate(cutoff.getUTCDate() - Math.max(0, Number(topPagesDays || 0)));
+					filtered.filter((r: any) => String(r.event_type) === 'page_view').forEach((r: any) => {
+						// each row has a `period` like 'YYYY-MM-DD' or 'YYYY-MM-DD HH'
+						const periodRaw = String(r.period || '').split(' ')[0];
+						if (!periodRaw) return;
+						const rowDate = new Date(periodRaw + 'T00:00:00Z');
+						if (isNaN(rowDate.getTime())) return;
+						if (rowDate < cutoff) return; // skip rows outside timeframe
+						const p = (r.page || '').toString() || '/';
+						// Only count roaster pages for Top Roasters
+						if (!p.startsWith('/roasters')) return;
+						pageCounts[p] = (pageCounts[p] || 0) + (Number(r.count) || 0);
+					});
+					const pagesArr = Object.keys(pageCounts).map(p => ({ page: p, count: pageCounts[p] }));
+					pagesArr.sort((a, b) => b.count - a.count);
+					const top3 = pagesArr.slice(0, 3); // only top 3 roaster pages
+					// Resolve roaster names for these top 3
+					(async () => {
+						const resolved: Array<{ label: string; page: string; count: number }> = [];
+						for (const it of top3) {
+							let label = it.page === '/' ? 'home' : (it.page.startsWith('/') ? it.page.slice(1) : it.page);
+							const m = String(it.page).match(/^\/roasters\/([^\/\?]+)/);
+							if (m && m[1]) {
+								const id = m[1];
+								try {
+									const r: any = await apiClient.getRoaster(id);
+									if (r && (r.name || r.roasterName || r.roaster_name)) label = r.name || r.roasterName || r.roaster_name;
+								} catch (e) {
+									// leave label as path fallback
+								}
+							}
+							resolved.push({ label, page: it.page, count: it.count });
+						}
+						setTopPages(resolved);
+					})();
+				} catch (e) {
+					setTopPages([]);
+				}
 		} catch (e) {
 			setTotals({ totalPageViews: 0, discover: 0, about: 0, roasters: 0 });
 		}
@@ -207,7 +277,10 @@ export default function AnalyticsDashboard() {
 			if (selectedPages && selectedPages.length > 0) {
 				filtered = filtered.filter((r: any) => {
 					const rp = (r.page || '').toString();
-					return selectedPages.some(sp => rp === sp || rp.startsWith(sp + '/') || rp.startsWith(sp));
+					return selectedPages.some(sp => {
+						if (sp === '/') return rp === '/' || rp === '';
+						return rp === sp || rp.startsWith(sp + '/') || rp.startsWith(sp);
+					});
 				});
 			} else {
 				// Default export should also exclude admin pages
@@ -291,23 +364,43 @@ export default function AnalyticsDashboard() {
 			</div>
 			{/* Totals summary similar to audit logs */}
 			{!loading && (
-				<div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
-						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.totalPageViews', 'Total Page Views')}</h3>
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-6 mb-6">
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500 md:col-span-1 flex flex-col items-center justify-center text-center">
+					<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.totalPageViews', 'Total Views')}</h3>
 						<p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{(totals.totalPageViews || 0).toLocaleString()}</p>
 					</div>
-					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
-						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.discover', 'discover Page Views')}</h3>
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500 md:col-span-1 flex flex-col items-center justify-center text-center">
+					<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.discover', 'discover')}</h3>
 						<p className="text-3xl font-bold text-green-600 dark:text-green-400">{(totals.discover || 0).toLocaleString()}</p>
 					</div>
-					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
-						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.about', 'about Page Views')}</h3>
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500 md:col-span-1 flex flex-col items-center justify-center text-center">
+					<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.about', 'about')}</h3>
 						<p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{(totals.about || 0).toLocaleString()}</p>
 					</div>
-					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
-						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.roasters', 'roaster Page Views')}</h3>
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500 md:col-span-1 flex flex-col items-center justify-center text-center">
+					<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.roasters', 'roaster')}</h3>
 						<p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{(totals.roasters || 0).toLocaleString()}</p>
 					</div>
+				<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500 md:col-span-2">
+					<div className="flex items-start justify-between">
+						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Top Roasters</h3>
+						<select value={String(topPagesDays)} onChange={(e) => setTopPagesDays(Number(e.target.value))} className="ml-4 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+							<option value="7">7d</option>
+							<option value="30">30d</option>
+							<option value="90">90d</option>
+							<option value="365">365d</option>
+						</select>
+					</div>
+					<div className="space-y-2">
+						{topPages.length === 0 && <div className="text-sm text-gray-500 dark:text-gray-400">No data</div>}
+						{topPages.slice(0,3).map((p) => (
+							<div key={p.page} className="flex items-center justify-between">
+								<Link href={p.page} className="truncate text-sm text-gray-800 dark:text-gray-200 mr-4 hover:underline">{p.label}</Link>
+								<span className="font-semibold text-sm text-gray-700 dark:text-gray-300">{p.count.toLocaleString()}</span>
+							</div>
+						))}
+					</div>
+				</div>
 				</div>
 			)}
 			{loading && <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">{tr('admin.analytics.loading', 'Loading analytics...')}</div>}
@@ -365,7 +458,7 @@ export default function AnalyticsDashboard() {
 												isMulti
 												formatOptionLabel={(opt: any) => (opt && opt.label !== undefined && opt.label !== null && opt.label !== '' ? opt.label : (opt && opt.value ? (String(opt.value).startsWith('/') ? String(opt.value).slice(1) : opt.value) : ''))}
 												options={adminOptions}
-												value={selectedPages.map(p => ({ value: p, label: p && String(p).startsWith('/') ? String(p).slice(1) : p }))}
+												value={selectedPages.map(p => ({ value: p, label: p === '/' ? 'home' : (p && String(p).startsWith('/') ? String(p).slice(1) : p) }))}
 												onChange={(vals: any) => {
 													const v = vals || [];
 													setSelectedPages(v.map((it: any) => it.value));
@@ -461,7 +554,7 @@ export default function AnalyticsDashboard() {
 							<tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.period}</td>
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{getEventLabel(row.event_type)}</td>
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100 max-w-[14rem] sm:max-w-none break-words whitespace-normal">{(row.page || '').toString().replace(/^\//, '')}</td>
+								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100 max-w-[14rem] sm:max-w-none break-words whitespace-normal">{(() => { const raw = (row.page || '').toString(); return raw === '' || raw === '/' ? 'home' : raw.replace(/^\//, ''); })()}</td>
 								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.count}</td>
 							</tr>
 						))}
