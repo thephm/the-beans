@@ -284,6 +284,7 @@ export default function AuditLogsPage() {
               <option value="">All Types</option>
               <option value="roaster">Roaster</option>
               <option value="review">Review</option>
+              <option value="RoasterSuggestion">Suggestion</option>
               <option value="bean">Bean</option>
               <option value="user">User</option>
               <option value="person">Person</option>
