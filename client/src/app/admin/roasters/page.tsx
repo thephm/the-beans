@@ -677,6 +677,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   // Helper function to convert old hours format to new format
   const convertHoursFormat = (hours: any) => {
+    // Handle case where hours is stored as a stringified JSON in the DB
+    if (typeof hours === 'string') {
+      try {
+        hours = JSON.parse(hours);
+      } catch (err) {
+        // If parsing fails, fall through and treat as missing
+        console.warn('convertHoursFormat: failed to parse string hours', err);
+      }
+    }
   // Restore missing handleInputChange function
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

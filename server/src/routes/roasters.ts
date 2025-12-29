@@ -410,8 +410,20 @@ router.get('/', [
         deprecated: rs.specialty.deprecated
       })) || [];
 
+      // Ensure `hours` is returned as JSON object (handle legacy stringified JSON)
+      let hoursValue = roaster.hours;
+      if (typeof hoursValue === 'string') {
+        try {
+          hoursValue = JSON.parse(hoursValue);
+        } catch (err) {
+          console.warn('Failed to parse roaster.hours string for roaster', roaster.id, err);
+          hoursValue = roaster.hours; // leave as-is if parse fails
+        }
+      }
+
       const result = {
         ...roaster,
+        hours: hoursValue,
         imageUrl,
         specialties,
       };
@@ -608,8 +620,20 @@ router.get('/:id', [
       deprecated: rs.specialty.deprecated
     })) || [];
 
+    // Ensure `hours` is returned as JSON object (handle legacy stringified JSON)
+    let hoursValue = roaster.hours;
+    if (typeof hoursValue === 'string') {
+      try {
+        hoursValue = JSON.parse(hoursValue);
+      } catch (err) {
+        console.warn('Failed to parse roaster.hours string for roaster', roaster.id, err);
+        hoursValue = roaster.hours;
+      }
+    }
+
     const roasterWithImageUrl = {
       ...roaster,
+      hours: hoursValue,
       imageUrl,
       specialties,
       isFavorited,
@@ -756,6 +780,15 @@ router.post('/', [
       socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined,
       verified: false, // Always set verified to false by default
     };
+    // Normalize `hours` field: if client sent a stringified JSON, parse it
+    if (roasterData.hours && typeof roasterData.hours === 'string') {
+      try {
+        roasterData.hours = JSON.parse(roasterData.hours);
+      } catch (err) {
+        // leave as-is if parsing fails
+        console.warn('Create roaster: failed to parse hours string', err);
+      }
+    }
     // Remove fields that aren't part of the Roaster schema
     delete roasterData.ownerEmail;
     delete roasterData.ownerName;
@@ -994,6 +1027,14 @@ router.put('/:id', [
   }
 
   const updateData = { ...req.body };
+  // Normalize `hours` field on update: parse stringified JSON if necessary
+  if (updateData.hours && typeof updateData.hours === 'string') {
+    try {
+      updateData.hours = JSON.parse(updateData.hours);
+    } catch (err) {
+      console.warn('Update roaster: failed to parse hours string', err);
+    }
+  }
   if (req.body.sourceType) updateData.sourceType = req.body.sourceType;
   if (req.body.sourceDetails) updateData.sourceDetails = req.body.sourceDetails;
   // Remove deprecated contact fields if present
