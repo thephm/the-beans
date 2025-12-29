@@ -93,6 +93,7 @@ export default function AnalyticsDashboard() {
 	const [totalPages, setTotalPages] = useState(1);
 	const [filteredCount, setFilteredCount] = useState(0);
 	const [displayRows, setDisplayRows] = useState([] as any[]);
+	const [totals, setTotals] = useState({ totalPageViews: 0, discover: 0, about: 0, roasters: 0 });
 
 	useEffect(() => {
 		// detect light/dark mode on client and keep a simple state for react-select styles
@@ -170,6 +171,17 @@ export default function AnalyticsDashboard() {
 		}
 		const tp = Math.max(1, Math.ceil(filtered.length / limit));
 		setFilteredCount(filtered.length);
+
+		// compute totals from the filtered set (before pagination)
+		try {
+			const totalPageViews = filtered.filter((r: any) => String(r.event_type) === 'page_view').reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
+			const discover = filtered.filter((r: any) => (r.page || '').toString() === '/discover' && String(r.event_type) === 'page_view').reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
+			const about = filtered.filter((r: any) => (r.page || '').toString() === '/about' && String(r.event_type) === 'page_view').reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
+			const roasters = filtered.filter((r: any) => { const p = (r.page || '').toString(); return (p === '/roasters' || p.startsWith('/roasters/')) && String(r.event_type) === 'page_view'; }).reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
+			setTotals({ totalPageViews, discover, about, roasters });
+		} catch (e) {
+			setTotals({ totalPageViews: 0, discover: 0, about: 0, roasters: 0 });
+		}
 		setTotalPages(tp);
 		const p = Math.max(1, Math.min(page, tp));
 		setCurrentPage(p);
@@ -277,6 +289,27 @@ export default function AnalyticsDashboard() {
 			<div className="mb-6">
 				<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{tr('admin.analytics.title', 'Analytics')}</h1>
 			</div>
+			{/* Totals summary similar to audit logs */}
+			{!loading && (
+				<div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
+						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.totalPageViews', 'Total Page Views')}</h3>
+						<p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{(totals.totalPageViews || 0).toLocaleString()}</p>
+					</div>
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
+						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.discover', 'discover Page Views')}</h3>
+						<p className="text-3xl font-bold text-green-600 dark:text-green-400">{(totals.discover || 0).toLocaleString()}</p>
+					</div>
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
+						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.about', 'about Page Views')}</h3>
+						<p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{(totals.about || 0).toLocaleString()}</p>
+					</div>
+					<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
+						<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{tr('admin.analytics.totals.roasters', 'roaster Page Views')}</h3>
+						<p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{(totals.roasters || 0).toLocaleString()}</p>
+					</div>
+				</div>
+			)}
 			{loading && <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">{tr('admin.analytics.loading', 'Loading analytics...')}</div>}
 			{error && <div className="text-sm text-red-600 dark:text-red-400 mb-4">{error}</div>}
 			<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-6 border border-gray-200 dark:border-blue-500">
