@@ -775,6 +775,7 @@
       "x": "X (Twitter)",
       "reddit": "Reddit",
       "post": "Post",
+      "saveAndPost": "Save and Post",
       "confirmPost": "Post this roaster to configured Reddit communities?",
       "postResults": "Post results:",
       "postFailed": "Failed to post to Reddit:",

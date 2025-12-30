@@ -30,7 +30,7 @@ const AdminRoastersPage: React.FC = () => {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('verified');
+  const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('unverified');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
 
   // person management state
@@ -429,15 +429,7 @@ const AdminRoastersPage: React.FC = () => {
                           >
                             {roaster.name}
                           </button>
-                          {!roaster.verified && (
-                            <button
-                              className="text-sm bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700"
-                              onClick={() => handleVerify(roaster, true)}
-                              disabled={verifyingId === roaster.id}
-                            >
-                              {verifyingId === roaster.id ? t('roasters.verifying', 'Verifying...') : t('roasters.verify', 'Verify')}
-                            </button>
-                          )}
+                          {/* Verify button removed from desktop Name column per request */}
                         </div>
                       </td>
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
@@ -913,8 +905,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent, afterSaveNavigate?: string) => {
+    if (e && typeof (e as any).preventDefault === 'function') (e as any).preventDefault();
     setLoading(true);
     setError(null);
 
@@ -1080,6 +1072,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         }
       }
       onSuccess();
+
+      // Navigate after save if requested (used for "Save and Post")
+      if (afterSaveNavigate) {
+        try {
+          router.push(afterSaveNavigate);
+        } catch (navErr) {
+          // ignore navigation error
+        }
+      }
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -2358,11 +2359,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
               <button
                 type="button"
-                onClick={() => router.push(`/admin/roasters/${roaster?.id}/post`)}
+                onClick={() => handleSubmit(undefined, `/admin/roasters/${roaster?.id}/post`)}
                 disabled={!formData.verified}
                 className="min-w-[110px] px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t('adminForms.roasters.post', 'Post')}
+                {t('adminForms.roasters.saveAndPost', 'Save and Post')}
               </button>
 
               <button

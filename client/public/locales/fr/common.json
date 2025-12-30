@@ -776,6 +776,7 @@
       "x": "X (Twitter)",
       "reddit": "Reddit",
         "post": "Publier",
+        "saveAndPost": "Enregistrer et publier",
         "confirmPost": "Publier ce torréfacteur dans les communautés Reddit configurées ?",
         "postResults": "Résultats de la publication :",
         "postFailed": "Échec de la publication sur Reddit :",
