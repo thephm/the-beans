@@ -740,6 +740,7 @@
       "onlineOnly": "Online Only",
       "locationDetails": "Location",
       "images": "Images",
+      "completeness": "Completeness",
       "urlImages": "URL Images",
       "uploadedImages": "Uploaded Images",
       "addImages": "Add Images",

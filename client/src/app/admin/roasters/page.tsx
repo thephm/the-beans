@@ -69,7 +69,7 @@ const AdminRoastersPage: React.FC = () => {
     try {
       // If showing unverified only, use admin unverified endpoint
       if (verifiedFilter === 'unverified') {
-        const data = await apiClient.getUnverifiedRoasters({ page: currentPage, limit });
+        const data = await apiClient.getUnverifiedRoasters({ page: currentPage, limit }) as any;
         setRoasters(data.roasters || []);
         setTotalPages(data.pagination?.pages || 1);
         return;
@@ -169,6 +169,74 @@ const AdminRoastersPage: React.FC = () => {
   // ...existing code...
   // Server-side pagination and filtering are applied; use returned roasters directly
   const filteredRoasters = roasters;
+
+  // Calculate completeness score for a roaster (out of 39 possible points)
+  const calculateCompleteness = (r: any) => {
+    const totalPossible = 39;
+    let points = 0;
+
+    // Name
+    if (r.name && String(r.name).trim().length > 0) points += 3;
+
+    // Description
+    const desc = r.description || '';
+    if (desc.length <= 40 && desc.length > 0) points += 3;
+    else if (desc.length > 40 && desc.length <= 150) points += 5;
+
+    // Email
+    if (r.email) points += 1;
+
+    // Founded
+    if (r.founded) points += 1;
+
+    // Address
+    if (r.address) points += 2;
+
+    // City
+    if (r.city) points += 2;
+
+    // Latitude and Longitude
+    if (r.latitude !== undefined && r.longitude !== undefined && r.latitude !== null && r.longitude !== null) points += 1;
+
+    // Country
+    if (r.country) points += 1;
+
+    // Website
+    if (r.website) points += 2;
+
+    // Social networks (socialNetworks JSON or legacy fields)
+    const sn = r.socialNetworks || {};
+    const instagram = sn.instagram || r.instagram || '';
+    const linkedin = sn.linkedin || r.linkedin || '';
+    const facebook = sn.facebook || r.facebook || '';
+    if (instagram) points += 2;
+    if (linkedin) points += 1;
+    if (facebook) points += 1;
+
+    // Specialty (check roasterSpecialties if included)
+    if (Array.isArray(r.roasterSpecialties) && r.roasterSpecialties.length > 0) points += 2;
+
+    // Image - check uploaded images (roasterImages) or fallback imageUrl or images array
+    const hasImage = (Array.isArray(r.roasterImages) && r.roasterImages.length > 0) || r.imageUrl || (Array.isArray(r.images) && r.images.length > 0);
+    if (hasImage) points += 5;
+
+    // Contacts - use people included from the admin endpoint
+    const people = Array.isArray(r.people) ? r.people : [];
+    // Primary contact points: first name, last name, email, mobile, isPrimary, role, bio
+    const primary = people.find((p: any) => p.isPrimary) || people[0];
+    if (primary) {
+      if (primary.firstName) points += 1;
+      if (primary.lastName) points += 1;
+      if (primary.email) points += 2;
+      if (primary.mobile) points += 2;
+      if (primary.isPrimary) points += 2;
+      if (primary.roles && primary.roles.length > 0) points += 1; // role
+      if (primary.bio) points += 1;
+    }
+
+    const pct = Math.round((points / totalPossible) * 100);
+    return { points, pct };
+  };
 
   // Render the list of roasters
   return (
@@ -355,6 +423,24 @@ const AdminRoastersPage: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Completeness Score */}
+                  <div className="mb-3">
+                    {(() => {
+                      const r = calculateCompleteness(roaster);
+                      return (
+                        <div className="text-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="text-gray-600 dark:text-gray-400">{t('adminForms.roasters.completeness', 'Completeness')}</div>
+                            <div className="font-semibold text-gray-900 dark:text-gray-100">{r.pct}%</div>
+                          </div>
+                          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden mt-1">
+                            <div style={{ width: `${r.pct}%` }} className="h-2 bg-gradient-to-r from-green-400 to-yellow-400"></div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
                   {/* Rating */}
                   {showRatings && roaster.rating && (
                     <div className="mb-3">
@@ -395,6 +481,7 @@ const AdminRoastersPage: React.FC = () => {
                     <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.name', 'Name')}</th>
                     <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.city', 'City')}</th>
                     <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.country', 'Country')}</th>
+                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.completeness', 'Completeness')}</th>
                     <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.verified', 'Verified')}</th>
                     <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.featured', 'Featured')}</th>
                     {showRatings && <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.rating', 'Rating')}</th>}
@@ -416,6 +503,19 @@ const AdminRoastersPage: React.FC = () => {
                       </td>
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.country || '-'}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100 w-36">
+                        {(() => {
+                          const r = calculateCompleteness(roaster);
+                          return (
+                            <div className="min-w-[120px]">
+                              <div className="text-sm font-medium mb-1">{r.pct}%</div>
+                              <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
+                                <div style={{ width: `${r.pct}%` }} className="h-2 bg-gradient-to-r from-green-400 to-yellow-400"></div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </td>
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.verified ? '✔️' : ''}</td>
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.featured ? '⭐' : ''}</td>
                       {showRatings && <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.rating || '-'}</td>}
