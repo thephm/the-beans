@@ -116,7 +116,13 @@ export async function postWelcomeToReddit(roaster: any): Promise<PostResult[]> {
 
         results.push({ subreddit: sr, success: true });
       } catch (err: any) {
-        results.push({ subreddit: sr, success: false, error: err?.message || 'unknown' });
+        const status = err?.response?.status;
+        const data = err?.response?.data;
+        const msg = err?.message || 'unknown';
+        const details = status ? `status ${status}` : msg;
+        const errorText = data ? JSON.stringify(data) : msg;
+        results.push({ subreddit: sr, success: false, error: `${details} - ${errorText}` });
+        console.error(`Reddit post error for /r/${sr}:`, { status, data, message: msg });
       }
     }
 
