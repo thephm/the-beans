@@ -277,7 +277,10 @@ const AdminRoastersPage: React.FC = () => {
               </span>
             </button>
             <button
-              onClick={() => setVerifiedFilter('unverified')}
+              onClick={() => {
+                setVerifiedFilter('unverified');
+                setFeaturedFilter('all');
+              }}
               className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 verifiedFilter === 'unverified'
                   ? 'bg-orange-600 text-white'
@@ -296,7 +299,13 @@ const AdminRoastersPage: React.FC = () => {
             
             {/* Featured Filter */}
             <button
-              onClick={() => setFeaturedFilter(featuredFilter === 'featured' ? 'all' : 'featured')}
+              onClick={() => {
+                const newFeatured = featuredFilter === 'featured' ? 'all' : 'featured';
+                setFeaturedFilter(newFeatured);
+                if (newFeatured === 'featured') {
+                  setVerifiedFilter('all');
+                }
+              }}
               className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 featuredFilter === 'featured'
                   ? 'bg-yellow-600 text-white'
