@@ -1387,11 +1387,34 @@ router.get('/admin/unverified', [
             username: true,
           }
         },
+        // Include uploaded images metadata
         roasterImages: {
           orderBy: [
             { isPrimary: 'desc' },
             { uploadedAt: 'asc' }
           ]
+        },
+        // Include contact people so frontend can compute readiness/contact info
+        people: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            mobile: true,
+            isPrimary: true,
+            bio: true,
+            roles: true,
+            title: true,
+          }
+        },
+        // Include specialties to allow frontend readiness calculation
+        roasterSpecialties: {
+          select: {
+            specialty: {
+              select: { id: true }
+            }
+          }
         },
         _count: {
           select: {
