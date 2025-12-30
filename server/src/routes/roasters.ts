@@ -219,7 +219,7 @@ router.get('/', [
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
-    const { search, city, state, specialty, latitude, longitude, radius = 50, sort } = req.query;
+    const { search, city, state, specialty, latitude, longitude, radius = 50, sort, featured, verified } = req.query;
 
     // Build orderBy clause based on sort parameter
     let orderBy: any[] = [];
@@ -266,12 +266,27 @@ router.get('/', [
     
     console.log('GET /api/roasters - userId:', req.userId, 'userRole:', userRole);
     
-    // Only show verified roasters to non-admin users
+    // Only show verified roasters to non-admin users by default
     if (userRole !== 'admin') {
       where.verified = true;
       console.log('Non-admin user, filtering to verified roasters only');
     } else {
       console.log('Admin user, showing all roasters (verified and unverified)');
+      // Allow admin to filter by verified/unverified via query param
+      if (verified === 'true' || verified === '1') {
+        where.verified = true;
+      } else if (verified === 'false' || verified === '0') {
+        where.verified = false;
+      }
+    }
+
+    // Support filtering by featured flag via query param
+    if (typeof featured !== 'undefined') {
+      if (featured === 'true' || featured === '1') {
+        where.featured = true;
+      } else if (featured === 'false' || featured === '0') {
+        where.featured = false;
+      }
     }
     
     if (search) {
