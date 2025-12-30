@@ -303,9 +303,17 @@ class ApiClient {
     return this.request(endpoint);
   }
 
-  async verifyRoaster(id: string) {
-    return this.request(`/roasters/${id}/verify`, {
-      method: 'PATCH',
+  async verifyRoaster(id: string, postToReddit?: boolean) {
+    const options: any = { method: 'PATCH' };
+    if (postToReddit) {
+      options.body = JSON.stringify({ postToReddit: true });
+    }
+    return this.request(`/roasters/${id}/verify`, options);
+  }
+
+  async postRoasterToReddit(id: string) {
+    return this.request(`/roasters/${id}/post-to-reddit`, {
+      method: 'POST',
     });
   }
 

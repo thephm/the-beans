@@ -26,6 +26,28 @@
     "termsOfService": "Conditions d'utilisation",
     "cookiePolicy": "Politique des cookies"
   },
+  "admin": {
+    "reddit": {
+      "redirectTitle": "Réponse OAuth Reddit",
+      "exchanging": "Échange du code contre des jetons...",
+      "exchangeFailed": "Échec de l'échange de jetons :",
+      "accessToken": "Jeton d'accès",
+      "refreshToken": "Jeton d'actualisation",
+      "done": "Terminé",
+      "nextSteps": "Enregistrez le jeton d'actualisation dans votre fichier .env du serveur en tant que REDDIT_REFRESH_TOKEN et redémarrez le conteneur du serveur.",
+      "noCode": "Aucun code d'autorisation trouvé dans l'URL."
+    },
+    "oauth": {
+      "redirectTitle": "Réponse d'autorisation pour {{service}}",
+      "exchanging": "Échange du code contre des jetons...",
+      "exchangeFailed": "Échec de l'échange de jetons :",
+      "accessToken": "Jeton d'accès",
+      "refreshToken": "Jeton d'actualisation",
+      "done": "Terminé",
+      "nextSteps": "Enregistrez le jeton d'actualisation dans votre fichier .env du serveur en tant que {{envVar}} et redémarrez le conteneur du serveur.",
+      "noCode": "Aucun code d'autorisation trouvé dans l'URL."
+    }
+  },
   "auth": {
     "welcomeBack": "Bon retour !",
     "signInToDiscover": "Connectez-vous pour découvrir un café incroyable.",
@@ -753,6 +775,12 @@
       "bluesky": "BlueSky",
       "x": "X (Twitter)",
       "reddit": "Reddit",
+        "post": "Publier",
+        "confirmPost": "Publier ce torréfacteur dans les communautés Reddit configurées ?",
+        "postResults": "Résultats de la publication :",
+        "postFailed": "Échec de la publication sur Reddit :",
+        "posting": "Publication en cours...",
+        "postSuccess": "Publié avec succès",
       "contacts": "Contacts",
       "contact": "Contact",
       "showHours": "Afficher les heures",

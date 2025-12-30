@@ -35,6 +35,8 @@ import contactRouter from './routes/contact'; // Import contact router
 import favoritesRoutes from './routes/favorites';
 import suggestionsRoutes from './routes/suggestions';
 import backupRoutes from './routes/backup';
+import redditRoutes from './routes/reddit';
+import oauthRoutes from './routes/oauth';
 
 // Load environment variables
 dotenv.config();
@@ -150,6 +152,8 @@ app.use('/api/contact', contactRouter); // Register contact route
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/backup', backupRoutes);
+app.use('/api/reddit', redditRoutes);
+app.use('/api/oauth', oauthRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 app.use('/api/debug', debugRoutes); // Debug authentication routes
 // Analytics event capture route
