@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
@@ -26,6 +26,9 @@ export default function DiscoverPage() {
     }
   }, [])
   const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const limit = 20
   const [filters, setFilters] = useState({
     search: '',
     location: '',
@@ -49,13 +52,15 @@ export default function DiscoverPage() {
     }));
   }, [searchParams]);
 
-  const searchRoasters = useCallback(async () => {
+  const fetchRoasters = useCallback(async (pageToLoad = 1, append = false) => {
     setLoading(true)
     try {
       const searchParams = new URLSearchParams()
       if (filters.search) searchParams.append('q', filters.search)
       if (filters.location) searchParams.append('location', filters.location)
       searchParams.append('distance', filters.distance.toString())
+      searchParams.append('page', String(pageToLoad))
+      searchParams.append('limit', String(limit))
 
       const searchParamsObj: Record<string, string> = {}
       searchParams.forEach((value, key) => {
@@ -63,29 +68,35 @@ export default function DiscoverPage() {
       });
 
       const data = await apiClient.searchRoasters(searchParamsObj) as any
-      
-      // Sort specialties alphabetically for each roaster
-      const roastersWithSortedSpecialties = (data.roasters || []).map((roaster: Roaster) => {
+
+      const roastersReturned = (data.roasters || []).map((roaster: Roaster) => {
         return {
           ...roaster,
           specialties: roaster.specialties && roaster.specialties.length > 0
             ? [...roaster.specialties].sort((a, b) => {
-                const nameA = typeof a === 'string' ? a : (a.name || '');
-                const nameB = typeof b === 'string' ? b : (b.name || '');
-                return nameA.localeCompare(nameB);
+                const nameA = typeof a === 'string' ? a : (a.name || '')
+                const nameB = typeof b === 'string' ? b : (b.name || '')
+                return nameA.localeCompare(nameB)
               })
             : roaster.specialties
-        };
-      });
-      
-      setRoasters(roastersWithSortedSpecialties)
-        
+        }
+      })
+
+      if (append) {
+        setRoasters(prev => [...prev, ...roastersReturned])
+      } else {
+        setRoasters(roastersReturned)
+      }
+
+      if (data.pagination) {
+        setTotalPages(data.pagination.totalPages || 1)
+      } else {
+        setTotalPages(1)
+      }
+
       // Trigger popular searches refetch after successful search
-      if (filters.search && filters.search.trim().length > 0) {
-        // Dispatch a custom event that SearchSection can listen to
-        window.dispatchEvent(new CustomEvent('searchCompleted', { 
-          detail: { query: filters.search } 
-        }))
+      if (filters.search && filters.search.trim().length > 0 && pageToLoad === 1) {
+        window.dispatchEvent(new CustomEvent('searchCompleted', { detail: { query: filters.search } }))
       }
     } catch (error) {
       console.error('Search failed:', error)
@@ -94,14 +105,32 @@ export default function DiscoverPage() {
     }
   }, [filters.search, filters.location, filters.distance])
 
+  // Debounced fetch when filters change
   useEffect(() => {
-    // Debounce the search to prevent rapid-fire API calls
-    const timeoutId = setTimeout(() => {
-      searchRoasters()
-    }, 300) // Debounce search by 300ms
-    
-    return () => clearTimeout(timeoutId)
-  }, [searchRoasters])
+    const id = setTimeout(() => {
+      setPage(1)
+      fetchRoasters(1, false)
+    }, 300)
+    return () => clearTimeout(id)
+  }, [filters.search, filters.location, filters.distance, fetchRoasters])
+
+  // Infinite scroll sentinel
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    if (!sentinelRef.current) return
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !loading && page < totalPages) {
+          const next = page + 1
+          setPage(next)
+          fetchRoasters(next, true)
+        }
+      })
+    }, { rootMargin: '200px' })
+
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [sentinelRef.current, loading, page, totalPages, fetchRoasters])
 
   // Remove the debounced search effect since we're handling it in the main effect
   // useEffect(() => {
@@ -139,7 +168,8 @@ export default function DiscoverPage() {
               onLocationChange={(value) => setFilters(prev => ({ ...prev, location: value }))}
               onSearch={(searchQuery, location) => {
                 setFilters(prev => ({ ...prev, search: searchQuery, location: location }))
-                searchRoasters()
+                setPage(1)
+                fetchRoasters(1, false)
               }}
             />
           </div>
@@ -183,6 +213,8 @@ export default function DiscoverPage() {
               </div>
             )}
           </div>
+          {/* Sentinel for infinite scroll */}
+          <div ref={sentinelRef as any} className="w-full h-1" />
         </div>
       </div>
     </div>

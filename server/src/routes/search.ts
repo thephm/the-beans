@@ -247,6 +247,8 @@ router.get('/roasters', [
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
   query('radius').optional().isFloat({ min: 1, max: 100 }),
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 100 }),
 ], async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
@@ -255,6 +257,8 @@ router.get('/roasters', [
     }
 
     const { q, specialty, location, sort, latitude, longitude, radius = 25 } = req.query;
+    const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
     let whereClause: any = {};
 
     // Log the search query to the Search table (for popular searches)
@@ -278,7 +282,24 @@ router.get('/roasters', [
     }
 
     if (q && typeof q === 'string') {
-      // Remove Prisma filtering for search query; filter in JS below
+      const qLower = q.trim();
+      whereClause.OR = [
+        { name: { contains: qLower, mode: 'insensitive' } },
+        { description: { contains: qLower, mode: 'insensitive' } },
+        { city: { contains: qLower, mode: 'insensitive' } },
+        { state: { contains: qLower, mode: 'insensitive' } },
+        {
+          roasterSpecialties: {
+            some: {
+              specialty: {
+                translations: {
+                  some: { name: { contains: qLower, mode: 'insensitive' } }
+                }
+              }
+            }
+          }
+        }
+      ];
     }
     if (location) {
       whereClause.OR = [
@@ -332,74 +353,75 @@ router.get('/roasters', [
       whereClause.verified = true;
     }
 
-    let roasters = await prisma.roaster.findMany({
-      where: whereClause,
-      include: {
-        owner: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-        reviews: {
-          select: {
-            rating: true,
-          },
-        },
-        roasterSpecialties: {
-          include: {
-            specialty: {
-              include: {
-                translations: true
-              }
-            }
-          }
-        },
-        roasterImages: {
-          orderBy: [
-            { isPrimary: 'desc' },
-            { uploadedAt: 'asc' }
-          ]
-        }
-      },
-      orderBy,
-    });
-    // Filter by all fields (including specialties, case-insensitive, partial match) in JS if q is present
-    if (q && typeof q === 'string') {
-      const qLower = q.trim().toLowerCase();
-      roasters = roasters.filter(roaster =>
-        (roaster.roasterSpecialties && roaster.roasterSpecialties.some((rs: any) => 
-          rs.specialty.translations.some((t: any) => t.name.toLowerCase().includes(qLower))
-        ))
-        || (roaster.name && roaster.name.toLowerCase().includes(qLower))
-        || (roaster.description && roaster.description.toLowerCase().includes(qLower))
-        || (roaster.city && roaster.city.toLowerCase().includes(qLower))
-        || (roaster.state && roaster.state.toLowerCase().includes(qLower))
-      );
-    }
-
     // Add distance calculation and filtering if coordinates provided
     if (latitude && longitude) {
       const lat = parseFloat(latitude as string);
       const lng = parseFloat(longitude as string);
       const maxRadius = parseFloat(radius as string);
 
-      roasters = roasters.filter(roaster => {
+      // Fetch candidates matching textual/location filters
+      const candidates = await prisma.roaster.findMany({
+        where: whereClause,
+        include: {
+          owner: { select: { id: true, username: true } },
+          reviews: { select: { rating: true } },
+          roasterSpecialties: { include: { specialty: { include: { translations: true } } } },
+          roasterImages: { orderBy: [{ isPrimary: 'desc' }, { uploadedAt: 'asc' }] }
+        },
+        orderBy,
+      });
+
+      const filtered = candidates.filter((roaster: any) => {
         if (!roaster.latitude || !roaster.longitude) return false;
-        
-        const distance = calculateDistance(
-          lat,
-          lng,
-          roaster.latitude,
-          roaster.longitude
-        );
+        const distance = calculateDistance(lat, lng, roaster.latitude, roaster.longitude);
         return distance <= maxRadius;
       });
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / limit));
+      const pageStart = (page - 1) * limit;
+      const pageItems = filtered.slice(pageStart, pageStart + limit);
+
+      const roastersWithImageUrl = pageItems.map((roaster: any) => {
+        let imageUrl = null;
+        if (roaster.roasterImages && roaster.roasterImages.length > 0) {
+          imageUrl = roaster.roasterImages[0].url;
+        } else if (roaster.images && roaster.images.length > 0) {
+          imageUrl = roaster.images[0];
+        } else {
+          imageUrl = 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop';
+        }
+
+        const specialties = roaster.roasterSpecialties?.map((rs: any) => ({
+          id: rs.specialty.id,
+          name: rs.specialty.translations[0]?.name || 'Unknown',
+          deprecated: rs.specialty.deprecated
+        })) || [];
+
+        return { ...roaster, imageUrl, specialties };
+      });
+
+      return res.json({ roasters: roastersWithImageUrl, pagination: { total, page, limit, totalPages } });
     }
 
-    // Add imageUrl field for frontend compatibility
+    // No coordinates provided: use DB pagination
+    const total = await prisma.roaster.count({ where: whereClause });
+    const roasters = await prisma.roaster.findMany({
+      where: whereClause,
+      include: {
+        owner: { select: { id: true, username: true } },
+        reviews: { select: { rating: true } },
+        roasterSpecialties: { include: { specialty: { include: { translations: true } } } },
+        roasterImages: { orderBy: [{ isPrimary: 'desc' }, { uploadedAt: 'asc' }] }
+      },
+      orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
     const roastersWithImageUrl = roasters.map((roaster: any) => {
-      // Use the primary image from roasterImages if available, fall back to old images array
       let imageUrl = null;
       if (roaster.roasterImages && roaster.roasterImages.length > 0) {
         imageUrl = roaster.roasterImages[0].url;
@@ -409,29 +431,16 @@ router.get('/roasters', [
         imageUrl = 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop';
       }
 
-      // Transform roasterSpecialties to simple specialty array for frontend
       const specialties = roaster.roasterSpecialties?.map((rs: any) => ({
         id: rs.specialty.id,
         name: rs.specialty.translations[0]?.name || 'Unknown',
         deprecated: rs.specialty.deprecated
       })) || [];
 
-      return {
-        ...roaster,
-        imageUrl,
-        specialties
-      };
+      return { ...roaster, imageUrl, specialties };
     });
 
-    res.json({
-      roasters: roastersWithImageUrl,
-      pagination: {
-        total: roasters.length,
-        page: 1,
-        limit: roasters.length,
-        totalPages: 1,
-      },
-    });
+    res.json({ roasters: roastersWithImageUrl, pagination: { total, page, limit, totalPages } });
   } catch (error) {
     console.error('Roaster search error:', error);
     res.status(500).json({ error: 'Internal server error' });

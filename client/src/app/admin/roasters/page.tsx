@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { apiClient } from '@/lib/api';
 import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '@/types';
 import SimpleImageUpload from '@/components/SimpleImageUpload';
 import SpecialtyPillSelector from '@/components/SpecialtyPillSelector';
@@ -12,10 +13,7 @@ import PersonRoleButtons from '@/components/PersonRoleButtons';
 
 
 const AdminRoastersPage: React.FC = () => {
-  // ...existing code...
-  useEffect(() => {
-    fetchRoasters();
-  }, []);
+  
   const { t } = useTranslation();
   const { showRatings } = useFeatureFlags();
   const searchParams = useSearchParams();
@@ -32,6 +30,14 @@ const AdminRoastersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('unverified');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(20);
+
+  // Fetch roasters when pagination, filters, or search change
+  useEffect(() => {
+    fetchRoasters();
+  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery]);
 
   // person management state
   const [people, setPeople] = useState<RoasterPerson[]>([]);
@@ -61,52 +67,29 @@ const AdminRoastersPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      
-      // Fetch all roasters by requesting with max limit
-      const res = await fetch(`${apiUrl}/api/roasters?limit=100&_t=${Date.now()}`, {
-        headers: token ? { 
-          'Authorization': `Bearer ${token}`,
-        } : {},
-      });
-      
-      if (!res.ok) {
-        throw new Error(`API returned ${res.status}: ${res.statusText}`);
+      // If showing unverified only, use admin unverified endpoint
+      if (verifiedFilter === 'unverified') {
+        const data = await apiClient.getUnverifiedRoasters({ page: currentPage, limit });
+        setRoasters(data.roasters || []);
+        setTotalPages(data.pagination?.pages || 1);
+        return;
       }
-      
-      const data = await res.json();
-      
-      // If there are more pages, fetch them all
-      let allRoasters = data.roasters || [];
-      const totalPages = data.pagination?.pages || 1;
-      
-      if (totalPages > 1) {
-        const additionalFetches: Promise<any>[] = [];
-        for (let page = 2; page <= totalPages; page++) {
-          additionalFetches.push(
-            fetch(`${apiUrl}/api/roasters?limit=100&page=${page}&_t=${Date.now()}`, {
-              headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-            }).then(r => r.json())
-          );
-        }
-        const additionalPages = await Promise.all(additionalFetches);
-        additionalPages.forEach(pageData => {
-          allRoasters = [...allRoasters, ...(pageData.roasters || [])];
-        });
-      }
-      
-      const sortedRoasters = allRoasters.sort((a: Roaster, b: Roaster) => 
-        a.name.localeCompare(b.name)
-      );
-      setRoasters(sortedRoasters);
+
+      const params: Record<string, any> = { page: currentPage, limit };
+      if (searchQuery && searchQuery.trim()) params.search = searchQuery.trim();
+      if (featuredFilter === 'featured') params.featured = 'true';
+      if (verifiedFilter === 'verified') params.verified = 'true';
+
+      const data = await apiClient.getRoasters(params) as any;
+      setRoasters(data.roasters || []);
+      setTotalPages(data.pagination?.pages || 1);
     } catch (err: any) {
       console.error('Fetch roasters error:', err);
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
 
   const onFormSuccess = () => {
@@ -172,6 +155,10 @@ const AdminRoastersPage: React.FC = () => {
     return roasters.filter(r => r.featured).length;
   };
 
+  const changePage = (page: number) => {
+    setCurrentPage(page);
+  };
+
   if (editingId || showAddForm) {
     const roaster = editingId ? roasters.find(r => r.id === editingId) : undefined;
     return <RoasterForm roaster={roaster} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
@@ -180,28 +167,8 @@ const AdminRoastersPage: React.FC = () => {
   // Filter roasters based on search query
 
   // ...existing code...
-  const filteredRoasters = roasters.filter(roaster => {
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      const matchesSearch = (
-        roaster.name.toLowerCase().includes(query) ||
-        roaster.description?.toLowerCase().includes(query) ||
-        roaster.city?.toLowerCase().includes(query) ||
-        roaster.country?.toLowerCase().includes(query)
-      );
-      if (!matchesSearch) return false;
-    }
-    
-    // Apply verified filter
-    if (verifiedFilter === 'verified' && !roaster.verified) return false;
-    if (verifiedFilter === 'unverified' && roaster.verified) return false;
-    
-    // Apply featured filter
-    if (featuredFilter === 'featured' && !roaster.featured) return false;
-    
-    return true;
-  });
+  // Server-side pagination and filtering are applied; use returned roasters directly
+  const filteredRoasters = roasters;
 
   // Render the list of roasters
   return (
@@ -260,7 +227,11 @@ const AdminRoastersPage: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             {/* Verified Filters */}
             <button
-              onClick={() => setVerifiedFilter('verified')}
+              onClick={() => {
+                setVerifiedFilter('verified');
+                setFeaturedFilter('all');
+                setCurrentPage(1);
+              }}
               className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 verifiedFilter === 'verified'
                   ? 'bg-green-600 text-white'
@@ -280,6 +251,7 @@ const AdminRoastersPage: React.FC = () => {
               onClick={() => {
                 setVerifiedFilter('unverified');
                 setFeaturedFilter('all');
+                setCurrentPage(1);
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 verifiedFilter === 'unverified'
@@ -305,6 +277,7 @@ const AdminRoastersPage: React.FC = () => {
                 if (newFeatured === 'featured') {
                   setVerifiedFilter('all');
                 }
+                setCurrentPage(1);
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 featuredFilter === 'featured'
@@ -452,6 +425,57 @@ const AdminRoastersPage: React.FC = () => {
               </table>
             </div>
           </>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6 rounded-lg shadow">
+            <div className="flex-1 flex justify-between sm:hidden">
+              <button
+                onClick={() => changePage(Math.max(1, currentPage - 1))}
+                disabled={currentPage <= 1}
+                className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage >= totalPages}
+                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  Page <span className="font-medium">{currentPage}</span> of{' '}
+                  <span className="font-medium">{totalPages}</span>
+                </p>
+              </div>
+              <div>
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const page = i + Math.max(1, currentPage - 2);
+                    if (page > totalPages) return null;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => changePage(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          page === currentPage
+                            ? 'z-10 bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
+                            : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
