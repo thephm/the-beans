@@ -88,19 +88,19 @@ export default function RoasterPostPage() {
 
         <div className="flex gap-3">
           <button
-            onClick={startPost}
+            onClick={() => router.push(`/admin/roasters?edit=${id}`)}
             disabled={isPosting}
-            className={`px-6 py-3 rounded-lg font-medium transition-colors ${isPosting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            className="px-6 py-3 rounded-lg font-medium transition-colors bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600"
           >
-            {isPosting ? t('adminForms.roasters.posting', 'Posting...') : t('adminForms.roasters.post', 'Post')}
+            {t('adminForms.roasters.no', 'No')}
           </button>
 
           <button
-            onClick={() => router.push(`/admin/roasters?edit=${id}`)}
+            onClick={startPost}
             disabled={isPosting}
-            className="px-6 py-3 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200"
+            className={`px-6 py-3 rounded-lg font-medium transition-colors ${isPosting ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 text-white'}`}
           >
-            {t('adminForms.roasters.cancel', 'Cancel')}
+            {isPosting ? t('adminForms.roasters.posting', 'Posting...') : t('adminForms.roasters.yes', 'Yes')}
           </button>
         </div>
       </div>
