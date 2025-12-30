@@ -123,6 +123,43 @@ const AdminRoastersPage: React.FC = () => {
     router.push('/admin/roasters');
   };
 
+  const handleVerify = async (roaster: Roaster, postToRedditPrompt = true) => {
+    if (!roaster?.id) return;
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+      let postToReddit = false;
+      if (postToRedditPrompt) {
+        postToReddit = window.confirm(`Also post ${roaster.name} to configured Reddit communities?`);
+      }
+
+      setVerifyingId(roaster.id);
+
+      const res = await fetch(`${apiUrl}/api/roasters/${roaster.id}/verify`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: postToReddit ? JSON.stringify({ postToReddit: true }) : undefined,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || `API returned ${res.status}`);
+      }
+
+      // Refresh list
+      await fetchRoasters();
+    } catch (err: any) {
+      console.error('Verify error:', err);
+      alert(err?.message || 'Failed to verify roaster');
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
   // Calculate counts for filters
   const getVerifiedCount = (type: 'all' | 'verified' | 'unverified') => {
     if (type === 'all') return roasters.length;
@@ -345,6 +382,25 @@ const AdminRoastersPage: React.FC = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* Actions */}
+                  <div className="mt-3">
+                    {!roaster.verified && (
+                      <button
+                        className="bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 mr-2"
+                        onClick={() => handleVerify(roaster, true)}
+                        disabled={verifyingId === roaster.id}
+                      >
+                        {verifyingId === roaster.id ? t('roasters.verifying', 'Verifying...') : t('roasters.verify', 'Verify')}
+                      </button>
+                    )}
+                    <button
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                      onClick={() => setEditingId(roaster.id)}
+                    >
+                      {t('common.edit', 'Edit')}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -366,12 +422,23 @@ const AdminRoastersPage: React.FC = () => {
                   {filteredRoasters.map((roaster) => (
                     <tr key={roaster.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-4 py-2 font-medium">
-                        <button
-                          className="text-blue-600 dark:text-blue-400 hover:underline text-left"
-                          onClick={() => setEditingId(roaster.id)}
-                        >
-                          {roaster.name}
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            className="text-blue-600 dark:text-blue-400 hover:underline text-left"
+                            onClick={() => setEditingId(roaster.id)}
+                          >
+                            {roaster.name}
+                          </button>
+                          {!roaster.verified && (
+                            <button
+                              className="text-sm bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700"
+                              onClick={() => handleVerify(roaster, true)}
+                              disabled={verifyingId === roaster.id}
+                            >
+                              {verifyingId === roaster.id ? t('roasters.verifying', 'Verifying...') : t('roasters.verify', 'Verify')}
+                            </button>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.country || '-'}</td>
@@ -469,6 +536,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     x: roaster?.socialNetworks?.x || '',
     reddit: roaster?.socialNetworks?.reddit || '',
   });
+  const router = useRouter();
   useEffect(() => {
     if (roaster?.id) {
       const fetchRoaster = async () => {
@@ -552,6 +620,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       return updates;
     });
   };
+
+  // Posting is handled on a separate confirmation/progress page.
 
   // Handles changes for hours fields
   const handleHoursChange = (day: string, field: string, value: any) => {
@@ -1748,6 +1818,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       placeholder="https://reddit.com/r/..."
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
+                    {/* Post button moved to form actions at bottom of page */}
                   </div>
                 </div>
               </>
@@ -2276,7 +2347,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               </button>
             )}
             {/* Right: Cancel and Save buttons (always right aligned) */}
-            <div className={roaster?.id ? "flex flex-row gap-3 ml-auto" : "flex flex-row gap-3 justify-end w-full"}>
+              <div className={roaster?.id ? "flex flex-row gap-3 ml-auto" : "flex flex-row gap-3 justify-end w-full"}>
               <button
                 type="button"
                 onClick={onCancel}
@@ -2284,6 +2355,16 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               >
                 {t('adminForms.roasters.cancel', 'Cancel')}
               </button>
+
+              <button
+                type="button"
+                onClick={() => router.push(`/admin/roasters/${roaster?.id}/post`)}
+                disabled={!formData.verified}
+                className="min-w-[110px] px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t('adminForms.roasters.post', 'Post')}
+              </button>
+
               <button
                 type="submit"
                 disabled={loading}

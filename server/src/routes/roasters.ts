@@ -5,6 +5,7 @@ import { upload, deleteImage, uploadImageFromUrl } from '../lib/cloudinary';
 import { canEditRoaster } from '../middleware/roasterAuth';
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
+import { postWelcomeToReddit } from '../lib/reddit';
 
 const router = Router();
 // Use shared Prisma client
@@ -1447,6 +1448,8 @@ router.get('/admin/unverified', [
  */
 router.patch('/:id/verify', [
   param('id').isString(),
+  // Optional flag to post to Reddit after verifying
+  body('postToReddit').optional().isBoolean(),
 ], requireAuth, auditBefore('roaster', 'UPDATE'), captureOldValues(prisma.roaster), async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -1479,6 +1482,16 @@ router.patch('/:id/verify', [
       }
     });
 
+    // Optionally post to Reddit if requested (do not fail verification on reddit errors)
+    try {
+      const postToReddit = req.body?.postToReddit === true || req.query?.postToReddit === 'true';
+      if (postToReddit) {
+        const results = await postWelcomeToReddit(roaster);
+        console.log('Reddit post results:', results);
+      }
+    } catch (redditErr) {
+      console.error('Failed to post to Reddit after verification:', redditErr);
+    }
     // Store entity for audit logging
     res.locals.auditEntity = roaster;
 
@@ -1494,6 +1507,48 @@ router.patch('/:id/verify', [
     res.status(500).json({ error: 'Internal server error' });
   }
 }, auditAfter());
+
+/**
+ * POST /api/roasters/{id}/post-to-reddit
+ * Trigger a welcome post to configured Reddit communities for a verified roaster
+ */
+router.post('/:id/post-to-reddit', [
+  param('id').isString(),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { role: true } });
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { id } = req.params;
+    const roaster = await prisma.roaster.findUnique({ where: { id } });
+    if (!roaster) {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+
+    if (!roaster.verified) {
+      return res.status(400).json({ error: 'Roaster must be verified before posting to Reddit' });
+    }
+
+    try {
+      const results = await postWelcomeToReddit(roaster);
+      return res.json({ results });
+    } catch (redditErr) {
+      console.error('Failed to post to Reddit via post-to-reddit endpoint:', redditErr);
+      return res.status(502).json({ error: 'Failed to post to Reddit', details: String(redditErr) });
+    }
+  } catch (error: any) {
+    console.error('Post to Reddit error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Helper function to calculate distance between two points
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

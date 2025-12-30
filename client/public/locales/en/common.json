@@ -263,6 +263,28 @@
     "termsOfService": "Terms of Service",
     "cookiePolicy": "Cookie Policy"
   },
+  "admin": {
+    "reddit": {
+      "redirectTitle": "Reddit OAuth Response",
+      "exchanging": "Exchanging code for tokens...",
+      "exchangeFailed": "Token exchange failed:",
+      "accessToken": "Access Token",
+      "refreshToken": "Refresh Token",
+      "done": "Done",
+      "nextSteps": "Save the refresh token to your server .env as REDDIT_REFRESH_TOKEN and restart the server container.",
+      "noCode": "No authorization code found in the URL."
+    },
+    "oauth": {
+      "redirectTitle": "{{service}} Authorization Response",
+      "exchanging": "Exchanging code for tokens...",
+      "exchangeFailed": "Token exchange failed:",
+      "accessToken": "Access Token",
+      "refreshToken": "Refresh Token",
+      "done": "Done",
+      "nextSteps": "Save the refresh token to your server .env as {{envVar}} and restart the server container.",
+      "noCode": "No authorization code found in the URL."
+    }
+  },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",
@@ -752,6 +774,12 @@
       "bluesky": "BlueSky",
       "x": "X (Twitter)",
       "reddit": "Reddit",
+      "post": "Post",
+      "confirmPost": "Post this roaster to configured Reddit communities?",
+      "postResults": "Post results:",
+      "postFailed": "Failed to post to Reddit:",
+      "posting": "Posting...",
+      "postSuccess": "Posted successfully",
       "contacts": "Contacts",
       "contact": "Contact",
       "showHours": "Show Hours",
