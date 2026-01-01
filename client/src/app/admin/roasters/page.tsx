@@ -33,6 +33,7 @@ const AdminRoastersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
+  const [globalCounts, setGlobalCounts] = useState<{ all: number; verified: number; unverified: number; featured: number } | null>(null);
 
   // Fetch roasters when pagination, filters, or search change
   useEffect(() => {
@@ -72,6 +73,13 @@ const AdminRoastersPage: React.FC = () => {
         const data = await apiClient.getUnverifiedRoasters({ page: currentPage, limit }) as any;
         setRoasters(data.roasters || []);
         setTotalPages(data.pagination?.pages || 1);
+        // For unverified, set globalCounts to match backend if available, else fallback to current page
+        setGlobalCounts((prev) => ({
+          all: prev?.all ?? 0,
+          verified: prev?.verified ?? 0,
+          unverified: data.pagination?.total ?? roasters.length,
+          featured: prev?.featured ?? 0,
+        }));
         return;
       }
 
@@ -83,6 +91,9 @@ const AdminRoastersPage: React.FC = () => {
       const data = await apiClient.getRoasters(params) as any;
       setRoasters(data.roasters || []);
       setTotalPages(data.pagination?.pages || 1);
+      if (data.globalCounts) {
+        setGlobalCounts(data.globalCounts);
+      }
     } catch (err: any) {
       console.error('Fetch roasters error:', err);
       setError(err.message || 'Unknown error');
@@ -143,16 +154,18 @@ const AdminRoastersPage: React.FC = () => {
     }
   };
 
-  // Calculate counts for filters
+  // Use backend globalCounts for filter badges
   const getVerifiedCount = (type: 'all' | 'verified' | 'unverified') => {
-    if (type === 'all') return roasters.length;
-    if (type === 'verified') return roasters.filter(r => r.verified).length;
-    return roasters.filter(r => !r.verified).length;
+    if (!globalCounts) return 0;
+    if (type === 'all') return globalCounts.all;
+    if (type === 'verified') return globalCounts.verified;
+    return globalCounts.unverified;
   };
 
   const getFeaturedCount = (type: 'all' | 'featured') => {
-    if (type === 'all') return roasters.length;
-    return roasters.filter(r => r.featured).length;
+    if (!globalCounts) return 0;
+    if (type === 'all') return globalCounts.all;
+    return globalCounts.featured;
   };
 
   const changePage = (page: number) => {

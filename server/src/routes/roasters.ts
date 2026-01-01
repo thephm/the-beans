@@ -460,6 +460,14 @@ router.get('/', [
       return result;
     });
 
+    // Get global counts for filter badges (not affected by pagination/search)
+    const [globalTotal, globalVerified, globalUnverified, globalFeatured] = await Promise.all([
+      prisma.roaster.count(),
+      prisma.roaster.count({ where: { verified: true } }),
+      prisma.roaster.count({ where: { verified: false } }),
+      prisma.roaster.count({ where: { featured: true, verified: true } })
+    ]);
+
     res.json({
       roasters: roastersWithImageUrl,
       pagination: {
@@ -467,6 +475,12 @@ router.get('/', [
         limit,
         total,
         pages,
+      },
+      globalCounts: {
+        all: globalTotal,
+        verified: globalVerified,
+        unverified: globalUnverified,
+        featured: globalFeatured,
       }
     });
   } catch (error) {
