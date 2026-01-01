@@ -73,13 +73,17 @@ const AdminRoastersPage: React.FC = () => {
         const data = await apiClient.getUnverifiedRoasters({ page: currentPage, limit }) as any;
         setRoasters(data.roasters || []);
         setTotalPages(data.pagination?.pages || 1);
-        // For unverified, set globalCounts to match backend if available, else fallback to current page
-        setGlobalCounts((prev) => ({
-          all: prev?.all ?? 0,
-          verified: prev?.verified ?? 0,
-          unverified: data.pagination?.total ?? roasters.length,
-          featured: prev?.featured ?? 0,
-        }));
+        if (data.globalCounts) {
+          setGlobalCounts(data.globalCounts);
+        } else {
+          // fallback for legacy response
+          setGlobalCounts((prev) => ({
+            all: prev?.all ?? 0,
+            verified: prev?.verified ?? 0,
+            unverified: data.pagination?.total ?? roasters.length,
+            featured: prev?.featured ?? 0,
+          }));
+        }
         return;
       }
 
