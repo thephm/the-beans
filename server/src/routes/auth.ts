@@ -500,7 +500,7 @@ router.put('/profile', [
 });
 
 // Validate password reset token
-router.get('/validate-reset-token', async (req, res) => {
+router.get('/validate-reset-token', async (req: import('express').Request, res: import('express').Response) => {
   const { token } = req.query;
   if (!token || typeof token !== 'string') {
     return res.json({ valid: false, error: 'Missing token' });
@@ -516,7 +516,7 @@ router.get('/validate-reset-token', async (req, res) => {
 router.post('/reset-password', [
   body('token').isString(),
   body('password').isLength({ min: 6 })
-], async (req, res) => {
+], async (req: import('express').Request, res: import('express').Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ error: 'Invalid input', details: errors.array() });
