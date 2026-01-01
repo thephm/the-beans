@@ -1,4 +1,4 @@
-// This file was copied from /favorites/page.tsx to support British spelling route
+// This file was copied from /favourites/page.tsx to support British spelling route
 'use client'
 
 import { useState, useEffect } from 'react'

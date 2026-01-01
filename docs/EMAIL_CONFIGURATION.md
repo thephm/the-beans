@@ -5,9 +5,9 @@ This guide covers setting up email functionality for **The Beans** application, 
 ## Overview
 
 The application uses SMTP (Simple Mail Transfer Protocol) to send emails. Email features include:
-- 📧 **Contact Us Form**: Users can send messages that are delivered to your configured email
-- 🔔 **User Notifications**: Welcome emails, password resets, and other system notifications
-- 📨 **Admin Notifications**: System alerts sent to administrators
+- **Contact Us Form**: Users can send messages that are delivered to your configured email
+- **User Notifications**: Welcome emails, password resets, and other system notifications
+- **Admin Notifications**: System alerts sent to administrators
 
 ## Required Environment Variables
 
