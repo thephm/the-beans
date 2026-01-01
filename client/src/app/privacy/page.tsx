@@ -46,7 +46,7 @@ export default function PrivacyPage() {
                 </h3>
                 <ul className="list-disc list-inside mb-4 space-y-2">
                   <li>{t('privacy.dataCollection.usage.reviews', 'Reviews, ratings, and photos you submit')}</li>
-                  <li>{t('privacy.dataCollection.usage.favorites', 'Roasters you favorite or bookmark')}</li>
+                  <li>{t('privacy.dataCollection.usage.favourites', 'Roasters you favourite or bookmark')}</li>
                   <li>{t('privacy.dataCollection.usage.interactions', 'Your interactions with roasters and other users')}</li>
                   <li>{t('privacy.dataCollection.usage.preferences', 'Language and other preferences')}</li>
                 </ul>

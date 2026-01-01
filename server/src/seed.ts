@@ -1,6 +1,34 @@
 import { PrismaClient } from '@prisma/client';
 async function main() {
   const prisma = new PrismaClient();
+
+  // Load admin credentials from environment variables
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@thebeans.ca';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+
+  // Hash password for security
+  const bcrypt = require('bcryptjs');
+  const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+
+  // Create or update admin user
+  const adminUser = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      password: hashedAdminPassword,
+      username: adminUsername,
+      role: 'admin',
+      language: 'en',
+    },
+    create: {
+      email: adminEmail,
+      password: hashedAdminPassword,
+      username: adminUsername,
+      role: 'admin',
+      language: 'en',
+    },
+  });
+
   // Create a test user for roaster ownership
   const testUser = await prisma.user.upsert({
     where: { email: 'coffee@lover.com' },

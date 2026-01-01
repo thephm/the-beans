@@ -379,19 +379,19 @@ class ApiClient {
     return this.request(`/admin/analytics/stats${searchParams}`);
   }
 
-  // Favorites methods
-  async getFavorites() {
-    return this.request('/favorites');
+  // Favourites methods
+  async getFavourites() {
+    return this.request('/favourites');
   }
 
-  async addFavorite(roasterId: string) {
-    return this.request(`/favorites/${roasterId}`, {
+  async addFavourite(roasterId: string) {
+    return this.request(`/favourites/${roasterId}`, {
       method: 'POST',
     });
   }
 
-  async removeFavorite(roasterId: string) {
-    return this.request(`/favorites/${roasterId}`, {
+  async removeFavourite(roasterId: string) {
+    return this.request(`/favourites/${roasterId}`, {
       method: 'DELETE',
     });
   }

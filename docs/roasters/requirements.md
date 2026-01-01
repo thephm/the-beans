@@ -7,7 +7,7 @@ List of requirements and user stories for roasters.
 - Users can view a list of coffee roasters with filtering and sorting options.
 - Users can search roasters by name, city, state, specialty, or proximity.
 - Users can view detailed information for each roaster.
-- Users can favorite/unfavorite roasters and see their favorites.
+- Users can favourite/unfavourite roasters and see their favourites.
 - Roaster profiles display ratings, review counts, specialties, contact info, hours, and founding year.
 - Roaster profiles include links to social media accounts (Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X/Twitter, Reddit).
 - Authenticated users can create new roasters.

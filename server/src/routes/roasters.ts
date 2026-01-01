@@ -380,7 +380,7 @@ router.get('/', [
         _count: {
           select: {
             reviews: true,
-            favorites: true,
+            favourites: true,
           }
         }
       },
@@ -577,7 +577,7 @@ router.get('/:id', [
         _count: {
           select: {
             reviews: true,
-            favorites: true,
+            favourites: true,
           }
         }
       }
@@ -604,10 +604,10 @@ router.get('/:id', [
       return res.status(404).json({ error: 'Roaster not found' });
     }
 
-    // Check if current user has favorited this roaster
-    let isFavorited = false;
+    // Check if current user has favourited this roaster
+    let isFavourited = false;
     if (req.userId) {
-      const favorite = await prisma.favorite.findUnique({
+      const favourite = await prisma.favourite.findUnique({
         where: {
           userId_roasterId: {
             userId: req.userId,
@@ -615,7 +615,7 @@ router.get('/:id', [
           }
         }
       });
-      isFavorited = !!favorite;
+      isFavourited = !!favourite;
     }
 
     // Add imageUrl and specialties fields for frontend compatibility
@@ -652,7 +652,7 @@ router.get('/:id', [
       hours: hoursValue,
       imageUrl,
       specialties,
-      isFavorited,
+      isFavourited,
     };
 
     // Only expose socialNetworks field
@@ -1419,7 +1419,7 @@ router.get('/admin/unverified', [
         _count: {
           select: {
             reviews: true,
-            favorites: true,
+            favourites: true,
           }
         }
       },

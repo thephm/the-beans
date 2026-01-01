@@ -2,25 +2,25 @@
 
 A beautiful, modern full-stack web application for discovering and exploring specialty coffee roasters. Built with Next.js 14, Express.js, and PostgreSQL in a Docker-first development environment.
 
-## 🚀 Features
+## Features
 
 ### Core Features
-- 🌍 **Location-based Discovery**: Find coffee roasters near you
-- ☕ **Roaster Profiles**: Detailed information including contact info, hours, and bean offerings
-- � **Owner Contact Information**: Store roaster owner details (name, email, bio, mobile)
-- �👥 **User Authentication**: Secure sign up and login system
-- ⭐ **Reviews & Favorites**: Rate roasters and save your favorites
-- 📸 **Image Uploads**: Upload and share roaster photos
-- 🔔 **Notifications**: Stay updated on new roasters and activity
+- **Location-based Discovery**: Find coffee roasters near you
+- **Roaster Profiles**: Detailed information including contact info, hours, and bean offerings
+- **Owner Contact Information**: Store roaster owner details (name, email, bio, mobile)
+- **User Authentication**: Secure sign up and login system
+- **Reviews & Favourites**: Rate roasters and save your favourites
+- **Image Uploads**: Upload and share roaster photos
+- **Notifications**: Stay updated on new roasters and activity
 
 ### Technical Features
-- 🔒 **Secure API**: RESTful API with comprehensive Swagger documentation
-- 🌐 **Internationalization**: Full i18n support (English/French)
-- 💜 **Beautiful Design**: Purple-themed UI with lavender, violet, and orchid colors
-- 🔒 **Admin Dashboard**: Complete user and role management (admin only)
-- � **Audit Logging**: Comprehensive activity tracking with geolocation and change history
-- �📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- 🐳 **Docker-First**: Containerized development and deployment
+- **Secure API**: RESTful API with comprehensive Swagger documentation
+- **Internationalization**: Full i18n support (English/French)
+- **Beautiful Design**: Purple-themed UI with lavender, violet, and orchid colors
+- **Admin Dashboard**: Complete user and role management (admin only)
+- **Audit Logging**: Comprehensive activity tracking with geolocation and change history
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Docker-First**: Containerized development and deployment
 
 ### Architecture
 - **Frontend**: Next.js 14 (App Router) with TypeScript
@@ -29,9 +29,9 @@ A beautiful, modern full-stack web application for discovering and exploring spe
 - **Deployment**: Docker-based containerization
 - **CDN**: Cloudflare for assets and domain management
 
-## 🐳 Quick Start (Docker - Recommended)
+## Quick Start (Docker - Recommended)
 
-**⚠️ Critical**: This project requires Docker container restarts for code changes to take effect. Hot reload is unreliable due to Docker volume mounting.
+**Critical**: This project requires Docker container restarts for code changes to take effect. Hot reload is unreliable due to Docker volume mounting.
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
@@ -51,11 +51,11 @@ A beautiful, modern full-stack web application for discovering and exploring spe
    ```
 
 3. **Access the applications**
-   - 🌐 **Frontend**: [http://localhost:3000](http://localhost:3000)
-   - 🔧 **Backend API**: [http://localhost:5000](http://localhost:5000)
-   - 📚 **API Documentation**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+   - **Frontend**: [http://localhost:3000](http://localhost:3000)
+   - **Backend API**: [http://localhost:5000](http://localhost:5000)
+   - **API Documentation**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
 
-### 🔄 Development Workflow
+### Development Workflow
 
 **Essential**: Always restart containers after code changes:
 
@@ -77,7 +77,7 @@ docker-compose down
 - **Email**: `admin@example.com`
 - **Password**: `admin123`
 
-### 🗃️ Database Management
+### Database Management
 
 ```bash
 # Connect to PostgreSQL shell
@@ -96,7 +96,7 @@ docker-compose exec server npx prisma generate
 docker-compose exec server npx prisma migrate reset
 ```
 
-## 📧 Contact Us Email Setup
+## Contact Us Email Setup
 
 To enable the Contact Us form and email notifications, configure the following environment variables in `server/.env`:
 
@@ -126,57 +126,57 @@ For detailed setup instructions including Gmail, Fastmail, SendGrid, and trouble
 Comprehensive documentation is maintained in the [`docs/`](./docs/) directory following docs-as-code principles.
 
 ### Core Documentation
-- 🏗️ [Architecture Overview](./docs/architecture.md)
-- 📖 [Documentation Index](./docs/README.md)
-- 📝 [Glossary](./docs/glossary.md)
-- ⚙️ [Setup Guide](./docs/SETUP.md)
-- 🐳 [Docker Documentation](./docs/DOCKER.md)
-- 📋 [Project Summary](./docs/PROJECT_SUMMARY.md)
+- [Architecture Overview](./docs/architecture.md)
+- [Documentation Index](./docs/README.md)
+- [Glossary](./docs/glossary.md)
+- [Setup Guide](./docs/SETUP.md)
+- [Docker Documentation](./docs/DOCKER.md)
+- [Project Summary](./docs/PROJECT_SUMMARY.md)
 
 ### Feature Documentation
-- 🔐 [Authentication System](./docs/auth/README.md)
-- 🔍 [Search & Discovery](./docs/search/README.md)
-- ☕ [Roaster Management](./docs/roasters/README.md)
-- ⭐ [Favorites & Reviews](./docs/favorites/README.md)
-- 👤 [User Profiles](./docs/profile/README.md)
-- ⚙️ [Settings & Preferences](./docs/settings/README.md)
-- 🛡️ [Admin Dashboard](./docs/admin/README.md)
-- 📊 [Audit Logging](./docs/admin/audit-logging.md)
+- [Authentication System](./docs/auth/README.md)
+- [Search & Discovery](./docs/search/README.md)
+- [Roaster Management](./docs/roasters/README.md)
+- [Favourites & Reviews](./docs/favourites/README.md)
+- [User Profiles](./docs/profile/README.md)
+- [Settings & Preferences](./docs/settings/README.md)
+- [Admin Dashboard](./docs/admin/README.md)
+- [Audit Logging](./docs/admin/audit-logging.md)
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 the-beans/
-├── 🌐 client/                    # Next.js 14 Frontend
+├── client/                    # Next.js 14 Frontend
 │   ├── src/
-│   │   ├── app/                 # App Router pages & layouts
-│   │   ├── components/          # Reusable React components
-│   │   ├── contexts/            # React Context providers
-│   │   ├── lib/                # Utilities & configurations
-│   │   └── types/              # TypeScript type definitions
+│   │   ├── app/               # App Router pages & layouts
+│   │   ├── components/        # Reusable React components
+│   │   ├── contexts/          # React Context providers
+│   │   ├── lib/               # Utilities & configurations
+│   │   └── types/             # TypeScript type definitions
 │   ├── public/
-│   │   ├── locales/            # i18n translation files
-│   │   └── images/             # Static images & icons
-│   └── Dockerfile              # Frontend container config
-├── 🔧 server/                   # Express.js Backend
+│   │   ├── locales/           # i18n translation files
+│   │   └── images/            # Static images & icons
+│   └── Dockerfile             # Frontend container config
+├── server/                    # Express.js Backend
 │   ├── src/
-│   │   ├── routes/             # RESTful API endpoints
-│   │   ├── middleware/         # Auth & validation middleware
+│   │   ├── routes/            # RESTful API endpoints
+│   │   ├── middleware/        # Auth & validation middleware
 │   │   └── lib/               # Server utilities
 │   ├── prisma/
 │   │   ├── schema.prisma      # Database schema
 │   │   ├── migrations/        # Database migrations
-│   │   └── seed.ts           # Database seeding
+│   │   └── seed.ts            # Database seeding
 │   ├── uploads/               # File upload storage
-│   └── Dockerfile            # Backend container config
-├── 📚 docs/                    # Documentation (docs-as-code)
-├── 🐳 docker-compose.yml       # Multi-service orchestration
-└── 📋 Various config files     # Setup, CI/CD, etc.
-```
+│   └── Dockerfile             # Backend container config
+├── docs/                      # Documentation (docs-as-code)
+├── docker-compose.yml         # Multi-service orchestration
+└── Various config files       # Setup, CI/CD, etc.
+``` 
 
-## 🛠️ Development
+## Development
 
-### 🎯 Key Development Patterns
+### Key Development Patterns
 
 #### API Routes (`server/src/routes/`)
 - **Authentication**: `optionalAuth` (public), `requireAuth` (protected)
@@ -196,24 +196,24 @@ docker-compose exec server npx prisma generate
 docker-compose exec server npx prisma migrate dev
 ```
 
-### 🔧 Adding New Features
+### Adding New Features
 1. **Backend**: Add routes in `server/src/routes/` with proper middleware
 2. **Frontend**: Create components in `client/src/components/`
 3. **Database**: Update `server/prisma/schema.prisma` + generate + migrate
 4. **i18n**: Add translations to `client/public/locales/{en,fr}/common.json`
 5. **Restart**: Always restart containers after changes
 
-### 🧪 Testing Strategy
+### Testing Strategy
 - **Frontend**: Jest + React Testing Library
 - **Backend**: Jest + Supertest for API testing
 - **E2E**: Playwright for integration tests
 - **Manual**: Admin dashboard at `/admin` (requires admin login)
 
-## 🚀 Deployment
+## Deployment
 
 For complete deployment documentation, see the **[Deployment Guide](./docs/deployment/README.md)**.
 
-### 🌟 Render.com (Recommended)
+### Render.com (Recommended)
 The Beans includes a complete `render.yaml` configuration for one-click deployment on Render.com:
 
 1. **Connect** your GitHub repository to [Render.com](https://render.com)
@@ -234,10 +234,10 @@ The Beans includes a complete `render.yaml` configuration for one-click deployme
    - Backend API service (Express.js)
    - Frontend web service (Next.js)
 
-### 🐳 Docker-Based Deployment
+### Docker-Based Deployment
 Alternative deployment using Docker containers with `docker-compose.yml`.
 
-### 🗃️ Database Migration
+### Database Migration
 ```bash
 # Automatic via render.yaml build process
 # Or manual via Render shell:
@@ -245,7 +245,7 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Process
 1. **Fork** the repository
@@ -265,7 +265,7 @@ npx prisma generate
 - **Tests**: Include tests for new features
 - **Documentation**: Update docs for new features
 
-## ⚠️ Important Development Notes
+## Important Development Notes
 
 ### Docker-First Workflow
 - **Always restart containers** after code changes: `docker-compose restart client server`
@@ -300,18 +300,18 @@ docker exec the-beans-server-1 ls -la /app/dist
 - **Admin access needed**: Use `admin@example.com` / `admin123`
 
 ### URLs & Access
-- 🌐 Frontend: [http://localhost:3000](http://localhost:3000)
-- 🔧 Backend: [http://localhost:5000](http://localhost:5000)
-- 📚 API Docs: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
-- 🛡️ Admin Panel: [http://localhost:3000/admin](http://localhost:3000/admin)
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend: [http://localhost:5000](http://localhost:5000)
+- API Docs: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+- Admin Panel: [http://localhost:3000/admin](http://localhost:3000/admin)
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## Support
 
-- 📧 **Email**: support@the-beans.app
-- 🐛 **Issues**: [GitHub Issues](https://github.com/thephm/the-beans/issues)
-- 📚 **Documentation**: [./docs/](./docs/)
-- 🚀 **Setup Help**: [SETUP.md](./SETUP.md)
+- **Email**: support@the-beans.app
+- **Issues**: [GitHub Issues](https://github.com/thephm/the-beans/issues)
+- **Documentation**: [./docs/](./docs/)
+- **Setup Help**: [SETUP.md](./SETUP.md)

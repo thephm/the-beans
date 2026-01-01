@@ -59,7 +59,7 @@ src/routes/auth.ts
 src/routes/contact.ts
 src/routes/countries.ts
 src/routes/debug.ts
-src/routes/favorites.ts
+src/routes/favourites.ts
 src/routes/people.ts
 src/routes/regions.ts
 src/routes/reviews.ts

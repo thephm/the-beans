@@ -40,14 +40,14 @@ export default function AnalyticsDashboard() {
 		}
 	};
 
-	const eventTypeLabels: Record<string, string> = useMemo(() => ({
-		page_view: tr('admin.analytics.eventTypes.page_view', 'Page View'),
-		signup: tr('admin.analytics.eventTypes.signup', 'Signup'),
-		login: tr('admin.analytics.eventTypes.login', 'Login'),
-		favorite: tr('admin.analytics.eventTypes.favorite', 'Favorite'),
-		review: tr('admin.analytics.eventTypes.review', 'Review'),
-		unknown: tr('admin.analytics.eventTypes.unknown', 'Unknown Event'),
-	}), [i18n.language, t]);
+	       const eventTypeLabels: Record<string, string> = useMemo(() => ({
+		       page_view: tr('admin.analytics.eventTypes.page_view', 'Page View'),
+		       signup: tr('admin.analytics.eventTypes.signup', 'Signup'),
+		       login: tr('admin.analytics.eventTypes.login', 'Login'),
+		       favourite: tr('admin.analytics.eventTypes.favourite', 'Favourite'),
+		       review: tr('admin.analytics.eventTypes.review', 'Review'),
+		       unknown: tr('admin.analytics.eventTypes.unknown', 'Unknown Event'),
+	       }), [i18n.language, t]);
 
 	const [stats, setStats] = useState([] as any[]);
 	const [loading, setLoading] = useState(true);
@@ -60,7 +60,7 @@ export default function AnalyticsDashboard() {
 		'/',
 		'/discover',
 		'/about',
-		'/favorites',
+		'/favourites',
 		'/suggest',
 		'/profile',
 		'/roasters',
@@ -424,7 +424,7 @@ export default function AnalyticsDashboard() {
 								<option value="page_view">{tr('admin.analytics.eventTypes.page_view', 'Page View')}</option>
 								<option value="signup">{tr('admin.analytics.eventTypes.signup', 'Signup')}</option>
 								<option value="login">{tr('admin.analytics.eventTypes.login', 'Login')}</option>
-								<option value="favorite">{tr('admin.analytics.eventTypes.favorite', 'Favorite')}</option>
+								   <option value="favourite">{tr('admin.analytics.eventTypes.favourite', 'Favourite')}</option>
 								<option value="review">{tr('admin.analytics.eventTypes.review', 'Review')}</option>
 							</select>
 						</div>

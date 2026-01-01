@@ -1,44 +1,44 @@
-# ☕ The Beans - Project Overview
+# The Beans - Project Overview
 
 **The Beans** is a modern, full-stack coffee roaster discovery platform designed to connect coffee enthusiasts with specialty roasters in their area. Built with a Docker-first development approach for consistency and reliability.
 
-## 🎯 Project Vision
+## Project Vision
 
 Create a beautiful, user-friendly platform where coffee lovers can:
 - **Discover** specialty coffee roasters near them
-- **Connect** with the coffee community through reviews and favorites
+- **Connect** with the coffee community through reviews and favourites
 - **Explore** the world of specialty coffee through detailed roaster profiles
 - **Share** their coffee experiences with photos and reviews
 
-## ✨ Feature Highlights
+## Feature Highlights
 
-### 🎨 **Beautiful Purple-Themed Design**
+### **Beautiful Purple-Themed Design**
 - Custom Tailwind CSS with lavender, violet, and orchid color palette
 - Smooth animations and transitions using Framer Motion
 - Fully responsive design optimized for all devices
 - Progressive Web App (PWA) capabilities for mobile installation
 
-### 🏗️ **Modern Architecture**
+### **Modern Architecture**
 - **Frontend**: Next.js 14 (App Router) with TypeScript and React 18
 - **Backend**: Express.js API with TypeScript and Prisma ORM
 - **Database**: PostgreSQL with comprehensive relational schema
 - **DevOps**: Docker Compose orchestration for development
 - **Authentication**: Secure JWT-based authentication system
 
-### 🌍 **Core Features**
+### **Core Features**
 - **Roaster Discovery**: Find coffee roasters near you with location-based search
 - **User Accounts**: Sign up, login, and personalized profiles
 - **Search & Filters**: Advanced search by location, specialty
 - **Review System**: Rate and review roasters
-- **Favorites**: Save your favorite coffee roasters
+- **Favourites**: Save your favourite coffee roasters
 - **Photo Uploads**: Share beautiful coffee photos (Cloudinary integration ready)
 
-### 📱 **Cross-Platform Support**
+### **Cross-Platform Support**
 - Works seamlessly on iOS, Android, and desktop browsers
 - PWA manifest for mobile app-like experience
 - Deep linking support for sharing specific roasters
 
-### 🔒 **Secure & Professional**
+### **Secure & Professional**
 - RESTful API with comprehensive Swagger documentation
 - JWT authentication with secure password hashing
 - Comprehensive audit logging with IP geolocation tracking
@@ -47,15 +47,15 @@ Create a beautiful, user-friendly platform where coffee lovers can:
 - CORS configuration
 - Admin dashboard with activity monitoring
 
-### 📊 **Database Schema**
+### **Database Schema**
 Complete database design with:
 - Users, Roasters, Reviews, Comments
-- Favorites system, Notifications
+- Favourites system, Notifications
 - Comprehensive Audit Logging with geolocation tracking
 - Geolocation support for proximity search
 - Flexible JSON fields for hours and metadata
 
-## 🚀 **Quick Start Guide**
+## **Quick Start Guide**
 
 ### 1. **Install Dependencies**
 ```bash
@@ -89,7 +89,7 @@ npm run dev
 
 This starts both frontend (localhost:3000) and backend (localhost:5000)!
 
-## 🌟 **Sample Data Included**
+## **Sample Data Included**
 
 I've created sample roasters for you:
 - **Purple Mountain Coffee** (Seattle) - Ethiopian specialists
@@ -98,11 +98,11 @@ I've created sample roasters for you:
 
 **Test Account**: `coffee@lover.com` / `password123`
 
-## 📚 **API Documentation**
+## **API Documentation**
 
 Once running, visit `http://localhost:5000/api-docs` for complete API documentation with Swagger UI.
 
-## 🎯 **Key API Endpoints**
+## **Key API Endpoints**
 
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
@@ -111,7 +111,7 @@ Once running, visit `http://localhost:5000/api-docs` for complete API documentat
 - `GET /api/search` - Search roasters
 - `POST /api/roasters` - Create new roaster (authenticated)
 
-## 🚀 **Deployment Ready**
+## **Deployment Ready**
 
 ### **Frontend (Docker-Based)**
 - Docker containerization for consistent deployment
@@ -123,17 +123,17 @@ Once running, visit `http://localhost:5000/api-docs` for complete API documentat
 - PostgreSQL database integration
 - Environment variable templates
 
-## 🔮 **Future Enhancements**
+## **Future Enhancements**
 
 The foundation is set for:
 - **Push Notifications** for new roasters near users
 - **Advanced Map View** with clustering
-- **Social Features** (follow users, share favorites)
+- **Social Features** (follow users, share favourites)
 - **Bean Inventory Tracking** with pricing
 - **Event System** for coffee tastings and events
 - **Mobile Apps** using React Native (easy migration)
 
-## 💜 **Your Beautiful Design**
+## **Your Beautiful Design**
 
 The app features your requested purple color palette:
 - **Lavender** (#f3f0ff) for light backgrounds
@@ -143,7 +143,7 @@ The app features your requested purple color palette:
 
 Clean, modern interface with smooth animations and intuitive navigation.
 
-## 📱 **Next Steps**
+## **Next Steps**
 
 1. **Test the app**: Start the development servers and explore
 2. **Customize**: Adjust colors, add your branding
@@ -151,7 +151,7 @@ Clean, modern interface with smooth animations and intuitive navigation.
 4. **Deploy**: Follow the deployment guide for your chosen platform
 5. **Domain**: Set up your custom domain with Cloudflare
 
-## 🆘 **Need Help?**
+## **Need Help?**
 
 - Read `SETUP.md` for detailed setup instructions
 - Check `README.md` for project overview
@@ -160,4 +160,4 @@ Clean, modern interface with smooth animations and intuitive navigation.
 
 Your coffee roaster discovery app is ready to help coffee lovers find amazing local roasters! The beautiful purple-themed interface, comprehensive features, and solid technical foundation will make this a delightful platform for the coffee community.
 
-**Happy brewing! ☕💜**
+**Happy brewing!**

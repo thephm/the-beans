@@ -1,42 +1,40 @@
-````markdown# Favorites API
+```markdown
 
-# Favorites API
+# Favourites API
 
-This document describes the API endpoints and contracts for the favorites feature.
+This document describes the API endpoints and contracts for the favourites feature.
 
-## ⚠️ Client-Side Only Implementation
+## Client-Side Only Implementation
 
 ## Implementation
 
-Favorites are currently managed **entirely client-side** using `localStorage`. There are **no backend API endpoints** for favorites functionality.
+Favourites are currently managed **entirely client-side** using `localStorage`. There are **no backend API endpoints** for favourites functionality.
 
-Favorites are currently managed **client-side only** using `localStorage`. There are no dedicated backend favorites endpoints.
+Favourites are currently managed **client-side only** using `localStorage`. There are no dedicated backend favourites endpoints.
 
 ### Implementation Details
 
 ### LocalStorage (Client-Side Only)
 
-#### LocalStorage Storage- **Key**: `favoriteRoasters`
+#### LocalStorage Storage- **Key**: `favouriteRoasters`
 
-- **Key**: `favoriteRoasters`- **Value**: Array of roaster IDs (as strings) `["1", "2", "3"]`
+- **Key**: `favouriteRoasters`- **Value**: Array of roaster IDs (as strings) `["1", "2", "3"]`
 
-- **Value**: Array of roaster IDs (as strings) `["roaster_id_1", "roaster_id_2", "roaster_id_3"]`- **Used for**: All favorite functionality, persistence, and cross-page state
+- **Value**: Array of roaster IDs (as strings) `["roaster_id_1", "roaster_id_2", "roaster_id_3"]`- **Used for**: All favourite functionality, persistence, and cross-page state
 
 - **Persistence**: Survives page reloads and browser restarts
 
 - **Scope**: Per-browser, not synced across devices### Current API Integration
 
-
-
 #### How It Works#### `GET /api/roasters/:id`
 
-1. **Add Favorite**: Append roaster ID to localStorage array- Returns roaster details with basic information
+1. **Add Favourite**: Append roaster ID to localStorage array- Returns roaster details with basic information
 
-2. **Remove Favorite**: Filter roaster ID from localStorage array  - **Note**: Does NOT include `isFavorited` field - this is calculated client-side
+2. **Remove Favourite**: Filter roaster ID from localStorage array  - **Note**: Does NOT include `isFavourited` field - this is calculated client-side
 
-3. **Check Favorite**: Search for roaster ID in localStorage array- Example response:
+3. **Check Favourite**: Search for roaster ID in localStorage array- Example response:
 
-4. **List Favorites**: Read entire array from localStorage```json
+4. **List Favourites**: Read entire array from localStorage```json
 
 {
 
@@ -44,27 +42,28 @@ Favorites are currently managed **client-side only** using `localStorage`. There
 
 ```typescript  "name": "Roaster Name",
 
-// Check if roaster is favorited  "description": "...",
+// Check if roaster is favourited  "description": "...",
 
-const favorites = JSON.parse(localStorage.getItem('favoriteRoasters') || '[]');  "address": "...",
+const favourites = JSON.parse(localStorage.getItem('favouriteRoasters') || '[]');  "address": "...",
 
-const isFavorited = favorites.includes(roasterId);  "specialties": ["Direct Trade", "Light Roast"]
+const isFavourited = favourites.includes(roasterId);  "specialties": ["Direct Trade", "Light Roast"]
 
 }
 
-// Add to favorites```
+// Add to favourites
 
-favorites.push(roasterId);
+```
+favourites.push(roasterId);
 
-localStorage.setItem('favoriteRoasters', JSON.stringify(favorites));#### Favorites Logic (Client-Side)
+localStorage.setItem('favouriteRoasters', JSON.stringify(favourites));#### Favourites Logic (Client-Side)
 
 - **Add/Remove**: Updates localStorage array and React state
 
-// Remove from favorites- **Persistence**: Survives page reloads via localStorage
+// Remove from favourites- **Persistence**: Survives page reloads via localStorage
 
-const updated = favorites.filter(id => id !== roasterId);- **Cross-Page Sync**: All pages read from same localStorage key
+const updated = favourites.filter(id => id !== roasterId);- **Cross-Page Sync**: All pages read from same localStorage key
 
-localStorage.setItem('favoriteRoasters', JSON.stringify(updated));- **No Authentication Required**: Works for all users
+localStorage.setItem('favouriteRoasters', JSON.stringify(updated));- **No Authentication Required**: Works for all users
 
 ```
 
@@ -72,23 +71,21 @@ localStorage.setItem('favoriteRoasters', JSON.stringify(updated));- **No Authent
 
 ### Integration with Roasters APIThe following endpoints are documented but **do not exist**:
 
-- ❌ `POST /api/roasters/:id/favorite` 
+- `POST /api/roasters/:id/favourite` 
 
-#### `GET /api/roasters/:id`- ❌ `DELETE /api/roasters/:id/favorite`
+#### `GET /api/roasters/:id`- `DELETE /api/roasters/:id/favourite`
 
-Returns roaster details. The `isFavorited` status is **calculated client-side** by checking localStorage.- ❌ `GET /api/roasters?favorites=true`
-
-
+Returns roaster details. The `isFavourited` status is **calculated client-side** by checking localStorage.- `GET /api/roasters?favourites=true`
 
 **Response:**### Future Backend Implementation
 
-```jsonWhen backend favorites are added, they should:
+```jsonWhen backend favourites are added, they should:
 
 {- Sync with localStorage on login/logout
 
-  "id": "roaster_123",- Provide user-specific favorite persistence
+  "id": "roaster_123",- Provide user-specific favourite persistence
 
-  "name": "Blue Bottle Coffee",- Include `isFavorited` field in roaster responses
+  "name": "Blue Bottle Coffee",- Include `isFavourited` field in roaster responses
 
   "description": "Specialty coffee roaster",
 
@@ -102,40 +99,40 @@ Returns roaster details. The `isFavorited` status is **calculated client-side** 
 
 - `404 Not Found`: Roaster does not exist
 
-**Note**: No `isFavorited` field in response - must be determined by client.- `500 Internal Server Error`: Unexpected error
+**Note**: No `isFavourited` field in response - must be determined by client.- `500 Internal Server Error`: Unexpected error
 
 
 
-#### Filtering Favorites---
+#### Filtering Favourites---
 
-To show only favorited roasters:
+To show only favourited roasters:
 
-1. Get favorite IDs from localStorageSee also: [Favorites Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)
+1. Get favourite IDs from localStorageSee also: [Favourites Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)
 
 2. Fetch roaster details for each ID
 3. Filter/display in UI
 
 ### Limitations
-- ❌ No authentication required (anyone can favorite)
-- ❌ Not synced across devices/browsers
-- ❌ Lost if browser data is cleared
-- ❌ Cannot query "all my favorites" from backend
-- ❌ No server-side favorite counts
+- No authentication required (anyone can favourite)
+- Not synced across devices/browsers
+- Lost if browser data is cleared
+- Cannot query "all my favourites" from backend
+- No server-side favourite counts
 
 ### Future Backend Implementation
 
-When favorites are moved to the backend, the system should provide:
-- User-specific favorites (requires authentication)
+When favourites are moved to the backend, the system should provide:
+- User-specific favourites (requires authentication)
 - Sync across devices
 - API endpoints:
-  - `POST /api/favorites/:roasterId` - Add favorite
-  - `DELETE /api/favorites/:roasterId` - Remove favorite
-  - `GET /api/favorites` - List user's favorites
-  - `GET /api/roasters?favorited=true` - Filter favorited roasters
+  - `POST /api/favourites/:roasterId` - Add favourite
+  - `DELETE /api/favourites/:roasterId` - Remove favourite
+  - `GET /api/favourites` - List user's favourites
+  - `GET /api/roasters?favourited=true` - Filter favourited roasters
 - Migration path from localStorage to database
 
 ---
 
-See also: [Favorites Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)
+See also: [Favourites Design](design.md), [Overview](overview.md), [Requirements](requirements.md), [Test Cases](test.md)
 
 ````

@@ -6,7 +6,7 @@
   "nav": {
     "discover": "Découvrir",
     "about": "À propos",
-    "favorites": "Favoris",
+    "favourites": "Favoris",
     "suggest": "Suggérer",
     "profile": "Profil",
     "settings": "Paramètres",
@@ -185,14 +185,14 @@
     "noResults": "Aucun résultat trouvé",
     "tryAdjusting": "Essayez d'ajuster vos critères de recherche ou votre emplacement."
   },
-  "favorites": {
+  "favourites": {
     "title": "Vos favoris",
     "subtitle": "Suivez vos torréfacteurs préférés.",
     "roasters": "Torréfacteurs favoris",
-    "noFavorites": "Aucun favori pour le moment",
+    "noFavourites": "Aucun favori pour le moment",
     "startExploring": "Commencez à explorer pour ajouter vos favoris !",
     "loginRequired": "Veuillez vous connecter pour voir vos favoris",
-    "noFavoritesYet": "Aucun favori pour le moment",
+    "noFavouritesYet": "Aucun favori pour le moment",
     "startExploringDescription": "Commencez à explorer et ajoutez vos torréfacteurs préférés pour les garder ici pour un accès facile.",
     "viewDetails": "Voir les détails",
     "remove": "Retirer"
@@ -253,7 +253,7 @@
     "notifications": "Notifications",
     "privacy": "Confidentialité",
     "showProfile": "Montrer mon profil aux autres utilisateurs",
-    "allowLocationTracking": "Autoriser le suivi de localisation pour de meilleures recommandations",
+    "allowLocationTracking": "Autoriser le partage de localisation pour de meilleures recommandations",
   "preferences": "Préférences",
   "coffeePreferences": "Préférences de café",
   "roastLevel": "Niveau de torréfaction",
@@ -385,8 +385,8 @@
   "reviews": "avis",
   "visitWebsite": "Visiter le site web",
   "visitAction": "Visiter",
-  "addToFavorites": "Ajouter aux favoris",
-  "removeFromFavorites": "Retirer des favoris",
+  "addToFavourites": "Ajouter aux favoris",
+  "removeFromFavourites": "Retirer des favoris",
   "contactInfo": "Informations de contact",
   "address": "Adresse",
   "phone": "Téléphone",
@@ -446,7 +446,7 @@
         "page_view": "Vue de page",
         "signup": "Inscription",
         "login": "Connexion",
-        "favorite": "Favori",
+        "favourite": "Favori",
         "review": "Avis",
         "unknown": "Événement inconnu"
       },
@@ -916,7 +916,7 @@
       "usage": {
         "title": "Informations d'utilisation",
         "reviews": "Avis, notes et photos que vous soumettez",
-        "favorites": "Torréfacteurs que vous mettez en favoris ou signalez",
+        "favourites": "Torréfacteurs que vous mettez en favoris ou signalez",
         "interactions": "Vos interactions avec les torréfacteurs et autres utilisateurs",
         "preferences": "Langue et autres préférences"
       },
@@ -1012,7 +1012,7 @@
         "discover": "Découvrir et évaluer des torréfacteurs de café",
         "share": "Partager des avis honnêtes et des photos",
         "connect": "Vous connecter avec d'autres amateurs de café",
-        "favorite": "Sauvegarder vos torréfacteurs favoris"
+        "favourite": "Sauvegarder vos torréfacteurs favoris"
       },
       "forbidden": {
         "spam": "Publier du spam ou de faux avis",

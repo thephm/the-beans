@@ -114,8 +114,6 @@ export function UserMenu() {
               {t('nav.settings')}
             </Link>
 
-            {/* Favorites link removed as it's now in the navbar */}
-
             <hr className="border-gray-100 dark:border-gray-700 my-1" />
 
             <button

@@ -39,7 +39,7 @@ model User {
   createdBeans    Bean[]          @relation("BeanCreatedBy")
   updatedBeans    Bean[]          @relation("BeanUpdatedBy")
   comments        Comment[]
-  favorites       Favorite[]
+  favourites       Favourite[]
   notifications   Notification[]
   createdReviews  Review[]        @relation("ReviewCreatedBy")
   updatedReviews  Review[]        @relation("ReviewUpdatedBy")
@@ -91,7 +91,7 @@ model Roaster {
   socialNetworks     Json?
   founded            Int?
   beans              Bean[]
-  favorites          Favorite[]
+  favourites          Favourite[]
   reviews            Review[]
   roasterImages      RoasterImage[]
   people             RoasterPerson[]
@@ -222,7 +222,7 @@ model Comment {
   @@map("comments")
 }
 
-model Favorite {
+model Favourite {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   userId    String
@@ -231,7 +231,7 @@ model Favorite {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, roasterId])
-  @@map("favorites")
+  @@map("favourites")
 }
 
 model Notification {

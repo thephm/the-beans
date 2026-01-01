@@ -2,39 +2,39 @@
 
 Welcome to the comprehensive documentation for **The Beans** - a modern coffee roaster discovery platform!
 
-## 📋 Product Overview
+## Product Overview
 
 The Beans is a full-stack web application for discovering, reviewing, and managing specialty coffee roasters. Built with a Docker-first development approach, it provides a complete platform for coffee enthusiasts and roaster businesses.
 
-### 🚀 Key Features
+### Key Features
 - **Location-based Discovery**: Find roasters near you
 - **User Authentication**: Secure registration and login
-- **Reviews & Favorites**: Rate and save favorite roasters  
+- **Reviews & Favourites**: Rate and save favourite roasters  
 - **Admin Dashboard**: Complete user and content management
 - **Internationalization**: Full i18n support (English/French)
 - **Responsive Design**: Works on all devices
 
-## 🏗️ Documentation Structure
+## Documentation Structure
 
 ### Core Architecture
-- 📐 [**Architecture Overview**](architecture.md) - System design and technical stack
-- 📚 [**Glossary**](glossary.md) - Key terms and definitions
+- [**Architecture Overview**](architecture.md) - System design and technical stack
+- [**Glossary**](glossary.md) - Key terms and definitions
 
 ### Feature Documentation
 
 #### User Features
-- 🔐 [**Authentication System**](./auth/README.md) - Login, registration, JWT tokens
-- 🔍 [**Search & Discovery**](./search/README.md) - Find and filter roasters
-- ☕ [**Roaster Management**](./roasters/README.md) - Roaster profiles and data
-- ⭐ [**Favorites & Reviews**](./favorites/README.md) - User interaction features
-- 👤 [**User Profiles**](./profile/README.md) - Profile management and settings
-- ⚙️ [**Settings & Preferences**](./settings/README.md) - User customization
+- [**Authentication System**](./auth/README.md) - Login, registration, JWT tokens
+- [**Search & Discovery**](./search/README.md) - Find and filter roasters
+- [**Roaster Management**](./roasters/README.md) - Roaster profiles and data
+- [**Favourites & Reviews**](./favourites/README.md) - User interaction features
+- [**User Profiles**](./profile/README.md) - Profile management and settings
+- [**Settings & Preferences**](./settings/README.md) - User customization
 
 #### Administrative Features  
-- 🛡️ [**Admin Dashboard**](./admin/README.md) - User management and system administration
-- 📊 [**Audit Logging**](./admin/audit-logging.md) - Comprehensive activity tracking and monitoring
+- [**Admin Dashboard**](./admin/README.md) - User management and system administration
+- [**Audit Logging**](./admin/audit-logging.md) - Comprehensive activity tracking and monitoring
 
-## 🐳 Development Notes
+## Development Notes
 
 This project uses a **Docker-first development approach**. Key points:
 
@@ -43,12 +43,12 @@ This project uses a **Docker-first development approach**. Key points:
 - **Database operations** require Prisma generate/migrate
 - **Full setup instructions** available in [main README](../README.md)
 
-## � Deployment
+## Deployment
 
-- 📦 [**Deployment Documentation**](./deployment/README.md) - Render.com deployment guides and troubleshooting
+- [**Deployment Documentation**](./deployment/README.md) - Render.com deployment guides and troubleshooting
 
-## �🔧 Quick Navigation
+## Quick Navigation
 
-- 🏠 [**Back to Main README**](../README.md)
-- ⚙️ [**Setup Guide**](SETUP.md)  
-- 🐳 [**Docker Documentation**](DOCKER.md)- 📧 [**Email Configuration**](EMAIL_CONFIGURATION.md)- 📋 [**Project Summary**](PROJECT_SUMMARY.md)
+- [**Back to Main README**](../README.md)
+- [**Setup Guide**](SETUP.md)  
+- [**Docker Documentation**](DOCKER.md)- 📧 [**Email Configuration**](EMAIL_CONFIGURATION.md)- 📋 [**Project Summary**](PROJECT_SUMMARY.md)
