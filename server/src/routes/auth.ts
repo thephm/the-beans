@@ -535,7 +535,10 @@ router.post('/reset-password', [
     where: { id: user.id },
     data: { password: hashedPassword }
   });
+  // Remove the used token
   await prisma.passwordResetToken.delete({ where: { token } });
+  // Remove all expired tokens
+  await prisma.passwordResetToken.deleteMany({ where: { expiresAt: { lt: new Date() } } });
   res.json({ message: 'Password reset successful' });
 });
 
