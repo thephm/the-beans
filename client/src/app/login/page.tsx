@@ -114,9 +114,13 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                <button
+                  type="button"
+                  className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 focus:outline-none"
+                  onClick={() => router.push('/forgot-password')}
+                >
                   {t('auth.forgotPassword')}
-                </a>
+                </button>
               </div>
             </div>
 

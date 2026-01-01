@@ -1,6 +1,5 @@
 # Auth Design
 
-
 ## Overview
 
 Authentication is implemented using JWT tokens and secure password hashing. The backend exposes RESTful endpoints for registration, login, and user info. The frontend manages authentication state and token storage.
