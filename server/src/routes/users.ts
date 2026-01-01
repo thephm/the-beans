@@ -116,7 +116,7 @@ router.delete('/:id', requireAuth, auditDelete('user', prisma.user), async (req:
     // then delete the user. We keep roaster rows but nullify owner/createdBy/updatedBy references.
     await prisma.$transaction([
       // Remove direct user-owned relations
-      prisma.favorite.deleteMany({ where: { userId } }),
+      prisma.favourite.deleteMany({ where: { userId } }),
       prisma.notification.deleteMany({ where: { userId } }),
 
       // Comments: remove comments created by the user, and comments on reviews
@@ -295,7 +295,7 @@ router.post('/:id/cascade-delete', requireAuth, async (req: Request, res: Respon
 
     await prisma.$transaction([
       // Remove direct user-owned relations
-      prisma.favorite.deleteMany({ where: { userId } }),
+      prisma.favourite.deleteMany({ where: { userId } }),
       prisma.notification.deleteMany({ where: { userId } }),
 
       // Comments: remove comments created by the user, and comments on reviews

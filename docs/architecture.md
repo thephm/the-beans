@@ -1,10 +1,10 @@
 # Architecture Overview
 
-## 🏗️ System Overview
+## System Overview
 
 The Beans is a modern full-stack web application for discovering specialty coffee roasters. Built with a **Docker-first development approach**, it features a clean separation between frontend, backend, and database layers using industry-standard technologies.
 
-## 🎯 High-Level Architecture
+## High-Level Architecture
 
 ```
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
@@ -16,7 +16,7 @@ The Beans is a modern full-stack web application for discovering specialty coffe
 └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
-### 📦 Technology Stack
+### Technology Stack
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS
 - **Backend**: Node.js, Express.js, TypeScript, Prisma ORM
 - **Database**: PostgreSQL (containerized for development)
@@ -25,7 +25,7 @@ The Beans is a modern full-stack web application for discovering specialty coffe
 
 All services are **containerized and orchestrated** with Docker Compose for consistent local development.
 
-## 🌐 Frontend Architecture (`client/`)
+## Frontend Architecture (`client/`)
 
 ### Core Technologies
 - **Framework**: Next.js 14 with App Router
@@ -49,7 +49,7 @@ src/app/                    # App Router pages
 ├── layout.tsx             # Root layout with providers
 ├── discover/              # Roaster discovery
 ├── roasters/              # Individual roaster pages
-├── favorites/             # User favorites
+├── favourites/            # User favourites
 ├── profile/               # User profile management
 ├── settings/              # User preferences
 ├── admin/                 # Admin dashboard (protected)
@@ -57,7 +57,7 @@ src/app/                    # App Router pages
 └── about/                 # About page
 ```
 
-## 🔧 Backend Architecture (`server/`)
+## Backend Architecture (`server/`)
 
 ### Core Technologies
 - **Runtime**: Node.js with Express.js framework
@@ -82,9 +82,9 @@ src/routes/
 ├── roasters.ts           # Roaster CRUD operations
 ├── search.ts             # Search and filtering
 ├── reviews.ts            # Review system
-├── favorites.ts          # User favorites
+├── favourites.ts         # User favourites
 ├── notifications.ts      # User notifications
-└── uploads.ts           # File upload handling
+└── uploads.ts            # File upload handling
 ```
 
 ### Security Features
@@ -94,7 +94,7 @@ src/routes/
 - **Input Sanitization**: XSS and injection prevention
 - **JWT Validation**: Token-based authentication middleware
 
-## 🗃️ Database Architecture
+## Database Architecture
 
 ### Database Technology
 - **Engine**: PostgreSQL (production-ready, ACID compliant)
@@ -107,13 +107,13 @@ src/routes/
 User (1:many)
 ├── Roaster (owns/creates/updates)
 ├── Review (creates/updates)
-├── Favorite (has)
+├── Favourite (has)
 ├── Notification (receives)
 └── AuditLog (performs actions)
 
 Roaster (1:many)
 ├── Review (receives)
-├── Favorite (in)
+├── Favourite (in)
 ├── Comment (has)
 ├── CreatedBy (User audit)
 └── UpdatedBy (User audit)
@@ -127,12 +127,12 @@ AuditLog (many:1)
 - **Roaster**: Coffee shop data, location, specialties, founded year, social media links (Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X, Reddit), owner contact fields (ownerName, ownerEmail, ownerBio, ownerMobile) (with audit tracking)
 - **Review**: User ratings and feedback (with audit tracking)
 - **Bean**: Coffee product information (with audit tracking)
-- **Favorite**: User's saved roasters
+- **Favourite**: User's saved roasters
 - **Notification**: System and user notifications
 - **Comment**: Community discussions
 - **AuditLog**: Comprehensive activity tracking with geolocation
 
-## 🐳 DevOps & Deployment
+## DevOps & Deployment
 
 ### Local Development (Docker)
 ```yaml
@@ -143,7 +143,7 @@ docker-compose.yml orchestrates:
 ```
 
 ### Critical Development Workflow
-⚠️ **Container restarts required** for code changes:
+**Container restarts required** for code changes:
 ```bash
 # After frontend changes
 docker-compose restart client
@@ -166,7 +166,7 @@ Staging:      Railway/Render (environment variables)
 Production:   Railway/Render + Docker (secure env vars)
 ```
 
-## 📊 Audit Logging System
+## Audit Logging System
 
 ### Overview
 Comprehensive audit trail system that tracks all system changes with detailed metadata for compliance, security, and debugging.
@@ -240,11 +240,11 @@ Roaster/Review/Bean {
 - **Database Indexing**: Optimized queries on common filters
 - **Error Handling**: Robust error isolation and logging
 
-## 📁 Detailed Project Structure
+## Detailed Project Structure
 
 ```
 the-beans/
-├── 🌐 client/                    # Next.js 14 Frontend
+├── client/                      # Next.js 14 Frontend
 │   ├── src/
 │   │   ├── app/                 # App Router (pages & layouts)
 │   │   ├── components/          # Reusable React components
@@ -262,60 +262,60 @@ the-beans/
 │   │   └── images/             # Static assets
 │   └── Dockerfile              # Frontend container
 │
-├── 🔧 server/                   # Express.js Backend
+├── server/                    # Express.js Backend
 │   ├── src/
-│   │   ├── routes/             # RESTful API endpoints
+│   │   ├── routes/            # RESTful API endpoints
 │   │   │   └── auditLogs.ts   # Admin audit log API
-│   │   ├── middleware/         # Auth, validation, error handling
+│   │   ├── middleware/        # Auth, validation, error handling
 │   │   │   └── auditMiddleware.ts # Audit logging middleware
 │   │   └── lib/               # Server utilities
 │   │       └── auditService.ts # Audit logging service
 │   ├── prisma/
-│   │   ├── schema.prisma      # Database schema definition
-│   │   ├── migrations/        # Database version control
+│   │   ├── schema.prisma     # Database schema definition
+│   │   ├── migrations/       # Database version control
 │   │   └── seed.ts           # Development data seeding
-│   ├── uploads/               # Temporary file storage
+│   ├── uploads/              # Temporary file storage
 │   └── Dockerfile            # Backend container
 │
-├── 📚 docs/                    # Documentation (docs-as-code)
-│   ├── README.md              # Documentation index
+├── docs/                     # Documentation (docs-as-code)
+│   ├── README.md             # Documentation index
 │   ├── architecture.md       # This file
 │   ├── glossary.md           # Terms and definitions
 │   └── [features]/           # Feature-specific docs
 │
-├── 🐳 docker-compose.yml       # Multi-service orchestration
-├── 📋 README.md               # Main project documentation
-├── ⚙️  SETUP.md               # Detailed setup instructions
-└── 🔧 Various configs         # ESLint, TypeScript, etc.
+├── docker-compose.yml        # Multi-service orchestration
+├── README.md                 # Main project documentation
+├── SETUP.md                  # Detailed setup instructions
+└── Various configs          # ESLint, TypeScript, etc.
 ```
 
-## 🔄 Key Application Flows
+## Key Application Flows
 
-### 🔐 User Authentication Flow
+### User Authentication Flow
 1. **Registration**: Email/password → bcrypt hashing → JWT token
 2. **Login**: Credentials validation → JWT token generation
 3. **Token Management**: Auto-refresh, localStorage persistence
 4. **Role-Based Access**: User vs Admin permissions
 
-### ☕ Roaster Discovery Flow
+### Roaster Discovery Flow
 1. **Search Interface**: Location, specialty, name filters
 2. **API Query**: Backend search with pagination
 3. **Results Display**: Card layout with images, ratings
 4. **Detail View**: Full roaster profile with reviews
 
-### ⭐ User Interaction Flow
-1. **Favorites**: Add/remove with optimistic UI updates
+### User Interaction Flow
+1. **Favourites**: Add/remove with optimistic UI updates
 2. **Reviews**: Create, edit, delete with validation
 3. **Notifications**: Real-time updates for user activity
 4. **Admin Actions**: User management, content moderation
 
-### 🖼️ Image Upload Flow
+### Image Upload Flow
 1. **Frontend**: File selection with preview
 2. **Backend**: Multer handling + Cloudinary upload
 3. **Database**: Store Cloudinary URL in roaster record
 4. **Display**: Optimized images via Next.js Image component
 
-## 🔒 Security Architecture
+## Security Architecture
 
 ### Backend Security
 - **Helmet**: HTTP security headers (CSP, XSS protection)
@@ -331,7 +331,7 @@ the-beans/
 - **Content Security Policy**: Strict resource loading
 - **Secure API Calls**: HTTPS-only in production
 
-## 📚 API Documentation
+## API Documentation
 
 ### Interactive Documentation
 - **Swagger UI**: Available at `http://localhost:5000/api-docs`
@@ -343,7 +343,7 @@ the-beans/
 - **Consistent Responses**: Uniform JSON structure
 - **Error Handling**: Detailed error messages and codes
 
-## 🌐 Internationalization (i18n)
+## Internationalization (i18n)
 
 ### Translation System
 - **Framework**: i18next with React integration
@@ -360,7 +360,7 @@ const { t } = useTranslation();
 <h1>{t('admin.users.title', 'User Management')}</h1>
 ```
 
-## 🧪 Testing Strategy
+## Testing Strategy
 
 ### Frontend Testing
 - **Unit Tests**: Jest + React Testing Library
@@ -381,12 +381,12 @@ const { t } = useTranslation();
 
 ---
 
-## 🎯 Architecture Benefits
+## Architecture Benefits
 
 This architecture provides:
-- **🚀 Rapid Development**: Docker-first workflow with hot reload
-- **🔒 Strong Security**: Multi-layered security approach
-- **📱 Great UX**: Responsive design and performance optimization
-- **🌍 Global Ready**: Full internationalization support
-- **🔧 Maintainable**: Clear separation of concerns and documentation
-- **📈 Scalable**: Modular design supporting horizontal scaling
+- **Rapid Development**: Docker-first workflow with hot reload
+- **Strong Security**: Multi-layered security approach
+- **Great UX**: Responsive design and performance optimization
+- **Global Ready**: Full internationalization support
+- **Maintainable**: Clear separation of concerns and documentation
+- **Scalable**: Modular design supporting horizontal scaling

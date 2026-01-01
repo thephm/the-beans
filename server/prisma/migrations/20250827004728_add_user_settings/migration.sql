@@ -6,7 +6,15 @@
 
 */
 -- DropForeignKey
-ALTER TABLE "public"."cafes" DROP CONSTRAINT "cafes_roasterId_fkey";
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'cafes_roasterId_fkey' AND table_name = 'cafes'
+  ) THEN
+    ALTER TABLE "public"."cafes" DROP CONSTRAINT "cafes_roasterId_fkey";
+  END IF;
+END$$;
 
 -- DropForeignKey
 ALTER TABLE "public"."reviews" DROP CONSTRAINT "reviews_cafeId_fkey";

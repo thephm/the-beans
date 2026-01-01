@@ -20,7 +20,7 @@
 
 **Docker**: Containerization platform used to package and run the app's services in isolated environments.
 
-**Favorite**: A feature allowing users to bookmark or save roasters for quick access.
+**Favourite**: A feature allowing users to bookmark or save roasters for quick access.
 
 **Frontend**: The user-facing web application built with Next.js, React, and TypeScript.
 
@@ -52,6 +52,6 @@
 
 **Specialty**: A tag describing a roaster's coffee focus, e.g., Espresso, Single Origin, Direct Trade.
 
-**User**: A registered person who can log in, save favorites, write reviews, and manage a profile.
+**User**: A registered person who can log in, save favourites, and manage their profile.
 
 ---

@@ -79,7 +79,7 @@ interface RoasterCardProps {
     bluesky?: string
     x?: string
     reddit?: string
-    isFavorited?: boolean
+    isFavourited?: boolean
   }
   userLocation?: { lat: number; lng: number } | null
   onSpecialtyClick?: (specialtyName: string) => void
@@ -92,12 +92,12 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
   const { user } = useAuth()
   const { showRatings } = useFeatureFlags()
   const router = useRouter()
-  const [isFavorited, setIsFavorited] = useState<boolean>(roaster.isFavorited || false)
+  const [isFavourited, setIsFavourited] = useState<boolean>(roaster.isFavourited || false)
 
-  // Update isFavorited when roaster prop changes
+  // Update isFavourited when roaster prop changes
   useEffect(() => {
-    setIsFavorited(roaster.isFavorited || false)
-  }, [roaster.isFavorited])
+    setIsFavourited(roaster.isFavourited || false)
+  }, [roaster.isFavourited])
 
   // Helper function to translate specialty names
   const translateSpecialty = (specialty: Specialty | string): string => {
@@ -142,7 +142,7 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
     return key ? t(`specialties.${key}`, name) : name
   }
 
-  const toggleFavorite = async (roasterId: string | number) => {
+  const toggleFavourite = async (roasterId: string | number) => {
     const idStr = roasterId.toString()
     
     // Check if user is authenticated
@@ -152,21 +152,21 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
     }
 
     try {
-      const wasRemoved = isFavorited
+      const wasRemoved = isFavourited
       if (wasRemoved) {
-        await apiClient.removeFavorite(idStr)
+        await apiClient.removeFavourite(idStr)
       } else {
-        await apiClient.addFavorite(idStr)
+        await apiClient.addFavourite(idStr)
       }
-      setIsFavorited(!isFavorited)
+      setIsFavourited(!isFavourited)
       
-      // Dispatch custom event for favorites page to remove card from display
+      // Dispatch custom event for favourites page to remove card from display
       if (wasRemoved) {
-        window.dispatchEvent(new CustomEvent('roasterUnfavorited', { detail: { roasterId: idStr } }))
+        window.dispatchEvent(new CustomEvent('roasterUnfavourited', { detail: { roasterId: idStr } }))
       }
     } catch (err) {
-      console.error('Toggle favorite error:', err)
-      alert('Failed to update favorite. Please try again.')
+      console.error('Toggle favourite error:', err)
+      alert('Failed to update favourite. Please try again.')
     }
   }
 
@@ -308,15 +308,15 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
               <Share sx={{ fontSize: 20 }} />
             </button>
             <button
-              onClick={() => toggleFavorite(roaster.id)}
+              onClick={() => toggleFavourite(roaster.id)}
               className={`p-3 rounded-full pointer-events-auto ${
-                isFavorited
+                isFavourited
                   ? 'bg-red-500 text-white'
                   : 'bg-white text-red-500 hover:bg-red-50'
               } shadow-lg transition-all transform hover:scale-110`}
-              aria-label={isFavorited ? 'Unfavorite' : 'Favorite'}
+              aria-label={isFavourited ? 'Unfavourite' : 'Favourite'}
             >
-              {isFavorited ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
+              {isFavourited ? <Favorite sx={{ fontSize: 20 }} /> : <FavoriteBorder sx={{ fontSize: 20 }} />}
             </button>
           </div>
         )}

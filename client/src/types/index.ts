@@ -90,7 +90,7 @@ export interface Roaster {
   beans?: Bean[];
   reviews?: Review[];
   roasterImages?: RoasterImage[];
-  isFavorited?: boolean;
+  isFavourited?: boolean;
   createdBy?: User;
   updatedBy?: User;
   sourceType?: string;
@@ -173,7 +173,7 @@ export interface Comment {
   review?: Review;
 }
 
-export interface Favorite {
+export interface Favourite {
   id: string;
   createdAt: string;
   user?: User;

@@ -32,7 +32,7 @@ import regionRoutes from './routes/regions';
 import countryRoutes from './routes/countries';
 import specialtyRoutes from './routes/specialties';
 import contactRouter from './routes/contact'; // Import contact router
-import favoritesRoutes from './routes/favorites';
+import favouritesRoutes from './routes/favourites';
 import suggestionsRoutes from './routes/suggestions';
 import backupRoutes from './routes/backup';
 import redditRoutes from './routes/reddit';
@@ -149,7 +149,7 @@ app.use('/api/regions', regionRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/specialties', specialtyRoutes);
 app.use('/api/contact', contactRouter); // Register contact route
-app.use('/api/favorites', favoritesRoutes);
+app.use('/api/favourites', favouritesRoutes);
 app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/reddit', redditRoutes);

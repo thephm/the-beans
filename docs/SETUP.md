@@ -2,7 +2,7 @@
 
 Welcome to **The Beans** - a modern coffee roaster discovery platform! This comprehensive guide will help you get the entire development environment up and running.
 
-## 🎯 Prerequisites
+## Prerequisites
 
 ### Required Software
 - [Docker Desktop](https://www.docker.com/products/docker-desktop) (recommended)
@@ -12,11 +12,11 @@ Welcome to **The Beans** - a modern coffee roaster discovery platform! This comp
 - [Node.js 18+](https://nodejs.org/)
 - [PostgreSQL](https://www.postgresql.org/download/)
 
-## 🐳 Recommended Setup (Docker - Preferred)
+## Recommended Setup (Docker - Preferred)
 
-**⚠️ Critical**: Docker provides the most reliable development environment. Container restarts are **required** for code changes to take effect.
+**Critical**: Docker provides the most reliable development environment. Container restarts are **required** for code changes to take effect.
 
-### 🚀 Quick Start
+### Quick Start
 
 1. **Clone the repository**
    ```bash
@@ -30,11 +30,11 @@ Welcome to **The Beans** - a modern coffee roaster discovery platform! This comp
    ```
 
 3. **Access the applications**
-   - 🌐 **Frontend**: [http://localhost:3000](http://localhost:3000)
-   - 🔧 **Backend API**: [http://localhost:5000](http://localhost:5000)  
-   - 📚 **API Documentation**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+   - **Frontend**: [http://localhost:3000](http://localhost:3000)
+   - **Backend API**: [http://localhost:5000](http://localhost:5000)  
+   - **API Documentation**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
 
-### 🔄 Development Workflow
+### Development Workflow
 
 **Essential commands for Docker development:**
 
@@ -56,7 +56,7 @@ docker-compose logs -f client    # Frontend logs
 docker-compose logs -f server    # Backend logs
 ```
 
-### 🗃️ Database Management
+### Database Management
 
 ```bash
 # Connect to PostgreSQL shell
@@ -75,9 +75,9 @@ docker-compose exec server npx prisma migrate reset
 docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELECT email, username, role FROM users WHERE role = 'admin';"
 ```
 
-## 💻 Alternative Setup (Local Development)
+## Alternative Setup (Local Development)
 
-⚠️ **Not Recommended**: Use this only if Docker is unavailable. Local setup is more complex and prone to environment issues.
+**Not Recommended**: Use this only if Docker is unavailable. Local setup is more complex and prone to environment issues.
 
 ### Prerequisites
 - **Node.js 18+** - [Download](https://nodejs.org/)
@@ -125,9 +125,9 @@ docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELE
    cd server && npm run dev    # Backend on :5000
    ```
 
-## ⚙️ Environment Variables Guide
+## Environment Variables Guide
 
-### 🔧 Server Configuration (`server/.env`)
+### Server Configuration (`server/.env`)
 
 ```env
 # Database
@@ -161,7 +161,7 @@ PORT="5000"
 NODE_ENV="development"
 ```
 
-### 🔁 Optional: Reddit Posting (admin feature)
+### Optional: Reddit Posting (admin feature)
 
 If you want the server to optionally post a welcome message to Reddit when an admin verifies a roaster, add these environment variables to `server/.env`. Posting is disabled unless you provide credentials and configure `REDDIT_COMMUNITIES`.
 
@@ -201,7 +201,8 @@ Follow these quick steps when verifying and posting:
 4. If posting failed due to authentication, ensure the `REDDIT_*` env vars are correct and the Reddit app is a `script` type.
 
 
-### 🌐 Client Configuration (`client/.env.local`)
+
+### Client Configuration (`client/.env.local`)
 
 ```env
 # API Connection
@@ -216,9 +217,12 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="your_google_maps_api_key"
 # App Configuration
 NEXT_PUBLIC_APP_NAME="The Beans"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Social Links (Footer)
+NEXT_PUBLIC_REDDIT_URL="https://www.reddit.com/r/thebeans"
 ```
 
-## 🗃️ Manual Database Setup (Local Development Only)
+## Manual Database Setup (Local Development Only)
 
 **Note**: Skip this if using Docker - the database is automatically configured.
 
@@ -252,9 +256,9 @@ GRANT ALL PRIVILEGES ON DATABASE the_beans_db TO beans_user;
 DATABASE_URL="postgresql://beans_user:secure_password_here@localhost:5432/the_beans_db"
 ```
 
-## 🔑 External API Keys Setup
+## External API Keys Setup
 
-### 📧 Email Configuration (Required for Contact Form & Notifications)
+### Email Configuration (Required for Contact Form & Notifications)
 
 The application uses SMTP for sending emails via the Contact Us form and user notifications. You'll need:
 
@@ -304,21 +308,21 @@ The application uses SMTP for sending emails via the Contact Us form and user no
 3. **Create API Key** with appropriate restrictions
 4. **Add to** `client/.env.local`
 
-## 🎯 Development URLs
+## Development URLs
 
-- 🌐 **Frontend**: [http://localhost:3000](http://localhost:3000)
-- 🔧 **Backend API**: [http://localhost:5000](http://localhost:5000)
-- 📚 **API Documentation**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
-- 🛡️ **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin)
-- 🗃️ **Database Studio**: `cd server && npx prisma studio`
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:5000](http://localhost:5000)
+- **API Documentation**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+- **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Database Studio**: `cd server && npx prisma studio`
 
 ### 👤 Default Admin Credentials
 - **Email**: `admin@example.com`
 - **Password**: `admin123`
 
-## 🚀 Production Deployment
+## Production Deployment
 
-### 🌟 Render.com Deployment (Recommended)
+### Render.com Deployment (Recommended)
 
 #### One-Click Deployment with Blueprint
 1. **Fork/Clone** the repository to your GitHub account
@@ -343,17 +347,17 @@ If you prefer manual setup:
 3. **Create Web Service** for frontend (Next.js)
 4. **Configure environment variables** for each service
 
-### 🐳 Docker-Based Deployment
+### Docker-Based Deployment
 Alternative deployment using Docker containers with `docker-compose.yml`.
 
-### 🗃️ Production Database
+### Production Database
 ```bash
 # Run migrations on production
 npx prisma migrate deploy
 npx prisma generate
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Docker Issues
 - **Containers won't start**: Ensure Docker Desktop is running
@@ -367,7 +371,7 @@ npx prisma generate
 - **Prisma issues**: Run `npx prisma generate` after schema changes
 - **API calls fail**: Check if backend is running on correct port
 
-### 🔧 Useful Commands
+### Useful Commands
 ```bash
 # Check what's running on ports
 netstat -an | findstr :3000
@@ -391,7 +395,7 @@ docker-compose exec server npx prisma migrate reset
 
 ## Features Overview
 
-✅ **Current Features:**
+**Current Features:**
 - Beautiful purple-themed UI
 - User authentication (signup/login)
 - Roaster discovery and profiles
@@ -399,11 +403,10 @@ docker-compose exec server npx prisma migrate reset
 - Responsive design (mobile/desktop)
 - RESTful API with Swagger docs
 
-🚧 **Coming Soon:**
+**Coming Soon:**
 - Cafe profiles linked to roasters
 - Photo uploads
 - User reviews and ratings
-- Favorites system
 - Push notifications
 - Advanced filtering
 - Map view
@@ -434,7 +437,7 @@ For help or questions:
 - Review API documentation at http://localhost:5000/api-docs
 - Read the troubleshooting section above
 
-Happy coding! ☕💜
+Happy coding!
 
 > do i need to put quotes around my api key in the client/.env files?
 

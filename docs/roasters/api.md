@@ -36,7 +36,7 @@ Returns details for a single roaster by ID.
 ```json
 {
 	...roaster fields...,
-	"isFavorited": true|false
+	"isFavourited": true|false
 }
 ```
 

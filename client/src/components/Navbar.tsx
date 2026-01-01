@@ -71,8 +71,8 @@ export function Navbar() {
             <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               {t('nav.about')}
             </Link>
-            <Link href="/favorites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              {t('nav.favorites')}
+            <Link href="/favourites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              {t('nav.favourites', 'Favourites')}
             </Link>
             <Link href="/suggest" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               {t('nav.suggest')}
@@ -235,8 +235,8 @@ export function Navbar() {
               <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.about')}
               </Link>
-              <Link href="/favorites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('nav.favorites')}
+              <Link href="/favourites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                {t('nav.favourites', 'Favourites')}
               </Link>
               <Link href="/suggest" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.suggest')}

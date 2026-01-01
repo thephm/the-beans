@@ -1,19 +1,19 @@
-# Favorites Design
+# Favourites Design
 
-This document describes the technical design and architecture of the favorites feature.
+This document describes the technical design and architecture of the favourites feature.
 
 ## Frontend
-- **Favorites State:** Managed in React state and localStorage for guests; synced with backend for authenticated users.
-- **UI Components:** Heart icon/button on roaster cards and detail pages; dedicated Favorites page.
-- **Sync Logic:** On login, merges localStorage favorites with backend.
+- **Favourites State:** Managed in React state and localStorage for guests; synced with backend for authenticated users.
+- **UI Components:** Heart icon/button on roaster cards and detail pages; dedicated Favourites page.
+- **Sync Logic:** On login, merges localStorage favourites with backend.
 
 ## Backend
-- **Favorites Table:** Stores user-roaster relationships.
+- **Favourites Table:** Stores user-roaster relationships.
 - **Endpoints:**
-  - `POST /api/roasters/:id/favorite` to add
-  - `DELETE /api/roasters/:id/favorite` to remove
-  - `GET /api/roasters?favorites=true` to list
-- **isFavorited Field:** Included in roaster detail responses for authenticated users.
+  - `POST /api/roasters/:id/favourite` to add
+  - `DELETE /api/roasters/:id/favourite` to remove
+  - `GET /api/roasters?favourites=true` to list
+- **isFavourited Field:** Included in roaster detail responses for authenticated users.
 
 ## Error Handling
 - Handles unauthenticated access, missing roasters, and server errors.

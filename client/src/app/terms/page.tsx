@@ -45,7 +45,7 @@ export default function TermsPage() {
                   <li>{t('terms.userConduct.allowed.discover', 'Discover and review coffee roasters')}</li>
                   <li>{t('terms.userConduct.allowed.share', 'Share honest reviews and photos')}</li>
                   <li>{t('terms.userConduct.allowed.connect', 'Connect with other coffee lovers')}</li>
-                  <li>{t('terms.userConduct.allowed.favorite', 'Save your favorite roasters')}</li>
+                  <li>{t('terms.userConduct.allowed.favourite', 'Save your favourite roasters')}</li>
                 </ul>
                 <p className="mb-3">{t('terms.userConduct.prohibited', 'Please don\'t:')}</p>
                 <ul className="list-disc list-inside space-y-2">

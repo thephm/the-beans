@@ -6,7 +6,7 @@
   "nav": {
     "discover": "Discover",
     "about": "About",
-    "favorites": "Favorites",
+    "favourites": "Favourites",
     "suggest": "Suggest",
     "profile": "Profile",
     "settings": "Settings",
@@ -152,15 +152,15 @@
     "noResults": "No results found",
     "tryAdjusting": "Try adjusting your search criteria or location."
   },
-  "favorites": {
-    "title": "Your Favorites",
-    "subtitle": "Keep track of your favorite roasters.",
-    "roasters": "Favorite Roasters",
-    "noFavorites": "No favorites yet",
-    "startExploring": "Start exploring to add your favorites!",
-    "loginRequired": "Please log in to view your favorites",
-    "noFavoritesYet": "No favorites yet",
-    "startExploringDescription": "Start exploring and add your favorite roasters to keep them here for easy access.",
+  "favourites": {
+    "title": "Your Favourites",
+    "subtitle": "Keep track of your favourite roasters.",
+    "roasters": "Favourite Roasters",
+    "noFavourites": "No favourites yet",
+    "startExploring": "Start exploring to add your favourites!",
+    "loginRequired": "Please log in to view your favourites",
+    "noFavouritesYet": "No favourites yet",
+    "startExploringDescription": "Start exploring and add your favourite roasters to keep them here for easy access.",
     "viewDetails": "View Details",
     "remove": "Remove"
   },
@@ -222,7 +222,7 @@
     "notifications": "Notifications",
     "privacy": "Privacy",
     "showProfile": "Show my profile to other users",
-    "allowLocationTracking": "Allow location tracking for better recommendations",
+    "allowLocationTracking": "Allow location sharing for better recommendations",
   "preferences": "Preferences",
   "coffeePreferences": "Coffee Preferences",
   "roastLevel": "Roast level",
@@ -328,16 +328,16 @@
     "description": "Nous sommes passionnés de connecter les amateurs de café avec d'incroyables torréfacteurs. Découvrez votre prochaine infusion préférée avec nous.",
     "mission": {
       "title": "Our Mission",
-      "description": "We're passionate about connecting coffee lovers with amazing roasters. Discover your next favorite brew with us."
+      "description": "We're passionate about connecting coffee lovers with amazing roasters. Discover your next favourite brew with us."
     },
     "features": {
       "discoverLocal": {
         "title": "Discover Local",
-        "description": "Find amazing coffee roasters in your neighborhood and beyond."
+        "description": "Find amazing coffee roasters in your neighbourhood and beyond."
       },
       "buildCommunity": {
         "title": "Build Community", 
-        "description": "Connect with fellow coffee lovers and share your favorite discoveries."
+        "description": "Connect with fellow coffee lovers and share your favourite discoveries."
       },
       "qualityFirst": {
         "title": "Quality First",
@@ -388,8 +388,8 @@
   "reviews": "reviews",
   "visitWebsite": "Visit Website",
   "visitAction": "Visit",
-  "addToFavorites": "Add to Favorites",
-  "removeFromFavorites": "Remove from Favorites",
+  "addToFavourites": "Add to Favourites",
+  "removeFromFavourites": "Remove from Favourites",
   "contactInfo": "Contact Info",
   "address": "Address",
   "phone": "Phone", 
@@ -449,7 +449,7 @@
         "page_view": "Page View",
         "signup": "Signup",
         "login": "Login",
-        "favorite": "Favorite",
+        "favourite": "Favourite",
         "review": "Review",
         "unknown": "Unknown Event"
       },
@@ -857,7 +857,7 @@
     "whatAreCookies": {
       "title": "What Are Cookies?",
       "description": "Cookies are small text files that websites store on your device (computer, phone, or tablet) when you visit them. Think of them as tiny digital notes that help websites remember things about you.",
-      "analogy": "It's like when you visit your favorite coffee shop and the barista remembers your usual order - cookies help our website remember your preferences and provide a better experience."
+      "analogy": "It's like when you visit your favourite coffee shop and the barista remembers your usual order - cookies help our website remember your preferences and provide a better experience."
     },
     "howWeUse": {
       "title": "How We Use Cookies",
@@ -871,7 +871,7 @@
       },
       "preferences": {
         "title": "Preference Cookies (Optional)",
-        "description": "These remember your choices like your language preference (English or French), your favorite roasters, and other settings that make your experience more personalized."
+        "description": "These remember your choices like your language preference (English or French), your favourite roasters, and other settings that make your experience more personalised."
       }
     },
     "managing": {
@@ -915,7 +915,7 @@
       "usage": {
         "title": "Usage Information",
         "reviews": "Reviews, ratings, and photos you submit",
-        "favorites": "Roasters you favorite or bookmark",
+        "favourites": "Roasters you favourite or bookmark",
         "interactions": "Your interactions with roasters and other users",
         "preferences": "Language and other preferences"
       },
@@ -1011,7 +1011,7 @@
         "discover": "Discover and review coffee roasters",
         "share": "Share honest reviews and photos",
         "connect": "Connect with other coffee lovers",
-        "favorite": "Save your favorite roasters"
+        "favourite": "Save your favourite roasters"
       },
       "forbidden": {
         "spam": "Post spam or fake reviews",

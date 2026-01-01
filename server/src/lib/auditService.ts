@@ -216,8 +216,8 @@ export function getEntityName(entityType: string, entity: any): string {
       return entity.name || entity.id;
     case 'user':
       return entity.username || entity.email || entity.id;
-    case 'favorite':
-      return `Favorite: ${entity.roaster?.name || 'Unknown Roaster'}`;
+    case 'favourite':
+      return `Favourite: ${entity.roaster?.name || 'Unknown Roaster'}`;
     case 'comment':
       return `Comment on ${entity.review?.title || 'review'}`;
     case 'specialty':

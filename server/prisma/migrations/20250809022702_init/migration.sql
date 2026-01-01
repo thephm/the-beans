@@ -17,7 +17,7 @@ CREATE TABLE "users" (
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
+
 CREATE TABLE "roasters" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -26,13 +26,9 @@ CREATE TABLE "roasters" (
     "phone" TEXT,
     "website" TEXT,
     "address" TEXT,
-    "city" TEXT,
-    "state" TEXT,
     "zipCode" TEXT,
-    "country" TEXT NOT NULL DEFAULT 'US',
     "latitude" DOUBLE PRECISION,
     "longitude" DOUBLE PRECISION,
-    "images" TEXT[],
     "hours" JSONB,
     "priceRange" TEXT,
     "specialties" TEXT[],
@@ -43,9 +39,19 @@ CREATE TABLE "roasters" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "ownerId" TEXT NOT NULL,
-
     CONSTRAINT "roasters_pkey" PRIMARY KEY ("id")
 );
+
+CREATE TABLE "favourites" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT NOT NULL,
+    "roasterId" TEXT NOT NULL,
+    CONSTRAINT "favourites_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "favourites_userId_roasterId_key" ON "favourites"("userId", "roasterId");
 
 -- CreateTable
 CREATE TABLE "cafes" (
@@ -120,15 +126,6 @@ CREATE TABLE "comments" (
     CONSTRAINT "comments_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "favorites" (
-    "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "userId" TEXT NOT NULL,
-    "roasterId" TEXT NOT NULL,
-
-    CONSTRAINT "favorites_pkey" PRIMARY KEY ("id")
-);
 
 -- CreateTable
 CREATE TABLE "notifications" (
@@ -151,20 +148,13 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "favorites_userId_roasterId_key" ON "favorites"("userId", "roasterId");
 
--- AddForeignKey
 ALTER TABLE "roasters" ADD CONSTRAINT "roasters_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
-ALTER TABLE "cafes" ADD CONSTRAINT "cafes_roasterId_fkey" FOREIGN KEY ("roasterId") REFERENCES "roasters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "beans" ADD CONSTRAINT "beans_roasterId_fkey" FOREIGN KEY ("roasterId") REFERENCES "roasters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "reviews" ADD CONSTRAINT "reviews_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
+ALTER TABLE "favourites" ADD CONSTRAINT "favourites_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "favourites" ADD CONSTRAINT "favourites_roasterId_fkey" FOREIGN KEY ("roasterId") REFERENCES "roasters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_roasterId_fkey" FOREIGN KEY ("roasterId") REFERENCES "roasters"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -178,10 +168,8 @@ ALTER TABLE "comments" ADD CONSTRAINT "comments_userId_fkey" FOREIGN KEY ("userI
 ALTER TABLE "comments" ADD CONSTRAINT "comments_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "reviews"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "favorites" ADD CONSTRAINT "favorites_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "favorites" ADD CONSTRAINT "favorites_roasterId_fkey" FOREIGN KEY ("roasterId") REFERENCES "roasters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "notifications" ADD CONSTRAINT "notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

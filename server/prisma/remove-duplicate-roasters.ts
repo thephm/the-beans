@@ -16,11 +16,11 @@ async function removeDuplicateRoasters() {
   }
 
   if (toDelete.length > 0) {
-    // Delete related beans, reviews, favorites for each duplicate roaster
+    // Delete related beans, reviews, favourites for each duplicate roaster
     for (const roasterId of toDelete) {
       await prisma.bean.deleteMany({ where: { roasterId } });
       await prisma.review.deleteMany({ where: { roasterId } });
-      await prisma.favorite.deleteMany({ where: { roasterId } });
+      await prisma.favourite.deleteMany({ where: { roasterId } });
       // Add more related deletes if needed
     }
     await prisma.roaster.deleteMany({

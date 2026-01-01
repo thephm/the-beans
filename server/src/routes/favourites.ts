@@ -5,14 +5,14 @@ import { requireAuth } from '../middleware/requireAuth';
 const router = express.Router();
 // Use shared Prisma client
 
-// Get current user's favorites
+// Get current user's favourites
 router.get('/', requireAuth, async (req: Request, res: Response) => {
   const authReq = req as import('../types').AuthenticatedRequest;
 
   try {
     const userId = authReq.user?.id;
 
-    const favorites = await prisma.favorite.findMany({
+    const favourites = await prisma.favourite.findMany({
       where: { userId },
       include: {
         roaster: {
@@ -40,7 +40,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
             _count: {
               select: {
                 reviews: true,
-                favorites: true
+                favourites: true
               }
             }
           }
@@ -52,8 +52,8 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     });
 
     // Transform the response to match the expected format
-    const roastersWithImageUrl = favorites.map(fav => {
-      const roaster = fav.roaster;
+    const roastersWithImageUrl = favourites.map(fav => {
+      const roaster = fav.roaster ?? fav.roasterId;
       
       // Get primary image URL
       let imageUrl = null;
@@ -74,18 +74,18 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
         ...roaster,
         imageUrl,
         specialties,
-        isFavorited: true
+          isFavourited: true
       };
     });
 
     res.json(roastersWithImageUrl);
   } catch (error) {
-    console.error('Get favorites error:', error);
+    console.error('Get favourites error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Add a roaster to favorites
+// Add a roaster to favourites
 router.post('/:roasterId', requireAuth, async (req: Request, res: Response) => {
   const authReq = req as import('../types').AuthenticatedRequest;
 
@@ -102,8 +102,8 @@ router.post('/:roasterId', requireAuth, async (req: Request, res: Response) => {
     if (!roaster) {
       return res.status(404).json({ error: 'Roaster not found' });
     }
-    // Check if already favorited
-    const existing = await prisma.favorite.findUnique({
+    // Check if already favourited
+    const existing = await prisma.favourite.findUnique({
       where: {
         userId_roasterId: {
           userId,
@@ -112,23 +112,23 @@ router.post('/:roasterId', requireAuth, async (req: Request, res: Response) => {
       }
     });
     if (existing) {
-      return res.status(400).json({ error: 'Already favorited' });
+      return res.status(400).json({ error: 'Already favourited' });
     }
-    // Create favorite
-    const favorite = await prisma.favorite.create({
+    // Create favourite
+    const favourite = await prisma.favourite.create({
       data: {
         userId,
         roasterId
       }
     });
-    res.status(201).json({ message: 'Added to favorites', favorite });
+    res.status(201).json({ message: 'Added to favourites', favourite });
   } catch (error) {
-    console.error('Add favorite error:', error);
+    console.error('Add favourite error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Remove a roaster from favorites
+// Remove a roaster from favourites
 router.delete('/:roasterId', requireAuth, async (req: Request, res: Response) => {
   const authReq = req as import('../types').AuthenticatedRequest;
 
@@ -138,8 +138,8 @@ router.delete('/:roasterId', requireAuth, async (req: Request, res: Response) =>
     if (!userId || !roasterId) {
       return res.status(400).json({ error: 'Missing userId or roasterId' });
     }
-    // Check if favorite exists
-    const existing = await prisma.favorite.findUnique({
+    // Check if favourite exists
+    const existing = await prisma.favourite.findUnique({
       where: {
         userId_roasterId: {
           userId,
@@ -148,10 +148,10 @@ router.delete('/:roasterId', requireAuth, async (req: Request, res: Response) =>
       }
     });
     if (!existing) {
-      return res.status(404).json({ error: 'Favorite not found' });
+      return res.status(404).json({ error: 'Favourite not found' });
     }
-    // Delete favorite
-    await prisma.favorite.delete({
+    // Delete favourite
+    await prisma.favourite.delete({
       where: {
         userId_roasterId: {
           userId,
@@ -159,9 +159,9 @@ router.delete('/:roasterId', requireAuth, async (req: Request, res: Response) =>
         }
       }
     });
-    res.json({ message: 'Removed from favorites' });
+    res.json({ message: 'Removed from favourites' });
   } catch (error) {
-    console.error('Remove favorite error:', error);
+    console.error('Remove favourite error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

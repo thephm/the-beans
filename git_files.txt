@@ -41,7 +41,7 @@ client/src/app/contact/page.tsx
 client/src/app/cookies/page.tsx
 client/src/app/discover/page.tsx
 client/src/app/error.tsx
-client/src/app/favorites/page.tsx
+client/src/app/favourites/page.tsx
 client/src/app/globals.css
 client/src/app/layout.tsx
 client/src/app/login/page.tsx
@@ -104,12 +104,12 @@ docs/deployment/RENDER_DEPLOYMENT.md
 docs/deployment/RENDER_DEPLOYMENT_FIX.md
 docs/deployment/RENDER_SETUP_INSTRUCTIONS.md
 docs/deployment/RENDER_TROUBLESHOOTING.md
-docs/favorites/README.md
-docs/favorites/api.md
-docs/favorites/design.md
-docs/favorites/overview.md
-docs/favorites/requirements.md
-docs/favorites/test.md
+docs/favourites/README.md
+docs/favourites/api.md
+docs/favourites/design.md
+docs/favourites/overview.md
+docs/favourites/requirements.md
+docs/favourites/test.md
 docs/glossary.md
 docs/product.md
 docs/profile/README.md
@@ -203,7 +203,7 @@ server/src/routes/auth.ts
 server/src/routes/contact.ts
 server/src/routes/countries.ts
 server/src/routes/debug.ts
-server/src/routes/favorites.ts
+server/src/routes/favourites.ts
 server/src/routes/people.ts
 server/src/routes/regions.ts
 server/src/routes/reviews.ts

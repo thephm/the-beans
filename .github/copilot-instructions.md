@@ -64,9 +64,9 @@ docker-compose exec server npx prisma migrate dev
 ## Data Model Relationships (Prisma)
 
 Key entities in `server/prisma/schema.prisma`:
-- **User**: Has role ('user' | 'admin'), owns roasters, creates reviews/favorites
-- **Roaster**: Location-based, has reviews, can be favorited, owned by user, includes owner contact fields (ownerName, ownerEmail, ownerBio, ownerMobile)
-- **Review/Favorite/Notification**: Relationship tables linking users to roasters
+- **User**: Has role ('user' | 'admin'), owns roasters, creates reviews/favourites
+- **Roaster**: Location-based, has reviews, can be favourited, owned by user, includes owner contact fields (ownerName, ownerEmail, ownerBio, ownerMobile)
+- **Review/Favourite/Notification**: Relationship tables linking users to roasters
 
 ### Roaster Owner Contact Fields
 - **ownerName**: Optional string field for roaster owner's name
