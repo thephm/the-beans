@@ -17,6 +17,7 @@ export function Navbar() {
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
   const [isAdminMobileOpen, setIsAdminMobileOpen] = useState(false)
   const { user, logout, loading } = useAuth()
+  const router = typeof window !== 'undefined' ? require('next/navigation').useRouter() : null;
   const { t } = useTranslation()
   const adminMenuRef = useRef<HTMLDivElement>(null)
 
@@ -342,8 +343,9 @@ export function Navbar() {
                   </Link>
                   <button
                     onClick={() => {
-                      logout()
-                      setIsMobileMenuOpen(false)
+                      logout();
+                      setIsMobileMenuOpen(false);
+                      if (router) router.push('/');
                     }}
                     className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2 text-left w-full text-left"
                   >
