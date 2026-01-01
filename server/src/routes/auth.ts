@@ -499,4 +499,44 @@ router.put('/profile', [
   }
 });
 
+// Validate password reset token
+router.get('/validate-reset-token', async (req, res) => {
+  const { token } = req.query;
+  if (!token || typeof token !== 'string') {
+    return res.json({ valid: false, error: 'Missing token' });
+  }
+  const resetToken = await prisma.passwordResetToken.findUnique({ where: { token } });
+  if (!resetToken || resetToken.expiresAt < new Date()) {
+    return res.json({ valid: false });
+  }
+  return res.json({ valid: true });
+});
+
+// Reset password using token
+router.post('/reset-password', [
+  body('token').isString(),
+  body('password').isLength({ min: 6 })
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: 'Invalid input', details: errors.array() });
+  }
+  const { token, password } = req.body;
+  const resetToken = await prisma.passwordResetToken.findUnique({ where: { token } });
+  if (!resetToken || resetToken.expiresAt < new Date()) {
+    return res.status(400).json({ error: 'Invalid or expired token' });
+  }
+  const user = await prisma.user.findUnique({ where: { id: resetToken.userId } });
+  if (!user) {
+    return res.status(400).json({ error: 'User not found' });
+  }
+  const hashedPassword = await bcrypt.hash(password, 12);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { password: hashedPassword }
+  });
+  await prisma.passwordResetToken.delete({ where: { token } });
+  res.json({ message: 'Password reset successful' });
+});
+
 export default router;
