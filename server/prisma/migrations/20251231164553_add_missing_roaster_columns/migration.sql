@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE "roasters" ADD COLUMN     "images" TEXT[],
+ALTER TABLE "roasters"
 ALTER COLUMN "country" SET NOT NULL;
 
 -- AddForeignKey
