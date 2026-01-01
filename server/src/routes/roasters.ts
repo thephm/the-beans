@@ -1461,6 +1461,14 @@ router.get('/admin/unverified', [
       };
     });
 
+    // Compute global counts for admin filter badges
+    const [globalTotal, globalVerified, globalUnverified, globalFeatured] = await Promise.all([
+      prisma.roaster.count(),
+      prisma.roaster.count({ where: { verified: true } }),
+      prisma.roaster.count({ where: { verified: false } }),
+      prisma.roaster.count({ where: { featured: true } }),
+    ]);
+
     res.json({
       roasters: roastersWithImageUrl,
       pagination: {
@@ -1468,6 +1476,12 @@ router.get('/admin/unverified', [
         limit,
         total,
         pages,
+      },
+      globalCounts: {
+        all: globalTotal,
+        verified: globalVerified,
+        unverified: globalUnverified,
+        featured: globalFeatured,
       }
     });
   } catch (error) {
