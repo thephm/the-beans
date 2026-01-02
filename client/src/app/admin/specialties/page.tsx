@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { SortArrow } from '@/components/SortArrow';
 import { SpecialtyListItem } from '@/types';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
 
@@ -150,16 +151,16 @@ const AdminSpecialtiesPage: React.FC = () => {
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'name' ? { key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'name', direction: 'asc' })}>
-                {t('admin.specialties.name', 'Specialty')}{sortConfig?.key === 'name' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                {t('admin.specialties.name', 'Specialty')}{sortConfig?.key === 'name' && <SortArrow direction={sortConfig.direction} />}
               </th>
               <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'description' ? { key: 'description', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'description', direction: 'asc' })}>
-                {t('admin.specialties.description', 'Description')}{sortConfig?.key === 'description' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                {t('admin.specialties.description', 'Description')}{sortConfig?.key === 'description' && <SortArrow direction={sortConfig.direction} />}
               </th>
               <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roasterCount' ? { key: 'roasterCount', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roasterCount', direction: 'asc' })}>
-                {t('admin.specialties.roasterCount', 'Roasters')}{sortConfig?.key === 'roasterCount' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                {t('admin.specialties.roasterCount', 'Roasters')}{sortConfig?.key === 'roasterCount' && <SortArrow direction={sortConfig.direction} />}
               </th>
               <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'deprecated' ? { key: 'deprecated', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'deprecated', direction: 'asc' })}>
-                {t('admin.specialties.deprecated', 'Deprecated')}{sortConfig?.key === 'deprecated' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                {t('admin.specialties.deprecated', 'Deprecated')}{sortConfig?.key === 'deprecated' && <SortArrow direction={sortConfig.direction} />}
               </th>
             </tr>
           </thead>
