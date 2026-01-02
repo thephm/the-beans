@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 
 export default function PeopleTable() {
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const { t } = useTranslation();
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [roasters, setRoasters] = useState<Roaster[]>([]);
@@ -229,11 +230,21 @@ export default function PeopleTable() {
           <table className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">{t('adminForms.roasters.name', 'Name')}</th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roaster')}</th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">{t('adminSection.role', 'Role')}</th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">{t('adminForms.roasters.email', 'Email')}</th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">{t('adminForms.roasters.phone', 'Mobile')}</th>
+                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'firstName' ? { key: 'firstName', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'firstName', direction: 'asc' })}>
+                  {t('adminForms.roasters.name', 'Name')}{sortConfig?.key === 'firstName' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                </th>
+                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roaster' ? { key: 'roaster', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roaster', direction: 'asc' })}>
+                  {t('adminSection.roasters', 'Roaster')}{sortConfig?.key === 'roaster' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                </th>
+                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roles' ? { key: 'roles', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roles', direction: 'asc' })}>
+                  {t('adminSection.role', 'Role')}{sortConfig?.key === 'roles' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                </th>
+                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
+                  {t('adminForms.roasters.email', 'Email')}{sortConfig?.key === 'email' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                </th>
+                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'mobile' ? { key: 'mobile', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'mobile', direction: 'asc' })}>
+                  {t('adminForms.roasters.phone', 'Mobile')}{sortConfig?.key === 'mobile' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                </th>
               </tr>
             </thead>
             <tbody>

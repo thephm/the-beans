@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { SortArrow } from '@/components/SortArrow';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { apiClient } from '@/lib/api';
 import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '@/types';
@@ -13,12 +14,14 @@ import PersonRoleButtons from '@/components/PersonRoleButtons';
 
 
 const AdminRoastersPage: React.FC = () => {
-  
+
+  // All hooks and state declarations must come first
   const { t } = useTranslation();
   const { showRatings } = useFeatureFlags();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [roasters, setRoasters] = useState<Roaster[]>([]);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -34,12 +37,6 @@ const AdminRoastersPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
   const [globalCounts, setGlobalCounts] = useState<{ all: number; verified: number; unverified: number; featured: number } | null>(null);
-
-  // Fetch roasters when pagination, filters, or search change
-  useEffect(() => {
-    fetchRoasters();
-  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery]);
-
   // person management state
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [showAddPerson, setShowAddPerson] = useState(false);
@@ -55,6 +52,53 @@ const AdminRoastersPage: React.FC = () => {
     roles: [] as PersonRole[],
     isPrimary: false
   });
+
+  // Calculate completeness score for a roaster (out of 39 possible points)
+  function calculateCompleteness(r: Roaster) {
+    let points = 0;
+    const totalPossible = 39;
+    // Name
+    if (r.name) points += 2;
+    // Description
+    if (r.description) points += 2;
+    // Country
+    if (r.country) points += 1;
+    // Website
+    if (r.website) points += 2;
+    // Social networks (socialNetworks JSON or legacy fields)
+    const sn = r.socialNetworks || {};
+    const instagram = sn.instagram || r.instagram || '';
+    const linkedin = sn.linkedin || r.linkedin || '';
+    const facebook = sn.facebook || r.facebook || '';
+    if (instagram) points += 2;
+    if (linkedin) points += 1;
+    if (facebook) points += 1;
+    // Specialty (check roasterSpecialties if included)
+    if (Array.isArray(r.roasterSpecialties) && r.roasterSpecialties.length > 0) points += 2;
+    // Image - check uploaded images (roasterImages) or fallback imageUrl or images array
+    const hasImage = (Array.isArray(r.roasterImages) && r.roasterImages.length > 0) || r.imageUrl || (Array.isArray(r.images) && r.images.length > 0);
+    if (hasImage) points += 5;
+    // Contacts - use people included from the admin endpoint
+    const people = Array.isArray(r.people) ? r.people : [];
+    // Primary contact points: first name, last name, email, mobile, isPrimary, role, bio
+    const primary = people.find((p: any) => p.isPrimary) || people[0];
+    if (primary) {
+      if (primary.firstName) points += 1;
+      if (primary.lastName) points += 1;
+      if (primary.email) points += 2;
+      if (primary.mobile) points += 2;
+      if (primary.isPrimary) points += 2;
+      if (primary.roles && primary.roles.length > 0) points += 1; // role
+      if (primary.bio) points += 1;
+    }
+    const pct = Math.round((points / totalPossible) * 100);
+    return { points, pct };
+  }
+
+  // Fetch roasters when pagination, filters, or search change
+  useEffect(() => {
+    fetchRoasters();
+  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery]);
 
   // Check for edit query parameter on mount
   useEffect(() => {
@@ -176,427 +220,393 @@ const AdminRoastersPage: React.FC = () => {
     setCurrentPage(page);
   };
 
+
+  // Sorting logic
+  const sortedRoasters = React.useMemo(() => {
+    if (!sortConfig) return roasters;
+    const sorted = [...roasters];
+    sorted.sort((a, b) => {
+      let aValue = a[sortConfig.key];
+      let bValue = b[sortConfig.key];
+      // Handle completeness as special case
+      if (sortConfig.key === 'completeness') {
+        aValue = calculateCompleteness(a).pct;
+        bValue = calculateCompleteness(b).pct;
+      }
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      return 0;
+    });
+    return sorted;
+  }, [roasters, sortConfig]);
+
+  // Server-side pagination and filtering are applied; use returned roasters directly
+  const filteredRoasters = sortedRoasters;
+
+  let content: React.ReactNode = null;
   if (editingId || showAddForm) {
     const roaster = editingId ? roasters.find(r => r.id === editingId) : undefined;
-    return <RoasterForm roaster={roaster} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
-  }
-
-  // Filter roasters based on search query
-
-  // ...existing code...
-  // Server-side pagination and filtering are applied; use returned roasters directly
-  const filteredRoasters = roasters;
-
-  // Calculate completeness score for a roaster (out of 39 possible points)
-  const calculateCompleteness = (r: any) => {
-    const totalPossible = 39;
-    let points = 0;
-
-    // Name
-    if (r.name && String(r.name).trim().length > 0) points += 3;
-
-    // Description
-    const desc = r.description || '';
-    if (desc.length <= 40 && desc.length > 0) points += 3;
-    else if (desc.length > 40 && desc.length <= 150) points += 5;
-
-    // Email
-    if (r.email) points += 1;
-
-    // Founded
-    if (r.founded) points += 1;
-
-    // Address
-    if (r.address) points += 2;
-
-    // City
-    if (r.city) points += 2;
-
-    // Latitude and Longitude
-    if (r.latitude !== undefined && r.longitude !== undefined && r.latitude !== null && r.longitude !== null) points += 1;
-
-    // Country
-    if (r.country) points += 1;
-
-    // Website
-    if (r.website) points += 2;
-
-    // Social networks (socialNetworks JSON or legacy fields)
-    const sn = r.socialNetworks || {};
-    const instagram = sn.instagram || r.instagram || '';
-    const linkedin = sn.linkedin || r.linkedin || '';
-    const facebook = sn.facebook || r.facebook || '';
-    if (instagram) points += 2;
-    if (linkedin) points += 1;
-    if (facebook) points += 1;
-
-    // Specialty (check roasterSpecialties if included)
-    if (Array.isArray(r.roasterSpecialties) && r.roasterSpecialties.length > 0) points += 2;
-
-    // Image - check uploaded images (roasterImages) or fallback imageUrl or images array
-    const hasImage = (Array.isArray(r.roasterImages) && r.roasterImages.length > 0) || r.imageUrl || (Array.isArray(r.images) && r.images.length > 0);
-    if (hasImage) points += 5;
-
-    // Contacts - use people included from the admin endpoint
-    const people = Array.isArray(r.people) ? r.people : [];
-    // Primary contact points: first name, last name, email, mobile, isPrimary, role, bio
-    const primary = people.find((p: any) => p.isPrimary) || people[0];
-    if (primary) {
-      if (primary.firstName) points += 1;
-      if (primary.lastName) points += 1;
-      if (primary.email) points += 2;
-      if (primary.mobile) points += 2;
-      if (primary.isPrimary) points += 2;
-      if (primary.roles && primary.roles.length > 0) points += 1; // role
-      if (primary.bio) points += 1;
-    }
-
-    const pct = Math.round((points / totalPossible) * 100);
-    return { points, pct };
-  };
-
-  // Render the list of roasters
-  return (
-    <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
-      <div className="mb-6 max-w-6xl mx-auto flex justify-between items-center">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roasters')}</h1>
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={() => setShowAddForm(true)}
-        >
-          {t('common.add', 'Add')}
-        </button>
-      </div>
-      
-      {/* Search bar and Filter Buttons */}
-      <div className="mb-6 max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-3">
-          {/* Search Input */}
-          <div className="flex-1 lg:max-w-md">
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
-                className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-              />
-              <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+    content = <RoasterForm roaster={roaster} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
+  } else {
+    content = (
+      <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
+        <div className="mb-6 max-w-6xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roasters')}</h1>
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={() => setShowAddForm(true)}
+          >
+            {t('common.add', 'Add')}
+          </button>
+        </div>
+        {/* Search bar and Filter Buttons */}
+        <div className="mb-6 max-w-6xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-3">
+            {/* Search Input */}
+            <div className="flex-1 lg:max-w-md">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
+                  className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 />
-              </svg>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-                  aria-label={t('common.clear', 'Clear')}
+                <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    aria-label={t('common.clear', 'Clear')}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+            {/* Filter Buttons */}
+            <div className="flex flex-wrap gap-2">
+              {/* Verified Filters */}
+              <button
+                onClick={() => {
+                  setVerifiedFilter('verified');
+                  setFeaturedFilter('all');
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  verifiedFilter === 'verified'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                <span>{t('adminForms.roasters.verified', 'Verified')}</span>
+                <span className={`text-xs px-2 py-0.5 rounded ${
+                  verifiedFilter === 'verified' 
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                    : 'bg-green-600 text-white'
+                }`}>
+                  {getVerifiedCount('verified')}
+                </span>
+              </button>
+              <button
+                onClick={() => {
+                  setVerifiedFilter('unverified');
+                  setFeaturedFilter('all');
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  verifiedFilter === 'unverified'
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                <span>{t('admin.roasters.unverified', 'Unverified')}</span>
+                <span className={`text-xs px-2 py-0.5 rounded ${
+                  verifiedFilter === 'unverified' 
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                    : 'bg-orange-600 text-white'
+                }`}>
+                  {getVerifiedCount('unverified')}
+                </span>
+              </button>
+              {/* Featured Filter */}
+              <button
+                onClick={() => {
+                  const newFeatured = featuredFilter === 'featured' ? 'all' : 'featured';
+                  setFeaturedFilter(newFeatured);
+                  if (newFeatured === 'featured') {
+                    setVerifiedFilter('all');
+                  }
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  featuredFilter === 'featured'
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                <span>{t('adminForms.roasters.featured', 'Featured')}</span>
+                <span className={`text-xs px-2 py-0.5 rounded ${
+                  featuredFilter === 'featured' 
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                    : 'bg-yellow-600 text-white'
+                }`}>
+                  {getFeaturedCount('featured')}
+                </span>
+              </button>
             </div>
           </div>
-
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap gap-2">
-            {/* Verified Filters */}
-            <button
-              onClick={() => {
-                setVerifiedFilter('verified');
-                setFeaturedFilter('all');
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                verifiedFilter === 'verified'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              <span>{t('adminForms.roasters.verified', 'Verified')}</span>
-              <span className={`text-xs px-2 py-0.5 rounded ${
-                verifiedFilter === 'verified' 
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
-                  : 'bg-green-600 text-white'
-              }`}>
-                {getVerifiedCount('verified')}
-              </span>
-            </button>
-            <button
-              onClick={() => {
-                setVerifiedFilter('unverified');
-                setFeaturedFilter('all');
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                verifiedFilter === 'unverified'
-                  ? 'bg-orange-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              <span>{t('admin.roasters.unverified', 'Unverified')}</span>
-              <span className={`text-xs px-2 py-0.5 rounded ${
-                verifiedFilter === 'unverified' 
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
-                  : 'bg-orange-600 text-white'
-              }`}>
-                {getVerifiedCount('unverified')}
-              </span>
-            </button>
-            
-            {/* Featured Filter */}
-            <button
-              onClick={() => {
-                const newFeatured = featuredFilter === 'featured' ? 'all' : 'featured';
-                setFeaturedFilter(newFeatured);
-                if (newFeatured === 'featured') {
-                  setVerifiedFilter('all');
-                }
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                featuredFilter === 'featured'
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              <span>{t('adminForms.roasters.featured', 'Featured')}</span>
-              <span className={`text-xs px-2 py-0.5 rounded ${
-                featuredFilter === 'featured' 
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
-                  : 'bg-yellow-600 text-white'
-              }`}>
-                {getFeaturedCount('featured')}
-              </span>
-            </button>
-          </div>
+          {/* Search Results Count */}
+          {searchQuery && (
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              {t('admin.roasters.searchResults', 'Found {{count}} roaster(s)', { count: filteredRoasters.length })}
+            </div>
+          )}
         </div>
-
-        {/* Search Results Count */}
-        {searchQuery && (
-          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {t('admin.roasters.searchResults', 'Found {{count}} roaster(s)', { count: filteredRoasters.length })}
-          </div>
-        )}
-      </div>
-
-      <div className="max-w-6xl mx-auto">
-        {filteredRoasters.length === 0 ? (
-          <div className="text-gray-500 dark:text-gray-400 text-center py-12">
-            {searchQuery 
-              ? t('admin.roasters.noSearchResults', 'No roasters match your search.')
-              : t('admin.roasters.noRoasters', 'No roasters found.')
-            }
-          </div>
-        ) : (
-          <>
-            {/* Mobile Card View */}
-            <div className="md:hidden space-y-4">
-              {filteredRoasters.map((roaster) => (
-                <div key={roaster.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm dark:shadow-gray-900/50">
-                  {/* Roaster Header */}
-                  <div className="mb-3">
-                    <button
-                      className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-left"
-                      onClick={() => setEditingId(roaster.id)}
-                    >
-                      {roaster.name}
-                    </button>
-                    
-                    {/* Status Badges */}
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {roaster.verified && (
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                          <span className="mr-1">✔️</span>
-                          {t('adminForms.roasters.verified', 'Verified')}
-                        </span>
-                      )}
-                      {roaster.featured && (
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400">
-                          <span className="mr-1">⭐</span>
-                          {t('adminForms.roasters.featured', 'Featured')}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Location */}
-                  <div className="mb-3">
-                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                      <span className="mr-2">📍</span>
-                      <span>
-                        {[roaster.city, roaster.country].filter(Boolean).join(', ') || '-'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Completeness Score */}
-                  <div className="mb-3">
-                    {(() => {
-                      const r = calculateCompleteness(roaster);
-                      return (
-                        <div className="text-sm">
-                          <div className="flex items-center justify-between">
-                            <div className="text-gray-600 dark:text-gray-400">{t('adminForms.roasters.completeness', 'Completeness')}</div>
-                            <div className="font-semibold text-gray-900 dark:text-gray-100">{r.pct}%</div>
-                          </div>
-                          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden mt-1">
-                            <div style={{ width: `${r.pct}%` }} className="h-2 bg-gradient-to-r from-green-400 to-yellow-400"></div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Rating */}
-                  {showRatings && roaster.rating && (
+        <div className="max-w-6xl mx-auto">
+          {filteredRoasters.length === 0 ? (
+            <div className="text-gray-500 dark:text-gray-400 text-center py-12">
+              {searchQuery 
+                ? t('admin.roasters.noSearchResults', 'No roasters match your search.')
+                : t('admin.roasters.noRoasters', 'No roasters found.')
+              }
+            </div>
+          ) : (
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-4">
+                {filteredRoasters.map((roaster) => (
+                  <div key={roaster.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm dark:shadow-gray-900/50">
+                    {/* Roaster Header */}
                     <div className="mb-3">
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                        <span className="mr-2">⭐</span>
-                        <span>{roaster.rating}</span>
+                      <button
+                        className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-left"
+                        onClick={() => setEditingId(roaster.id)}
+                      >
+                        {roaster.name}
+                      </button>
+                      {/* Status Badges */}
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {roaster.verified && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
+                            <span className="mr-1">✔️</span>
+                            {t('adminForms.roasters.verified', 'Verified')}
+                          </span>
+                        )}
+                        {roaster.featured && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400">
+                            <span className="mr-1">⭐</span>
+                            {t('adminForms.roasters.featured', 'Featured')}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="mt-3">
-                    {!roaster.verified && (
-                      <button
-                        className="bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 mr-2"
-                        onClick={() => handleVerify(roaster, true)}
-                        disabled={verifyingId === roaster.id}
-                      >
-                        {verifyingId === roaster.id ? t('roasters.verifying', 'Verifying...') : t('roasters.verify', 'Verify')}
-                      </button>
-                    )}
-                    <button
-                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                      onClick={() => setEditingId(roaster.id)}
-                    >
-                      {t('common.edit', 'Edit')}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.name', 'Name')}</th>
-                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.city', 'City')}</th>
-                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.country', 'Country')}</th>
-                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.completeness', 'Completeness')}</th>
-                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.verified', 'Verified')}</th>
-                    <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.featured', 'Featured')}</th>
-                    {showRatings && <th className="px-4 py-2 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100">{t('adminForms.roasters.rating', 'Rating')}</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRoasters.map((roaster) => (
-                    <tr key={roaster.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-4 py-2 font-medium">
-                        <div className="flex items-center gap-3">
-                          <button
-                            className="text-blue-600 dark:text-blue-400 hover:underline text-left"
-                            onClick={() => setEditingId(roaster.id)}
-                          >
-                            {roaster.name}
-                          </button>
-                          {/* Verify button removed from desktop Name column per request */}
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.country || '-'}</td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100 w-36">
-                        {(() => {
-                          const r = calculateCompleteness(roaster);
-                          return (
-                            <div className="min-w-[120px]">
-                              <div className="text-sm font-medium mb-1">{r.pct}%</div>
-                              <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
-                                <div style={{ width: `${r.pct}%` }} className="h-2 bg-gradient-to-r from-green-400 to-yellow-400"></div>
-                              </div>
+                    {/* Location */}
+                    <div className="mb-3">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <span className="mr-2">📍</span>
+                        <span>
+                          {[roaster.city, roaster.country].filter(Boolean).join(', ') || '-'}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Completeness Score */}
+                    <div className="mb-3">
+                      {(() => {
+                        const r = calculateCompleteness(roaster);
+                        return (
+                          <div className="text-sm">
+                            <div className="flex items-center justify-between">
+                              <div className="text-gray-600 dark:text-gray-400">{t('adminForms.roasters.completeness', 'Completeness')}</div>
+                              <div className="font-semibold text-gray-900 dark:text-gray-100">{r.pct}%</div>
                             </div>
-                          );
-                        })()}
-                      </td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.verified ? '✔️' : ''}</td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.featured ? '⭐' : ''}</td>
-                      {showRatings && <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.rating || '-'}</td>}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6 rounded-lg shadow">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => changePage(Math.max(1, currentPage - 1))}
-                disabled={currentPage <= 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage >= totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Page <span className="font-medium">{currentPage}</span> of{' '}
-                  <span className="font-medium">{totalPages}</span>
-                </p>
-              </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const page = i + Math.max(1, currentPage - 2);
-                    if (page > totalPages) return null;
-                    return (
+                            <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden mt-1">
+                              <div style={{ width: `${r.pct}%` }} className="h-2 bg-gradient-to-r from-green-400 to-yellow-400"></div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                    {/* Rating */}
+                    {showRatings && roaster.rating && (
+                      <div className="mb-3">
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                          <span className="mr-2">⭐</span>
+                          <span>{roaster.rating}</span>
+                        </div>
+                      </div>
+                    )}
+                    {/* Actions */}
+                    <div className="mt-3">
+                      {!roaster.verified && (
+                        <button
+                          className="bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 mr-2"
+                          onClick={() => handleVerify(roaster, true)}
+                          disabled={verifyingId === roaster.id}
+                        >
+                          {verifyingId === roaster.id ? t('roasters.verifying', 'Verifying...') : t('roasters.verify', 'Verify')}
+                        </button>
+                      )}
                       <button
-                        key={page}
-                        onClick={() => changePage(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          page === currentPage
-                            ? 'z-10 bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
-                            : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
-                        }`}
+                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                        onClick={() => setEditingId(roaster.id)}
                       >
-                        {page}
+                        {t('common.edit', 'Edit')}
                       </button>
-                    );
-                  })}
-                </nav>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                  <thead className="bg-gray-50 dark:bg-gray-900">
+                    <tr>
+                      <th className="px-4 py-4 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'name' ? { key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'name', direction: 'asc' })}>
+                        {t('adminForms.roasters.name', 'Name')}
+                        {sortConfig?.key === 'name' && <SortArrow direction={sortConfig.direction} />}
+                      </th>
+                      <th className="px-4 py-4 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'city' ? { key: 'city', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'city', direction: 'asc' })}>
+                        {t('adminForms.roasters.city', 'City')}
+                        {sortConfig?.key === 'city' && <SortArrow direction={sortConfig.direction} />}
+                      </th>
+                      <th className="px-4 py-4 min-w-[140px] whitespace-nowrap border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'country' ? { key: 'country', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'country', direction: 'asc' })}>
+                        {t('adminForms.roasters.country', 'Country')}
+                        {sortConfig?.key === 'country' && <SortArrow direction={sortConfig.direction} />}
+                      </th>
+                      <th className="px-4 py-4 min-w-[160px] whitespace-nowrap border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'completeness' ? { key: 'completeness', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'completeness', direction: 'asc' })}>
+                        {t('adminForms.roasters.completeness', 'Completeness')}
+                        {sortConfig?.key === 'completeness' && <SortArrow direction={sortConfig.direction} />}
+                      </th>
+                      <th className="px-4 py-4 border-b dark:border-gray-700 text-center text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'verified' ? { key: 'verified', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'verified', direction: 'asc' })}>
+                        {t('adminForms.roasters.verified', 'Verified')}
+                        {sortConfig?.key === 'verified' && <SortArrow direction={sortConfig.direction} />}
+                      </th>
+                      <th className="px-4 py-4 border-b dark:border-gray-700 text-center text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'featured' ? { key: 'featured', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'featured', direction: 'asc' })}>
+                        {t('adminForms.roasters.featured', 'Featured')}
+                        {sortConfig?.key === 'featured' && <SortArrow direction={sortConfig.direction} />}
+                      </th>
+                      {showRatings && <th className="px-4 py-4 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'rating' ? { key: 'rating', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'rating', direction: 'asc' })}>
+                        {t('adminForms.roasters.rating', 'Rating')}
+                        {sortConfig?.key === 'rating' && <SortArrow direction={sortConfig.direction} />}
+                      </th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredRoasters.map((roaster) => (
+                      <tr key={roaster.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-2 font-medium">
+                          <div className="flex items-center gap-3">
+                            <button
+                              className="text-blue-600 dark:text-blue-400 hover:underline text-left"
+                              onClick={() => setEditingId(roaster.id)}
+                            >
+                              {roaster.name}
+                            </button>
+                            {/* Verify button removed from desktop Name column per request */}
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
+                        <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.country || '-'}</td>
+                        <td className="px-4 py-2 text-gray-900 dark:text-gray-100 w-36">
+                          {(() => {
+                            const r = calculateCompleteness(roaster);
+                            return (
+                              <div className="min-w-[120px]">
+                                <div className="text-sm font-medium mb-1">{r.pct}%</div>
+                                <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
+                                  <div style={{ width: `${r.pct}%` }} className="h-2 bg-gradient-to-r from-green-400 to-yellow-400"></div>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </td>
+                        <td className="px-4 py-2 text-center text-gray-900 dark:text-gray-100">{roaster.verified ? '✔️' : ''}</td>
+                        <td className="px-4 py-2 text-center text-gray-900 dark:text-gray-100">{roaster.featured ? '⭐' : ''}</td>
+                        {showRatings && <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.rating || '-'}</td>}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6 rounded-lg shadow">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => changePage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage <= 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    Page <span className="font-medium">{currentPage}</span> of{' '}
+                    <span className="font-medium">{totalPages}</span>
+                  </p>
+                </div>
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const page = i + Math.max(1, currentPage - 2);
+                      if (page > totalPages) return null;
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => changePage(page)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            page === currentPage
+                              ? 'z-10 bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
+                              : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
+                  </nav>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return content;
 };
 
 interface RoasterFormProps {

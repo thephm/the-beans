@@ -26,6 +26,7 @@ const AdminUsersPage: React.FC = () => {
   const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -67,10 +68,30 @@ const AdminUsersPage: React.FC = () => {
     fetchUsers();
   }, []);
 
+
+  const sortedUsers = React.useMemo(() => {
+    if (!sortConfig) return filteredUsers;
+    const sorted = [...filteredUsers];
+    sorted.sort((a, b) => {
+      let aValue = a[sortConfig.key];
+      let bValue = b[sortConfig.key];
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      return 0;
+    });
+    return sorted;
+  }, [filteredUsers, sortConfig]);
+
   if (loading) return <div>{t('loading')}</div>;
+
   if (error) return <div className="text-red-600">{t('error')}: {error}</div>;
 
-  // Debug: Show raw users data if empty
   if (!users || users.length === 0) {
     return (
       <div className="container mx-auto p-4 pt-28 pl-8 pr-8">
@@ -178,6 +199,24 @@ const AdminUsersPage: React.FC = () => {
         <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'username' ? { key: 'username', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'username', direction: 'asc' })}>
+                {t('admin.users.username', 'Username')}{sortConfig?.key === 'username' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              </th>
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/4 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
+                {t('admin.users.email', 'Email')}{sortConfig?.key === 'email' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              </th>
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/6 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'role' ? { key: 'role', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'role', direction: 'asc' })}>
+                {t('admin.users.role', 'Role')}{sortConfig?.key === 'role' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              </th>
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/12 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'language' ? { key: 'language', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'language', direction: 'asc' })}>
+                {t('admin.users.language', 'Language')}{sortConfig?.key === 'language' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              </th>
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'lastLogin' ? { key: 'lastLogin', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'lastLogin', direction: 'asc' })}>
+                {t('admin.users.lastLogin', 'Last Login')}{sortConfig?.key === 'lastLogin' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              </th>
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'createdAt' ? { key: 'createdAt', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'createdAt', direction: 'asc' })}>
+                {t('admin.users.created', 'Created')}{sortConfig?.key === 'createdAt' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              </th>
               <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/5">
                 {t('admin.users.username', 'Username')}
               </th>
