@@ -15,6 +15,9 @@ export default function PeopleTable() {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredPeople, setFilteredPeople] = useState<RoasterPerson[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(100);
 
   useEffect(() => {
     async function fetchRoastersAndPeople() {
@@ -26,18 +29,24 @@ export default function PeopleTable() {
         console.log('Fetched roasters:', roastersList.length);
         setRoasters(roastersList);
 
-        // Fetch all people in a single request (admin endpoint)
-        const peopleData = await apiClient.getPeople();
+        // Fetch all people with pagination and sorting
+        const params: any = { page: currentPage, limit };
+        if (sortConfig) {
+          params.sortBy = sortConfig.key;
+          params.sortOrder = sortConfig.direction;
+        }
+
+        const peopleData = await apiClient.getPeople(params);
         const allPeople = (peopleData && Array.isArray((peopleData as any).data)) ? (peopleData as any).data : [];
         
         console.log('Total people fetched:', allPeople.length);
-        // Sort people alphabetically by first name, then last name
-        allPeople.sort((a: RoasterPerson, b: RoasterPerson) => {
-          const nameA = `${a.firstName} ${a.lastName || ''}`.trim().toLowerCase();
-          const nameB = `${b.firstName} ${b.lastName || ''}`.trim().toLowerCase();
-          return nameA.localeCompare(nameB);
-        });
         setPeople(allPeople);
+        setFilteredPeople(allPeople);
+
+        // Update pagination info
+        if (peopleData && (peopleData as any).pagination) {
+          setTotalPages((peopleData as any).pagination.pages || 1);
+        }
       } catch (err) {
         console.error('Error fetching roasters and people:', err);
         setPeople([]);
@@ -46,9 +55,9 @@ export default function PeopleTable() {
       }
     }
     fetchRoastersAndPeople();
-  }, []);
+  }, [currentPage, limit, sortConfig]);
 
-  // Filter people based on search term
+  // Filter people based on search term (client-side filtering for now)
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredPeople(people);
@@ -68,6 +77,8 @@ export default function PeopleTable() {
       setFilteredPeople(filtered);
     }
   }, [searchTerm, people]);
+
+  // Sorting is now handled by the backend
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -338,6 +349,57 @@ export default function PeopleTable() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6 rounded-lg shadow">
+            <div className="flex-1 flex justify-between sm:hidden">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage <= 1}
+                className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage >= totalPages}
+                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  Page <span className="font-medium">{currentPage}</span> of{' '}
+                  <span className="font-medium">{totalPages}</span>
+                </p>
+              </div>
+              <div>
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const page = i + Math.max(1, currentPage - 2);
+                    if (page > totalPages) return null;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          page === currentPage
+                            ? 'z-10 bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
+                            : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 }
