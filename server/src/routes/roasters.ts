@@ -208,6 +208,8 @@ router.get('/', [
   query('longitude').optional().isFloat(),
   query('radius').optional().isFloat({ min: 1, max: 500 }),
   query('sort').optional().isString(),
+  query('sortBy').optional().isString(),
+  query('sortOrder').optional().isIn(['asc', 'desc']),
 ], optionalAuth, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -219,34 +221,68 @@ router.get('/', [
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
-    const { search, city, state, specialty, latitude, longitude, radius = 50, sort, featured, verified } = req.query;
+    const { search, city, state, specialty, latitude, longitude, radius = 50, sort, sortBy, sortOrder, featured, verified } = req.query;
 
-    // Build orderBy clause based on sort parameter
+    // Build orderBy clause based on sortBy/sortOrder or legacy sort parameter
     let orderBy: any[] = [];
     
-    switch (sort) {
-      case 'name':
-        orderBy = [{ name: 'asc' }];
-        break;
-      case '-name':
-        orderBy = [{ name: 'desc' }];
-        break;
-      case '-rating':
-        orderBy = [{ rating: 'desc' }];
-        break;
-      case '-reviewCount':
-        orderBy = [{ reviewCount: 'desc' }];
-        break;
-      case 'city':
-        orderBy = [{ city: 'asc' }];
-        break;
-      default:
-        // Default sorting when no sort parameter or invalid value
-        orderBy = [
-          { featured: 'desc' },
-          { rating: 'desc' },
-          { reviewCount: 'desc' },
-        ];
+    // New sortBy/sortOrder parameters (preferred)
+    if (sortBy) {
+      const direction = sortOrder === 'desc' ? 'desc' : 'asc';
+      switch (sortBy) {
+        case 'name':
+        case 'city':
+        case 'country':
+        case 'rating':
+          orderBy = [{ [sortBy]: direction }];
+          break;
+        case 'verified':
+        case 'featured':
+          orderBy = [{ [sortBy]: direction }];
+          break;
+        default:
+          // Invalid sortBy, use default
+          orderBy = [
+            { featured: 'desc' },
+            { rating: 'desc' },
+            { reviewCount: 'desc' },
+          ];
+      }
+    }
+    // Legacy sort parameter support
+    else if (sort) {
+      switch (sort) {
+        case 'name':
+          orderBy = [{ name: 'asc' }];
+          break;
+        case '-name':
+          orderBy = [{ name: 'desc' }];
+          break;
+        case '-rating':
+          orderBy = [{ rating: 'desc' }];
+          break;
+        case '-reviewCount':
+          orderBy = [{ reviewCount: 'desc' }];
+          break;
+        case 'city':
+          orderBy = [{ city: 'asc' }];
+          break;
+        default:
+          // Default sorting when no sort parameter or invalid value
+          orderBy = [
+            { featured: 'desc' },
+            { rating: 'desc' },
+            { reviewCount: 'desc' },
+          ];
+      }
+    }
+    // No sorting specified, use default
+    else {
+      orderBy = [
+        { featured: 'desc' },
+        { rating: 'desc' },
+        { reviewCount: 'desc' },
+      ];
     }
 
     // Build where clause
@@ -1368,6 +1404,8 @@ router.delete('/:id', [
 router.get('/admin/unverified', [
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 100 }),
+  query('sortBy').optional().isString(),
+  query('sortOrder').optional().isIn(['asc', 'desc']),
 ], requireAuth, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -1388,6 +1426,29 @@ router.get('/admin/unverified', [
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
+
+    const { sortBy, sortOrder } = req.query;
+
+    // Build orderBy clause
+    let orderBy: any = { createdAt: 'desc' }; // Default
+    if (sortBy) {
+      const direction = sortOrder === 'desc' ? 'desc' : 'asc';
+      switch (sortBy) {
+        case 'name':
+        case 'city':
+        case 'country':
+        case 'rating':
+        case 'createdAt':
+          orderBy = { [sortBy]: direction };
+          break;
+        case 'verified':
+        case 'featured':
+          orderBy = { [sortBy]: direction };
+          break;
+        default:
+          orderBy = { createdAt: 'desc' };
+      }
+    }
 
     // Get unverified roasters
     const roasters = await prisma.roaster.findMany({
@@ -1437,7 +1498,7 @@ router.get('/admin/unverified', [
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: orderBy
     });
 
     const total = await prisma.roaster.count({ where: { verified: false } });

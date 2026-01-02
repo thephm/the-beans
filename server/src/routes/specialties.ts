@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body, query, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 
@@ -24,14 +24,49 @@ const requireAdmin = async (req: any, res: Response, next: any) => {
 };
 
 // GET /api/specialties - Get all specialties with translations and roaster count
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 100 }),
+  query('sortBy').optional().isString(),
+  query('sortOrder').optional().isIn(['asc', 'desc']),
+  query('language').optional().isString(),
+  query('includeDeprecated').optional().isString(),
+], async (req: Request, res: Response) => {
   try {
-    const { language = 'en', includeDeprecated = 'false' } = req.query;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { language = 'en', includeDeprecated = 'false', sortBy, sortOrder } = req.query;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 100;
+    const skip = (page - 1) * limit;
     
     const whereClause = includeDeprecated === 'true' ? {} : { deprecated: false };
 
+    // Build orderBy clause
+    // Note: name and description are in translations, so we need special handling
+    let orderBy: any = { createdAt: 'asc' }; // Default
+    if (sortBy) {
+      const direction = sortOrder === 'desc' ? 'desc' : 'asc';
+      switch (sortBy) {
+        case 'deprecated':
+        case 'createdAt':
+        case 'updatedAt':
+          orderBy = { [sortBy]: direction };
+          break;
+        // For name, description, roasterCount we'll sort in memory after fetching
+        // since they require joins/aggregations
+        default:
+          orderBy = { createdAt: 'asc' };
+      }
+    }
+
     const specialties = await prisma.specialty.findMany({
       where: whereClause,
+      skip,
+      take: limit,
       include: {
         translations: {
           where: {
@@ -44,13 +79,14 @@ router.get('/', async (req: Request, res: Response) => {
           }
         }
       },
-      orderBy: {
-        createdAt: 'asc'
-      }
+      orderBy: orderBy
     });
 
+    const total = await prisma.specialty.count({ where: whereClause });
+    const pages = Math.ceil(total / limit);
+
     // Format response to include roaster count and primary translation
-    const formattedSpecialties = specialties.map(specialty => ({
+    let formattedSpecialties = specialties.map(specialty => ({
       id: specialty.id,
       name: specialty.translations[0]?.name || 'Unnamed',
       description: specialty.translations[0]?.description || '',
@@ -60,7 +96,31 @@ router.get('/', async (req: Request, res: Response) => {
       updatedAt: specialty.updatedAt
     }));
 
-    res.json(formattedSpecialties);
+    // Apply client-side sorting for fields that can't be sorted in the query
+    if (sortBy === 'name' || sortBy === 'description' || sortBy === 'roasterCount') {
+      const direction = sortOrder === 'desc' ? -1 : 1;
+      formattedSpecialties.sort((a, b) => {
+        const aValue = a[sortBy];
+        const bValue = b[sortBy];
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return direction * aValue.localeCompare(bValue);
+        }
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return direction * (aValue - bValue);
+        }
+        return 0;
+      });
+    }
+
+    res.json({
+      specialties: formattedSpecialties,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages,
+      }
+    });
   } catch (error) {
     console.error('Error fetching specialties:', error);
     res.status(500).json({ error: 'Internal server error' });

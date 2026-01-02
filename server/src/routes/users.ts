@@ -1,6 +1,6 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body, query, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 
@@ -12,16 +12,52 @@ const router = Router();
 // Admin: Get all users
 
 // Admin: Get all users
-router.get('/', requireAuth, async (req: Request, res: Response) => {
+router.get('/', [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 100 }),
+  query('sortBy').optional().isString(),
+  query('sortOrder').optional().isIn(['asc', 'desc']),
+], requireAuth, async (req: Request, res: Response) => {
   const authReq = req as import('../types').AuthenticatedRequest;
 
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     // Only allow admin users
     const me = await prisma.user.findUnique({ where: { id: authReq.user?.id }, select: { role: true } });
     if (!me || me.role !== 'admin') {
       return res.status(403).json({ error: 'Forbidden: Admins only' });
     }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 100;
+    const skip = (page - 1) * limit;
+    const { sortBy, sortOrder } = req.query;
+
+    // Build orderBy clause
+    let orderBy: any = { createdAt: 'desc' }; // Default
+    if (sortBy) {
+      const direction = sortOrder === 'desc' ? 'desc' : 'asc';
+      switch (sortBy) {
+        case 'username':
+        case 'email':
+        case 'role':
+        case 'createdAt':
+        case 'lastLogin':
+          orderBy = { [sortBy]: direction };
+          break;
+        default:
+          orderBy = { createdAt: 'desc' };
+      }
+    }
+
     const users = await prisma.user.findMany({
+      skip,
+      take: limit,
+      orderBy: orderBy,
       select: {
         id: true,
         email: true,
@@ -36,6 +72,10 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
         updatedById: true,
       }
     });
+
+    const total = await prisma.user.count();
+    const pages = Math.ceil(total / limit);
+
     // Serialize date fields to ISO strings
     const serialized = users.map(user => ({
       ...user,
@@ -43,7 +83,16 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
       updatedAt: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt,
       lastLogin: user.lastLogin instanceof Date ? user.lastLogin.toISOString() : user.lastLogin,
     }));
-    res.json(serialized);
+
+    res.json({
+      users: serialized,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages,
+      }
+    });
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });

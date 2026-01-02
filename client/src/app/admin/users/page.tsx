@@ -31,6 +31,9 @@ const AdminUsersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(20);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -38,19 +41,43 @@ const AdminUsersPage: React.FC = () => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/users`, {
+      
+      // Build query params
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: limit.toString(),
+      });
+      if (sortConfig) {
+        params.append('sortBy', sortConfig.key);
+        params.append('sortOrder', sortConfig.direction);
+      }
+      
+      const res = await fetch(`${apiUrl}/api/users?${params.toString()}`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
       if (!res.ok) throw new Error('Failed to fetch users');
       const data = await res.json();
-      // Map alternate field names to expected camelCase
-      const mapped = Array.isArray(data) ? data.map((user: any) => ({
-        ...user,
-        lastLogin: user.lastLogin || user.last_login || null,
-        createdAt: user.createdAt || user.created_at || null,
-      })) : [];
-      setUsers(mapped);
-      setFilteredUsers(mapped);
+      
+      // Handle paginated response
+      if (data.users && data.pagination) {
+        const mapped = data.users.map((user: any) => ({
+          ...user,
+          lastLogin: user.lastLogin || user.last_login || null,
+          createdAt: user.createdAt || user.created_at || null,
+        }));
+        setUsers(mapped);
+        setFilteredUsers(mapped);
+        setTotalPages(data.pagination.pages || 1);
+      } else {
+        // Fallback for old API response format
+        const mapped = Array.isArray(data) ? data.map((user: any) => ({
+          ...user,
+          lastLogin: user.lastLogin || user.last_login || null,
+          createdAt: user.createdAt || user.created_at || null,
+        })) : [];
+        setUsers(mapped);
+        setFilteredUsers(mapped);
+      }
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -58,42 +85,27 @@ const AdminUsersPage: React.FC = () => {
     }
   };
 
-  // Filter users based on search term
+  // Filter users based on search term (client-side for now)
   useEffect(() => {
     if (!searchTerm.trim()) {
-      setFilteredUsers(users);
+      // When search is cleared, refetch from server
+      fetchUsers();
     } else {
+      // Client-side filtering for search
       const filtered = users.filter(user => 
         user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredUsers(filtered);
     }
-  }, [searchTerm, users]);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [currentPage, limit, sortConfig]);
 
-
-  const sortedUsers = React.useMemo(() => {
-    if (!sortConfig) return filteredUsers;
-    const sorted = [...filteredUsers];
-    sorted.sort((a, b) => {
-      let aValue = a[sortConfig.key];
-      let bValue = b[sortConfig.key];
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortConfig.direction === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      }
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-      }
-      return 0;
-    });
-    return sorted;
-  }, [filteredUsers, sortConfig]);
+  // Sorting is now handled by backend, display users directly
+  const sortedUsers = filteredUsers;
 
   if (loading) return <div>{t('loading')}</div>;
 
@@ -274,6 +286,56 @@ const AdminUsersPage: React.FC = () => {
         </table>
       </div>
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6 rounded-lg shadow">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage <= 1}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage >= totalPages}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Page <span className="font-medium">{currentPage}</span> of{' '}
+                <span className="font-medium">{totalPages}</span>
+              </p>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const page = i + Math.max(1, currentPage - 2);
+                  if (page > totalPages) return null;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                        page === currentPage
+                          ? 'z-10 bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
+                          : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

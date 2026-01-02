@@ -95,10 +95,10 @@ const AdminRoastersPage: React.FC = () => {
     return { points, pct };
   }
 
-  // Fetch roasters when pagination, filters, or search change
+  // Fetch roasters when pagination, filters, search, or sorting change
   useEffect(() => {
     fetchRoasters();
-  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery]);
+  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, sortConfig]);
 
   // Check for edit query parameter on mount
   useEffect(() => {
@@ -114,7 +114,13 @@ const AdminRoastersPage: React.FC = () => {
     try {
       // If showing unverified only, use admin unverified endpoint
       if (verifiedFilter === 'unverified') {
-        const data = await apiClient.getUnverifiedRoasters({ page: currentPage, limit }) as any;
+        const params: any = { page: currentPage, limit };
+        // Add sorting if configured
+        if (sortConfig) {
+          params.sortBy = sortConfig.key;
+          params.sortOrder = sortConfig.direction;
+        }
+        const data = await apiClient.getUnverifiedRoasters(params) as any;
         setRoasters(data.roasters || []);
         setTotalPages(data.pagination?.pages || 1);
         if (data.globalCounts) {
@@ -135,6 +141,11 @@ const AdminRoastersPage: React.FC = () => {
       if (searchQuery && searchQuery.trim()) params.search = searchQuery.trim();
       if (featuredFilter === 'featured') params.featured = 'true';
       if (verifiedFilter === 'verified') params.verified = 'true';
+      // Add sorting if configured
+      if (sortConfig) {
+        params.sortBy = sortConfig.key;
+        params.sortOrder = sortConfig.direction;
+      }
 
       const data = await apiClient.getRoasters(params) as any;
       setRoasters(data.roasters || []);
@@ -220,34 +231,9 @@ const AdminRoastersPage: React.FC = () => {
     setCurrentPage(page);
   };
 
-
-  // Sorting logic
-  const sortedRoasters = React.useMemo(() => {
-    if (!sortConfig) return roasters;
-    const sorted = [...roasters];
-    sorted.sort((a, b) => {
-      let aValue = a[sortConfig.key];
-      let bValue = b[sortConfig.key];
-      // Handle completeness as special case
-      if (sortConfig.key === 'completeness') {
-        aValue = calculateCompleteness(a).pct;
-        bValue = calculateCompleteness(b).pct;
-      }
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortConfig.direction === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      }
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-      }
-      return 0;
-    });
-    return sorted;
-  }, [roasters, sortConfig]);
-
-  // Server-side pagination and filtering are applied; use returned roasters directly
-  const filteredRoasters = sortedRoasters;
+  // Sorting is now handled by the backend
+  // Display roasters directly as returned from API (already sorted and paginated)
+  const filteredRoasters = roasters;
 
   let content: React.ReactNode = null;
   if (editingId || showAddForm) {

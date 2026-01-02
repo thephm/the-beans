@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { body, param, validationResult } from 'express-validator';
+import { body, param, query, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 
@@ -95,9 +95,19 @@ async function canManagePeople(userId: string, roasterId: string): Promise<boole
 }
 
 // GET /api/people - Get all people (admin only, for people management page)
-router.get('/', requireAuth, async (req: Request, res: Response) => {
+router.get('/', [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 500 }),
+  query('sortBy').optional().isString(),
+  query('sortOrder').optional().isIn(['asc', 'desc']),
+], requireAuth, async (req: Request, res: Response) => {
 
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     // Only admin users can get all people
     const userId = req.user?.id;
     const user = await prisma.user.findUnique({
@@ -108,11 +118,45 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Admin access required' });
     }
 
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 100;
+    const skip = (page - 1) * limit;
+    const { sortBy, sortOrder } = req.query;
+
+    // Build orderBy clause
+    let orderBy: any = [
+      { firstName: 'asc' },
+      { lastName: 'asc' }
+    ]; // Default
+
+    if (sortBy) {
+      const direction = sortOrder === 'desc' ? 'desc' : 'asc';
+      switch (sortBy) {
+        case 'firstName':
+        case 'lastName':
+        case 'email':
+        case 'mobile':
+        case 'title':
+        case 'isPrimary':
+        case 'createdAt':
+          orderBy = [{ [sortBy]: direction }];
+          break;
+        // For roaster and roles, we'll need to handle them specially
+        default:
+          orderBy = [
+            { firstName: 'asc' },
+            { lastName: 'asc' }
+          ];
+      }
+    }
+
     // Get all people across all roasters
     const people = await prisma.roasterPerson.findMany({
       where: {
         isActive: true
       },
+      skip,
+      take: limit,
       include: {
         roaster: {
           select: {
@@ -128,11 +172,15 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
           }
         }
       },
-      orderBy: [
-        { firstName: 'asc' },
-        { lastName: 'asc' }
-      ]
+      orderBy: orderBy
     });
+
+    const total = await prisma.roasterPerson.count({
+      where: {
+        isActive: true
+      }
+    });
+    const pages = Math.ceil(total / limit);
 
     // Add permissions to each person
     const peopleWithPermissions = people.map((person: any) => ({
@@ -142,7 +190,13 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
 
     res.json({
       data: peopleWithPermissions,
-      count: people.length
+      count: people.length,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages,
+      }
     });
 
   } catch (error) {
