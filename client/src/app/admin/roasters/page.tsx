@@ -74,7 +74,7 @@ const AdminRoastersPage: React.FC = () => {
     if (linkedin) points += 1;
     if (facebook) points += 1;
     // Specialty (check roasterSpecialties if included)
-    if (Array.isArray(r.roasterSpecialties) && r.roasterSpecialties.length > 0) points += 2;
+    if (Array.isArray(r.specialties) && r.specialties.length > 0) points += 2;
     // Image - check uploaded images (roasterImages) or fallback imageUrl or images array
     const hasImage = (Array.isArray(r.roasterImages) && r.roasterImages.length > 0) || r.imageUrl || (Array.isArray(r.images) && r.images.length > 0);
     if (hasImage) points += 5;
