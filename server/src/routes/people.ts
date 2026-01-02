@@ -12,6 +12,8 @@ const router = Router();
 export enum PersonRole {
   OWNER = 'owner',
   ADMIN = 'admin',
+  ROASTER = 'roaster',
+  EMPLOYEE = 'employee',
   BILLING = 'billing',
   MARKETING = 'marketing',
   SCOUT = 'scout',
@@ -35,6 +37,16 @@ export function getPersonPermissions(roles: string[]): any {
   } else if (roles.includes(PersonRole.ADMIN)) {
     permissions.canEditRoaster = true;
     permissions.canManagePeople = false; // Can't manage owners
+    permissions.canViewBilling = false;
+    permissions.canDeleteRoaster = false;
+  } else if (roles.includes(PersonRole.ROASTER)) {
+    permissions.canEditRoaster = true;
+    permissions.canManagePeople = false;
+    permissions.canViewBilling = false;
+    permissions.canDeleteRoaster = false;
+  } else if (roles.includes(PersonRole.EMPLOYEE)) {
+    permissions.canEditRoaster = false;
+    permissions.canManagePeople = false;
     permissions.canViewBilling = false;
     permissions.canDeleteRoaster = false;
   } else if (roles.includes(PersonRole.BILLING)) {

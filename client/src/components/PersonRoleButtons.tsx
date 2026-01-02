@@ -14,6 +14,8 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
   const roles = [
     { value: PersonRole.OWNER, label: t('admin.people.roleOwner', 'Owner') },
     { value: PersonRole.ADMIN, label: t('admin.people.roleAdmin', 'Admin') },
+    { value: PersonRole.ROASTER, label: t('admin.people.roleRoaster', 'Roaster') },
+    { value: PersonRole.EMPLOYEE, label: t('admin.people.roleEmployee', 'Employee') },
     { value: PersonRole.BILLING, label: t('admin.people.roleBilling', 'Billing') },
     { value: PersonRole.MARKETING, label: t('admin.people.roleMarketing', 'Marketing') },
     { value: PersonRole.SCOUT, label: t('admin.people.roleScout', 'Scout') },
