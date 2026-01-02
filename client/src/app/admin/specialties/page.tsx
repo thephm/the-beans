@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -13,6 +14,7 @@ const AdminSpecialtiesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
   const fetchSpecialties = async () => {
     setLoading(true);
@@ -38,21 +40,32 @@ const AdminSpecialtiesPage: React.FC = () => {
   // Filter specialties based on search term
   useEffect(() => {
     let filtered = specialties;
-    
     if (searchTerm.trim()) {
       filtered = specialties.filter(specialty => 
         specialty.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         specialty.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
-    // Sort alphabetically by name
-    const sorted = [...filtered].sort((a, b) => 
-      (a.name || '').localeCompare(b.name || '')
-    );
-    
-    setFilteredSpecialties(sorted);
-  }, [searchTerm, specialties]);
+    // Sorting logic
+    if (sortConfig) {
+      filtered = [...filtered].sort((a, b) => {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sortConfig.direction === 'asc'
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+        }
+        return 0;
+      });
+    } else {
+      filtered = [...filtered].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+    setFilteredSpecialties(filtered);
+  }, [searchTerm, specialties, sortConfig]);
 
   useEffect(() => {
     fetchSpecialties();
@@ -136,17 +149,17 @@ const AdminSpecialtiesPage: React.FC = () => {
         <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100">
-                {t('admin.specialties.name', 'Specialty')}
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'name' ? { key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'name', direction: 'asc' })}>
+                {t('admin.specialties.name', 'Specialty')}{sortConfig?.key === 'name' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
               </th>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100">
-                {t('admin.specialties.description', 'Description')}
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'description' ? { key: 'description', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'description', direction: 'asc' })}>
+                {t('admin.specialties.description', 'Description')}{sortConfig?.key === 'description' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
               </th>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100">
-                {t('admin.specialties.roasterCount', 'Roasters')}
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roasterCount' ? { key: 'roasterCount', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roasterCount', direction: 'asc' })}>
+                {t('admin.specialties.roasterCount', 'Roasters')}{sortConfig?.key === 'roasterCount' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
               </th>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100">
-                {t('admin.specialties.deprecated', 'Deprecated')}
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'deprecated' ? { key: 'deprecated', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'deprecated', direction: 'asc' })}>
+                {t('admin.specialties.deprecated', 'Deprecated')}{sortConfig?.key === 'deprecated' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
               </th>
             </tr>
           </thead>

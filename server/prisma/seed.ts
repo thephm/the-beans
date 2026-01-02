@@ -98,11 +98,14 @@ async function main() {
         }
       },
     });
-  } else if (adminUser.role !== 'admin') {
-    // Update existing user to admin role if needed
+  } else {
+    // Always update existing admin user with latest password and role
     adminUser = await prisma.user.update({
       where: { id: adminUser.id },
-      data: { role: 'admin' }
+      data: {
+        password: hashedAdminPassword,
+        role: 'admin',
+      }
     });
   }
   console.log('✅ Created/ensured admin user:', adminUser.email);
