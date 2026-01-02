@@ -36,7 +36,14 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
         updatedById: true,
       }
     });
-    res.json(users);
+    // Serialize date fields to ISO strings
+    const serialized = users.map(user => ({
+      ...user,
+      createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+      updatedAt: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt,
+      lastLogin: user.lastLogin instanceof Date ? user.lastLogin.toISOString() : user.lastLogin,
+    }));
+    res.json(serialized);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
