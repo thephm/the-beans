@@ -43,8 +43,14 @@ const AdminUsersPage: React.FC = () => {
       });
       if (!res.ok) throw new Error('Failed to fetch users');
       const data = await res.json();
-      setUsers(data);
-      setFilteredUsers(data);
+      // Map alternate field names to expected camelCase
+      const mapped = Array.isArray(data) ? data.map((user: any) => ({
+        ...user,
+        lastLogin: user.lastLogin || user.last_login || null,
+        createdAt: user.createdAt || user.created_at || null,
+      })) : [];
+      setUsers(mapped);
+      setFilteredUsers(mapped);
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -257,10 +263,10 @@ const AdminUsersPage: React.FC = () => {
                   )}
                 </td>
                 <td className="py-3 px-4 text-center text-sm text-gray-600 dark:text-gray-400">
-                  {user.lastLogin ? formatDateToYYYYMMDD(user.lastLogin) : '-'}
+                    {user.lastLogin ? formatDateToYYYYMMDD(user.lastLogin) : '-'}
                 </td>
-                <td className="py-3 px-4 text-center text-sm text-gray-600 dark:text-gray-400">
-                  {user.createdAt ? formatDateToYYYYMMDD(user.createdAt) : ''}
+                  <td className="py-3 px-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                    {user.createdAt ? formatDateToYYYYMMDD(user.createdAt) : '-'}
                 </td>
               </tr>
             ))}
