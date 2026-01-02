@@ -66,10 +66,10 @@ const AdminRoastersPage: React.FC = () => {
     // Website
     if (r.website) points += 2;
     // Social networks (socialNetworks JSON or legacy fields)
-    const sn = r.socialNetworks || {};
-    const instagram = sn.instagram || r.instagram || '';
-    const linkedin = sn.linkedin || r.linkedin || '';
-    const facebook = sn.facebook || r.facebook || '';
+      const sn = r.socialNetworks || {};
+      const instagram = sn.instagram || '';
+      const linkedin = sn.linkedin || '';
+      const facebook = sn.facebook || '';
     if (instagram) points += 2;
     if (linkedin) points += 1;
     if (facebook) points += 1;
