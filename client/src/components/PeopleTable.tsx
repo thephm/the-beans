@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { SortArrow } from '@/components/SortArrow';
 import AddPersonForm from './AddPersonForm';
 import { apiClient } from '../lib/api';
 import { RoasterPerson, Roaster } from '../types';
@@ -231,19 +232,19 @@ export default function PeopleTable() {
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'firstName' ? { key: 'firstName', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'firstName', direction: 'asc' })}>
-                  {t('adminForms.roasters.name', 'Name')}{sortConfig?.key === 'firstName' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                  {t('adminForms.roasters.name', 'Name')}{sortConfig?.key === 'firstName' && <SortArrow direction={sortConfig.direction} />}
                 </th>
                 <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roaster' ? { key: 'roaster', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roaster', direction: 'asc' })}>
-                  {t('adminSection.roasters', 'Roaster')}{sortConfig?.key === 'roaster' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                  {t('adminSection.roasters', 'Roaster')}{sortConfig?.key === 'roaster' && <SortArrow direction={sortConfig.direction} />}
                 </th>
                 <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roles' ? { key: 'roles', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roles', direction: 'asc' })}>
-                  {t('adminSection.role', 'Role')}{sortConfig?.key === 'roles' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                  {t('adminSection.role', 'Role')}{sortConfig?.key === 'roles' && <SortArrow direction={sortConfig.direction} />}
                 </th>
                 <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
-                  {t('adminForms.roasters.email', 'Email')}{sortConfig?.key === 'email' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                  {t('adminForms.roasters.email', 'Email')}{sortConfig?.key === 'email' && <SortArrow direction={sortConfig.direction} />}
                 </th>
                 <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'mobile' ? { key: 'mobile', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'mobile', direction: 'asc' })}>
-                  {t('adminForms.roasters.phone', 'Mobile')}{sortConfig?.key === 'mobile' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                  {t('adminForms.roasters.phone', 'Mobile')}{sortConfig?.key === 'mobile' && <SortArrow direction={sortConfig.direction} />}
                 </th>
               </tr>
             </thead>
