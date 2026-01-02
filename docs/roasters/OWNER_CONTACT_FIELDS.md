@@ -98,9 +98,9 @@ model RoasterPerson {  id        String   @id @default(cuid())
 
     // Multiple roles per person
 
-  // Multiple roles per person  roles     String[] // "owner", "admin", "billing", etc.
+  // Multiple roles per person  roles     String[] // "owner", "admin", "roaster", "employee", "billing", "marketing", "scout", "customer"
 
-  roles     String[] // "owner", "admin", "billing", etc.  
+  roles     String[] // "owner", "admin", "roaster", "employee", "billing", "marketing", "scout", "customer"  
 
     isActive  Boolean @default(true)
 

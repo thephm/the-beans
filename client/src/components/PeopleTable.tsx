@@ -164,6 +164,8 @@ export default function PeopleTable() {
                           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                             role === 'owner' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' :
                             role === 'admin' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                            role === 'roaster' ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200' :
+                            role === 'employee' ? 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200' :
                             role === 'billing' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
                             role === 'marketing' ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200' :
                             'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
@@ -302,6 +304,8 @@ export default function PeopleTable() {
                               className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                                 role === 'owner' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' :
                                 role === 'admin' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                                role === 'roaster' ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200' :
+                                role === 'employee' ? 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200' :
                                 role === 'billing' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
                                 role === 'marketing' ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200' :
                                 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'

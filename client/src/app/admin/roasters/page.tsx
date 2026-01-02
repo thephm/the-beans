@@ -1452,6 +1452,10 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400';
       case PersonRole.ADMIN:
         return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
+      case PersonRole.ROASTER:
+        return 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400';
+      case PersonRole.EMPLOYEE:
+        return 'bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-400';
       case PersonRole.BILLING:
         return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
       case PersonRole.MARKETING:
