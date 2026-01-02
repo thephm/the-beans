@@ -18,7 +18,7 @@ services:
     rootDir: server
     buildCommand: npm install && npx prisma generate && npm run build
     # Run DB migrations as part of start command (free tier doesn't support preDeployCommand)
-    startCommand: npx prisma migrate resolve --applied 20260101201138_sync_images_column && npx prisma migrate deploy && npx prisma generate && npm run start
+    startCommand: npx prisma migrate deploy && npx prisma generate && npm run start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
