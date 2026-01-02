@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { SortArrow } from '@/components/SortArrow';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
 
 interface User {
@@ -199,46 +200,28 @@ const AdminUsersPage: React.FC = () => {
         <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'username' ? { key: 'username', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'username', direction: 'asc' })}>
-                {t('admin.users.username', 'Username')}{sortConfig?.key === 'username' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'username' ? { key: 'username', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'username', direction: 'asc' })}>
+                {t('admin.users.username', 'Username')}{sortConfig?.key === 'username' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/4 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
-                {t('admin.users.email', 'Email')}{sortConfig?.key === 'email' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/4 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
+                {t('admin.users.email', 'Email')}{sortConfig?.key === 'email' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/6 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'role' ? { key: 'role', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'role', direction: 'asc' })}>
-                {t('admin.users.role', 'Role')}{sortConfig?.key === 'role' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/6 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'role' ? { key: 'role', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'role', direction: 'asc' })}>
+                {t('admin.users.role', 'Role')}{sortConfig?.key === 'role' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/12 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'language' ? { key: 'language', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'language', direction: 'asc' })}>
-                {t('admin.users.language', 'Language')}{sortConfig?.key === 'language' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/12 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'language' ? { key: 'language', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'language', direction: 'asc' })}>
+                {t('admin.users.language', 'Language')}{sortConfig?.key === 'language' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'lastLogin' ? { key: 'lastLogin', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'lastLogin', direction: 'asc' })}>
-                {t('admin.users.lastLogin', 'Last Login')}{sortConfig?.key === 'lastLogin' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'lastLogin' ? { key: 'lastLogin', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'lastLogin', direction: 'asc' })}>
+                {t('admin.users.lastLogin', 'Last Login')}{sortConfig?.key === 'lastLogin' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'createdAt' ? { key: 'createdAt', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'createdAt', direction: 'asc' })}>
-                {t('admin.users.created', 'Created')}{sortConfig?.key === 'createdAt' && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
-              </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/5">
-                {t('admin.users.username', 'Username')}
-              </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/4">
-                {t('admin.users.email', 'Email')}
-              </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 w-1/6">
-                {t('admin.users.role', 'Role')}
-              </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/12">
-                {t('admin.users.language', 'Language')}
-              </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5">
-                {t('admin.users.lastLogin', 'Last Login')}
-              </th>
-              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5">
-                {t('admin.users.created', 'Created')}
+              <th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'createdAt' ? { key: 'createdAt', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'createdAt', direction: 'asc' })}>
+                {t('admin.users.created', 'Created')}{sortConfig?.key === 'createdAt' && <SortArrow direction={sortConfig.direction} />}
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredUsers.map((user) => (
+            {sortedUsers.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td className="py-3 px-4 text-left">
                   <Link
