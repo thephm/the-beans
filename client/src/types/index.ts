@@ -345,3 +345,15 @@ export interface CreateRoasterFromSuggestionResponse {
   nameChanged: boolean;
   existingContactUsed: boolean;
 }
+
+export interface RoasterExistsResponse {
+  exists: boolean;
+  roaster: {
+    id: string;
+    name: string;
+    website?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  } | null;
+}
