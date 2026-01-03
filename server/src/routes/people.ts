@@ -141,7 +141,18 @@ router.get('/', [
         case 'createdAt':
           orderBy = [{ [sortBy]: direction }];
           break;
-        // For roaster and roles, we'll need to handle them specially
+        case 'roaster':
+          // Sort by roaster name (relation)
+          orderBy = [{ roaster: { name: direction } }];
+          break;
+        case 'roles':
+          // For roles (array field), we can't directly sort in Prisma
+          // We'll fetch all and sort in memory later
+          orderBy = [
+            { firstName: 'asc' },
+            { lastName: 'asc' }
+          ];
+          break;
         default:
           orderBy = [
             { firstName: 'asc' },
@@ -183,14 +194,25 @@ router.get('/', [
     const pages = Math.ceil(total / limit);
 
     // Add permissions to each person
-    const peopleWithPermissions = people.map((person: any) => ({
+    let peopleWithPermissions = people.map((person: any) => ({
       ...person,
       permissions: getPersonPermissions(person.roles)
     }));
 
+    // If sorting by roles, do in-memory sort
+    if (sortBy === 'roles') {
+      const direction = sortOrder === 'desc' ? 'desc' : 'asc';
+      peopleWithPermissions.sort((a: any, b: any) => {
+        const roleA = a.roles && a.roles.length > 0 ? a.roles[0] : '';
+        const roleB = b.roles && b.roles.length > 0 ? b.roles[0] : '';
+        const comparison = roleA.localeCompare(roleB);
+        return direction === 'desc' ? -comparison : comparison;
+      });
+    }
+
     res.json({
       data: peopleWithPermissions,
-      count: people.length,
+      count: peopleWithPermissions.length,
       pagination: {
         page,
         limit,

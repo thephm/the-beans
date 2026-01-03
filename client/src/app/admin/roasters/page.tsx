@@ -113,35 +113,11 @@ const AdminRoastersPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      // If showing unverified only, use admin unverified endpoint
-      if (verifiedFilter === 'unverified') {
-        const params: any = { page: currentPage, limit };
-        // Add sorting if configured
-        if (sortConfig) {
-          params.sortBy = sortConfig.key;
-          params.sortOrder = sortConfig.direction;
-        }
-        const data = await apiClient.getUnverifiedRoasters(params) as any;
-        setRoasters(data.roasters || []);
-        setTotalPages(data.pagination?.pages || 1);
-        if (data.globalCounts) {
-          setGlobalCounts(data.globalCounts);
-        } else {
-          // fallback for legacy response
-          setGlobalCounts((prev) => ({
-            all: prev?.all ?? 0,
-            verified: prev?.verified ?? 0,
-            unverified: data.pagination?.total ?? roasters.length,
-            featured: prev?.featured ?? 0,
-          }));
-        }
-        return;
-      }
-
       const params: Record<string, any> = { page: currentPage, limit };
       if (searchQuery && searchQuery.trim()) params.search = searchQuery.trim();
       if (featuredFilter === 'featured') params.featured = 'true';
       if (verifiedFilter === 'verified') params.verified = 'true';
+      if (verifiedFilter === 'unverified') params.verified = 'false';
       // Add sorting if configured
       if (sortConfig) {
         params.sortBy = sortConfig.key;
