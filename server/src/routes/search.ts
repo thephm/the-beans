@@ -281,32 +281,45 @@ router.get('/roasters', [
       }
     }
 
+    // Build AND clause combining search query and location filters
+    const andClauses: any[] = [];
+
     if (q && typeof q === 'string') {
       const qLower = q.trim();
-      whereClause.OR = [
-        { name: { contains: qLower, mode: 'insensitive' } },
-        { description: { contains: qLower, mode: 'insensitive' } },
-        { city: { contains: qLower, mode: 'insensitive' } },
-        { state: { contains: qLower, mode: 'insensitive' } },
-        {
-          roasterSpecialties: {
-            some: {
-              specialty: {
-                translations: {
-                  some: { name: { contains: qLower, mode: 'insensitive' } }
+      andClauses.push({
+        OR: [
+          { name: { contains: qLower, mode: 'insensitive' } },
+          { description: { contains: qLower, mode: 'insensitive' } },
+          { city: { contains: qLower, mode: 'insensitive' } },
+          { state: { contains: qLower, mode: 'insensitive' } },
+          {
+            roasterSpecialties: {
+              some: {
+                specialty: {
+                  translations: {
+                    some: { name: { contains: qLower, mode: 'insensitive' } }
+                  }
                 }
               }
             }
           }
-        }
-      ];
+        ]
+      });
     }
+    
     if (location) {
-      whereClause.OR = [
-        { city: { contains: location as string, mode: 'insensitive' } },
-        { state: { contains: location as string, mode: 'insensitive' } },
-        { address: { contains: location as string, mode: 'insensitive' } },
-      ];
+      andClauses.push({
+        OR: [
+          { city: { contains: location as string, mode: 'insensitive' } },
+          { state: { contains: location as string, mode: 'insensitive' } },
+          { address: { contains: location as string, mode: 'insensitive' } },
+        ]
+      });
+    }
+
+    // Combine all filters with AND logic
+    if (andClauses.length > 0) {
+      whereClause.AND = andClauses;
     }
 
     // Dynamic sorting
