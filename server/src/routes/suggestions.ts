@@ -92,7 +92,7 @@ const createSuggestionValidation = [
   body('website').trim().isURL().withMessage('Valid website URL is required'),
   body('submitterRole')
     .trim()
-    .isIn(['customer', 'rando', 'scout', 'owner', 'admin', 'marketing'])
+    .isIn(['customer', 'rando', 'scout', 'owner', 'admin', 'marketing', 'employee', 'roaster', 'billing'])
     .withMessage('Valid role is required'),
   body('submitterFirstName').optional().trim(),
   body('submitterLastName').optional().trim(),
