@@ -1147,21 +1147,21 @@ router.put('/:id', [
   param('id').isString(),
   body('name').optional().isLength({ min: 1, max: 100 }).withMessage('Name must be between 1-100 characters'),
   body('description').optional().isLength({ max: 1000 }).withMessage('Description must be less than 1000 characters'),
-  body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
+  body('email').optional({ nullable: true, checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('phone').optional().isLength({ max: 20 }).withMessage('Phone number must be less than 20 characters'),
-  body('website').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid website URL'),
+  body('website').optional({ nullable: true, checkFalsy: true }).isURL().withMessage('Please enter a valid website URL'),
   body('address').optional().isLength({ max: 200 }).withMessage('Address must be less than 200 characters'),
   body('city').optional().isLength({ max: 100 }).withMessage('City must be less than 100 characters'),
   body('state').optional().isLength({ max: 50 }).withMessage('State must be less than 50 characters'),
   body('zipCode').optional().isLength({ max: 20 }).withMessage('Zip code must be less than 20 characters'),
   body('country').optional().isLength({ max: 100 }).withMessage('Country must be less than 100 characters'),
-  body('latitude').optional().isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
-  body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
+  body('latitude').optional({ nullable: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
+  body('longitude').optional({ nullable: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
   body('verified').optional().isBoolean().withMessage('Verified must be true or false'),
   body('featured').optional().isBoolean().withMessage('Featured must be true or false'),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
-  body('ownerEmail').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
+  body('ownerEmail').optional({ nullable: true, checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   
   // Social network validation
   // New consolidated socialNetworks object (key -> url/handle)
@@ -1249,7 +1249,7 @@ router.put('/:id', [
       delete updateData.ownerEmail;
     }
 
-    // Remove undefined values
+    // Remove undefined values (but keep null values to allow clearing fields)
     Object.keys(updateData).forEach(key => {
       if (updateData[key] === undefined) {
         delete updateData[key];
@@ -2408,6 +2408,145 @@ router.put('/:id/source-countries', [
     });
   } catch (error) {
     console.error('Error updating roaster source countries:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/roasters/admin/missing-coordinates
+ * Get roasters that have an address but no latitude/longitude (admin only)
+ */
+router.get('/admin/missing-coordinates', requireAuth, async (req: any, res: any) => {
+  try {
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+
+    if (user?.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Get roasters with address but no coordinates
+    const roasters = await prisma.roaster.findMany({
+      where: {
+        OR: [
+          { address: { not: null } },
+          { city: { not: null } }
+        ],
+        AND: [
+          {
+            OR: [
+              { latitude: null },
+              { longitude: null }
+            ]
+          }
+        ]
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+        state: true,
+        zipCode: true,
+        country: true,
+        latitude: true,
+        longitude: true,
+        verified: true
+      },
+      orderBy: {
+        name: 'asc'
+      }
+    });
+
+    res.json({
+      roasters,
+      total: roasters.length
+    });
+  } catch (error) {
+    console.error('Get roasters with missing coordinates error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * PATCH /api/roasters/:id/coordinates
+ * Update a roaster's latitude and longitude (admin only)
+ */
+router.patch('/:id/coordinates', [
+  param('id').isString(),
+  body('latitude').isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
+  body('longitude').isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
+], requireAuth, async (req: any, res: any) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Check if user is admin
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true }
+    });
+
+    if (user?.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { id } = req.params;
+    const { latitude, longitude } = req.body;
+
+    // Check if roaster exists
+    const roaster = await prisma.roaster.findUnique({
+      where: { id }
+    });
+
+    if (!roaster) {
+      return res.status(404).json({ error: 'Roaster not found' });
+    }
+
+    // Update coordinates
+    const updatedRoaster = await prisma.roaster.update({
+      where: { id },
+      data: {
+        latitude,
+        longitude,
+        updatedById: req.userId
+      },
+      select: {
+        id: true,
+        name: true,
+        latitude: true,
+        longitude: true
+      }
+    });
+
+    // Create audit log
+    try {
+      await createAuditLog({
+        action: 'UPDATE',
+        entityType: 'roaster',
+        entityId: id,
+        entityName: getEntityName('roaster', roaster),
+        userId: req.userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        oldValues: { latitude: roaster.latitude, longitude: roaster.longitude },
+        newValues: { latitude, longitude }
+      });
+    } catch (auditErr) {
+      console.error('Failed to write UPDATE audit log for roaster coordinates:', auditErr);
+    }
+
+    res.json({
+      message: 'Coordinates updated successfully',
+      roaster: updatedRoaster
+    });
+  } catch (error) {
+    console.error('Update roaster coordinates error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -16,7 +16,12 @@ const SECTIONS = [
   { key: "settings", label: "Settings" },
 ];
 
-export default function AdminRoasterEditLayout({ roasterName = "[Roaster Name]" }) {
+interface AdminRoasterEditLayoutProps {
+  roasterId?: string;
+  roasterName?: string;
+}
+
+export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roaster Name]" }: AdminRoasterEditLayoutProps) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(SECTIONS[0].key);
 

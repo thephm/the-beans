@@ -828,7 +828,33 @@
       "unverified": "Non vérifiés",
       "topCountries": "Principaux Pays",
       "topCities": "Principales Villes"
-    }
+    },
+    "coordinates": {
+      "title": "Définir les Coordonnées des Torréfacteurs",
+      "address": "Adresse",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "calculate": "Calculer",
+      "calculating": "Calcul en cours...",
+      "search": "Rechercher",
+      "paste": "Coller",
+      "test": "Tester",
+      "set": "Définir",
+      "saving": "Enregistrement...",
+      "skip": "Passer",
+      "progress": "Torréfacteur {{current}} sur {{total}}",
+      "allSet": "Tous les torréfacteurs ont des coordonnées !",
+      "note": "Note : Utilisez le bouton \"Calculer\" pour géocoder automatiquement l'adresse, puis testez le résultat sur Google Maps avant de définir.",
+      "workflow": "Flux de travail :",
+      "workflowStep1": "Cliquez sur \"Rechercher\" (s'ouvre dans un nouvel onglet)",
+      "workflowStep2": "Trouvez l'emplacement exact sur la carte",
+      "workflowStep3": "Copiez l'URL de la barre d'adresse de votre navigateur (Ctrl+L, Ctrl+C)",
+      "workflowStep4": "Cliquez sur \"Coller depuis le presse-papiers\" - il lira automatiquement votre presse-papiers !",
+      "workflowStep5": "Cliquez sur \"Tester\" pour vérifier",
+      "workflowStep6": "Cliquez sur \"Définir\" pour enregistrer",
+      "workflowTip": "Astuce : Vous pouvez également utiliser \"Calculer\" pour une estimation rapide, ou saisir les coordonnées manuellement."
+    },
+    "unverified": "Non vérifié"
   },
   "adminSection": {
     "users": "Utilisateurs",
@@ -837,6 +863,7 @@
     "people": "Personnes",
     "roasters": "Torréfacteurs",
     "auditLogs": "Journal d'audit",
+    "coordinates": "Définir Lat/Long",
     "roasters.unverified": "Torréfacteurs Non Vérifiés",
     "roasters.unverified.title": "Torréfacteurs Non Vérifiés",
     "roasters.unverified.description": "Examiner et vérifier les torréfacteurs en attente d'approbation",

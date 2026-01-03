@@ -827,7 +827,33 @@
       "unverified": "Unverified",
       "topCountries": "Top Countries",
       "topCities": "Top Cities"
-    }
+    },
+    "coordinates": {
+      "title": "Set Roaster Coordinates",
+      "address": "Address",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "calculate": "Calculate",
+      "calculating": "Calculating...",
+      "search": "Search",
+      "paste": "Paste",
+      "test": "Test",
+      "set": "Set",
+      "saving": "Saving...",
+      "skip": "Skip",
+      "progress": "Roaster {{current}} of {{total}}",
+      "allSet": "All roasters have coordinates!",
+      "note": "Note: Use the \"Calculate\" button to auto-geocode the address, then test the result on Google Maps before setting.",
+      "workflow": "Workflow:",
+      "workflowStep1": "Click \"Search\" (opens in new tab)",
+      "workflowStep2": "Find the exact location on the map",
+      "workflowStep3": "Copy the URL from your browser address bar (Ctrl+L, Ctrl+C)",
+      "workflowStep4": "Click \"Paste from Clipboard\" - it will auto-read your clipboard!",
+      "workflowStep5": "Click \"Test\" to verify",
+      "workflowStep6": "Click \"Set\" to save",
+      "workflowTip": "Tip: You can also use \"Calculate\" for a quick estimate, or type coordinates manually."
+    },
+    "unverified": "Unverified"
   },
   "adminSection": {
   "users": "Users",
@@ -836,6 +862,7 @@
   "people": "People",
     "roasters": "Roasters",
     "auditLogs": "Audit Logs",
+    "coordinates": "Set Lat/Long",
     "roasters.unverified": "Unverified Roasters",
     "roasters.unverified.title": "Unverified Roasters",
     "roasters.unverified.description": "Review and verify roasters waiting for approval",
