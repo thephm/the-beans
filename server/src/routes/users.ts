@@ -110,6 +110,32 @@ router.get('/', [
 // ...existing code...
 
 
+// Get user settings
+router.get('/settings', requireAuth, async (req: Request, res: Response) => {
+  const authReq = req as import('../types').AuthenticatedRequest;
+
+  try {
+    const userId = authReq.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { settings: true }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ settings: user.settings || {} });
+  } catch (error) {
+    console.error('Error getting settings:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Update user settings
 router.put('/settings', requireAuth, auditBefore('user', 'UPDATE'), async (req: Request, res: Response) => {
   const authReq = req as import('../types').AuthenticatedRequest;

@@ -26,7 +26,8 @@ export default function SettingsPage() {
     },
     preferences: {
       roastLevel: 'no-preference',
-      distanceUnit: 'km' // 'km' (default) or 'mi'
+      distanceUnit: 'km', // 'km' (default) or 'mi'
+      searchRadius: 25 // Default search radius in km (1-20,037)
     },
     language: user?.language || 'en',
   })
@@ -137,6 +138,47 @@ export default function SettingsPage() {
                       <option value="mi">{t('mi')}</option>
                     </select>
                   </div>
+                </div>
+                {/* Search Radius */}
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('settings.searchRadius')} (km)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20037"
+                    value={settings.preferences.searchRadius}
+                    onChange={e => {
+                      const inputValue = e.target.value
+                      // Allow empty field
+                      if (inputValue === '') {
+                        setSettings(prev => ({
+                          ...prev,
+                          preferences: { ...prev.preferences, searchRadius: '' as any }
+                        }))
+                        return
+                      }
+                      const value = parseInt(inputValue)
+                      if (!isNaN(value) && value >= 1 && value <= 20037) {
+                        setSettings(prev => ({
+                          ...prev,
+                          preferences: { ...prev.preferences, searchRadius: value }
+                        }))
+                      }
+                    }}
+                    onBlur={e => {
+                      // On blur, ensure we have a valid value or reset to default
+                      const value = parseInt(e.target.value)
+                      if (isNaN(value) || value < 1) {
+                        setSettings(prev => ({
+                          ...prev,
+                          preferences: { ...prev.preferences, searchRadius: 25 }
+                        }))
+                      }
+                    }}
+                    className="w-32 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="25"
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('settings.searchRadiusHint', 'Enter a value between 1 and 20,037 km')}</p>
                 </div>
               </div>
               {/* Privacy */}

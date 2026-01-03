@@ -30,12 +30,33 @@ Search for roasters by query string and optional geolocation.
       "longitude": 0,
       "owner": { "id": "string", "username": "string" },
       "reviews": [{ "rating": 0 }],
+      "matchType": "exact",
+      "distance": 5.2,
       ...
     }
   ],
-  "total": 0
+  "exact": [...],
+  "radius": [...],
+  "total": 0,
+  "counts": {
+    "exact": 15,
+    "radius": 35
+  }
 }
 ```
+
+**Progressive Loading:**
+
+When both `latitude`, `longitude`, and `radius` are provided, results are split into two categories:
+
+- **`exact`**: Roasters where the city name matches the search query (returned for immediate display)
+- **`radius`**: Roasters within the radius that don't match the city name exactly (can be loaded progressively)
+- **`roasters`**: Combined array with exact matches first, then radius matches
+- **`matchType`**: Each roaster is tagged with either `'exact'` or `'radius'`
+- **`distance`**: Distance in miles from the search coordinates (when coordinates provided)
+- **`counts`**: Object containing count of exact and radius matches
+
+This enables fast initial rendering of exact city matches followed by progressive loading of nearby results.
 
 ---
 

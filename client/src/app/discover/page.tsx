@@ -32,8 +32,27 @@ export default function DiscoverPage() {
   const [filters, setFilters] = useState({
     search: '',
     location: '',
-    distance: 25
+    distance: 25 // Default, will be overridden by user settings
   })
+
+  // Load user's search radius preference from settings
+  useEffect(() => {
+    const loadUserSearchRadius = async () => {
+      if (user) {
+        try {
+          const data = await apiClient.getUserSettings() as any
+          const userRadius = data?.settings?.preferences?.searchRadius
+          if (userRadius && typeof userRadius === 'number') {
+            setFilters(prev => ({ ...prev, distance: userRadius }))
+          }
+        } catch (error) {
+          console.error('Error loading user search radius:', error)
+          // Continue with default radius
+        }
+      }
+    }
+    loadUserSearchRadius()
+  }, [user])
 
   // Initialize filters from URL parameters
   useEffect(() => {
@@ -58,7 +77,15 @@ export default function DiscoverPage() {
       const searchParams = new URLSearchParams()
       if (filters.search) searchParams.append('q', filters.search)
       if (filters.location) searchParams.append('location', filters.location)
-      searchParams.append('distance', filters.distance.toString())
+      searchParams.append('radius', filters.distance.toString())
+      
+      // Only add coordinates if location is explicitly set (user clicked "use my location")
+      // This prevents automatic filtering by radius on initial page load
+      if (filters.location && userLocation) {
+        searchParams.append('latitude', userLocation.lat.toString())
+        searchParams.append('longitude', userLocation.lng.toString())
+      }
+      
       searchParams.append('page', String(pageToLoad))
       searchParams.append('limit', String(limit))
 

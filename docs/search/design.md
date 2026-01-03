@@ -11,6 +11,9 @@ This document describes the technical design and architecture of the search feat
 ## Backend
 - **API:** Express.js routes in `server/src/routes/search.ts`
 	- `/api/search`: General search by query string and optional geolocation.
+		- **Progressive Loading**: Returns exact city matches separately from radius matches
+		- Exact matches can be displayed immediately while radius results load progressively
+		- Each result tagged with `matchType` ('exact' or 'radius') and optional `distance`
 	- `/api/search/roasters`: Filtered search by specialty, location, and sort options.
 	- Uses Prisma ORM to query the database.
 	- Supports specialty translation (French/English) for internationalization.
