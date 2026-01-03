@@ -504,6 +504,45 @@ router.get('/', [
       prisma.roaster.count({ where: { featured: true, verified: true } })
     ]);
 
+    // Get top countries and cities (only for admin users)
+    let topCountries: Array<{ country: string; count: number }> = [];
+    let topCities: Array<{ city: string; count: number }> = [];
+    
+    if (userRole === 'admin') {
+      console.log('Fetching top countries and cities for admin user');
+      // Get top countries using raw query to avoid TypeScript issues
+      const countryResult: Array<{ country: string; _count: string }> = await prisma.$queryRaw`
+        SELECT country, COUNT(*)::text as "_count"
+        FROM roasters
+        WHERE country IS NOT NULL
+        GROUP BY country
+        ORDER BY COUNT(*) DESC
+        LIMIT 10
+      `;
+      console.log('Country result:', countryResult);
+      topCountries = countryResult.map(r => ({ 
+        country: r.country, 
+        count: parseInt(r._count) 
+      }));
+
+      // Get top cities using raw query
+      const cityResult: Array<{ city: string; _count: string }> = await prisma.$queryRaw`
+        SELECT city, COUNT(*)::text as "_count"
+        FROM roasters
+        WHERE city IS NOT NULL
+        GROUP BY city
+        ORDER BY COUNT(*) DESC
+        LIMIT 10
+      `;
+      console.log('City result:', cityResult);
+      topCities = cityResult.map(r => ({ 
+        city: r.city, 
+        count: parseInt(r._count) 
+      }));
+      console.log('Top countries:', topCountries);
+      console.log('Top cities:', topCities);
+    }
+
     res.json({
       roasters: roastersWithImageUrl,
       pagination: {
@@ -517,7 +556,9 @@ router.get('/', [
         verified: globalVerified,
         unverified: globalUnverified,
         featured: globalFeatured,
-      }
+      },
+      topCountries,
+      topCities
     });
   } catch (error: any) {
     console.error('Get roasters error:', error);
