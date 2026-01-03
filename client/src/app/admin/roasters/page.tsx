@@ -1243,7 +1243,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       const { instagram, tiktok, facebook, linkedin, youtube, threads, pinterest, bluesky, x, reddit, ...payloadData } = formData;
 
       // Clean up empty strings - convert to null to allow clearing optional fields
-      const cleanedPayloadData: typeof payloadData & {
+      const cleanedPayloadData: Omit<typeof payloadData, 'website' | 'email' | 'phone' | 'address' | 'city' | 'state' | 'zipCode' | 'country' | 'description'> & {
         website: string | null;
         email: string | null;
         phone: string | null;
