@@ -329,11 +329,18 @@ export function Navbar() {
                       >
                         {t('adminSection.auditLogs', 'Audit Logs')}
                       </Link>
+                      <Link 
+                        href="/admin/coordinates" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.coordinates', 'Set Lat/Long')}
+                      </Link>
                     </div>
                   )}
                 </div>
               )}
-              {/* Mobile Language Selector */}
+              {/* Mobile Language Selector */}}
               <div className="py-2">
                 <LanguageSelector />
               </div>
