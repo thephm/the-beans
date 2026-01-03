@@ -614,6 +614,58 @@ router.get('/domain-exists', optionalAuth, async (req: any, res: any) => {
 });
 
 /**
+ * Helper function to normalize roaster name for comparison
+ * Removes common company suffixes and coffee-related words, normalizes whitespace
+ */
+function normalizeRoasterName(name: string): string {
+  const normalized = name
+    .toLowerCase()
+    .trim()
+    // Remove common company suffixes (with or without periods)
+    .replace(/\s+(co\.?|ltd\.?|inc\.?|llc|lp|corp\.?)$/i, '')
+    // Remove coffee-related suffixes
+    .replace(/\s+(coffee|roasters?|roasting)$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return normalized;
+}
+
+/**
+ * GET /api/roasters/name-exists
+ * Check whether a roaster exists with a similar name (normalized, case-insensitive).
+ * Query: ?name=Coffee+Roasters+Inc
+ */
+router.get('/name-exists', optionalAuth, async (req: any, res: any) => {
+  try {
+    const name = (req.query.name || '').toString().trim();
+    if (!name) return res.status(400).json({ error: 'Name query parameter is required' });
+
+    // Normalize the input name
+    const normalizedInput = normalizeRoasterName(name);
+
+    // Fetch all roasters and check normalized names
+    const allRoasters = await prisma.roaster.findMany({
+      select: {
+        id: true,
+        name: true,
+        website: true,
+        city: true,
+        state: true,
+        country: true,
+      }
+    });
+
+    // Find matching roaster by normalized name
+    const existing = allRoasters.find(r => normalizeRoasterName(r.name) === normalizedInput);
+
+    res.json({ exists: !!existing, roaster: existing || null });
+  } catch (error) {
+    console.error('Name exists check error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * @swagger
  * /api/roasters/{id}:
  *   get:

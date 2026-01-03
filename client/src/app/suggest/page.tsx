@@ -49,6 +49,39 @@ export default function SuggestRoaster() {
   const [websiteChecking, setWebsiteChecking] = useState(false);
   const [websiteFieldClass, setWebsiteFieldClass] = useState('');
 
+  // State for duplicate roaster name
+  const [nameError, setNameError] = useState('');
+  const [nameChecking, setNameChecking] = useState(false);
+  const [nameFieldClass, setNameFieldClass] = useState('');
+
+  // Check if roaster name already exists (normalized comparison)
+  const checkRoasterName = async (name: string) => {
+    setNameError('');
+    setNameFieldClass('');
+    if (!name.trim()) return;
+    setNameChecking(true);
+    
+    try {
+      const { apiClient } = await import('@/lib/api');
+      const result = await apiClient.checkRoasterName(name);
+      
+      if (result.exists && result.roaster) {
+        const location = [result.roaster.city, result.roaster.state, result.roaster.country]
+          .filter(Boolean)
+          .join(', ');
+        setNameError(
+          t('suggest.errors.duplicateName', 
+            `A roaster with a similar name already exists${location ? ` in ${location}` : ''}`)
+        );
+        setNameFieldClass('border-yellow-500');
+      }
+    } catch (err) {
+      console.error('Name check error:', err);
+    } finally {
+      setNameChecking(false);
+    }
+  };
+
   // Check if URL exists and is not a duplicate
   const checkWebsite = async (website: string) => {
     setWebsiteError('');
@@ -96,6 +129,13 @@ export default function SuggestRoaster() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError('');
+    
+    if (name === 'roasterName') {
+      // Clear name error when typing
+      setNameError('');
+      setNameFieldClass('');
+    }
+    
     if (name === 'website') {
       // Debounce checkWebsite
       setWebsiteError('');
@@ -264,9 +304,24 @@ export default function SuggestRoaster() {
                     name="roasterName"
                     value={formData.roasterName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    onBlur={(e) => {
+                      if (e.target.value.trim()) {
+                        checkRoasterName(e.target.value);
+                      }
+                    }}
+                    className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${nameFieldClass}`}
                     required
                   />
+                  {nameChecking && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {t('suggest.checkingName', 'Checking for duplicates...')}
+                    </p>
+                  )}
+                  {nameError && (
+                    <p className="text-sm text-yellow-600 dark:text-yellow-500 mt-1">
+                      ⚠️ {nameError}
+                    </p>
+                  )}
                 </div>
 
                 <div>
