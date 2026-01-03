@@ -43,6 +43,7 @@ const AdminRoastersPage: React.FC = () => {
   const [cityFilter, setCityFilter] = useState<string>('');
   const [showAllCountries, setShowAllCountries] = useState<boolean>(false);
   const [showAllCities, setShowAllCities] = useState<boolean>(false);
+  const [hasUserSetFilter, setHasUserSetFilter] = useState<boolean>(false);
   // person management state
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [showAddPerson, setShowAddPerson] = useState(false);
@@ -109,13 +110,13 @@ const AdminRoastersPage: React.FC = () => {
 
   // Set Canada as default country filter if available and no filter is set
   useEffect(() => {
-    if (topCountries.length > 0 && !countryFilter && !cityFilter) {
+    if (topCountries.length > 0 && !countryFilter && !cityFilter && !hasUserSetFilter) {
       const canadaEntry = topCountries.find(c => c.country === 'Canada');
       if (canadaEntry) {
         setCountryFilter('Canada');
       }
     }
-  }, [topCountries]);
+  }, [topCountries, hasUserSetFilter]);
 
   // Check for edit query parameter on mount
   useEffect(() => {
@@ -272,6 +273,7 @@ const AdminRoastersPage: React.FC = () => {
                     setCountryFilter('');
                     setCityFilter('');
                     setCurrentPage(1);
+                    setHasUserSetFilter(true);
                   }}
                   className={`p-2 rounded-lg border-2 transition-all ${
                     verifiedFilter === 'all' && featuredFilter === 'all' && !countryFilter && !cityFilter
@@ -291,6 +293,7 @@ const AdminRoastersPage: React.FC = () => {
                     setCountryFilter('');
                     setCityFilter('');
                     setCurrentPage(1);
+                    setHasUserSetFilter(true);
                   }}
                   className={`p-2 rounded-lg border-2 transition-all ${
                     verifiedFilter === 'verified'
@@ -310,6 +313,7 @@ const AdminRoastersPage: React.FC = () => {
                     setCountryFilter('');
                     setCityFilter('');
                     setCurrentPage(1);
+                    setHasUserSetFilter(true);
                   }}
                   className={`p-2 rounded-lg border-2 transition-all ${
                     featuredFilter === 'featured'
@@ -329,6 +333,7 @@ const AdminRoastersPage: React.FC = () => {
                     setCountryFilter('');
                     setCityFilter('');
                     setCurrentPage(1);
+                    setHasUserSetFilter(true);
                   }}
                   className={`p-2 rounded-lg border-2 transition-all ${
                     verifiedFilter === 'unverified'
@@ -343,8 +348,8 @@ const AdminRoastersPage: React.FC = () => {
             </div>
 
             {/* Top Countries */}
-            <div className="hidden md:block p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-3 lg:col-span-2">
-              <div className="flex justify-between items-center mb-1">
+            <div className="hidden md:block p-4 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-3 lg:col-span-2">
+              <div className="flex justify-between items-center mb-3">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCountries', 'Top Countries')}</h3>
                 <div className="flex gap-2">
                   {countryFilter && (
@@ -352,6 +357,7 @@ const AdminRoastersPage: React.FC = () => {
                       onClick={() => {
                         setCountryFilter('');
                         setCurrentPage(1);
+                        setHasUserSetFilter(true);
                       }}
                       className="text-sm text-blue-400 hover:text-blue-300 dark:text-blue-400 dark:hover:text-blue-300"
                     >
@@ -367,7 +373,7 @@ const AdminRoastersPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <div className={`space-y-0.5 ${!showAllCountries ? 'hidden lg:block' : ''}`}>
+              <div className={`space-y-1 ${!showAllCountries ? 'hidden lg:block' : ''}`}>
                 {topCountries.slice(0, 5).map((item) => (
                   <button
                     key={item.country}
@@ -375,8 +381,9 @@ const AdminRoastersPage: React.FC = () => {
                       setCountryFilter(item.country);
                       setCityFilter('');
                       setCurrentPage(1);
+                      setHasUserSetFilter(true);
                     }}
-                    className={`w-full flex justify-between items-center px-2 py-1 rounded text-sm transition-colors ${
+                    className={`w-full flex justify-between items-center px-3 py-2 rounded text-sm transition-colors ${
                       countryFilter === item.country
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/30 dark:text-blue-300'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
@@ -390,8 +397,8 @@ const AdminRoastersPage: React.FC = () => {
             </div>
 
             {/* Top Cities */}
-            <div className="hidden md:block p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-4 lg:col-span-3">
-              <div className="flex justify-between items-center mb-1">
+            <div className="hidden md:block p-4 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-4 lg:col-span-3">
+              <div className="flex justify-between items-center mb-3">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCities', 'Top Cities')}</h3>
                 <div className="flex gap-2">
                   {cityFilter && (
@@ -399,6 +406,7 @@ const AdminRoastersPage: React.FC = () => {
                       onClick={() => {
                         setCityFilter('');
                         setCurrentPage(1);
+                        setHasUserSetFilter(true);
                       }}
                       className="text-sm text-blue-400 hover:text-blue-300 dark:text-blue-400 dark:hover:text-blue-300"
                     >
@@ -414,7 +422,7 @@ const AdminRoastersPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <div className={`space-y-0.5 ${!showAllCities ? 'hidden lg:block' : ''}`}>
+              <div className={`space-y-1 ${!showAllCities ? 'hidden lg:block' : ''}`}>
                 {topCities.slice(0, 5).map((item) => (
                   <button
                     key={item.city}
@@ -422,8 +430,9 @@ const AdminRoastersPage: React.FC = () => {
                       setCityFilter(item.city);
                       setCountryFilter('');
                       setCurrentPage(1);
+                      setHasUserSetFilter(true);
                     }}
-                    className={`w-full flex justify-between items-center px-2 py-1 rounded text-sm transition-colors ${
+                    className={`w-full flex justify-between items-center px-3 py-2 rounded text-sm transition-colors ${
                       cityFilter === item.city
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/30 dark:text-blue-300'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
@@ -793,7 +802,10 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       const fetchRoaster = async () => {
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-          const res = await fetch(`${apiUrl}/api/roasters/${roaster.id}`);
+          const token = localStorage.getItem('token');
+          const res = await fetch(`${apiUrl}/api/roasters/${roaster.id}`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          });
           if (res.ok) {
             const data = await res.json();
             // Extract individual social fields from socialNetworks object for form display
@@ -1197,11 +1209,23 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       // Create payload without individual social fields
       const { instagram, tiktok, facebook, linkedin, youtube, threads, pinterest, bluesky, x, reddit, ...payloadData } = formData;
 
+      // Clean up empty strings - convert to null to allow clearing optional fields
+      const cleanedPayloadData = { ...payloadData };
+      if (cleanedPayloadData.website === '') cleanedPayloadData.website = null;
+      if (cleanedPayloadData.email === '') cleanedPayloadData.email = null;
+      if (cleanedPayloadData.phone === '') cleanedPayloadData.phone = null;
+      if (cleanedPayloadData.address === '') cleanedPayloadData.address = null;
+      if (cleanedPayloadData.city === '') cleanedPayloadData.city = null;
+      if (cleanedPayloadData.state === '') cleanedPayloadData.state = null;
+      if (cleanedPayloadData.zipCode === '') cleanedPayloadData.zipCode = null;
+      if (cleanedPayloadData.country === '') cleanedPayloadData.country = null;
+      if (cleanedPayloadData.description === '') cleanedPayloadData.description = null;
+
       const payload = {
-        ...payloadData,
+        ...cleanedPayloadData,
         hours: convertedHours,
-        latitude: formData.latitude ? parseFloat(String(formData.latitude)) : undefined,
-        longitude: formData.longitude ? parseFloat(String(formData.longitude)) : undefined,
+        latitude: formData.latitude && formData.latitude !== '' ? parseFloat(String(formData.latitude)) : null,
+        longitude: formData.longitude && formData.longitude !== '' ? parseFloat(String(formData.longitude)) : null,
         founded: formData.founded ? parseInt(String(formData.founded)) : undefined,
         rating: parseFloat(String(formData.rating)) || 0,
         specialtyIds: formData.specialtyIds, // Send specialty IDs array directly
@@ -1257,7 +1281,9 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
       // After saving, fetch the updated roaster and update formData
       if (roasterId) {
-        const res = await fetch(`${apiUrl}/api/roasters/${roasterId}`);
+        const res = await fetch(`${apiUrl}/api/roasters/${roasterId}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        });
         if (res.ok) {
           const data = await res.json();
           // Extract individual social fields from socialNetworks object for form display
