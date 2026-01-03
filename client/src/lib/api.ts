@@ -294,6 +294,11 @@ class ApiClient {
     return this.request(`/roasters/domain-exists?${params}`);
   }
 
+  async checkRoasterName(name: string) {
+    const params = new URLSearchParams({ name }).toString();
+    return this.request(`/roasters/name-exists?${params}`);
+  }
+
   async getRoaster(id: string) {
     return this.request(`/roasters/${id}`);
   }
