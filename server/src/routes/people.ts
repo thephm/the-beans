@@ -199,9 +199,14 @@ router.get('/', [
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get all people error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error message:', error?.message);
+    console.error('Error stack:', error?.stack);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      message: process.env.NODE_ENV === 'production' ? 'Failed to fetch people' : error?.message
+    });
   }
 });
 
