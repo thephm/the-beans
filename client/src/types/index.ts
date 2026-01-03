@@ -278,6 +278,7 @@ export interface RoasterPerson {
   email?: string;
   mobile?: string;
   linkedinUrl?: string;
+  instagramUrl?: string;
   bio?: string;
   userId?: string;
   user?: User;

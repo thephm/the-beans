@@ -48,6 +48,7 @@ const AdminRoastersPage: React.FC = () => {
     email: '',
     mobile: '',
     linkedinUrl: '',
+    instagramUrl: '',
     bio: '',
     roles: [] as PersonRole[],
     isPrimary: false
@@ -805,6 +806,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     email: '',
     mobile: '',
     linkedinUrl: '',
+    instagramUrl: '',
     bio: '',
     userId: '',
     roles: [],
@@ -1266,6 +1268,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       email: '',
       mobile: '',
       linkedinUrl: '',
+      instagramUrl: '',
       bio: '',
       roles: [],
       isActive: true,
@@ -1293,6 +1296,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       email: person.email || '',
       mobile: person.mobile || '',
       linkedinUrl: person.linkedinUrl || '',
+      instagramUrl: person.instagramUrl || '',
       bio: person.bio || '',
       roles: person.roles,
       isActive: person.isActive,
@@ -1334,6 +1338,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       const sanitizedData = { ...dataToSave };
   if (sanitizedData.email === '') sanitizedData.email = undefined;
   if (sanitizedData.linkedinUrl === '') sanitizedData.linkedinUrl = undefined;
+  if (sanitizedData.instagramUrl === '') sanitizedData.instagramUrl = undefined;
   if (sanitizedData.mobile === '') sanitizedData.mobile = undefined;
   if (sanitizedData.lastName === '') sanitizedData.lastName = undefined;
   if (sanitizedData.title === '') sanitizedData.title = null;
