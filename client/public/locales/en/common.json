@@ -232,6 +232,8 @@
     "dark": "Dark",
 
     "showOnlyVerified": "Show only verified roasters",
+    "searchRadius": "Default search radius",
+    "searchRadiusHint": "Enter a value between 1 and 20,037 km (max distance around Earth)",
     "save": "Save Settings",
     "saving": "Saving...",
     "saved": "Settings saved successfully!",

@@ -263,6 +263,8 @@
     "dark": "Foncé",
 
     "showOnlyVerified": "Afficher uniquement les torréfacteurs vérifiés",
+    "searchRadius": "Rayon de recherche par défaut",
+    "searchRadiusHint": "Entrez une valeur entre 1 et 20 037 km (distance maximale autour de la Terre)",
     "save": "Enregistrer les paramètres",
     "saving": "Enregistrement en cours...",
     "saved": "Paramètres enregistrés avec succès !",

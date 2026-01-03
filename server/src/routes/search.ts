@@ -78,7 +78,7 @@ router.get('/', [
   query('type').optional().isIn(['roasters']),
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
-  query('radius').optional().isFloat({ min: 1, max: 100 }),
+  query('radius').optional().isFloat({ min: 1, max: 20037 }),
 ], async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
@@ -86,9 +86,17 @@ router.get('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { q, search, type = 'roasters', latitude, longitude, radius = 25 } = req.query;
+    const { q, search, type = 'roasters', latitude, longitude } = req.query;
     // Accept both ?q= and ?search= for search term
     const searchQuery = (typeof q === 'string' && q) || (typeof search === 'string' && search) || '';
+
+    // Get user's preferred search radius from settings, or use provided radius, or default to 25
+    const user = (req as any).user;
+    let defaultRadius = 25;
+    if (user?.settings?.preferences?.searchRadius) {
+      defaultRadius = user.settings.preferences.searchRadius;
+    }
+    const radius = req.query.radius ? parseFloat(req.query.radius as string) : defaultRadius;
 
     // Log the search query to the Search table
     if (searchQuery && searchQuery.trim().length > 0) {
@@ -107,7 +115,6 @@ router.get('/', [
     }
 
     // Check user role for verification filtering
-    const user = (req as any).user;
     let userRole = 'user';
     if (user) {
       const currentUser = await prisma.user.findUnique({
@@ -185,25 +192,53 @@ router.get('/', [
         || (roaster.state && roaster.state.toLowerCase().includes(qLower))
       );
     }
+
+    // Progressive loading: separate exact city matches from radius matches
+    let exactMatches: any[] = [];
+    let radiusMatches: any[] = [];
+
     if (latitude && longitude) {
       const lat = parseFloat(latitude as string);
       const lng = parseFloat(longitude as string);
-      const maxRadius = parseFloat(radius as string);
-      roasters = roasters.filter((roaster: any) => {
-        if (!roaster.latitude || !roaster.longitude) return false;
-        const distance = calculateDistance(
-          lat,
-          lng,
-          roaster.latitude,
-          roaster.longitude
-        );
-        return distance <= maxRadius;
+      const maxRadius = typeof radius === 'number' ? radius : parseFloat(radius as string);
+      const qLower = searchQuery.trim().toLowerCase();
+      
+      roasters.forEach((roaster: any) => {
+        // Check if this is an exact city match
+        const isExactCityMatch = roaster.city && roaster.city.toLowerCase().includes(qLower);
+        
+        // Calculate distance if coordinates exist
+        if (roaster.latitude && roaster.longitude) {
+          const distance = calculateDistance(
+            lat,
+            lng,
+            roaster.latitude,
+            roaster.longitude
+          );
+          
+          if (distance <= maxRadius) {
+            // Add distance info to roaster
+            (roaster as any).distance = distance;
+            
+            // Categorize as exact or radius match
+            if (isExactCityMatch) {
+              exactMatches.push(roaster);
+            } else {
+              radiusMatches.push(roaster);
+            }
+          }
+        } else if (isExactCityMatch) {
+          // Include exact city matches even without coordinates
+          exactMatches.push(roaster);
+        }
       });
+    } else {
+      // No radius filtering, all results are "exact" matches
+      exactMatches = roasters;
     }
 
-    // Add imageUrl field for frontend compatibility
-    const roastersWithImageUrl = roasters.map((roaster: any) => {
-      // Use the primary image from roasterImages if available, fall back to old images array
+    // Helper function to transform roaster data
+    const transformRoaster = (roaster: any, matchType: string) => {
       let imageUrl = null;
       if (roaster.roasterImages && roaster.roasterImages.length > 0) {
         imageUrl = roaster.roasterImages[0].url;
@@ -213,7 +248,6 @@ router.get('/', [
         imageUrl = 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop';
       }
 
-      // Transform roasterSpecialties to simple specialty array for frontend
       const specialties = roaster.roasterSpecialties?.map((rs: any) => ({
         id: rs.specialty.id,
         name: rs.specialty.translations[0]?.name || 'Unknown',
@@ -223,13 +257,25 @@ router.get('/', [
       return {
         ...roaster,
         imageUrl,
-        specialties
+        specialties,
+        matchType, // 'exact' or 'radius'
+        distance: roaster.distance || null
       };
-    });
+    };
+
+    // Transform both sets
+    const exactRoasters = exactMatches.map(r => transformRoaster(r, 'exact'));
+    const radiusRoasters = radiusMatches.map(r => transformRoaster(r, 'radius'));
 
     res.json({
-      roasters: roastersWithImageUrl,
-      total: roastersWithImageUrl.length,
+      roasters: [...exactRoasters, ...radiusRoasters],
+      exact: exactRoasters,
+      radius: radiusRoasters,
+      total: exactRoasters.length + radiusRoasters.length,
+      counts: {
+        exact: exactRoasters.length,
+        radius: radiusRoasters.length
+      }
     });
   } catch (error) {
     console.error('Search error:', error);
@@ -246,7 +292,7 @@ router.get('/roasters', [
   query('sort').optional().isIn(['name', '-name', '-rating', '-reviewCount', 'city']),
   query('latitude').optional().isFloat(),
   query('longitude').optional().isFloat(),
-  query('radius').optional().isFloat({ min: 1, max: 100 }),
+  query('radius').optional().isFloat({ min: 1, max: 20037 }),
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 100 }),
 ], async (req: Request, res: Response) => {
@@ -256,9 +302,18 @@ router.get('/roasters', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { q, specialty, location, sort, latitude, longitude, radius = 25 } = req.query;
+    const { q, specialty, location, sort, latitude, longitude } = req.query;
     const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
     const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
+    
+    // Get user's preferred search radius from settings, or use provided radius, or default to 25
+    const user = (req as any).user;
+    let defaultRadius = 25;
+    if (user?.settings?.preferences?.searchRadius) {
+      defaultRadius = user.settings.preferences.searchRadius;
+    }
+    const radius = req.query.radius ? parseFloat(req.query.radius as string) : defaultRadius;
+    
     let whereClause: any = {};
 
     // Log the search query to the Search table (for popular searches)
@@ -307,7 +362,8 @@ router.get('/roasters', [
       });
     }
     
-    if (location) {
+    // Only add location text filter if no coordinates provided (otherwise we'll do radius filtering)
+    if (location && !(latitude && longitude)) {
       andClauses.push({
         OR: [
           { city: { contains: location as string, mode: 'insensitive' } },
@@ -349,7 +405,6 @@ router.get('/roasters', [
     }
 
     // Check user role for verification filtering
-    const user = (req as any).user;
     let userRole = 'user';
     if (user) {
       const currentUser = await prisma.user.findUnique({
@@ -370,7 +425,7 @@ router.get('/roasters', [
     if (latitude && longitude) {
       const lat = parseFloat(latitude as string);
       const lng = parseFloat(longitude as string);
-      const maxRadius = parseFloat(radius as string);
+      const maxRadius = typeof radius === 'number' ? radius : parseFloat(radius as string);
 
       // Fetch candidates matching textual/location filters
       const candidates = await prisma.roaster.findMany({
@@ -462,7 +517,7 @@ router.get('/roasters', [
 
 // Helper function to calculate distance between two coordinates
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 3959; // Radius of the Earth in miles
+  const R = 6371; // Radius of the Earth in kilometers
   const dLat = deg2rad(lat2 - lat1);
   const dLon = deg2rad(lon2 - lon1);
   const a =
@@ -470,7 +525,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const d = R * c; // Distance in miles
+  const d = R * c; // Distance in kilometers
   return d;
 }
 
