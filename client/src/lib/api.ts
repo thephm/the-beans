@@ -11,7 +11,7 @@ export async function resetPassword(token: string, password: string) {
   }
   return res.json();
 }
-import { CreateRoasterFromSuggestionResponse } from '../types';
+import { CreateRoasterFromSuggestionResponse, RoasterExistsResponse } from '../types';
 
 
 // Determine API base URL with fallback for production
@@ -289,14 +289,14 @@ class ApiClient {
     return this.request(endpoint);
   }
 
-  async checkRoasterDomain(domain: string) {
+  async checkRoasterDomain(domain: string): Promise<RoasterExistsResponse> {
     const params = new URLSearchParams({ domain }).toString();
-    return this.request(`/roasters/domain-exists?${params}`);
+    return this.request(`/roasters/domain-exists?${params}`) as Promise<RoasterExistsResponse>;
   }
 
-  async checkRoasterName(name: string) {
+  async checkRoasterName(name: string): Promise<RoasterExistsResponse> {
     const params = new URLSearchParams({ name }).toString();
-    return this.request(`/roasters/name-exists?${params}`);
+    return this.request(`/roasters/name-exists?${params}`) as Promise<RoasterExistsResponse>;
   }
 
   async getRoaster(id: string) {
