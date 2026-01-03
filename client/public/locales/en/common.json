@@ -303,6 +303,7 @@
     "showMore": "Show More",
     "showLess": "Show Less",
     "more": "more",
+    "less": "Less",
     "selectAll": "Select All",
     "none": "None",
     "all": "All",
@@ -605,7 +606,10 @@
       "searchResults": "Found {{count}} roaster(s)",
       "noRoasters": "No roasters found.",
       "noSearchResults": "No roasters match your search.",
-      "unverified": "Unverified"
+      "unverified": "Unverified",
+      "total": "Total",
+      "topCountries": "Top Countries",
+      "topCities": "Top Cities"
     },
     "specialties": {
       "title": "Specialties",

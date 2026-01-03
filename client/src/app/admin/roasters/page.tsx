@@ -37,6 +37,12 @@ const AdminRoastersPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
   const [globalCounts, setGlobalCounts] = useState<{ all: number; verified: number; unverified: number; featured: number } | null>(null);
+  const [topCountries, setTopCountries] = useState<Array<{ country: string; count: number }>>([]);
+  const [topCities, setTopCities] = useState<Array<{ city: string; count: number }>>([]);
+  const [countryFilter, setCountryFilter] = useState<string>('');
+  const [cityFilter, setCityFilter] = useState<string>('');
+  const [showAllCountries, setShowAllCountries] = useState<boolean>(false);
+  const [showAllCities, setShowAllCities] = useState<boolean>(false);
   // person management state
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [showAddPerson, setShowAddPerson] = useState(false);
@@ -99,7 +105,7 @@ const AdminRoastersPage: React.FC = () => {
   // Fetch roasters when pagination, filters, search, or sorting change
   useEffect(() => {
     fetchRoasters();
-  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, sortConfig]);
+  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, sortConfig, countryFilter, cityFilter]);
 
   // Check for edit query parameter on mount
   useEffect(() => {
@@ -125,10 +131,26 @@ const AdminRoastersPage: React.FC = () => {
       }
 
       const data = await apiClient.getRoasters(params) as any;
-      setRoasters(data.roasters || []);
+      let roastersData = data.roasters || [];
+      
+      // Apply client-side country/city filters
+      if (countryFilter) {
+        roastersData = roastersData.filter((r: Roaster) => r.country === countryFilter);
+      }
+      if (cityFilter) {
+        roastersData = roastersData.filter((r: Roaster) => r.city === cityFilter);
+      }
+      
+      setRoasters(roastersData);
       setTotalPages(data.pagination?.pages || 1);
       if (data.globalCounts) {
         setGlobalCounts(data.globalCounts);
+      }
+      if (data.topCountries) {
+        setTopCountries(data.topCountries);
+      }
+      if (data.topCities) {
+        setTopCities(data.topCities);
       }
     } catch (err: any) {
       console.error('Fetch roasters error:', err);
@@ -219,7 +241,7 @@ const AdminRoastersPage: React.FC = () => {
   } else {
     content = (
       <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
-        <div className="mb-6 max-w-6xl mx-auto flex justify-between items-center">
+        <div className="mb-6 max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roasters')}</h1>
           <button
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
@@ -228,116 +250,222 @@ const AdminRoastersPage: React.FC = () => {
             {t('common.add', 'Add')}
           </button>
         </div>
-        {/* Search bar and Filter Buttons */}
-        <div className="mb-6 max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-3">
-            {/* Search Input */}
-            <div className="flex-1 lg:max-w-md">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
-                  className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                />
-                <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        
+        {/* Scorecard Grid */}
+        <div className="max-w-7xl mx-auto mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-7 lg:grid-cols-7 gap-3 mb-6">
+            {/* Count Cards Column - 2x2 Grid */}
+            <div className="col-span-2 sm:col-span-7 lg:col-span-2">
+              <div className="grid grid-cols-4 sm:grid-cols-2 gap-3 h-full">
+                {/* Total Card */}
+                <button
+                  onClick={() => {
+                    setVerifiedFilter('all');
+                    setFeaturedFilter('all');
+                    setCountryFilter('');
+                    setCityFilter('');
+                    setCurrentPage(1);
+                  }}
+                  className={`p-2 rounded-lg border-2 transition-all ${
+                    verifiedFilter === 'all' && featuredFilter === 'all' && !countryFilter && !cityFilter
+                      ? 'bg-blue-100 border-blue-500 dark:bg-blue-500/20 dark:border-blue-400'
+                      : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-                    aria-label={t('common.clear', 'Clear')}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
+                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.total', 'Total')}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-blue-500 dark:text-blue-300 text-center">{globalCounts?.all || 0}</div>
+                </button>
+
+                {/* Verified Card */}
+                <button
+                  onClick={() => {
+                    setVerifiedFilter('verified');
+                    setFeaturedFilter('all');
+                    setCountryFilter('');
+                    setCityFilter('');
+                    setCurrentPage(1);
+                  }}
+                  className={`p-2 rounded-lg border-2 transition-all ${
+                    verifiedFilter === 'verified'
+                      ? 'bg-green-100 border-green-500 dark:bg-green-500/20 dark:border-green-400'
+                      : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
+                  }`}
+                >
+                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('adminForms.roasters.verified', 'Verified')}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-green-500 dark:text-green-300 text-center">{globalCounts?.verified || 0}</div>
+                </button>
+
+                {/* Featured Card */}
+                <button
+                  onClick={() => {
+                    setFeaturedFilter('featured');
+                    setVerifiedFilter('all');
+                    setCountryFilter('');
+                    setCityFilter('');
+                    setCurrentPage(1);
+                  }}
+                  className={`p-2 rounded-lg border-2 transition-all ${
+                    featuredFilter === 'featured'
+                      ? 'bg-yellow-100 border-yellow-500 dark:bg-yellow-500/20 dark:border-yellow-400'
+                      : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
+                  }`}
+                >
+                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('adminForms.roasters.featured', 'Featured')}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-yellow-500 dark:text-yellow-300 text-center">{globalCounts?.featured || 0}</div>
+                </button>
+
+                {/* Unverified Card */}
+                <button
+                  onClick={() => {
+                    setVerifiedFilter('unverified');
+                    setFeaturedFilter('all');
+                    setCountryFilter('');
+                    setCityFilter('');
+                    setCurrentPage(1);
+                  }}
+                  className={`p-2 rounded-lg border-2 transition-all ${
+                    verifiedFilter === 'unverified'
+                      ? 'bg-orange-100 border-orange-500 dark:bg-orange-500/20 dark:border-orange-400'
+                      : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
+                  }`}
+                >
+                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.unverified', 'Unverified')}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-orange-500 dark:text-orange-300 text-center">{globalCounts?.unverified || 0}</div>
+                </button>
               </div>
             </div>
-            {/* Filter Buttons */}
-            <div className="flex flex-wrap gap-2">
-              {/* Verified Filters */}
-              <button
-                onClick={() => {
-                  setVerifiedFilter('verified');
-                  setFeaturedFilter('all');
-                  setCurrentPage(1);
-                }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                  verifiedFilter === 'verified'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-              >
-                <span>{t('adminForms.roasters.verified', 'Verified')}</span>
-                <span className={`text-xs px-2 py-0.5 rounded ${
-                  verifiedFilter === 'verified' 
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
-                    : 'bg-green-600 text-white'
-                }`}>
-                  {getVerifiedCount('verified')}
-                </span>
-              </button>
-              <button
-                onClick={() => {
-                  setVerifiedFilter('unverified');
-                  setFeaturedFilter('all');
-                  setCurrentPage(1);
-                }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                  verifiedFilter === 'unverified'
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-              >
-                <span>{t('admin.roasters.unverified', 'Unverified')}</span>
-                <span className={`text-xs px-2 py-0.5 rounded ${
-                  verifiedFilter === 'unverified' 
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
-                    : 'bg-orange-600 text-white'
-                }`}>
-                  {getVerifiedCount('unverified')}
-                </span>
-              </button>
-              {/* Featured Filter */}
-              <button
-                onClick={() => {
-                  const newFeatured = featuredFilter === 'featured' ? 'all' : 'featured';
-                  setFeaturedFilter(newFeatured);
-                  if (newFeatured === 'featured') {
-                    setVerifiedFilter('all');
-                  }
-                  setCurrentPage(1);
-                }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                  featuredFilter === 'featured'
-                    ? 'bg-yellow-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-              >
-                <span>{t('adminForms.roasters.featured', 'Featured')}</span>
-                <span className={`text-xs px-2 py-0.5 rounded ${
-                  featuredFilter === 'featured' 
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
-                    : 'bg-yellow-600 text-white'
-                }`}>
-                  {getFeaturedCount('featured')}
-                </span>
-              </button>
+
+            {/* Top Countries */}
+            <div className="p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-3 lg:col-span-2">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCountries', 'Top Countries')}</h3>
+                <div className="flex gap-2">
+                  {countryFilter && (
+                    <button
+                      onClick={() => {
+                        setCountryFilter('');
+                        setCurrentPage(1);
+                      }}
+                      className="text-sm text-blue-400 hover:text-blue-300 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      {t('common.clear', 'Clear')}
+                    </button>
+                  )}
+                  {/* Mobile collapse button */}
+                  <button
+                    onClick={() => setShowAllCountries(!showAllCountries)}
+                    className="lg:hidden text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  >
+                    {showAllCountries ? '▲' : '▼'}
+                  </button>
+                </div>
+              </div>
+              <div className={`space-y-0.5 ${!showAllCountries ? 'hidden lg:block' : ''}`}>
+                {topCountries.slice(0, 5).map((item) => (
+                  <button
+                    key={item.country}
+                    onClick={() => {
+                      setCountryFilter(item.country);
+                      setCityFilter('');
+                      setCurrentPage(1);
+                    }}
+                    className={`w-full flex justify-between items-center px-2 py-1 rounded text-sm transition-colors ${
+                      countryFilter === item.country
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/30 dark:text-blue-300'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
+                    }`}
+                  >
+                    <span>{item.country}</span>
+                    <span className="font-semibold">{item.count}</span>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* Top Cities */}
+            <div className="p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-4 lg:col-span-3">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCities', 'Top Cities')}</h3>
+                <div className="flex gap-2">
+                  {cityFilter && (
+                    <button
+                      onClick={() => {
+                        setCityFilter('');
+                        setCurrentPage(1);
+                      }}
+                      className="text-sm text-blue-400 hover:text-blue-300 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      {t('common.clear', 'Clear')}
+                    </button>
+                  )}
+                  {/* Mobile collapse button */}
+                  <button
+                    onClick={() => setShowAllCities(!showAllCities)}
+                    className="lg:hidden text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  >
+                    {showAllCities ? '▲' : '▼'}
+                  </button>
+                </div>
+              </div>
+              <div className={`space-y-0.5 ${!showAllCities ? 'hidden lg:block' : ''}`}>
+                {topCities.slice(0, 5).map((item) => (
+                  <button
+                    key={item.city}
+                    onClick={() => {
+                      setCityFilter(item.city);
+                      setCountryFilter('');
+                      setCurrentPage(1);
+                    }}
+                    className={`w-full flex justify-between items-center px-2 py-1 rounded text-sm transition-colors ${
+                      cityFilter === item.city
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/30 dark:text-blue-300'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
+                    }`}
+                  >
+                    <span>{item.city}</span>
+                    <span className="font-semibold">{item.count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Search bar */}
+        <div className="mb-6 max-w-7xl mx-auto">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
+              className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+            />
+            <svg
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                aria-label={t('common.clear', 'Clear')}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
           {/* Search Results Count */}
           {searchQuery && (
@@ -346,7 +474,8 @@ const AdminRoastersPage: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="max-w-6xl mx-auto">
+        
+        <div className="max-w-7xl mx-auto">
           {filteredRoasters.length === 0 ? (
             <div className="text-gray-500 dark:text-gray-400 text-center py-12">
               {searchQuery 

@@ -300,6 +300,7 @@
     "showMore": "Afficher plus",
     "showLess": "Afficher moins",
     "more": "plus",
+    "less": "Moins",
     "selectAll": "Tout sélectionner",
     "none": "Aucun",
     "all": "Tout",
@@ -602,7 +603,10 @@
       "searchResults": "{{count}} torréfacteur(s) trouvé(s)",
       "noRoasters": "Aucun torréfacteur trouvé.",
       "noSearchResults": "Aucun torréfacteur ne correspond à votre recherche.",
-      "unverified": "Non vérifié"
+      "unverified": "Non vérifié",
+      "total": "Total",
+      "topCountries": "Pays Principaux",
+      "topCities": "Villes Principales"
     },
     "specialties": {
       "title": "Spécialités",
