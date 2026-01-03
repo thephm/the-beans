@@ -26,15 +26,6 @@ export default function FavouritesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
 
-  // Get user location for distance calculation
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setUserLocation(null)
-      )
-    }
-  }, [])
 
   // Redirect to login if not authenticated
   useEffect(() => {
