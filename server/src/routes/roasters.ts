@@ -221,7 +221,7 @@ router.get('/', [
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
-    const { search, city, state, specialty, latitude, longitude, radius = 50, sort, sortBy, sortOrder, featured, verified, topCitiesCountry } = req.query;
+    const { search, city, state, country, specialty, latitude, longitude, radius = 50, sort, sortBy, sortOrder, featured, verified, topCitiesCountry } = req.query;
 
     // Build orderBy clause based on sortBy/sortOrder or legacy sort parameter
     let orderBy: any[] = [];
@@ -345,11 +345,15 @@ router.get('/', [
     }
     
     if (city) {
-      where.city = { contains: city, mode: 'insensitive' };
+      where.city = { equals: city, mode: 'insensitive' };
     }
     
     if (state) {
       where.state = { contains: state, mode: 'insensitive' };
+    }
+    
+    if (country) {
+      where.country = { equals: country, mode: 'insensitive' };
     }
     
     if (specialty) {

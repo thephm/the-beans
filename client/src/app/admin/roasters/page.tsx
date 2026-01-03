@@ -107,6 +107,16 @@ const AdminRoastersPage: React.FC = () => {
     fetchRoasters();
   }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, sortConfig, countryFilter, cityFilter]);
 
+  // Set Canada as default country filter if available and no filter is set
+  useEffect(() => {
+    if (topCountries.length > 0 && !countryFilter && !cityFilter) {
+      const canadaEntry = topCountries.find(c => c.country === 'Canada');
+      if (canadaEntry) {
+        setCountryFilter('Canada');
+      }
+    }
+  }, [topCountries]);
+
   // Check for edit query parameter on mount
   useEffect(() => {
     const editId = searchParams?.get('edit');
@@ -123,7 +133,11 @@ const AdminRoastersPage: React.FC = () => {
       if (searchQuery && searchQuery.trim()) params.search = searchQuery.trim();
       if (featuredFilter === 'featured') params.featured = 'true';
       if (verifiedFilter === 'verified') params.verified = 'true';
-      if (countryFilter) params.topCitiesCountry = countryFilter;
+      if (countryFilter) {
+        params.country = countryFilter;
+        params.topCitiesCountry = countryFilter; // Still needed for city list
+      }
+      if (cityFilter) params.city = cityFilter;
       if (verifiedFilter === 'unverified') params.verified = 'false';
       // Add sorting if configured
       if (sortConfig) {
@@ -132,15 +146,7 @@ const AdminRoastersPage: React.FC = () => {
       }
 
       const data = await apiClient.getRoasters(params) as any;
-      let roastersData = data.roasters || [];
-      
-      // Apply client-side country/city filters
-      if (countryFilter) {
-        roastersData = roastersData.filter((r: Roaster) => r.country === countryFilter);
-      }
-      if (cityFilter) {
-        roastersData = roastersData.filter((r: Roaster) => r.city === cityFilter);
-      }
+      const roastersData = data.roasters || [];
       
       setRoasters(roastersData);
       setTotalPages(data.pagination?.pages || 1);
