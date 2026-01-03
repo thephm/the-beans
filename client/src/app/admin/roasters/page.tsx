@@ -123,6 +123,7 @@ const AdminRoastersPage: React.FC = () => {
       if (searchQuery && searchQuery.trim()) params.search = searchQuery.trim();
       if (featuredFilter === 'featured') params.featured = 'true';
       if (verifiedFilter === 'verified') params.verified = 'true';
+      if (countryFilter) params.topCitiesCountry = countryFilter;
       if (verifiedFilter === 'unverified') params.verified = 'false';
       // Add sorting if configured
       if (sortConfig) {
@@ -375,7 +376,7 @@ const AdminRoastersPage: React.FC = () => {
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
                     }`}
                   >
-                    <span>{item.country}</span>
+                    <span>{item.country || '(blank)'}</span>
                     <span className="font-semibold">{item.count}</span>
                   </button>
                 ))}
@@ -422,7 +423,7 @@ const AdminRoastersPage: React.FC = () => {
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
                     }`}
                   >
-                    <span>{item.city}</span>
+                    <span>{item.city || '(blank)'}</span>
                     <span className="font-semibold">{item.count}</span>
                   </button>
                 ))}
