@@ -54,7 +54,7 @@ const AdminSuggestionsPage: React.FC = () => {
       
       // Redirect to 404 if unauthorized
       if (res.status === 403 || res.status === 401) {
-        window.location.href = '/not-found';
+        window.location.href = '/';
         return;
       }
       

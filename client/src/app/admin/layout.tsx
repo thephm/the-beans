@@ -16,9 +16,9 @@ export default function AdminLayout({
     // Wait for auth to load
     if (loading) return;
     
-    // Redirect non-admin users to 404
+    // Redirect non-admin users to home page
     if (!user || user.role !== 'admin') {
-      router.replace('/not-found');
+      router.replace('/');
     }
   }, [user, loading, router]);
 
