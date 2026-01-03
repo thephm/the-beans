@@ -134,27 +134,28 @@ model Roaster {
   }
 
 model RoasterPerson {
-  id          String   @id @default(cuid())
-  roasterId   String
-  firstName   String
-  lastName    String?
-  email       String?
-  mobile      String?
-  linkedinUrl String?
-  bio         String?
-  userId      String?
-  roles       String[]
-  isActive    Boolean  @default(true)
-  isPrimary   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdById String?
-  updatedById String?
-  title       String?
-  createdBy   User?    @relation("PersonCreatedBy", fields: [createdById], references: [id])
-  roaster     Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
-  updatedBy   User?    @relation("PersonUpdatedBy", fields: [updatedById], references: [id])
-  user        User?    @relation("UserPersonRole", fields: [userId], references: [id])
+  id           String   @id @default(cuid())
+  roasterId    String
+  firstName    String
+  lastName     String?
+  email        String?
+  mobile       String?
+  linkedinUrl  String?
+  instagramUrl String?
+  bio          String?
+  userId       String?
+  roles        String[]
+  isActive     Boolean  @default(true)
+  isPrimary    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdById  String?
+  updatedById  String?
+  title        String?
+  createdBy    User?    @relation("PersonCreatedBy", fields: [createdById], references: [id])
+  roaster      Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+  updatedBy    User?    @relation("PersonUpdatedBy", fields: [updatedById], references: [id])
+  user         User?    @relation("UserPersonRole", fields: [userId], references: [id])
 
   @@unique([roasterId, email])
   @@map("roaster_people")

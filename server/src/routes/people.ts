@@ -400,6 +400,7 @@ router.post('/', [
   const email = req.body.email;
   const mobile = req.body.mobile;
   const linkedinUrl = req.body.linkedinUrl;
+  const instagramUrl = req.body.instagramUrl;
   const bio = req.body.bio;
   const roles = req.body.roles;
   const isPrimary = req.body.isPrimary;
@@ -459,6 +460,7 @@ router.post('/', [
         email: normalizedEmail,
         mobile,
         linkedinUrl,
+        instagramUrl,
         bio,
         roles,
         isPrimary: isPrimary || false,
@@ -526,6 +528,7 @@ router.put('/:id', [
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
   body('linkedinUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid LinkedIn URL'),
+  body('instagramUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid Instagram URL'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
@@ -547,6 +550,7 @@ router.put('/:id', [
   const email = req.body.email;
   const mobile = req.body.mobile;
   const linkedinUrl = req.body.linkedinUrl;
+  const instagramUrl = req.body.instagramUrl;
   const bio = req.body.bio;
   const roles = req.body.roles;
   const isPrimary = req.body.isPrimary;
@@ -651,6 +655,7 @@ router.put('/:id', [
         ...(email !== undefined && { email: normalizedEmail }),
         ...(mobile !== undefined && { mobile }),
         ...(linkedinUrl !== undefined && { linkedinUrl }),
+        ...(instagramUrl !== undefined && { instagramUrl }),
         ...(bio !== undefined && { bio }),
         ...(roles !== undefined && { roles }),
         ...(isPrimary !== undefined && { isPrimary }),
