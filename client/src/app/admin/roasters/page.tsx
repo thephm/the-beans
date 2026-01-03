@@ -279,7 +279,7 @@ const AdminRoastersPage: React.FC = () => {
                       : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
                   }`}
                 >
-                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.total', 'Total')}</div>
+                  <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.all', 'All')}</div>
                   <div className="text-xl sm:text-2xl font-bold text-blue-500 dark:text-blue-300 text-center">{globalCounts?.all || 0}</div>
                 </button>
 
@@ -298,7 +298,7 @@ const AdminRoastersPage: React.FC = () => {
                       : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
                   }`}
                 >
-                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('adminForms.roasters.verified', 'Verified')}</div>
+                  <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('adminForms.roasters.verified', 'Verified')}</div>
                   <div className="text-xl sm:text-2xl font-bold text-green-500 dark:text-green-300 text-center">{globalCounts?.verified || 0}</div>
                 </button>
 
@@ -317,7 +317,7 @@ const AdminRoastersPage: React.FC = () => {
                       : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
                   }`}
                 >
-                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('adminForms.roasters.featured', 'Featured')}</div>
+                  <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('adminForms.roasters.featured', 'Featured')}</div>
                   <div className="text-xl sm:text-2xl font-bold text-yellow-500 dark:text-yellow-300 text-center">{globalCounts?.featured || 0}</div>
                 </button>
 
@@ -336,14 +336,14 @@ const AdminRoastersPage: React.FC = () => {
                       : 'bg-white border-gray-300 hover:border-gray-400 dark:bg-gray-800/30 dark:border-gray-700 dark:hover:border-gray-600'
                   }`}
                 >
-                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.unverified', 'Unverified')}</div>
+                  <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.unverified', 'Unverified')}</div>
                   <div className="text-xl sm:text-2xl font-bold text-orange-500 dark:text-orange-300 text-center">{globalCounts?.unverified || 0}</div>
                 </button>
               </div>
             </div>
 
             {/* Top Countries */}
-            <div className="p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-3 lg:col-span-2">
+            <div className="hidden md:block p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-3 lg:col-span-2">
               <div className="flex justify-between items-center mb-1">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCountries', 'Top Countries')}</h3>
                 <div className="flex gap-2">
@@ -390,7 +390,7 @@ const AdminRoastersPage: React.FC = () => {
             </div>
 
             {/* Top Cities */}
-            <div className="p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-4 lg:col-span-3">
+            <div className="hidden md:block p-2 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-4 lg:col-span-3">
               <div className="flex justify-between items-center mb-1">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCities', 'Top Cities')}</h3>
                 <div className="flex gap-2">
