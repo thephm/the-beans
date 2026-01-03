@@ -136,12 +136,30 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 }));
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
+app.get('/health', async (req: Request, res: Response) => {
+  try {
+    // Import prisma client
+    const { prisma } = await import('./lib/prisma');
+    
+    // Test database connection
+    await prisma.$queryRaw`SELECT 1`;
+    
+    res.status(200).json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'connected',
+    });
+  } catch (error: any) {
+    console.error('Health check failed:', error);
+    res.status(503).json({
+      status: 'ERROR',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'disconnected',
+      error: error?.message || 'Unknown error',
+    });
+  }
 });
 
 
