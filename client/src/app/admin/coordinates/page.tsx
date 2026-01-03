@@ -149,7 +149,7 @@ const AdminCoordinatesPage: React.FC = () => {
         addressVariations.push(`${currentRoaster.city}, ${currentRoaster.country}`);
       }
       
-      let location = null;
+      let location: { lat: string; lon: string } | null = null;
       let lastError = null;
       
       // Try each address variation
@@ -430,8 +430,8 @@ const AdminCoordinatesPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
-                <div className="flex gap-3 items-end">
+              <div className="flex items-end justify-between gap-3 mb-4">
+                <div className="flex gap-3 items-end flex-shrink-0">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t('admin.coordinates.latitude', 'Latitude')}
@@ -470,7 +470,7 @@ const AdminCoordinatesPage: React.FC = () => {
                 </div>
 
                 {!isCalculating && calculatedLat && calculatedLng && (
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 flex-shrink-0">
                     <a
                       href={getGoogleMapsUrl()}
                       target="_blank"
