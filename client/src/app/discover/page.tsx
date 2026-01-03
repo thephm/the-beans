@@ -16,15 +16,7 @@ export default function DiscoverPage() {
   const searchParams = useSearchParams()
   const [roasters, setRoasters] = useState<Roaster[]>([])
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
-  // Get user location for distance calculation
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setUserLocation(null)
-      )
-    }
-  }, [])
+
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)

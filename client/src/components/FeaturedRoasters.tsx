@@ -34,15 +34,6 @@ export function FeaturedRoasters() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
   const router = useRouter();
 
-  // Get user location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setUserLocation(null)
-      )
-    }
-  }, [])
 
   useEffect(() => {
     fetchFeaturedRoasters()
