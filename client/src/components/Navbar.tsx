@@ -340,7 +340,7 @@ export function Navbar() {
                   )}
                 </div>
               )}
-              {/* Mobile Language Selector */}}
+              {/* Mobile Language Selector */}
               <div className="py-2">
                 <LanguageSelector />
               </div>
