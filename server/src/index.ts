@@ -47,6 +47,10 @@ dotenv.config();
 const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
+// Trust proxy - Required when behind Render's load balancer or any reverse proxy
+// This allows express-rate-limit and other middleware to correctly identify client IPs
+app.set('trust proxy', true);
+
 // Rate limiting - More reasonable limits for development and normal usage
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
