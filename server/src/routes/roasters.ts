@@ -221,7 +221,7 @@ router.get('/', [
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
-    const { search, city, state, specialty, latitude, longitude, radius = 50, sort, sortBy, sortOrder, featured, verified } = req.query;
+    const { search, city, state, specialty, latitude, longitude, radius = 50, sort, sortBy, sortOrder, featured, verified, topCitiesCountry } = req.query;
 
     // Build orderBy clause based on sortBy/sortOrder or legacy sort parameter
     let orderBy: any[] = [];
@@ -525,15 +525,24 @@ router.get('/', [
         count: parseInt(r._count) 
       }));
 
-      // Get top cities using raw query
-      const cityResult: Array<{ city: string; _count: string }> = await prisma.$queryRaw`
-        SELECT city, COUNT(*)::text as "_count"
-        FROM roasters
-        WHERE city IS NOT NULL
-        GROUP BY city
-        ORDER BY COUNT(*) DESC
-        LIMIT 10
-      `;
+      // Get top cities using raw query (optionally filtered by country)
+      const cityResult: Array<{ city: string; _count: string }> = topCitiesCountry
+        ? await prisma.$queryRaw`
+            SELECT city, COUNT(*)::text as "_count"
+            FROM roasters
+            WHERE city IS NOT NULL AND country = ${topCitiesCountry}
+            GROUP BY city
+            ORDER BY COUNT(*) DESC
+            LIMIT 10
+          `
+        : await prisma.$queryRaw`
+            SELECT city, COUNT(*)::text as "_count"
+            FROM roasters
+            WHERE city IS NOT NULL
+            GROUP BY city
+            ORDER BY COUNT(*) DESC
+            LIMIT 10
+          `;
       console.log('City result:', cityResult);
       topCities = cityResult.map(r => ({ 
         city: r.city, 
