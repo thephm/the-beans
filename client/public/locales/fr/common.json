@@ -820,6 +820,14 @@
       "addImageUrl": "Ajouter une URL d'image..."
     }
   },
+  "admin": {
+    "roasters": {
+      "all": "Tous",
+      "unverified": "Non vérifiés",
+      "topCountries": "Principaux Pays",
+      "topCities": "Principales Villes"
+    }
+  },
   "adminSection": {
     "users": "Utilisateurs",
     "analytics": "Statistiques",

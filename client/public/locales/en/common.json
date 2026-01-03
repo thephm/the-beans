@@ -819,6 +819,14 @@
       "addImageUrl": "Add image URL..."
     }
   },
+  "admin": {
+    "roasters": {
+      "all": "All",
+      "unverified": "Unverified",
+      "topCountries": "Top Countries",
+      "topCities": "Top Cities"
+    }
+  },
   "adminSection": {
   "users": "Users",
   "analytics": "Analytics",
