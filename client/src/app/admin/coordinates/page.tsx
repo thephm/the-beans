@@ -108,7 +108,7 @@ const AdminCoordinatesPage: React.FC = () => {
     
     try {
       // Try multiple address variations for better geocoding results
-      const addressVariations = [];
+      const addressVariations: string[] = [];
       
       // Roaster name + full address (best option)
       addressVariations.push(`${currentRoaster.name}, ${buildAddress(currentRoaster)}`);
