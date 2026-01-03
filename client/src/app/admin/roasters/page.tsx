@@ -755,7 +755,40 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     fetchCountries();
   }, []);
   // Note: People are fetched by the loadPeople useEffect below (line ~760)
-  const [formData, setFormData] = useState({
+  type RoasterFormData = {
+    name: string;
+    description: string;
+    email: string;
+    phone: string;
+    website: string;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    latitude: string;
+    longitude: string;
+    founded: string;
+    specialtyIds: string[];
+    verified: boolean;
+    featured: boolean;
+    rating: number;
+    onlineOnly: boolean;
+    showHours: boolean;
+    hours: any;
+    images: string[];
+    instagram: string;
+    tiktok: string;
+    facebook: string;
+    linkedin: string;
+    youtube: string;
+    threads: string;
+    pinterest: string;
+    bluesky: string;
+    x: string;
+    reddit: string;
+  };
+  const [formData, setFormData] = useState<RoasterFormData>({
     name: roaster?.name || '',
     description: roaster?.description || '',
     email: roaster?.email || '',
@@ -766,15 +799,15 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     state: roaster?.state || '',
     zipCode: roaster?.zipCode || '',
     country: roaster?.country || '',
-    latitude: roaster?.latitude || '',
-    longitude: roaster?.longitude || '',
-    founded: roaster?.founded || '',
+    latitude: roaster?.latitude?.toString() || '',
+    longitude: roaster?.longitude?.toString() || '',
+    founded: roaster?.founded?.toString() || '',
     specialtyIds: roaster?.specialties?.map(s => s.id) || [],
     verified: roaster?.verified || false,
     featured: roaster?.featured || false,
     rating: roaster?.rating || 0,
     onlineOnly: roaster?.onlineOnly || false,
-      showHours: roaster?.showHours !== undefined ? roaster.showHours : false,
+    showHours: roaster?.showHours !== undefined ? roaster.showHours : false,
     hours: roaster?.hours || {
       monday: { open: '08:00', close: '18:00', closed: false },
       tuesday: { open: '08:00', close: '18:00', closed: false },
@@ -1210,7 +1243,17 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       const { instagram, tiktok, facebook, linkedin, youtube, threads, pinterest, bluesky, x, reddit, ...payloadData } = formData;
 
       // Clean up empty strings - convert to null to allow clearing optional fields
-      const cleanedPayloadData = { ...payloadData };
+      const cleanedPayloadData: typeof payloadData & {
+        website: string | null;
+        email: string | null;
+        phone: string | null;
+        address: string | null;
+        city: string | null;
+        state: string | null;
+        zipCode: string | null;
+        country: string | null;
+        description: string | null;
+      } = { ...payloadData };
       if (cleanedPayloadData.website === '') cleanedPayloadData.website = null;
       if (cleanedPayloadData.email === '') cleanedPayloadData.email = null;
       if (cleanedPayloadData.phone === '') cleanedPayloadData.phone = null;
