@@ -32,7 +32,7 @@ export default function SuggestRoaster() {
     }
   }, [user]);
 
-  const roles = ['customer', 'rando', 'scout', 'owner', 'admin', 'marketing'];
+  const roles = ['customer', 'rando', 'scout', 'owner', 'marketing', 'employee', 'roaster'];
 
   // Helper to extract domain from URL
   function extractDomain(url: string) {
@@ -355,7 +355,7 @@ export default function SuggestRoaster() {
                   >
                     {roles.map((role) => (
                       <option key={role} value={role}>
-                        {t(`roleButtons.${role}`, role.charAt(0).toUpperCase() + role.slice(1))}
+                        {t(`admin.people.role${role.charAt(0).toUpperCase() + role.slice(1)}`, role.charAt(0).toUpperCase() + role.slice(1))}
                       </option>
                     ))}
                   </select>
