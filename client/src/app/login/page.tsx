@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
+import { trackAnalytics } from '@/lib/analytics'
 import { Email, VpnKey } from '@mui/icons-material'
 
 export default function LoginPage() {
@@ -27,6 +28,7 @@ export default function LoginPage() {
     try {
       const data = await apiClient.login(formData) as { token: string; user: any }
       login(data.token, data.user)
+      trackAnalytics('login', { email: formData.email })
       router.push('/discover')
     } catch (error: any) {
       if (error.message && error.message.toLowerCase().includes('deprecated')) {

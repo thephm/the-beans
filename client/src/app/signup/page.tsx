@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
+import { trackAnalytics } from '@/lib/analytics'
 
 export default function SignupPage() {
   const { t } = useTranslation()
@@ -38,6 +39,7 @@ export default function SignupPage() {
       }
       
       const data = await apiClient.register(userData)
+      trackAnalytics('signup', { email: formData.email })
       router.push('/')
     } catch (error: any) {
       setError(error.message || 'Registration failed')

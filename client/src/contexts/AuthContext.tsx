@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { apiClient } from '@/lib/api'
+import { trackAnalytics } from '@/lib/analytics'
 
 interface User {
   id: string
@@ -69,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
+    trackAnalytics('logout', { userId: user?.id })
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
