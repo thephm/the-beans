@@ -110,6 +110,7 @@ const EditPersonPage: React.FC = () => {
               email: updatedPerson.email,
               mobile: updatedPerson.mobile,
               linkedinUrl: updatedPerson.linkedinUrl,
+              instagramUrl: updatedPerson.instagramUrl,
               bio: updatedPerson.bio,
               roasterId: association.roasterId,
               roles: association.roles,
