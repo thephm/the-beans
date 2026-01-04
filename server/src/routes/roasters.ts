@@ -300,14 +300,10 @@ router.get('/', [
       }
     }
     
-    console.log('GET /api/roasters - userId:', req.userId, 'userRole:', userRole);
-    
     // Only show verified roasters to non-admin users by default
     if (userRole !== 'admin') {
       where.verified = true;
-      console.log('Non-admin user, filtering to verified roasters only');
     } else {
-      console.log('Admin user, showing all roasters (verified and unverified)');
       // Allow admin to filter by verified/unverified via query param
       if (verified === 'true' || verified === '1') {
         where.verified = true;
@@ -513,7 +509,6 @@ router.get('/', [
     let topCities: Array<{ city: string; count: number }> = [];
     
     if (userRole === 'admin') {
-      console.log('Fetching top countries and cities for admin user');
       // Get top countries using raw query to avoid TypeScript issues
       const countryResult: Array<{ country: string; _count: string }> = await prisma.$queryRaw`
         SELECT country, COUNT(*)::text as "_count"
@@ -523,7 +518,6 @@ router.get('/', [
         ORDER BY COUNT(*) DESC
         LIMIT 10
       `;
-      console.log('Country result:', countryResult);
       topCountries = countryResult.map(r => ({ 
         country: r.country, 
         count: parseInt(r._count) 
@@ -547,13 +541,10 @@ router.get('/', [
             ORDER BY COUNT(*) DESC
             LIMIT 10
           `;
-      console.log('City result:', cityResult);
       topCities = cityResult.map(r => ({ 
         city: r.city, 
         count: parseInt(r._count) 
       }));
-      console.log('Top countries:', topCountries);
-      console.log('Top cities:', topCities);
     }
 
     res.json({
@@ -885,9 +876,11 @@ router.post('/', [
   body('city').optional().isLength({ max: 100 }).withMessage('City must be less than 100 characters'),
   body('state').optional().isLength({ max: 50 }).withMessage('State must be less than 50 characters'),
   body('zipCode').optional().isLength({ max: 20 }).withMessage('Zip code must be less than 20 characters'),
-  body('latitude').optional().isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
-  body('longitude').optional().isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
+  body('latitude').optional({ nullable: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
+  body('longitude').optional({ nullable: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
+  body('verified').optional().toBoolean(),
+  body('featured').optional().toBoolean(),
   // New nested owner contact validation
   body('ownerContact.email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   body('ownerContact.name').optional().isLength({ max: 100 }).withMessage('Owner name must be less than 100 characters'),
@@ -955,7 +948,8 @@ router.post('/', [
       sourceType: req.body.sourceType,
       sourceDetails: req.body.sourceDetails,
       socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined,
-      verified: false, // Always set verified to false by default
+      // Allow admin to set verified flag, otherwise default to false
+      verified: isAdmin && req.body.verified === true ? true : false,
     };
     // Normalize `hours` field: if client sent a stringified JSON, parse it
     if (roasterData.hours && typeof roasterData.hours === 'string') {
@@ -1158,8 +1152,8 @@ router.put('/:id', [
   body('latitude').optional({ nullable: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
   body('longitude').optional({ nullable: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
-  body('verified').optional().isBoolean().withMessage('Verified must be true or false'),
-  body('featured').optional().isBoolean().withMessage('Featured must be true or false'),
+  body('verified').optional().toBoolean(),
+  body('featured').optional().toBoolean(),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
   body('ownerEmail').optional({ nullable: true, checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   

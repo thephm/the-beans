@@ -150,8 +150,8 @@ const AdminUsersPage: React.FC = () => {
         {/* Results Count */}
         <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           {filteredUsers.length === users.length 
-            ? t('admin.users.total', { count: users.length })
-            : t('admin.users.filtered', { filteredCount: filteredUsers.length, totalCount: users.length })
+            ? t('admin.users.total', { count: users.length, defaultValue: '{{count}} users total' })
+            : t('admin.users.filtered', { filteredCount: filteredUsers.length, totalCount: users.length, defaultValue: '{{filteredCount}} of {{totalCount}} users' })
           }
         </div>
       </div>
