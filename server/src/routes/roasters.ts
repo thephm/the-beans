@@ -1068,8 +1068,22 @@ router.post('/', [
       message: 'Roaster created successfully',
       roaster,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create roaster error:', error);
+    
+    // Handle Prisma unique constraint violation (P2002)
+    if (error.code === 'P2002') {
+      const target = error.meta?.target;
+      if (target && target.includes('name')) {
+        return res.status(409).json({ 
+          error: 'A roaster with this name already exists. Please use a different name.' 
+        });
+      }
+      return res.status(409).json({ 
+        error: 'This roaster already exists. Please check for duplicates.' 
+      });
+    }
+    
     res.status(500).json({ error: 'Internal server error' });
   }
 }, auditAfter());
@@ -1395,6 +1409,18 @@ router.put('/:id', [
     console.error('Update roaster error:', error);
     if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Roaster not found' });
+    }
+    // Handle Prisma unique constraint violation (P2002)
+    if (error.code === 'P2002') {
+      const target = error.meta?.target;
+      if (target && target.includes('name')) {
+        return res.status(409).json({ 
+          error: 'A roaster with this name already exists. Please use a different name.' 
+        });
+      }
+      return res.status(409).json({ 
+        error: 'This update would create a duplicate entry.' 
+      });
     }
     res.status(500).json({ error: 'Internal server error' });
   }
