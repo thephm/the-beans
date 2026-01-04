@@ -392,7 +392,7 @@ const AdminCoordinatesPage: React.FC = () => {
           </div>
 
           {currentRoaster && (
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                 {currentRoaster.name}
@@ -404,13 +404,13 @@ const AdminCoordinatesPage: React.FC = () => {
               </h2>
 
               <div className="mb-6">
-                <div className="flex items-start gap-3">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    {t('admin.coordinates.address', 'Address')}:
-                  </h3>
-                  <p className="text-gray-900 dark:text-white">
-                    {buildAddress(currentRoaster)}
-                  </p>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  {t('admin.coordinates.address', 'Address')}:
+                </h3>
+                <p className="text-gray-900 dark:text-white mb-3">
+                  {buildAddress(currentRoaster)}
+                </p>
+                <div className="flex items-start gap-3 flex-wrap">
                   <a
                     href={getGoogleMapsSearchUrl()}
                     target="_blank"
@@ -430,36 +430,38 @@ const AdminCoordinatesPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-end justify-between gap-3 mb-4">
-                <div className="flex gap-3 items-end flex-shrink-0">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t('admin.coordinates.latitude', 'Latitude')}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      value={calculatedLat}
-                      onChange={(e) => setCalculatedLat(e.target.value)}
-                      className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="40.712776"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t('admin.coordinates.longitude', 'Longitude')}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      value={calculatedLng}
-                      onChange={(e) => setCalculatedLng(e.target.value)}
-                      className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="-74.005974"
-                    />
+              <div className="space-y-4 mb-4">
+                <div>
+                  <div className="flex gap-3 items-end flex-wrap">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {t('admin.coordinates.latitude', 'Latitude')}
+                      </label>
+                      <input
+                        type="number"
+                        step="0.000001"
+                        value={calculatedLat}
+                        onChange={(e) => setCalculatedLat(e.target.value)}
+                        className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="40.712776"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {t('admin.coordinates.longitude', 'Longitude')}
+                      </label>
+                      <input
+                        type="number"
+                        step="0.000001"
+                        value={calculatedLng}
+                        onChange={(e) => setCalculatedLng(e.target.value)}
+                        className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="-74.005974"
+                      />
+                    </div>
                   </div>
                   {isCalculating && (
-                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 pb-2">
+                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mt-3">
                       <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -470,19 +472,19 @@ const AdminCoordinatesPage: React.FC = () => {
                 </div>
 
                 {!isCalculating && calculatedLat && calculatedLng && (
-                  <div className="flex gap-3 flex-shrink-0">
+                  <div className="flex gap-3 flex-wrap">
                     <a
                       href={getGoogleMapsUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+                      className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 whitespace-nowrap"
                     >
                       {t('admin.coordinates.test', 'Test')} ↗
                     </a>
                     <button
                       onClick={handleSetCoordinates}
                       disabled={isSaving}
-                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold whitespace-nowrap"
                     >
                       {isSaving 
                         ? t('admin.coordinates.saving', 'Saving...') 
@@ -490,7 +492,7 @@ const AdminCoordinatesPage: React.FC = () => {
                     </button>
                     <button
                       onClick={skipCurrent}
-                      className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
+                      className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 whitespace-nowrap"
                     >
                       {t('admin.coordinates.skip', 'Skip')}
                     </button>
@@ -516,6 +518,34 @@ const AdminCoordinatesPage: React.FC = () => {
                 </div>
               )}
 
+              {/* Map iframe panel - appears here on mobile, before workflow */}
+              <div className="lg:hidden w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {t('admin.coordinates.test', 'Test')} Map
+                  </h3>
+                </div>
+                {calculatedLat && calculatedLng ? (
+                  <>
+                    <iframe
+                      src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(calculatedLng)-0.01}%2C${parseFloat(calculatedLat)-0.01}%2C${parseFloat(calculatedLng)+0.01}%2C${parseFloat(calculatedLat)+0.01}&layer=mapnik&marker=${calculatedLat}%2C${calculatedLng}`}
+                      className="w-full h-[400px] border-0 rounded"
+                      title="OpenStreetMap"
+                      loading="lazy"
+                    />
+                    <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      <a href={`https://www.openstreetmap.org/?mlat=${calculatedLat}&mlon=${calculatedLng}#map=16/${calculatedLat}/${calculatedLng}`} target="_blank" rel="noopener noreferrer" className="underline">
+                        {t('admin.coordinates.openInOsm', 'View on OpenStreetMap')}
+                      </a>
+                    </div>
+                  </>
+                ) : (
+                  <div className="h-[400px] flex items-center justify-center text-gray-400 text-lg">
+                    {t('admin.coordinates.noCoords', 'Enter coordinates to preview map.')}
+                  </div>
+                )}
+              </div>
+
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
                 <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
                   {t('admin.coordinates.workflow', 'Workflow:')}
@@ -534,8 +564,8 @@ const AdminCoordinatesPage: React.FC = () => {
               </div>
               </div>
 
-              {/* Map iframe panel */}
-              <div className="w-full lg:w-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+              {/* Map iframe panel - appears on right on desktop */}
+              <div className="hidden lg:block w-full lg:w-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {t('admin.coordinates.test', 'Test')} Map
