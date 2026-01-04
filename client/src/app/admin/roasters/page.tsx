@@ -31,7 +31,7 @@ const AdminRoastersPage: React.FC = () => {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('unverified');
+  const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('all');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -107,16 +107,6 @@ const AdminRoastersPage: React.FC = () => {
   useEffect(() => {
     fetchRoasters();
   }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, sortConfig, countryFilter, cityFilter]);
-
-  // Set Canada as default country filter if available and no filter is set
-  useEffect(() => {
-    if (topCountries.length > 0 && !countryFilter && !cityFilter && !hasUserSetFilter) {
-      const canadaEntry = topCountries.find(c => c.country === 'Canada');
-      if (canadaEntry) {
-        setCountryFilter('Canada');
-      }
-    }
-  }, [topCountries, hasUserSetFilter]);
 
   // Check for edit query parameter on mount
   useEffect(() => {
@@ -261,10 +251,10 @@ const AdminRoastersPage: React.FC = () => {
         
         {/* Scorecard Grid */}
         <div className="max-w-7xl mx-auto mb-6">
-          <div className="grid grid-cols-2 sm:grid-cols-7 lg:grid-cols-7 gap-3 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_1fr] gap-2">
             {/* Count Cards Column - 2x2 Grid */}
-            <div className="col-span-2 sm:col-span-7 lg:col-span-2">
-              <div className="grid grid-cols-4 sm:grid-cols-2 gap-3 h-full">
+            <div className="w-full lg:w-auto">
+              <div className="grid grid-cols-4 sm:grid-cols-2 lg:grid-cols-2 gap-2 h-full lg:min-w-[240px]">
                 {/* Total Card */}
                 <button
                   onClick={() => {
@@ -348,8 +338,8 @@ const AdminRoastersPage: React.FC = () => {
             </div>
 
             {/* Top Countries */}
-            <div className="hidden md:block p-4 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-3 lg:col-span-2">
-              <div className="flex justify-between items-center mb-3">
+            <div className="hidden lg:block p-3 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700">
+              <div className="flex justify-between items-center mb-2">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCountries', 'Top Countries')}</h3>
                 <div className="flex gap-2">
                   {countryFilter && (
@@ -373,7 +363,7 @@ const AdminRoastersPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <div className={`space-y-1 ${!showAllCountries ? 'hidden lg:block' : ''}`}>
+              <div className={`${!showAllCountries ? 'hidden lg:block' : ''}`}>
                 {topCountries.slice(0, 5).map((item) => (
                   <button
                     key={item.country}
@@ -383,7 +373,7 @@ const AdminRoastersPage: React.FC = () => {
                       setCurrentPage(1);
                       setHasUserSetFilter(true);
                     }}
-                    className={`w-full flex justify-between items-center px-3 py-2 rounded text-sm transition-colors ${
+                    className={`w-full flex justify-between items-center px-3 py-1 rounded text-sm transition-colors ${
                       countryFilter === item.country
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/30 dark:text-blue-300'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
@@ -397,8 +387,8 @@ const AdminRoastersPage: React.FC = () => {
             </div>
 
             {/* Top Cities */}
-            <div className="hidden md:block p-4 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 col-span-1 sm:col-span-4 lg:col-span-3">
-              <div className="flex justify-between items-center mb-3">
+            <div className="hidden lg:block p-3 rounded-lg bg-white border-2 border-gray-300 dark:bg-gray-800/30 dark:border-gray-700">
+              <div className="flex justify-between items-center mb-2">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{t('admin.roasters.topCities', 'Top Cities')}</h3>
                 <div className="flex gap-2">
                   {cityFilter && (
@@ -422,7 +412,7 @@ const AdminRoastersPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <div className={`space-y-1 ${!showAllCities ? 'hidden lg:block' : ''}`}>
+              <div className={`${!showAllCities ? 'hidden lg:block' : ''}`}>
                 {topCities.slice(0, 5).map((item) => (
                   <button
                     key={item.city}
@@ -432,7 +422,7 @@ const AdminRoastersPage: React.FC = () => {
                       setCurrentPage(1);
                       setHasUserSetFilter(true);
                     }}
-                    className={`w-full flex justify-between items-center px-3 py-2 rounded text-sm transition-colors ${
+                    className={`w-full flex justify-between items-center px-3 py-1 rounded text-sm transition-colors ${
                       cityFilter === item.city
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/30 dark:text-blue-300'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/30'
@@ -985,7 +975,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   // Section expand/collapse state
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const [locationExpanded, setLocationExpanded] = useState(true);
-  const [contactsExpanded, setContactsExpanded] = useState(false);
+  const [contactsExpanded, setContactsExpanded] = useState(true);
   const [specialtiesExpanded, setSpecialtiesExpanded] = useState(true);
   const [settingsExpanded, setSettingsExpanded] = useState(true);
   const [urlImagesExpanded, setUrlImagesExpanded] = useState(false);
