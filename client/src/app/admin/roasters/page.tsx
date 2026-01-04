@@ -985,7 +985,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   // Section expand/collapse state
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const [locationExpanded, setLocationExpanded] = useState(true);
-  const [contactsExpanded, setContactsExpanded] = useState(true);
+  const [contactsExpanded, setContactsExpanded] = useState(false);
   const [specialtiesExpanded, setSpecialtiesExpanded] = useState(true);
   const [settingsExpanded, setSettingsExpanded] = useState(true);
   const [urlImagesExpanded, setUrlImagesExpanded] = useState(false);
