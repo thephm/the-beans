@@ -500,7 +500,13 @@ const AdminCoordinatesPage: React.FC = () => {
 
               {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4">
-                  <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+                  <p className="text-red-700 dark:text-red-400 text-sm mb-3">{error}</p>
+                  <button
+                    onClick={skipCurrent}
+                    className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
+                  >
+                    {t('admin.coordinates.skip', 'Skip')}
+                  </button>
                 </div>
               )}
 
@@ -518,7 +524,7 @@ const AdminCoordinatesPage: React.FC = () => {
                   <li><strong>1.</strong> {t('admin.coordinates.workflowStep1', 'Click "Search" (opens in new tab)')}</li>
                   <li><strong>2.</strong> {t('admin.coordinates.workflowStep2', 'Find the exact location on the map')}</li>
                   <li><strong>3.</strong> {t('admin.coordinates.workflowStep3', 'Copy the URL from your browser address bar (Ctrl+L, Ctrl+C)')}</li>
-                  <li><strong>4.</strong> {t('admin.coordinates.workflowStep4', 'Click "Paste from Clipboard" - it will auto-read your clipboard!')}</li>
+                  <li><strong>4.</strong> {t('admin.coordinates.workflowStep4', 'Click "Paste" - it will auto-read your clipboard!')}</li>
                   <li><strong>5.</strong> {t('admin.coordinates.workflowStep5', 'Click "Test" to verify')}</li>
                   <li><strong>6.</strong> {t('admin.coordinates.workflowStep6', 'Click "Set" to save')}</li>
                 </ol>
