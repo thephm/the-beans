@@ -389,120 +389,121 @@ const AdminSuggestionsPage: React.FC = () => {
 
         {/* Right Column - Detail Panel */}
         {selectedSuggestion && (
-          <div className="lg:w-2/3 lg:sticky lg:top-24 lg:h-fit">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg">
-              {/* Roaster Information */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {selectedSuggestion.roasterName}
-                  </h3>
-                  <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeClass(selectedSuggestion.status)}`}>
-                    {getStatusText(selectedSuggestion.status)}
-                  </span>
-                </div>
+          <div className="lg:w-2/3 lg:sticky lg:top-24 lg:h-fit space-y-4">
+            {/* Title and Status */}
+            <div className="flex items-center justify-between gap-4">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {selectedSuggestion.roasterName}
+              </h3>
+              <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeClass(selectedSuggestion.status)}`}>
+                {getStatusText(selectedSuggestion.status)}
+              </span>
+            </div>
 
-                <div className="pt-4">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    {t('admin.suggestions.roasterInfo', 'Roaster')}
-                  </h4>
-                  <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
-                    <span className="font-medium text-gray-500 dark:text-gray-400">
-                      {t('admin.suggestions.location', 'Location')}:
-                    </span>
-                    <span className="text-gray-900 dark:text-gray-100">
-                      {formatLocation(selectedSuggestion.city, selectedSuggestion.state, selectedSuggestion.country)}
-                    </span>
-                    <span className="font-medium text-gray-500 dark:text-gray-400">
-                      {t('admin.suggestions.website', 'Website')}:
-                    </span>
-                    <a 
-                      href={selectedSuggestion.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-blue-600 dark:text-blue-400 hover:underline break-all"
-                    >
-                      {selectedSuggestion.website}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    {t('admin.suggestions.submitterInfo', 'Submitter')}
-                  </h4>
-                  <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
-                    <span className="font-medium text-gray-500 dark:text-gray-400">
-                      {t('admin.suggestions.name', 'Name')}:
-                    </span>
-                    <span className="text-gray-900 dark:text-gray-100">
-                      {selectedSuggestion.submitterFirstName} {selectedSuggestion.submitterLastName}
-                    </span>
-                    <span className="font-medium text-gray-500 dark:text-gray-400">
-                      {t('admin.suggestions.email', 'Email')}:
-                    </span>
-                    <span className="text-gray-900 dark:text-gray-100">
-                      {selectedSuggestion.submitterEmail}
-                    </span>
-                    {selectedSuggestion.submitterPhone && (
-                      <>
-                        <span className="font-medium text-gray-500 dark:text-gray-400">
-                          {t('admin.suggestions.phone', 'Phone')}:
-                        </span>
-                        <span className="text-gray-900 dark:text-gray-100">
-                          {selectedSuggestion.submitterPhone}
-                        </span>
-                      </>
-                    )}
-                    <span className="font-medium text-gray-500 dark:text-gray-400">
-                      {t('admin.suggestions.role', 'Role')}:
-                    </span>
-                    <span className="text-gray-900 dark:text-gray-100">
-                      {selectedSuggestion.submitterRole}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2 mt-4">
+            {/* Roaster and Submitter Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Roaster Information Card */}
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-md">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  {t('admin.suggestions.roasterInfo', 'Roaster')}
+                </h4>
+                <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
                   <span className="font-medium text-gray-500 dark:text-gray-400">
-                    {t('admin.suggestions.submitted', 'Submitted')}:
+                    {t('admin.suggestions.location', 'Location')}:
                   </span>
                   <span className="text-gray-900 dark:text-gray-100">
-                    {selectedSuggestion.createdAt ? (formatDateToYYYYMMDD(selectedSuggestion.createdAt) || 'Invalid date') : 'Not available'}
+                    {formatLocation(selectedSuggestion.city, selectedSuggestion.state, selectedSuggestion.country)}
                   </span>
-                  {selectedSuggestion.reviewedAt && (
+                  <span className="font-medium text-gray-500 dark:text-gray-400">
+                    {t('admin.suggestions.website', 'Website')}:
+                  </span>
+                  <a 
+                    href={selectedSuggestion.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                  >
+                    {selectedSuggestion.website}
+                  </a>
+                </div>
+              </div>
+
+              {/* Submitter Information Card */}
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-md">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  {t('admin.suggestions.submitterInfo', 'Submitter')}
+                </h4>
+                <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
+                  <span className="font-medium text-gray-500 dark:text-gray-400">
+                    {t('admin.suggestions.name', 'Name')}:
+                  </span>
+                  <span className="text-gray-900 dark:text-gray-100">
+                    {selectedSuggestion.submitterFirstName} {selectedSuggestion.submitterLastName}
+                  </span>
+                  <span className="font-medium text-gray-500 dark:text-gray-400">
+                    {t('admin.suggestions.email', 'Email')}:
+                  </span>
+                  <span className="text-gray-900 dark:text-gray-100">
+                    {selectedSuggestion.submitterEmail}
+                  </span>
+                  {selectedSuggestion.submitterPhone && (
                     <>
                       <span className="font-medium text-gray-500 dark:text-gray-400">
-                        {t('admin.suggestions.reviewed', 'Reviewed')}:
+                        {t('admin.suggestions.phone', 'Phone')}:
                       </span>
                       <span className="text-gray-900 dark:text-gray-100">
-                        {formatDateToYYYYMMDD(selectedSuggestion.reviewedAt)}
+                        {selectedSuggestion.submitterPhone}
                       </span>
                     </>
                   )}
-                </div>
-
-                {selectedSuggestion.adminNotes && (
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                      {t('admin.suggestions.notes', 'Admin Notes')}
-                    </h4>
-                    <p className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
-                      {selectedSuggestion.adminNotes}
-                    </p>
-                  </div>
-                )}
-
-                {/* Action Button */}
-                <div className="pt-4">
-                  <Link
-                    href={`/admin/suggestions/${selectedSuggestion.id}`}
-                    className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                  >
-                    {t('admin.suggestions.edit', 'Edit')}
-                  </Link>
+                  <span className="font-medium text-gray-500 dark:text-gray-400">
+                    {t('admin.suggestions.role', 'Role')}:
+                  </span>
+                  <span className="text-gray-900 dark:text-gray-100">
+                    {selectedSuggestion.submitterRole}
+                  </span>
                 </div>
               </div>
+            </div>
+
+            {/* Admin Notes Card */}
+            {selectedSuggestion.adminNotes && (
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-md">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  {t('admin.suggestions.notes', 'Admin Notes')}
+                </h4>
+                <p className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                  {selectedSuggestion.adminNotes}
+                </p>
+              </div>
+            )}
+
+            {/* Submitted Date and Edit Button */}
+            <div className="flex items-center justify-between">
+              <div className="text-sm">
+                <span className="font-medium text-gray-500 dark:text-gray-400">
+                  {t('admin.suggestions.submitted', 'Submitted')}:
+                </span>
+                <span className="ml-2 text-gray-900 dark:text-gray-100">
+                  {selectedSuggestion.createdAt ? (formatDateToYYYYMMDD(selectedSuggestion.createdAt) || 'Invalid date') : 'Not available'}
+                </span>
+                {selectedSuggestion.reviewedAt && (
+                  <>
+                    <span className="ml-4 font-medium text-gray-500 dark:text-gray-400">
+                      {t('admin.suggestions.reviewed', 'Reviewed')}:
+                    </span>
+                    <span className="ml-2 text-gray-900 dark:text-gray-100">
+                      {formatDateToYYYYMMDD(selectedSuggestion.reviewedAt)}
+                    </span>
+                  </>
+                )}
+              </div>
+              <Link
+                href={`/admin/suggestions/${selectedSuggestion.id}`}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+              >
+                {t('admin.suggestions.edit', 'Edit')}
+              </Link>
             </div>
           </div>
         )}
