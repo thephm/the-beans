@@ -71,6 +71,7 @@ interface Roaster {
   imageUrl: string
   city: string
   state: string
+  country?: string
   address: string
   phone?: string
   website?: string
@@ -372,10 +373,10 @@ const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-[5]"></div>
             <div className="absolute bottom-6 left-6 text-white z-20 pointer-events-none">
               <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">{roaster.name}</h1>
-              {(roaster.city || roaster.state) && (
+              {(roaster.city || roaster.state || roaster.country) && (
                 <p className="text-xl flex items-center drop-shadow-lg">
                   <LocationOn sx={{ fontSize: 24, marginRight: 1 }} />
-                  {[roaster.city, roaster.state].filter(Boolean).join(', ')}
+                  {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
                 </p>
               )}
             </div>
@@ -502,16 +503,16 @@ const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
                 <div className="rounded-xl p-6 sticky top-8 flex flex-col min-h-[400px] pl-0">
                   <div className="flex-grow">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('roasterDetail.contactInfo')}</h3>
-                    {(roaster.address || roaster.city || roaster.state) && (
+                    {(roaster.address || roaster.city || roaster.state || roaster.country) && (
                       <div className="mb-4">
                         <div className="flex items-start">
                           <LocationOn sx={{ fontSize: 20, color: '#6b7280', marginRight: 1, marginTop: 0.25 }} />
                           <div>
                             <p className="font-medium text-gray-900 dark:text-white">{t('roasterDetail.address')}</p>
                             {roaster.address && <p className="text-gray-600 dark:text-gray-300">{roaster.address}</p>}
-                            {(roaster.city || roaster.state) && (
+                            {(roaster.city || roaster.state || roaster.country) && (
                               <p className="text-gray-600 dark:text-gray-300">
-                                {[roaster.city, roaster.state].filter(Boolean).join(', ')}
+                                {[roaster.city, roaster.state, roaster.country].filter(Boolean).join(', ')}
                               </p>
                             )}
                           </div>
