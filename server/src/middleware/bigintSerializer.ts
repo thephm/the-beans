@@ -12,6 +12,10 @@ function convertBigIntValues(value: any): any {
       return value.toString();
     }
   }
+  // Handle Date objects - convert to ISO string
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
   if (Array.isArray(value)) {
     return value.map(convertBigIntValues);
   }

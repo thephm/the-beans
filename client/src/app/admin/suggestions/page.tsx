@@ -38,6 +38,12 @@ const AdminSuggestionsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('new');
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null);
 
+  // Helper function to format location
+  const formatLocation = (city: string, state: string | undefined, country: string) => {
+    const parts = [city, state, country].filter(part => part && part.trim());
+    return parts.length > 0 ? parts.join(', ') : '';
+  };
+
   const fetchSuggestions = async () => {
     setLoading(true);
     setError(null);
@@ -186,6 +192,23 @@ const AdminSuggestionsPage: React.FC = () => {
           {/* Status Filter Buttons */}
           <div className="flex flex-wrap gap-2 mb-4">
             <button
+              onClick={() => setStatusFilter('all')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                statusFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span>{t('admin.suggestions.all', 'All')}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                statusFilter === 'all' 
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
+                  : 'bg-blue-600 text-white'
+              }`}>
+                {getStatusCount('all')}
+              </span>
+            </button>
+            <button
               onClick={() => setStatusFilter('new')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                 statusFilter === 'new'
@@ -270,23 +293,6 @@ const AdminSuggestionsPage: React.FC = () => {
                 {getStatusCount('done')}
               </span>
             </button>
-            <button
-              onClick={() => setStatusFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                statusFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              <span>{t('admin.suggestions.all', 'All')}</span>
-              <span className={`text-xs px-2 py-0.5 rounded ${
-                statusFilter === 'all' 
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
-                  : 'bg-blue-600 text-white'
-              }`}>
-                {getStatusCount('all')}
-              </span>
-            </button>
           </div>
 
           {/* Results Count */}
@@ -307,32 +313,26 @@ const AdminSuggestionsPage: React.FC = () => {
                   selectedSuggestion?.id === suggestion.id ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-500' : ''
                 }`}
               >
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                      {suggestion.roasterName}
-                    </div>
-                    <span className={`inline-flex ml-2 px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(suggestion.status)}`}>
-                      {getStatusText(suggestion.status)}
-                    </span>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                    {suggestion.roasterName}
                   </div>
+                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(suggestion.status)}`}>
+                    {getStatusText(suggestion.status)}
+                  </span>
                 </div>
 
-                <div className="space-y-2 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.location', 'Location')}:</span>
-                    <span className="text-gray-600 dark:text-gray-400 ml-2">
-                      {suggestion.city}{suggestion.state ? `, ${suggestion.state}` : ''}, {suggestion.country}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.submitter', 'Submitter')}:</span>
-                    <span className="text-gray-600 dark:text-gray-400 ml-2">{suggestion.submitterEmail}</span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.submitted', 'Submitted')}:</span>
-                    <span className="text-gray-600 dark:text-gray-400 ml-2">{formatDateToYYYYMMDD(suggestion.createdAt)}</span>
-                  </div>
+                <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.location', 'Location')}:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {formatLocation(suggestion.city, suggestion.state, suggestion.country)}
+                  </span>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.submitter', 'Submitter')}:</span>
+                  <span className="text-gray-600 dark:text-gray-400">{suggestion.submitterEmail}</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">{t('admin.suggestions.submitted', 'Submitted')}:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {suggestion.createdAt ? (formatDateToYYYYMMDD(suggestion.createdAt) || 'Invalid date') : 'Not available'}
+                  </span>
                 </div>
               </div>
             ))}
@@ -365,7 +365,7 @@ const AdminSuggestionsPage: React.FC = () => {
                         {suggestion.roasterName}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {suggestion.city}{suggestion.state ? `, ${suggestion.state}` : ''}, {suggestion.country}
+                        {formatLocation(suggestion.city, suggestion.state, suggestion.country)}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -391,17 +391,10 @@ const AdminSuggestionsPage: React.FC = () => {
         {selectedSuggestion && (
           <div className="lg:w-2/3 lg:sticky lg:top-24 lg:h-fit">
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg">
-              {/* Header */}
-              <div className="mb-4">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  {t('admin.suggestions.details', 'Suggestion Details')}
-                </h2>
-              </div>
-
               {/* Roaster Information */}
               <div className="space-y-4">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                <div className="flex items-center justify-between gap-4">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {selectedSuggestion.roasterName}
                   </h3>
                   <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeClass(selectedSuggestion.status)}`}>
@@ -409,103 +402,84 @@ const AdminSuggestionsPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="pt-4">
                   <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    {t('admin.suggestions.roasterInfo', 'Roaster Information')}
+                    {t('admin.suggestions.roasterInfo', 'Roaster')}
                   </h4>
-                  <dl className="space-y-2">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('admin.suggestions.location', 'Location')}
-                      </dt>
-                      <dd className="text-sm text-gray-900 dark:text-gray-100">
-                        {selectedSuggestion.city}{selectedSuggestion.state ? `, ${selectedSuggestion.state}` : ''}, {selectedSuggestion.country}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('admin.suggestions.website', 'Website')}
-                      </dt>
-                      <dd className="text-sm">
-                        <a 
-                          href={selectedSuggestion.website} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="text-blue-600 dark:text-blue-400 hover:underline break-all"
-                        >
-                          {selectedSuggestion.website}
-                        </a>
-                      </dd>
-                    </div>
-                  </dl>
+                  <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
+                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                      {t('admin.suggestions.location', 'Location')}:
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {formatLocation(selectedSuggestion.city, selectedSuggestion.state, selectedSuggestion.country)}
+                    </span>
+                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                      {t('admin.suggestions.website', 'Website')}:
+                    </span>
+                    <a 
+                      href={selectedSuggestion.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                    >
+                      {selectedSuggestion.website}
+                    </a>
+                  </div>
                 </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="pt-4">
                   <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    {t('admin.suggestions.submitterInfo', 'Submitter Information')}
+                    {t('admin.suggestions.submitterInfo', 'Submitter')}
                   </h4>
-                  <dl className="space-y-2">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('admin.suggestions.name', 'Name')}
-                      </dt>
-                      <dd className="text-sm text-gray-900 dark:text-gray-100">
-                        {selectedSuggestion.submitterFirstName} {selectedSuggestion.submitterLastName}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('admin.suggestions.email', 'Email')}
-                      </dt>
-                      <dd className="text-sm text-gray-900 dark:text-gray-100">
-                        {selectedSuggestion.submitterEmail}
-                      </dd>
-                    </div>
+                  <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
+                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                      {t('admin.suggestions.name', 'Name')}:
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {selectedSuggestion.submitterFirstName} {selectedSuggestion.submitterLastName}
+                    </span>
+                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                      {t('admin.suggestions.email', 'Email')}:
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {selectedSuggestion.submitterEmail}
+                    </span>
                     {selectedSuggestion.submitterPhone && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {t('admin.suggestions.phone', 'Phone')}
-                        </dt>
-                        <dd className="text-sm text-gray-900 dark:text-gray-100">
+                      <>
+                        <span className="font-medium text-gray-500 dark:text-gray-400">
+                          {t('admin.suggestions.phone', 'Phone')}:
+                        </span>
+                        <span className="text-gray-900 dark:text-gray-100">
                           {selectedSuggestion.submitterPhone}
-                        </dd>
-                      </div>
+                        </span>
+                      </>
                     )}
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('admin.suggestions.role', 'Role')}
-                      </dt>
-                      <dd className="text-sm text-gray-900 dark:text-gray-100">
-                        {selectedSuggestion.submitterRole}
-                      </dd>
-                    </div>
-                  </dl>
+                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                      {t('admin.suggestions.role', 'Role')}:
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {selectedSuggestion.submitterRole}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    {t('admin.suggestions.timestamps', 'Timestamps')}
-                  </h4>
-                  <dl className="space-y-2">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {t('admin.suggestions.submitted', 'Submitted')}
-                      </dt>
-                      <dd className="text-sm text-gray-900 dark:text-gray-100">
-                        {formatDateToYYYYMMDD(selectedSuggestion.createdAt)}
-                      </dd>
-                    </div>
-                    {selectedSuggestion.reviewedAt && (
-                      <div>
-                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          {t('admin.suggestions.reviewed', 'Reviewed')}
-                        </dt>
-                        <dd className="text-sm text-gray-900 dark:text-gray-100">
-                          {formatDateToYYYYMMDD(selectedSuggestion.reviewedAt)}
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
+                <div className="text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-2 mt-4">
+                  <span className="font-medium text-gray-500 dark:text-gray-400">
+                    {t('admin.suggestions.submitted', 'Submitted')}:
+                  </span>
+                  <span className="text-gray-900 dark:text-gray-100">
+                    {selectedSuggestion.createdAt ? (formatDateToYYYYMMDD(selectedSuggestion.createdAt) || 'Invalid date') : 'Not available'}
+                  </span>
+                  {selectedSuggestion.reviewedAt && (
+                    <>
+                      <span className="font-medium text-gray-500 dark:text-gray-400">
+                        {t('admin.suggestions.reviewed', 'Reviewed')}:
+                      </span>
+                      <span className="text-gray-900 dark:text-gray-100">
+                        {formatDateToYYYYMMDD(selectedSuggestion.reviewedAt)}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 {selectedSuggestion.adminNotes && (
@@ -520,7 +494,7 @@ const AdminSuggestionsPage: React.FC = () => {
                 )}
 
                 {/* Action Button */}
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="pt-4">
                   <Link
                     href={`/admin/suggestions/${selectedSuggestion.id}`}
                     className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
