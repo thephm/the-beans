@@ -98,8 +98,9 @@ export default function SpecialtyPillSelector({
       }
 
       const data = await response.json();
-      // Store all specialties (including deprecated ones) from the API
-      setAllSpecialties(Array.isArray(data) ? data : []);
+      // API returns { specialties: [...], pagination: {...} }
+      const specialtiesArray = data.specialties || data;
+      setAllSpecialties(Array.isArray(specialtiesArray) ? specialtiesArray : []);
     } catch (err: any) {
       setError(err.message || 'Failed to load specialties');
     } finally {
@@ -150,6 +151,10 @@ export default function SpecialtyPillSelector({
 
   if (error) {
     return <div className="text-red-500 text-sm">{error}</div>;
+  }
+
+  if (specialties.length === 0) {
+    return <div className="text-gray-500 text-sm">{t('admin.specialties.noSpecialties', 'No specialties available. Please check the API connection.')}</div>;
   }
 
   return (
