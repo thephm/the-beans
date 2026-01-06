@@ -352,7 +352,7 @@ const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
         <nav className="mb-6">
           <Link
             href="/discover"
-            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+            className="text-primary-600 dark:text-primary-400 hover:underline font-medium"
           >
             ← Discover Roasters
           </Link>
@@ -528,7 +528,7 @@ const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
                             <div className="flex items-center gap-2">
                               <a
                                 href={`tel:${roaster.phone}`}
-                                className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                                className="text-primary-600 dark:text-primary-400 hover:underline"
                               >
                                 {roaster.phone}
                               </a>
@@ -555,7 +555,7 @@ const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
                               href={roaster.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                              className="text-primary-600 dark:text-primary-400 hover:underline"
                             >
                               {roaster.website.replace(/^https?:\/\//, '')}
                             </a>
@@ -571,7 +571,7 @@ const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
                             <p className="font-medium text-gray-900 dark:text-white">{t('roasterDetail.email')}</p>
                             <a
                               href={`mailto:${roaster.email}`}
-                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline underline cursor-pointer"
+                              className="text-primary-600 dark:text-primary-400 hover:underline underline cursor-pointer"
                             >
                               {roaster.email}
                             </a>

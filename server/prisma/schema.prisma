@@ -108,6 +108,7 @@ model Roaster {
   reviews            Review[]
   roasterImages      RoasterImage[]
   people             RoasterPerson[]
+  posts              Post[]
   sourceCountries    RoasterSourceCountry[]
   roasterSpecialties RoasterSpecialty[]
   suggestions        RoasterSuggestion[]
@@ -394,4 +395,20 @@ model AnalyticsEvent {
   @@index([timestamp], name: "idx_timestamp")
   @@index([sessionId], name: "idx_session_id")
   @@map("analytics_events")
+}
+
+model Post {
+  id             String   @id @default(cuid())
+  roasterId      String
+  url            String
+  socialNetwork  String   @db.VarChar(20) // Instagram, Reddit, Other
+  postedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  roaster        Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+
+  @@index([roasterId])
+  @@index([postedAt])
+  @@map("posts")
 }

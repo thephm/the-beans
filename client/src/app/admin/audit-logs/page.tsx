@@ -212,16 +212,16 @@ export default function AuditLogsPage() {
 
       {/* Stats Section */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500 flex flex-col items-center justify-center text-center">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-4">
+          <div className="bg-white dark:bg-gray-800 py-3 px-4 rounded-lg shadow border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-center">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Total Logs</h3>
             <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalLogs.toLocaleString()}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500 flex flex-col items-center justify-center text-center">
+          <div className="bg-white dark:bg-gray-800 py-3 px-4 rounded-lg shadow border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-center">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Last 30 Days</h3>
             <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.recentLogs.toLocaleString()}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
+          <div className="bg-white dark:bg-gray-800 py-3 px-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Actions</h3>
             <div className="space-y-1">
               {stats.actionStats.map((stat) => (
@@ -232,7 +232,7 @@ export default function AuditLogsPage() {
               ))}
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
+          <div className="bg-white dark:bg-gray-800 py-3 px-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Entity Types</h3>
             <div className="space-y-1">
               {stats.entityTypeStats.slice(0, 3).map((stat) => (
@@ -243,7 +243,7 @@ export default function AuditLogsPage() {
               ))}
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-blue-500">
+          <div className="bg-white dark:bg-gray-800 py-3 px-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Top Users</h3>
             <div className="space-y-1">
               {stats.topUsers.slice(0, 3).map((userStat) => (
@@ -258,8 +258,8 @@ export default function AuditLogsPage() {
       )}
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-8 border border-gray-200 dark:border-blue-500">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Filters</h2>
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4 border border-gray-200 dark:border-gray-700">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Filters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Action</label>
@@ -336,7 +336,7 @@ export default function AuditLogsPage() {
       </div>
 
       {/* Audit Logs - Desktop Table View */}
-      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-blue-500">
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
@@ -380,7 +380,7 @@ export default function AuditLogsPage() {
                           {log.user ? (
                             <Link 
                               href={`/admin/users/${log.user.id}/edit`} 
-                              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                              className="text-primary-600 dark:text-primary-400 hover:underline"
                             >
                               {log.user.username}
                             </Link>
@@ -407,7 +407,7 @@ export default function AuditLogsPage() {
                         ) : (
                           <Link 
                             href={getEntityLink(log)} 
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                            className="text-primary-600 dark:text-primary-400 hover:underline"
                           >
                             {log.entityType}
                           </Link>
@@ -440,7 +440,7 @@ export default function AuditLogsPage() {
                     {log.changes && Object.keys(log.changes).length > 0 ? (
                       <button
                         onClick={() => setSelectedLog(log)}
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                        className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
                       >
                         View Changes ({Object.keys(log.changes).length})
                       </button>
@@ -485,7 +485,7 @@ export default function AuditLogsPage() {
                 {log.user ? (
                   <Link 
                     href={`/admin/users/${log.user.id}/edit`} 
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                    className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium"
                   >
                     {log.user.username}
                   </Link>
@@ -503,7 +503,7 @@ export default function AuditLogsPage() {
                 ) : (
                   <Link 
                     href={getEntityLink(log)} 
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate max-w-[180px]"
+                    className="text-sm text-primary-600 dark:text-primary-400 hover:underline truncate max-w-[180px]"
                   >
                     {log.entityName || log.entityId}
                   </Link>
@@ -541,7 +541,7 @@ export default function AuditLogsPage() {
                 {log.changes && Object.keys(log.changes).length > 0 ? (
                   <button
                     onClick={() => setSelectedLog(log)}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                    className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium"
                   >
                     View ({Object.keys(log.changes).length})
                   </button>

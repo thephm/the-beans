@@ -346,7 +346,7 @@ const AdminCoordinatesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
+      <div className="container mx-auto pt-20 sm:pt-28 px-2 sm:px-8 lg:px-16 xl:px-32">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">{t('common.loading', 'Loading...')}</p>
@@ -357,7 +357,7 @@ const AdminCoordinatesPage: React.FC = () => {
 
   if (error && !currentRoaster) {
     return (
-      <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
+      <div className="container mx-auto pt-20 sm:pt-28 px-2 sm:px-8 lg:px-16 xl:px-32">
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
           <p className="text-red-700 dark:text-red-400">{error}</p>
           <Link href="/admin/roasters" className="text-primary-600 hover:text-primary-700 underline mt-2 inline-block">
@@ -369,7 +369,7 @@ const AdminCoordinatesPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto pt-20 sm:pt-28 px-4 sm:px-8 lg:px-16 xl:px-32">
+    <div className="container mx-auto pt-20 sm:pt-28 px-2 sm:px-8 lg:px-16 xl:px-32">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           {t('admin.coordinates.title', 'Set Roaster Coordinates')}
@@ -393,7 +393,7 @@ const AdminCoordinatesPage: React.FC = () => {
 
           {currentRoaster && (
             <div className="flex flex-col lg:flex-row gap-6">
-              <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+              <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-6 mb-6">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                 {currentRoaster.name}
                 {!currentRoaster.verified && (
@@ -502,7 +502,12 @@ const AdminCoordinatesPage: React.FC = () => {
 
               {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4">
-                  <p className="text-red-700 dark:text-red-400 text-sm mb-3">{error}</p>
+                  <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {error && (
+                <div className="mb-4">
                   <button
                     onClick={skipCurrent}
                     className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
@@ -519,7 +524,7 @@ const AdminCoordinatesPage: React.FC = () => {
               )}
 
               {/* Map iframe panel - appears here on mobile, before workflow */}
-              <div className="lg:hidden w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+              <div className="lg:hidden w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 mb-6">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {t('admin.coordinates.test', 'Test')} Map
@@ -565,7 +570,7 @@ const AdminCoordinatesPage: React.FC = () => {
               </div>
 
               {/* Map iframe panel - appears on right on desktop */}
-              <div className="hidden lg:block w-full lg:w-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+              <div className="hidden lg:block w-full lg:w-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 mb-6">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {t('admin.coordinates.test', 'Test')} Map

@@ -541,28 +541,28 @@ export default function AnalyticsDashboard() {
 					<button onClick={() => { exportFilteredCSV(exportScope === 'page'); }} className="px-3 py-2 bg-green-600 text-white rounded-md">{tr('admin.analytics.exportCSV', 'Export')}</button>
 				</div>
 			</div>
-			<div className="overflow-x-auto">
-				<table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+		<div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-gray-200 dark:border-gray-700">
+				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 					<thead className="bg-gray-50 dark:bg-gray-900">
 						<tr>
-							<th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100">{tr('admin.analytics.period', 'Period')}</th>
-							<th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100">{tr('admin.analytics.eventType', 'Event Type')}</th>
-							<th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100">{tr('admin.analytics.page', 'Page')}</th>
-							<th className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100">{tr('admin.analytics.count', 'Count')}</th>
+							<th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">{tr('admin.analytics.period', 'Period')}</th>
+							<th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">{tr('admin.analytics.eventType', 'Event Type')}</th>
+							<th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">{tr('admin.analytics.page', 'Page')}</th>
+							<th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">{tr('admin.analytics.count', 'Count')}</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
 						{displayRows.map((row, i) => (
 							<tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.period}</td>
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{getEventLabel(row.event_type)}</td>
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100 max-w-[14rem] sm:max-w-none break-words whitespace-normal">{(() => { const raw = (row.page || '').toString(); return raw === '' || raw === '/' ? 'home' : raw.replace(/^\//, ''); })()}</td>
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100">{row.count}</td>
+								<td className="px-6 py-4 text-left text-gray-900 dark:text-gray-100">{row.period}</td>
+								<td className="px-6 py-4 text-left text-gray-900 dark:text-gray-100">{getEventLabel(row.event_type)}</td>
+								<td className="px-6 py-4 text-left text-gray-900 dark:text-gray-100 max-w-[14rem] sm:max-w-none break-words whitespace-normal">{(() => { const raw = (row.page || '').toString(); return raw === '' || raw === '/' ? 'home' : raw.replace(/^\//, ''); })()}</td>
+								<td className="px-6 py-4 text-left text-gray-900 dark:text-gray-100">{row.count}</td>
 							</tr>
 						))}
 						{displayRows.length === 0 && (
 							<tr>
-								<td className="py-3 px-4 text-left text-gray-900 dark:text-gray-100" colSpan={4}>{tr('admin.analytics.noResults', 'No results found')}</td>
+								<td className="px-6 py-4 text-left text-gray-900 dark:text-gray-100" colSpan={4}>{tr('admin.analytics.noResults', 'No results found')}</td>
 							</tr>
 						)}
 					</tbody>

@@ -498,7 +498,7 @@ const AdminRoastersPage: React.FC = () => {
                     {/* Roaster Header */}
                     <div className="mb-3">
                       <button
-                        className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-left"
+                        className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline text-left"
                         onClick={() => setEditingId(roaster.id)}
                       >
                         {roaster.name}
@@ -576,47 +576,47 @@ const AdminRoastersPage: React.FC = () => {
                 ))}
               </div>
               {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-gray-200 dark:border-gray-700">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                      <th className="px-4 py-4 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'name' ? { key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'name', direction: 'asc' })}>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'name' ? { key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'name', direction: 'asc' })}>
                         {t('adminForms.roasters.name', 'Name')}
                         {sortConfig?.key === 'name' && <SortArrow direction={sortConfig.direction} />}
                       </th>
-                      <th className="px-4 py-4 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'city' ? { key: 'city', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'city', direction: 'asc' })}>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'city' ? { key: 'city', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'city', direction: 'asc' })}>
                         {t('adminForms.roasters.city', 'City')}
                         {sortConfig?.key === 'city' && <SortArrow direction={sortConfig.direction} />}
                       </th>
-                      <th className="px-4 py-4 min-w-[140px] whitespace-nowrap border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'country' ? { key: 'country', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'country', direction: 'asc' })}>
+                      <th className="px-6 py-3 min-w-[140px] whitespace-nowrap text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'country' ? { key: 'country', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'country', direction: 'asc' })}>
                         {t('adminForms.roasters.country', 'Country')}
                         {sortConfig?.key === 'country' && <SortArrow direction={sortConfig.direction} />}
                       </th>
-                      <th className="px-4 py-4 min-w-[160px] whitespace-nowrap border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'completeness' ? { key: 'completeness', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'completeness', direction: 'asc' })}>
+                      <th className="px-6 py-3 min-w-[160px] whitespace-nowrap text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'completeness' ? { key: 'completeness', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'completeness', direction: 'asc' })}>
                         {t('adminForms.roasters.completeness', 'Completeness')}
                         {sortConfig?.key === 'completeness' && <SortArrow direction={sortConfig.direction} />}
                       </th>
-                      <th className="px-4 py-4 border-b dark:border-gray-700 text-center text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'verified' ? { key: 'verified', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'verified', direction: 'asc' })}>
+                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'verified' ? { key: 'verified', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'verified', direction: 'asc' })}>
                         {t('adminForms.roasters.verified', 'Verified')}
                         {sortConfig?.key === 'verified' && <SortArrow direction={sortConfig.direction} />}
                       </th>
-                      <th className="px-4 py-4 border-b dark:border-gray-700 text-center text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'featured' ? { key: 'featured', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'featured', direction: 'asc' })}>
+                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'featured' ? { key: 'featured', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'featured', direction: 'asc' })}>
                         {t('adminForms.roasters.featured', 'Featured')}
                         {sortConfig?.key === 'featured' && <SortArrow direction={sortConfig.direction} />}
                       </th>
-                      {showRatings && <th className="px-4 py-4 border-b dark:border-gray-700 text-left text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'rating' ? { key: 'rating', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'rating', direction: 'asc' })}>
+                      {showRatings && <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'rating' ? { key: 'rating', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'rating', direction: 'asc' })}>
                         {t('adminForms.roasters.rating', 'Rating')}
                         {sortConfig?.key === 'rating' && <SortArrow direction={sortConfig.direction} />}
                       </th>}
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredRoasters.map((roaster) => (
-                      <tr key={roaster.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td className="px-4 py-2 font-medium">
+                      <tr key={roaster.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-6 py-4 font-medium">
                           <div className="flex items-center gap-3">
                             <button
-                              className="text-blue-600 dark:text-blue-400 hover:underline text-left"
+                              className="text-primary-600 dark:text-primary-400 hover:underline text-left"
                               onClick={() => setEditingId(roaster.id)}
                             >
                               {roaster.name}
@@ -624,9 +624,9 @@ const AdminRoastersPage: React.FC = () => {
                             {/* Verify button removed from desktop Name column per request */}
                           </div>
                         </td>
-                        <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
-                        <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.country || '-'}</td>
-                        <td className="px-4 py-2 text-gray-900 dark:text-gray-100 w-36">
+                        <td className="px-6 py-4 text-gray-900 dark:text-gray-100">{roaster.city || '-'}</td>
+                        <td className="px-6 py-4 text-gray-900 dark:text-gray-100">{roaster.country || '-'}</td>
+                        <td className="px-6 py-4 text-gray-900 dark:text-gray-100 w-36">
                           {(() => {
                             const r = calculateCompleteness(roaster);
                             return (
@@ -639,9 +639,9 @@ const AdminRoastersPage: React.FC = () => {
                             );
                           })()}
                         </td>
-                        <td className="px-4 py-2 text-center text-gray-900 dark:text-gray-100">{roaster.verified ? '✔️' : ''}</td>
-                        <td className="px-4 py-2 text-center text-gray-900 dark:text-gray-100">{roaster.featured ? '⭐' : ''}</td>
-                        {showRatings && <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{roaster.rating || '-'}</td>}
+                        <td className="px-6 py-4 text-center text-gray-900 dark:text-gray-100">{roaster.verified ? '✔️' : ''}</td>
+                        <td className="px-6 py-4 text-center text-gray-900 dark:text-gray-100">{roaster.featured ? '⭐' : ''}</td>
+                        {showRatings && <td className="px-6 py-4 text-gray-900 dark:text-gray-100">{roaster.rating || '-'}</td>}
                       </tr>
                     ))}
                   </tbody>
@@ -1770,7 +1770,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                             href={`/admin/suggestions/${suggestion.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1 text-sm font-mono bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                            className="inline-flex items-center px-3 py-1 text-sm font-mono bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800 rounded hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
                           >
                             {suggestion.id.substring(0, 8)}...
                           </a>
@@ -2207,7 +2207,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               <div className="font-semibold text-gray-900">
                                 <a 
                                   href={`/admin/people/edit/${person.id}`}
-                                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                                  className="text-primary-600 dark:text-primary-400 hover:underline"
                                 >
                                   {`${person.firstName} ${person.lastName || ''}`.trim()}
                                 </a>
@@ -2215,7 +2215,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                               {person.email && (
                                 <a 
                                   href={`mailto:${person.email}`}
-                                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline underline"
+                                  className="text-sm text-primary-600 dark:text-primary-400 hover:underline underline"
                                 >
                                   {person.email}
                                 </a>
