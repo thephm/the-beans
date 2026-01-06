@@ -713,12 +713,72 @@
       "configuration": "Configuration Requise",
       "configInfo": "Assurez-vous que les variables d'environnement suivantes sont définies dans la configuration de votre serveur :",
       "testSuccess": "✅ Connexion WebDAV réussie",
-      "testFailed": "❌ Échec de la connexion WebDAV"
-      ,
+      "testFailed": "❌ Échec de la connexion WebDAV",
       "invalidResponse401": "Réponse invalide : 401 Non autorisé",
       "connectionRefused": "Connexion refusée",
       "timedOut": "Délai de connexion dépassé"
-    }
+    },
+    "posts": {
+      "title": "Publications Sociales",
+      "roaster": "Torréfacteur",
+      "network": "Réseau",
+      "url": "URL",
+      "postedAt": "Publié le",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "newPost": "Nouvelle Publication",
+      "editPost": "Modifier la Publication",
+      "create": "Créer",
+      "update": "Mettre à jour",
+      "cancel": "Annuler",
+      "search": "Rechercher des publications...",
+      "all": "Tout",
+      "instagram": "Instagram",
+      "reddit": "Reddit",
+      "other": "Autre",
+      "searchRoaster": "Rechercher un torréfacteur...",
+      "selectRoaster": "Veuillez sélectionner un torréfacteur",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette publication?",
+      "deleteError": "Échec de la suppression de la publication : ",
+      "saveError": "Échec de l'enregistrement de la publication : ",
+      "page": "Page",
+      "of": "de",
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
+    "roasters": {
+      "all": "Tous",
+      "unverified": "Non vérifiés",
+      "topCountries": "Principaux Pays",
+      "topCities": "Principales Villes"
+    },
+    "coordinates": {
+      "title": "Définir les Coordonnées des Torréfacteurs",
+      "address": "Adresse",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "calculate": "Calculer",
+      "calculating": "Calcul en cours...",
+      "search": "Rechercher",
+      "paste": "Coller",
+      "test": "Tester",
+      "set": "Définir",
+      "saving": "Enregistrement...",
+      "skip": "Passer",
+      "progress": "Torréfacteur {{current}} sur {{total}}",
+      "allSet": "Tous les torréfacteurs ont des coordonnées !",
+      "note": "Note : Utilisez le bouton \"Calculer\" pour géocoder automatiquement l'adresse, puis testez le résultat sur Google Maps avant de définir.",
+      "workflow": "Flux de travail :",
+      "workflowStep1": "Cliquez sur \"Rechercher\" (s'ouvre dans un nouvel onglet)",
+      "workflowStep2": "Trouvez l'emplacement exact sur la carte",
+      "workflowStep3": "Copiez l'URL de la barre d'adresse de votre navigateur (Ctrl+L, Ctrl+C)",
+      "workflowStep4": "Cliquez sur \"Coller depuis le presse-papiers\" - il lira automatiquement votre presse-papiers !",
+      "workflowStep5": "Cliquez sur \"Tester\" pour vérifier",
+      "workflowStep6": "Cliquez sur \"Définir\" pour enregistrer",
+      "workflowTip": "Astuce : Vous pouvez également utiliser \"Calculer\" pour une estimation rapide, ou saisir les coordonnées manuellement."
+    },
+    "unverified": "Non vérifié"
   },
   "adminForms": {
     "roasters": {
@@ -821,40 +881,6 @@
       "sourceCountriesDescription": "Sélectionnez les pays d'origine du café que ce torréfacteur s'approvisionne.",
       "addImageUrl": "Ajouter une URL d'image..."
     }
-  },
-  "admin": {
-    "roasters": {
-      "all": "Tous",
-      "unverified": "Non vérifiés",
-      "topCountries": "Principaux Pays",
-      "topCities": "Principales Villes"
-    },
-    "coordinates": {
-      "title": "Définir les Coordonnées des Torréfacteurs",
-      "address": "Adresse",
-      "latitude": "Latitude",
-      "longitude": "Longitude",
-      "calculate": "Calculer",
-      "calculating": "Calcul en cours...",
-      "search": "Rechercher",
-      "paste": "Coller",
-      "test": "Tester",
-      "set": "Définir",
-      "saving": "Enregistrement...",
-      "skip": "Passer",
-      "progress": "Torréfacteur {{current}} sur {{total}}",
-      "allSet": "Tous les torréfacteurs ont des coordonnées !",
-      "note": "Note : Utilisez le bouton \"Calculer\" pour géocoder automatiquement l'adresse, puis testez le résultat sur Google Maps avant de définir.",
-      "workflow": "Flux de travail :",
-      "workflowStep1": "Cliquez sur \"Rechercher\" (s'ouvre dans un nouvel onglet)",
-      "workflowStep2": "Trouvez l'emplacement exact sur la carte",
-      "workflowStep3": "Copiez l'URL de la barre d'adresse de votre navigateur (Ctrl+L, Ctrl+C)",
-      "workflowStep4": "Cliquez sur \"Coller depuis le presse-papiers\" - il lira automatiquement votre presse-papiers !",
-      "workflowStep5": "Cliquez sur \"Tester\" pour vérifier",
-      "workflowStep6": "Cliquez sur \"Définir\" pour enregistrer",
-      "workflowTip": "Astuce : Vous pouvez également utiliser \"Calculer\" pour une estimation rapide, ou saisir les coordonnées manuellement."
-    },
-    "unverified": "Non vérifié"
   },
   "adminSection": {
     "users": "Utilisateurs",

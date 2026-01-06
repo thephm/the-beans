@@ -150,6 +150,13 @@ export function Navbar() {
                       {t('admin.suggestions.title', 'Suggestions')}
                     </Link>
                     <Link 
+                      href="/admin/posts" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.posts.title', 'Social Posts')}
+                    </Link>
+                    <Link 
                       href="/admin/backup" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
@@ -307,6 +314,13 @@ export function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t('admin.suggestions.title', 'Suggestions')}
+                      </Link>
+                      <Link 
+                        href="/admin/posts" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('admin.posts.title', 'Social Posts')}
                       </Link>
                       <Link 
                         href="/admin/backup" 

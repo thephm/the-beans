@@ -132,7 +132,7 @@ const AdminSpecialtiesPage: React.FC = () => {
               <div className="flex-1">
                 <Link
                   href={`/admin/specialties/${specialty.id}`}
-                  className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 block"
+                  className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline block"
                 >
                   {specialty.name}
                 </Link>
@@ -156,20 +156,20 @@ const AdminSpecialtiesPage: React.FC = () => {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-gray-200 dark:border-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'name' ? { key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'name', direction: 'asc' })}>
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'name' ? { key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'name', direction: 'asc' })}>
                 {t('admin.specialties.name', 'Specialty')}{sortConfig?.key === 'name' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-left font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'description' ? { key: 'description', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'description', direction: 'asc' })}>
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'description' ? { key: 'description', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'description', direction: 'asc' })}>
                 {t('admin.specialties.description', 'Description')}{sortConfig?.key === 'description' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roasterCount' ? { key: 'roasterCount', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roasterCount', direction: 'asc' })}>
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-center text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roasterCount' ? { key: 'roasterCount', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roasterCount', direction: 'asc' })}>
                 {t('admin.specialties.roasterCount', 'Roasters')}{sortConfig?.key === 'roasterCount' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="py-3 px-4 border-b dark:border-gray-700 text-center font-medium text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'deprecated' ? { key: 'deprecated', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'deprecated', direction: 'asc' })}>
+              <th className="py-3 px-4 border-b dark:border-gray-700 text-center text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'deprecated' ? { key: 'deprecated', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' } : { key: 'deprecated', direction: 'asc' })}>
                 {t('admin.specialties.deprecated', 'Deprecated')}{sortConfig?.key === 'deprecated' && <SortArrow direction={sortConfig.direction} />}
               </th>
             </tr>
@@ -180,7 +180,7 @@ const AdminSpecialtiesPage: React.FC = () => {
                 <td className="py-3 px-4">
                   <Link
                     href={`/admin/specialties/${specialty.id}`}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                    className="text-primary-600 dark:text-primary-400 hover:underline font-medium"
                   >
                     {specialty.name}
                   </Link>

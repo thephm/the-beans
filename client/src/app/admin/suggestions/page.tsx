@@ -421,7 +421,7 @@ const AdminSuggestionsPage: React.FC = () => {
                     href={selectedSuggestion.website} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                    className="text-primary-600 dark:text-primary-400 hover:underline break-all"
                   >
                     {selectedSuggestion.website}
                   </a>

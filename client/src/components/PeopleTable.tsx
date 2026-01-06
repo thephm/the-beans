@@ -107,9 +107,18 @@ export default function PeopleTable() {
 
   return (
     <div className="w-full">
-      {/* Search Bar */}
-      <div className="mb-4">
-        <div className="relative">
+      {/* Header with Person count, Search, and Add button */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+        {/* Person count */}
+        <span className="text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
+          {filteredPeople.length === people.length 
+            ? `${filteredPeople.length} ${t('admin.people.title', 'People')}`
+            : `${filteredPeople.length} ${t('admin.people.of', 'of')} ${people.length} ${t('admin.people.title', 'People')}`
+          }
+        </span>
+
+        {/* Search Bar */}
+        <div className="relative sm:ml-auto max-w-md w-full sm:w-auto">
           <input
             type="text"
             placeholder={t('admin.people.search', 'Search by name, email, roaster, title, or role...')}
@@ -121,20 +130,10 @@ export default function PeopleTable() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 mb-4">
-        {/* Person count */}
-        <span className="text-gray-500 dark:text-gray-400 text-sm">
-          {filteredPeople.length === people.length 
-            ? `${filteredPeople.length} ${t('admin.people.title', 'People')}`
-            : `${filteredPeople.length} ${t('admin.people.of', 'of')} ${people.length} ${t('admin.people.title', 'People')}`
-          }
-        </span>
         
         {/* Add Person button */}
         <button
-          className="sm:ml-auto bg-green-600 dark:bg-green-700 text-white px-5 py-2 rounded shadow hover:bg-green-700 dark:hover:bg-green-600 w-full sm:w-auto"
+          className="bg-green-600 dark:bg-green-700 text-white px-5 py-2 rounded shadow hover:bg-green-700 dark:hover:bg-green-600 whitespace-nowrap sm:ml-3"
           onClick={() => window.location.href = '/admin/people/add'}
         >
           {t('common.add', 'Add')}
@@ -158,7 +157,7 @@ export default function PeopleTable() {
                 <div className="mb-3">
                   <a
                     href={`/admin/people/edit/${person.id}`}
-                    className="text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                    className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline"
                   >
                     {`${person.firstName} ${person.lastName || ''}`.trim()}
                   </a>
@@ -196,7 +195,7 @@ export default function PeopleTable() {
                       <span className="mr-2">🏢</span>
                       <a
                         href={`/admin/roasters/edit/${person.roaster.id}`}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                        className="text-primary-600 dark:text-primary-400 hover:underline"
                       >
                         {person.roaster.name}
                       </a>
@@ -217,7 +216,7 @@ export default function PeopleTable() {
                       <span className="mr-2">📧</span>
                       <a
                         href={`mailto:${person.email}`}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                        className="text-primary-600 dark:text-primary-400 hover:underline"
                       >
                         {person.email}
                       </a>
@@ -240,43 +239,43 @@ export default function PeopleTable() {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow">
+        <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-gray-200 dark:border-gray-700">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'firstName' ? { key: 'firstName', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'firstName', direction: 'asc' })}>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'firstName' ? { key: 'firstName', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'firstName', direction: 'asc' })}>
                   {t('adminForms.roasters.name', 'Name')}{sortConfig?.key === 'firstName' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roaster' ? { key: 'roaster', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roaster', direction: 'asc' })}>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roaster' ? { key: 'roaster', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roaster', direction: 'asc' })}>
                   {t('adminSection.roasters', 'Roaster')}{sortConfig?.key === 'roaster' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roles' ? { key: 'roles', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roles', direction: 'asc' })}>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roles' ? { key: 'roles', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roles', direction: 'asc' })}>
                   {t('adminSection.role', 'Role')}{sortConfig?.key === 'roles' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
                   {t('adminForms.roasters.email', 'Email')}{sortConfig?.key === 'email' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-8 py-3 text-left font-semibold text-gray-900 dark:text-gray-100 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'mobile' ? { key: 'mobile', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'mobile', direction: 'asc' })}>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'mobile' ? { key: 'mobile', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'mobile', direction: 'asc' })}>
                   {t('adminForms.roasters.phone', 'Mobile')}{sortConfig?.key === 'mobile' && <SortArrow direction={sortConfig.direction} />}
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-4 text-center text-gray-500 dark:text-gray-400">{t('loading', 'Loading...')}</td>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('loading', 'Loading...')}</td>
                 </tr>
               ) : filteredPeople.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-4 text-center text-gray-500 dark:text-gray-400">{t('admin.people.noPeopleFound', 'No people found.')}</td>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('admin.people.noPeopleFound', 'No people found.')}</td>
                 </tr>
               ) : (
                 filteredPeople.map(person => (
                   <tr key={person.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-8 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <td className="px-6 py-4">
                       <a
                         href={`/admin/people/edit/${person.id}`}
-                        className="text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 underline cursor-pointer"
+                        className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                       >
                         {`${person.firstName} ${person.lastName || ''}`.trim()}
                       </a>
@@ -286,12 +285,12 @@ export default function PeopleTable() {
                         </div>
                       )}
                     </td>
-                    <td className="px-8 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <td className="px-6 py-4">
                       {person.roaster ? (
                         <div>
                           <a
                             href={`/admin/roasters/edit/${person.roaster.id}`}
-                            className="text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 underline cursor-pointer"
+                            className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                           >
                             {person.roaster.name}
                           </a>
@@ -306,7 +305,7 @@ export default function PeopleTable() {
                         <span className="text-gray-400 dark:text-gray-500">-</span>
                       )}
                     </td>
-                    <td className="px-8 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <td className="px-6 py-4">
                       {person.roles && person.roles.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {person.roles.map((role, index) => (
@@ -330,11 +329,11 @@ export default function PeopleTable() {
                         <span className="text-gray-400 dark:text-gray-500">-</span>
                       )}
                     </td>
-                    <td className="px-8 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <td className="px-6 py-4">
                       {person.email ? (
                         <a
                           href={`mailto:${person.email}`}
-                          className="text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 underline cursor-pointer"
+                          className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                         >
                           {person.email}
                         </a>
@@ -342,7 +341,7 @@ export default function PeopleTable() {
                         <span className="text-gray-400 dark:text-gray-500">-</span>
                       )}
                     </td>
-                    <td className="px-8 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">{person.mobile}</td>
+                    <td className="px-6 py-4 text-gray-900 dark:text-gray-100">{person.mobile}</td>
                   </tr>
                 ))
               )}
