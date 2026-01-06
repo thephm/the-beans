@@ -164,13 +164,13 @@ const AdminPostsPage: React.FC = () => {
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      if (roasterSearchTerm) {
+      if (roasterSearchTerm && !selectedRoaster) {
         searchRoasters(roasterSearchTerm);
       }
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [roasterSearchTerm]);
+  }, [roasterSearchTerm, selectedRoaster]);
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -270,6 +270,7 @@ const AdminPostsPage: React.FC = () => {
     setSelectedRoaster(roaster);
     setFormData({ ...formData, roasterId: roaster.id });
     setRoasterSearchTerm(roaster.name);
+    setRoasterResults([]);
     setShowRoasterResults(false);
   };
 
@@ -293,30 +294,32 @@ const AdminPostsPage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('admin.posts.roaster', 'Roaster')} *
               </label>
-              <input
-                type="text"
-                value={roasterSearchTerm}
-                onChange={(e) => {
-                  setRoasterSearchTerm(e.target.value);
-                  if (!e.target.value) {
-                    setSelectedRoaster(null);
-                    setShowRoasterResults(false);
-                  }
-                }}
-                onFocus={() => {
-                  if (roasterResults.length > 0) {
-                    setShowRoasterResults(true);
-                  }
-                }}
-                placeholder={t('admin.posts.searchRoaster', 'Search for a roaster...')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                required
-              />
-              {selectedRoaster && (
-                <div className="mt-2 text-sm text-green-600 dark:text-green-400">
-                  ✓ {selectedRoaster.name} - {selectedRoaster.city}, {selectedRoaster.state || selectedRoaster.country}
-                </div>
-              )}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={roasterSearchTerm}
+                  onChange={(e) => {
+                    setRoasterSearchTerm(e.target.value);
+                    if (!e.target.value) {
+                      setSelectedRoaster(null);
+                      setShowRoasterResults(false);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (roasterResults.length > 0) {
+                      setShowRoasterResults(true);
+                    }
+                  }}
+                  placeholder={t('admin.posts.searchRoaster', 'Search for a roaster...')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white pr-10"
+                  required
+                />
+                {selectedRoaster && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 dark:text-green-400 text-xl">
+                    ✓
+                  </span>
+                )}
+              </div>
               {showRoasterResults && roasterResults.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {roasterResults.map((roaster) => (
@@ -345,6 +348,33 @@ const AdminPostsPage: React.FC = () => {
                 type="url"
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const pastedText = e.clipboardData.getData('text');
+                  try {
+                    const url = new URL(pastedText);
+                    // Remove UTM and tracking parameters
+                    const paramsToRemove = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'msclkid', 'mc_cid', 'mc_eid', '_ga', 'igsh', 'igshid'];
+                    paramsToRemove.forEach(param => url.searchParams.delete(param));
+                    // Remove trailing slash from pathname
+                    let pathname = url.pathname;
+                    if (pathname.endsWith('/') && pathname.length > 1) {
+                      pathname = pathname.slice(0, -1);
+                    }
+                    // Clean up the URL - remove query string if empty
+                    let cleanUrl = url.origin + pathname;
+                    if (url.searchParams.toString()) {
+                      cleanUrl += '?' + url.searchParams.toString();
+                    }
+                    if (url.hash) {
+                      cleanUrl += url.hash;
+                    }
+                    setFormData({ ...formData, url: cleanUrl });
+                  } catch {
+                    // If not a valid URL, just paste as-is
+                    setFormData({ ...formData, url: pastedText });
+                  }
+                }}
                 placeholder="https://instagram.com/p/..."
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
                 required
@@ -451,24 +481,14 @@ const AdminPostsPage: React.FC = () => {
           </button>
           </div>
         </div>
-        <button
-          onClick={() => {
-            setShowForm(!showForm);
-            if (showForm) {
-              setEditingPost(null);
-              setSelectedRoaster(null);
-              setFormData({
-                roasterId: '',
-                url: '',
-                postedAt: formatLocalDateTime(new Date())
-              });
-              setRoasterSearchTerm('');
-            }
-          }}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
-        >
-          {showForm ? t('admin.posts.cancel', 'Cancel') : t('common.add', 'Add')}
-        </button>
+        {!showForm && (
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
+          >
+            {t('common.add', 'Add')}
+          </button>
+        )}
       </div>
 
       {/* Loading/Error States */}
