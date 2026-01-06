@@ -10,7 +10,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
 import bigintSerializer from './middleware/bigintSerializer';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
@@ -27,7 +26,6 @@ import peopleRoutes from './routes/people';
 import reviewRoutes from './routes/reviews';
 import searchRoutes from './routes/search';
 import auditLogRoutes from './routes/auditLogs';
-import debugRoutes from './routes/debug';
 import adminUsersRoutes from './routes/adminUsers';
 import regionRoutes from './routes/regions';
 import countryRoutes from './routes/countries';
@@ -49,22 +47,7 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Trust proxy - Required when behind Render's load balancer or any reverse proxy
-// This allows express-rate-limit and other middleware to correctly identify client IPs
-app.set('trust proxy', true);
-
-// Rate limiting - More reasonable limits for development and normal usage
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // increased from 100 to 1000 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-});
-
-// Stricter rate limiting for auth endpoints only
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // increased temporarily for development
-  message: 'Too many authentication attempts, please try again later.',
-});
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(helmet({
@@ -91,7 +74,6 @@ app.use(cors({
 // Convert BigInt values returned by raw SQL queries to safe JSON types
 app.use(bigintSerializer);
 app.use(morgan('combined'));
-app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -165,7 +147,7 @@ app.get('/health', async (req: Request, res: Response) => {
 
 
 // API routes
-app.use('/api/auth', authLimiter, authRoutes); // Apply stricter rate limiting to auth endpoints
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roasters', roasterRoutes);
 app.use('/api/people', peopleRoutes);
@@ -174,7 +156,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/regions', regionRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/specialties', specialtyRoutes);
-app.use('/api/contact', contactRouter); // Register contact route
+app.use('/api/contact', contactRouter);
 app.use('/api/favourites', favouritesRoutes);
 app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/backup', backupRoutes);
@@ -183,7 +165,6 @@ app.use('/api/oauth', oauthRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api', forgotPasswordRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
-app.use('/api/debug', debugRoutes); // Debug authentication routes
 // Analytics event capture route
 app.use('/api/analytics', analyticsRouter);
 // Analytics admin stats route

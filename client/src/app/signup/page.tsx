@@ -10,6 +10,8 @@ import { trackAnalytics } from '@/lib/analytics'
 export default function SignupPage() {
   const { t } = useTranslation()
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -35,7 +37,9 @@ export default function SignupPage() {
       const userData = {
         email: formData.email,
         password: formData.password,
-        username: formData.email // Use email as username for now
+        username: formData.email, // Use email as username for now
+        firstName: formData.firstName,
+        lastName: formData.lastName
       }
       
       const data = await apiClient.register(userData)
@@ -95,6 +99,40 @@ export default function SignupPage() {
                 {error}
               </div>
             )}
+
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('auth.firstName', 'First Name')}
+              </label>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                autoComplete="given-name"
+                required
+                value={formData.firstName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
+                placeholder={t('auth.firstNamePlaceholder', 'John')}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('auth.lastName', 'Last Name')}
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                autoComplete="family-name"
+                required
+                value={formData.lastName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
+                placeholder={t('auth.lastNamePlaceholder', 'Doe')}
+              />
+            </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

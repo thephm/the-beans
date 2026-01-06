@@ -135,27 +135,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo Account */}
-          <div className="mt-6 p-4 bg-lavender-50 dark:bg-lavender-900/20 rounded-lg border border-lavender-200 dark:border-lavender-800">
-            <h3 className="text-sm font-medium text-lavender-800 dark:text-lavender-300 mb-2">{t('auth.demo.title')}</h3>
-            <p className="text-sm text-lavender-700 dark:text-lavender-400">
-              <span className="flex items-center gap-1 mb-1">
-                <Email sx={{ fontSize: 16 }} />
-                Email: coffee@lover.com
-              </span>
-              <span className="flex items-center gap-1">
-                <VpnKey sx={{ fontSize: 16 }} />
-                Password: password123
-              </span>
-            </p>
-            <button
-              onClick={() => setFormData({ email: 'coffee@lover.com', password: 'password123' })}
-              className="mt-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
-            >
-              {t('auth.demo.fillCredentials')}
-            </button>
-          </div>
-
           {/* Social Login */}
 
         </div>

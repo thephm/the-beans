@@ -171,7 +171,7 @@ export default function AnalyticsDashboard() {
 		}
 	};
 
-	useEffect(() => { fetchStats(); }, [user, token, eventType, startDateFilter, endDateFilter]);
+	useEffect(() => { fetchStats(); }, [user, eventType, startDateFilter, endDateFilter]);
 	useEffect(() => { applyClientFilters(undefined, 1); }, [selectedPages, searchFilter, stats, topPagesDays]);
 
 	const applyClientFilters = (rowsParam?: any[], page = 1) => {
@@ -417,27 +417,27 @@ export default function AnalyticsDashboard() {
 					</div>
 				</div>
 				{!filtersCollapsed && (
-					<div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-						<div className="md:col-span-2">
-							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.eventType', 'Event Type')}</label>
-							<select value={eventType} onChange={(e) => setEventType(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-								<option value="page_view">{tr('admin.analytics.eventTypes.page_view', 'Page View')}</option>
-								<option value="signup">{tr('admin.analytics.eventTypes.signup', 'Signup')}</option>
-								<option value="login">{tr('admin.analytics.eventTypes.login', 'Login')}</option>
-								   <option value="favourite">{tr('admin.analytics.eventTypes.favourite', 'Favourite')}</option>
-								<option value="review">{tr('admin.analytics.eventTypes.review', 'Review')}</option>
-							</select>
-						</div>
-						{eventType === 'page_view' && (
-							<div className="md:col-span-3">
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.page', 'Page')}</label>
-								<div className="mt-1">
-									<div className="flex items-center space-x-2">
-										<div className="flex-1 min-w-0">
+					<div className="flex flex-col gap-4">
+						<div className="grid grid-cols-1 xl:grid-cols-[140px_auto_160px_160px_200px_auto] gap-3 items-end">
+							<div className="xl:col-span-1 col-span-1">
+								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.eventType', 'Event Type')}</label>
+								<select value={eventType} onChange={(e) => setEventType(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+									<option value="page_view">{tr('admin.analytics.eventTypes.page_view', 'Page View')}</option>
+									<option value="signup">{tr('admin.analytics.eventTypes.signup', 'Signup')}</option>
+									<option value="login">{tr('admin.analytics.eventTypes.login', 'Login')}</option>
+									   <option value="favourite">{tr('admin.analytics.eventTypes.favourite', 'Favourite')}</option>
+									<option value="review">{tr('admin.analytics.eventTypes.review', 'Review')}</option>
+								</select>
+							</div>
+							{eventType === 'page_view' && (
+								<div className="xl:col-span-1 col-span-1">
+									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.page', 'Page')}</label>
+									<div className="flex items-center gap-2">
+										<div className="min-w-[300px]">
 											<Select
 												components={{
 													ValueContainer: ({ children, ...props }: any) => {
-														const maxVisible = 3;
+														const maxVisible = 2;
 														const values = props.getValue ? props.getValue() : [];
 														const visible = (values || []).slice(0, maxVisible);
 														const rest = Math.max(0, (values || []).length - visible.length);
@@ -449,7 +449,7 @@ export default function AnalyticsDashboard() {
 																		<div className="react-select__multi-value__label">{v.label}</div>
 																	</div>
 																))}
-																{rest > 0 && <div className="ml-2 text-sm text-gray-400">{tr('admin.analytics.filters.more', '+{{count}} more').replace('{{count}}', String(rest))}</div>}
+																{rest > 0 && <div className="ml-2 text-xs text-gray-400">+{rest}</div>}
 																{input}
 															</components.ValueContainer>
 														);
@@ -492,41 +492,41 @@ export default function AnalyticsDashboard() {
 												menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
 												menuPosition="fixed" />
 										</div>
-										<label className="inline-flex items-center text-sm text-gray-700 dark:text-gray-200">
-											<input type="checkbox" className="ml-2" checked={selectedPages.length === pagesList.length} onChange={(e) => {
+										<label className="inline-flex items-center text-xs text-gray-700 dark:text-gray-200 whitespace-nowrap">
+											<input type="checkbox" className="mr-1" checked={selectedPages.length === pagesList.length} onChange={(e) => {
 												if (e.target.checked) setSelectedPages(pagesList.slice());
 												else setSelectedPages([]);
 											}} />
-											<span className="ml-2">{tr('admin.analytics.filters.selectAll', 'all')}</span>
+											<span>{tr('admin.analytics.filters.selectAll', 'all')}</span>
 										</label>
 									</div>
 								</div>
+							)}
+							<div className="xl:col-span-1 col-span-1 grid grid-cols-2 xl:grid-cols-1 gap-3 xl:block">
+								<div>
+									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.startDate', 'Start Date')}</label>
+									<input type="date" value={startDateFilter} onChange={(e) => setStartDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
+								</div>
+								<div className="xl:hidden">
+									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.endDate', 'End Date')}</label>
+									<input type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
+								</div>
 							</div>
-						)}
-						<div className="md:col-span-4 grid grid-cols-2 gap-4">
-							<div>
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.startDate', 'Start Date')}</label>
-								<input type="date" value={startDateFilter} onChange={(e) => setStartDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
-							</div>
-							<div>
+							<div className="xl:col-span-1 hidden xl:block">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.endDate', 'End Date')}</label>
 								<input type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
 							</div>
-						</div>
-						<div className="md:col-span-2">
-							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.search', 'Search')}</label>
-							<div className="flex items-center">
-								<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
-									<Tooltip title={tr('admin.analytics.filters.resetTooltip', 'Reset filters to defaults')}>
-										<IconButton type="button" onClick={resetFilters} size="small" aria-label={tr('admin.analytics.filters.reset', 'Reset')} className="ml-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">
-											<RefreshIcon fontSize="small" />
-										</IconButton>
-									</Tooltip>
+							<div className="xl:col-span-1 col-span-1">
+								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.search', 'Search')}</label>
+								<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
 							</div>
-						</div>
-						<div className="md:col-span-12 flex flex-col md:flex-row items-end md:items-center justify-end space-y-2 md:space-y-0 md:space-x-2">
-							{/* Export controls moved to table header row */}
-							{/* rows count moved below filter pane so it updates with client-side filters */}
+							<div className="xl:col-span-1 col-span-1 flex justify-end">
+								<Tooltip title={tr('admin.analytics.filters.resetTooltip', 'Reset filters to defaults')}>
+									<IconButton type="button" onClick={resetFilters} size="small" aria-label={tr('admin.analytics.filters.reset', 'Reset')} className="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">
+										<RefreshIcon fontSize="small" />
+									</IconButton>
+								</Tooltip>
+							</div>
 						</div>
 					</div>
 				)}
