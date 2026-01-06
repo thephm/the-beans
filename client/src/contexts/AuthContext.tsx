@@ -8,8 +8,8 @@ interface User {
   id: string
   email: string
   username: string
-  firstName?: string
-  lastName?: string
+  firstName: string
+  lastName: string
   avatar?: string
   language?: string
   role?: string // 'admin' | 'user' etc.

@@ -31,10 +31,10 @@ const router = Router();
  *           description: The user's username
  *         firstName:
  *           type: string
- *           description: The user's first name
+ *           description: The user's first name (required)
  *         lastName:
  *           type: string
- *           description: The user's last name
+ *           description: The user's last name (required)
  *         avatar:
  *           type: string
  *           description: URL to the user's avatar image
@@ -68,6 +68,8 @@ const router = Router();
  *               - email
  *               - username
  *               - password
+ *               - firstName
+ *               - lastName
  *             properties:
  *               email:
  *                 type: string
@@ -102,6 +104,8 @@ router.post('/register', [
   body('email').isEmail().normalizeEmail(),
   body('username').isLength({ min: 3, max: 50 }),
   body('password').isLength({ min: 6 }),
+  body('firstName').trim().isLength({ min: 1, max: 50 }).withMessage('First name is required'),
+  body('lastName').trim().isLength({ min: 1, max: 50 }).withMessage('Last name is required'),
 ], async (req: any, res: any) => {
   try {
     // Set up audit context before validation
@@ -115,7 +119,7 @@ router.post('/register', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, username, password } = req.body;
+    const { email, username, password, firstName, lastName } = req.body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
@@ -144,6 +148,8 @@ router.post('/register', [
         email,
         username,
         password: hashedPassword,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         // For self-registration, createdById is null (user created themselves)
         createdById: null,
       },
@@ -151,6 +157,8 @@ router.post('/register', [
         id: true,
         email: true,
         username: true,
+        firstName: true,
+        lastName: true,
         avatar: true,
         bio: true,
         location: true,
@@ -338,6 +346,8 @@ router.get('/me', async (req: Request, res: Response) => {
         id: true,
         email: true,
         username: true,
+        firstName: true,
+        lastName: true,
         avatar: true,
         bio: true,
         location: true,

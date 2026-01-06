@@ -97,11 +97,25 @@ export function Navbar() {
                 {isAdminMenuOpen && (
                   <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 py-2 z-50">
                     <Link 
-                      href="/admin/users" 
+                      href="/admin/analytics" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors font-semibold"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('adminSection.analytics', 'Analytics')}
+                    </Link>
+                    <Link 
+                      href="/admin/audit-logs" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
-                      {t('adminSection.users', 'Users')}
+                      {t('adminSection.auditLogs', 'Audit Logs')}
+                    </Link>
+                    <Link 
+                      href="/admin/backup" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.backup.title', 'Backup')}
                     </Link>
                     <Link 
                       href="/admin/people" 
@@ -120,20 +134,26 @@ export function Navbar() {
                     >
                       {t('adminSection.roasters', 'Roasters')}
                     </Link>
-                    {/* Add Analytics link here */}
-                    <Link 
-                      href="/admin/analytics" 
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors font-semibold"
-                      onClick={() => setIsAdminMenuOpen(false)}
-                    >
-                      {t('adminSection.analytics', 'Analytics')}
-                    </Link>
                     <Link 
                       href="/admin/roasters/new-admin" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-green-700 dark:hover:text-green-400 transition-colors font-semibold"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('adminSection.roastersNew', 'Roasters (New)')}
+                    </Link>
+                    <Link 
+                      href="/admin/coordinates" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('adminSection.coordinates', 'Set Lat/Long')}
+                    </Link>
+                    <Link 
+                      href="/admin/posts" 
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.posts.title', 'Social Posts')}
                     </Link>
                     <Link 
                       href="/admin/specialties" 
@@ -150,32 +170,11 @@ export function Navbar() {
                       {t('admin.suggestions.title', 'Suggestions')}
                     </Link>
                     <Link 
-                      href="/admin/posts" 
+                      href="/admin/users" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
-                      {t('admin.posts.title', 'Social Posts')}
-                    </Link>
-                    <Link 
-                      href="/admin/backup" 
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsAdminMenuOpen(false)}
-                    >
-                      {t('admin.backup.title', 'Backup')}
-                    </Link>
-                    <Link 
-                      href="/admin/audit-logs" 
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsAdminMenuOpen(false)}
-                    >
-                      {t('adminSection.auditLogs', 'Audit Logs')}
-                    </Link>
-                    <Link 
-                      href="/admin/coordinates" 
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsAdminMenuOpen(false)}
-                    >
-                      {t('adminSection.coordinates', 'Set Lat/Long')}
+                      {t('adminSection.users', 'Users')}
                     </Link>
                   </div>
                 )}

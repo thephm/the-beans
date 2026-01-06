@@ -26,6 +26,8 @@ async function main() {
       username: adminUsername,
       role: 'admin',
       language: 'en',
+      firstName: 'Admin',
+      lastName: 'User',
     },
   });
 
@@ -39,6 +41,8 @@ async function main() {
       password: 'password123',
       language: 'en',
       role: 'user',
+      firstName: 'Coffee',
+      lastName: 'Lover',
     },
   });
 
