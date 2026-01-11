@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
@@ -17,8 +17,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login } = useAuth()
   const { t } = useTranslation()
+
+  // Check for error parameter on mount
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'session_expired') {
+      setError(t('auth.sessionExpired', 'Your session has expired. Please login again.'))
+    }
+  }, [searchParams, t])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,7 +38,14 @@ export default function LoginPage() {
       const data = await apiClient.login(formData) as { token: string; user: any }
       login(data.token, data.user)
       trackAnalytics('login', { email: formData.email })
-      router.push('/discover')
+      
+      // Check for redirect parameter
+      const redirect = searchParams.get('redirect')
+      if (redirect) {
+        router.push(redirect)
+      } else {
+        router.push('/discover')
+      }
     } catch (error: any) {
       if (error.message && error.message.toLowerCase().includes('deprecated')) {
   setError(t('auth.deprecatedAccount', 'This account has been deprecated.'));

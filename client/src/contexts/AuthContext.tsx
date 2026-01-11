@@ -40,24 +40,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Check for existing auth data on mount
-    const token = localStorage.getItem('token')
-    const userData = localStorage.getItem('user')
-    
-    if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData)
-        setUser(parsedUser)
-        setToken(token)
-        // Ensure the API client has the token
-        apiClient.setToken(token)
-      } catch (error) {
-        console.error('Error parsing user data:', error)
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
+    const validateAndLoadAuth = async () => {
+      const storedToken = localStorage.getItem('token')
+      const userData = localStorage.getItem('user')
+      
+      if (storedToken && userData) {
+        try {
+          const parsedUser = JSON.parse(userData)
+          apiClient.setToken(storedToken)
+          
+          // Validate token by making an API call
+          try {
+            const currentUser = await apiClient.getCurrentUser() as User
+            // Token is valid, update with fresh user data
+            setUser(currentUser)
+            setToken(storedToken)
+            localStorage.setItem('user', JSON.stringify(currentUser))
+          } catch (apiError) {
+            // Token is invalid, clear auth
+            console.error('Token validation failed on mount:', apiError)
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            apiClient.clearToken()
+          }
+        } catch (error) {
+          console.error('Error parsing user data:', error)
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+        }
       }
+      
+      setLoading(false)
     }
     
-    setLoading(false)
+    validateAndLoadAuth()
   }, [])
 
   const login = (token: string, userData: User) => {

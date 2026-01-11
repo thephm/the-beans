@@ -2,28 +2,47 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { apiClient } from '@/lib/api';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
+  const [validating, setValidating] = useState(true);
 
   useEffect(() => {
-    // Wait for auth to load
-    if (loading) return;
-    
-    // Redirect non-admin users to home page
-    if (!user || user.role !== 'admin') {
-      router.replace('/');
-    }
-  }, [user, loading, router]);
+    // Validate token on mount
+    const validateToken = async () => {
+      if (loading) return;
+      
+      // Check if user exists and has admin role
+      if (!user || user.role !== 'admin') {
+        router.replace('/');
+        setValidating(false);
+        return;
+      }
 
-  // Show loading state while checking auth
-  if (loading) {
+      // Validate the token is still valid by making an API call
+      try {
+        await apiClient.getCurrentUser();
+        setValidating(false);
+      } catch (error) {
+        console.error('Token validation failed:', error);
+        // Token is invalid, logout and redirect
+        logout();
+        router.replace('/login?redirect=/admin&error=session_expired');
+      }
+    };
+
+    validateToken();
+  }, [user, loading, router, logout]);
+
+  // Show loading state while checking auth and validating token
+  if (loading || validating) {
     return (
       <div className="container mx-auto pt-20 sm:pt-28 px-4">
         <div className="flex items-center justify-center">
