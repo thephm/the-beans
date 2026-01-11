@@ -20,7 +20,7 @@ model User {
   id              String          @id @default(cuid())
   email           String          @unique
   username        String          @unique
-  password        String
+  password        String?
   firstName       String
   lastName        String
   avatar          String?
@@ -58,6 +58,8 @@ model User {
   updatedBy       User?           @relation("UserUpdatedBy", fields: [updatedById], references: [id])
   updatedUsers    User[]          @relation("UserUpdatedBy")
   passwordResetTokens PasswordResetToken[]
+  oauthAccounts   OAuthAccount[]
+  oauthStates     OAuthState[]
 
   @@map("users")
 }
@@ -413,4 +415,64 @@ model Post {
   @@index([roasterId])
   @@index([postedAt])
   @@map("posts")
+}
+
+// OAuth Models
+
+model OAuthAccount {
+  id                String        @id @default(cuid())
+  userId            String
+  provider          String        @db.VarChar(32) // 'facebook', 'instagram', 'google', 'microsoft'
+  providerAccountId String        // Unique ID from the OAuth provider
+  email             String?       // Email from provider (may differ from user.email)
+  displayName       String?       // Display name from provider
+  profilePicture    String?       // Profile picture URL from provider
+  metadata          Json?         // Additional provider-specific data
+  scope             String[]      // OAuth scopes granted
+  lastUsedAt        DateTime?     // Last time this account was used for login
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokens            OAuthToken?   // One-to-one relation
+
+  @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+model OAuthToken {
+  id               String       @id @default(cuid())
+  accountId        String       @unique // One-to-one with OAuthAccount
+  tokenType        String       @db.VarChar(16) // 'Bearer'
+  accessToken      String       @db.Text // Encrypted access token
+  refreshToken     String?      @db.Text // Encrypted refresh token (optional)
+  expiresAt        DateTime?    // Token expiration (null for long-lived tokens)
+  scope            String[]     // OAuth scopes for this token
+  lastRefreshedAt  DateTime?    // Last time the token was refreshed
+  refreshFailCount Int          @default(0) // Track failed refresh attempts
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  account          OAuthAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("oauth_tokens")
+}
+
+model OAuthState {
+  id            String   @id @default(cuid())
+  state         String   @unique @db.VarChar(64) // Random state parameter
+  provider      String   @db.VarChar(32)
+  userId        String?  // Optional - for linking existing accounts
+  codeVerifier  String?  @db.VarChar(256) // PKCE code_verifier (128 bytes base64url = ~171 chars)
+  codeChallenge String?  @db.VarChar(256) // PKCE code_challenge
+  redirectUrl   String?  @db.Text // Where to redirect after OAuth
+  ipAddress     String?  @db.VarChar(45) // IP address for security
+  userAgent     String?  @db.Text // User agent string
+  expiresAt     DateTime // State expires after 10 minutes
+  createdAt     DateTime @default(now())
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([state])
+  @@index([expiresAt])
+  @@map("oauth_states")
 }

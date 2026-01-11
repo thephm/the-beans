@@ -278,6 +278,14 @@ router.post('/login', [
       });
     }
 
+    // OAuth users don't have passwords
+    if (!user.password) {
+      return res.status(401).json({
+        error: 'Invalid login method',
+        message: 'This account uses social login. Please sign in with your social account.'
+      });
+    }
+
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {

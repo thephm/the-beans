@@ -270,11 +270,32 @@ export function Navbar() {
                   {isAdminMobileOpen && (
                     <div className="pl-4">
                       <Link 
-                        href="/admin/users" 
+                        href="/admin/analytics" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 py-1 font-semibold"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.analytics', 'Analytics')}
+                      </Link>
+                      <Link 
+                        href="/admin/audit-logs" 
                         className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        {t('adminSection.users', 'Users')}
+                        {t('adminSection.auditLogs', 'Audit Logs')}
+                      </Link>
+                      <Link 
+                        href="/admin/backup" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('admin.backup.title', 'Backup')}
+                      </Link>
+                      <Link 
+                        href="/admin/people" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('adminSection.people', 'People')}
                       </Link>
                       <Link 
                         href="/admin/roasters" 
@@ -294,11 +315,18 @@ export function Navbar() {
                         {t('adminSection.roastersNew', 'Roasters (New)')}
                       </Link>
                       <Link 
-                        href="/admin/people" 
+                        href="/admin/coordinates" 
                         className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        {t('adminSection.people', 'People')}
+                        {t('adminSection.coordinates', 'Set Lat/Long')}
+                      </Link>
+                      <Link 
+                        href="/admin/posts" 
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('admin.posts.title', 'Social Posts')}
                       </Link>
                       <Link 
                         href="/admin/specialties" 
@@ -315,39 +343,11 @@ export function Navbar() {
                         {t('admin.suggestions.title', 'Suggestions')}
                       </Link>
                       <Link 
-                        href="/admin/posts" 
+                        href="/admin/users" 
                         className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        {t('admin.posts.title', 'Social Posts')}
-                      </Link>
-                      <Link 
-                        href="/admin/backup" 
-                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {t('admin.backup.title', 'Backup')}
-                      </Link>
-                      <Link 
-                        href="/admin/analytics" 
-                        className="block text-gray-600 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 py-1 font-semibold"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {t('adminSection.analytics', 'Analytics')}
-                      </Link>
-                      <Link 
-                        href="/admin/audit-logs" 
-                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {t('adminSection.auditLogs', 'Audit Logs')}
-                      </Link>
-                      <Link 
-                        href="/admin/coordinates" 
-                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {t('adminSection.coordinates', 'Set Lat/Long')}
+                        {t('adminSection.users', 'Users')}
                       </Link>
                     </div>
                   )}
