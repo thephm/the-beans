@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Roaster, RoasterImage, RoasterPerson, PersonRole } from '../types/index';
 import RoasterSourceFields, { RoasterSourceType } from './RoasterSourceFields';
@@ -39,6 +39,8 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   const [formData, setFormData] = useState<any>(initialFormData);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const countryInputRef = useRef<HTMLInputElement>(null);
 
   // Handle specialty selection
   const handleSpecialtyChange = (specialtyIds: string[]) => {
@@ -63,6 +65,25 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     e.preventDefault();
     setSaving(true);
     setError(null);
+    setFieldErrors({});
+
+    // Validate required fields
+    const errors: { [key: string]: string } = {};
+    if (!formData.country || formData.country.trim() === '') {
+      errors.country = t('roaster.errors.countryRequired', 'Country is required');
+      // Focus on country field
+      if (countryInputRef.current) {
+        countryInputRef.current.focus();
+        countryInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setSaving(false);
+      return;
+    }
+
     // Remove deprecated social fields before submit
     const deprecatedSocials = [
       'instagram', 'tiktok', 'facebook', 'linkedin', 'youtube', 'threads', 'pinterest', 'bluesky', 'x', 'reddit'
@@ -148,13 +169,26 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           />
         </div>
         <div>
-          <label className="block font-semibold mb-1">{t('roaster.country', 'Country')}</label>
+          <label className="block font-semibold mb-1">
+            {t('roaster.country', 'Country')} <span className="text-red-500">*</span>
+          </label>
           <input
+            ref={countryInputRef}
             type="text"
-            className="border rounded px-2 py-1 w-full"
+            className={`border rounded px-2 py-1 w-full ${fieldErrors.country ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
             value={formData.country}
-            onChange={e => setFormData((prev: any) => ({ ...prev, country: e.target.value }))}
+            onChange={e => {
+              setFormData((prev: any) => ({ ...prev, country: e.target.value }));
+              // Clear error when user starts typing
+              if (fieldErrors.country) {
+                setFieldErrors((prev) => ({ ...prev, country: '' }));
+              }
+            }}
+            required
           />
+          {fieldErrors.country && (
+            <p className="text-red-500 text-sm mt-1">{fieldErrors.country}</p>
+          )}
         </div>
       </div>
 

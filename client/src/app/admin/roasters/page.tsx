@@ -975,7 +975,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   // Section expand/collapse state
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const [locationExpanded, setLocationExpanded] = useState(true);
-  const [contactsExpanded, setContactsExpanded] = useState(true);
+  const [contactsExpanded, setContactsExpanded] = useState(!!roaster?.id); // Collapsed for new roasters
   const [specialtiesExpanded, setSpecialtiesExpanded] = useState(true);
   const [settingsExpanded, setSettingsExpanded] = useState(true);
   const [urlImagesExpanded, setUrlImagesExpanded] = useState(false);
@@ -1205,6 +1205,18 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     setLoading(true);
     setError(null);
 
+    // Validate required fields
+    if (!formData.country || formData.country.trim() === '') {
+      setError('Country is required');
+      setLoading(false);
+      // Scroll to location section
+      const locationSection = document.querySelector('[data-section="location"]');
+      if (locationSection) {
+        locationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       
@@ -1233,7 +1245,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       const { instagram, tiktok, facebook, linkedin, youtube, threads, pinterest, bluesky, x, reddit, ...payloadData } = formData;
 
       // Clean up empty strings - convert to null to allow clearing optional fields
-      const cleanedPayloadData: Omit<typeof payloadData, 'website' | 'email' | 'phone' | 'address' | 'city' | 'state' | 'zipCode' | 'country' | 'description'> & {
+      const cleanedPayloadData: Omit<typeof payloadData, 'website' | 'email' | 'phone' | 'address' | 'city' | 'state' | 'zipCode' | 'description'> & {
         website: string | null;
         email: string | null;
         phone: string | null;
@@ -1241,7 +1253,6 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         city: string | null;
         state: string | null;
         zipCode: string | null;
-        country: string | null;
         description: string | null;
       } = { ...payloadData };
       if (cleanedPayloadData.website === '') cleanedPayloadData.website = null;
@@ -1251,7 +1262,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       if (cleanedPayloadData.city === '') cleanedPayloadData.city = null;
       if (cleanedPayloadData.state === '') cleanedPayloadData.state = null;
       if (cleanedPayloadData.zipCode === '') cleanedPayloadData.zipCode = null;
-      if (cleanedPayloadData.country === '') cleanedPayloadData.country = null;
+      // Don't convert country to null - it's required and validation should catch empty values
       if (cleanedPayloadData.description === '') cleanedPayloadData.description = null;
 
       const payload = {
@@ -1783,7 +1794,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
             </div>
 
             {/* Location & Details */}
-            <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
+            <div data-section="location" className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.locationDetails', 'Location & Details')}
@@ -1861,15 +1872,21 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t('admin.roasters.country', 'Country')}
+                        {t('admin.roasters.country', 'Country')} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="country"
                         value={formData.country}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        required
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${
+                          error && error.includes('Country') ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600'
+                        }`}
                       />
+                      {error && error.includes('Country') && (
+                        <p className="text-red-500 text-sm mt-1">{error}</p>
+                      )}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
