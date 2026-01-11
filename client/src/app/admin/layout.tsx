@@ -10,7 +10,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [validating, setValidating] = useState(true);
 
@@ -20,26 +20,33 @@ export default function AdminLayout({
       if (loading) return;
       
       // Check if user exists and has admin role
-      if (!user || user.role !== 'admin') {
+      if (!user) {
+        // No user at all - could be initial load or logged out
+        // Don't redirect here, let the auth system handle it
+        setValidating(false);
+        return;
+      }
+      
+      if (user.role !== 'admin') {
+        // User is logged in but not an admin
         router.replace('/');
         setValidating(false);
         return;
       }
 
-      // Validate the token is still valid by making an API call
+      // User is admin, validate the token is still valid
       try {
         await apiClient.getCurrentUser();
         setValidating(false);
       } catch (error) {
+        // Token validation failed - api.ts will handle redirect to login
         console.error('Token validation failed:', error);
-        // Token is invalid, logout and redirect
-        logout();
-        router.replace('/login?redirect=/admin&error=session_expired');
+        setValidating(false);
       }
     };
 
     validateToken();
-  }, [user, loading, router, logout]);
+  }, [user, loading, router]);
 
   // Show loading state while checking auth and validating token
   if (loading || validating) {
