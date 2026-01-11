@@ -1295,6 +1295,20 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
       if (!res.ok) {
         const errorData = await res.json();
+        
+        // Handle 401 authentication errors - redirect to login
+        if (res.status === 401) {
+          // Clear invalid token
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          // Redirect to login with message
+          window.location.href = '/login?redirect=/admin/roasters&error=session_expired';
+          return;
+        }
+        
+        // Log the error for debugging
+        console.error('Roaster save error:', { status: res.status, errorData });
+        
         if (errorData.errors && Array.isArray(errorData.errors)) {
           // Handle validation errors
           const errorMessages = errorData.errors.map((err: any) => err.msg).join(', ');
@@ -1412,7 +1426,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Unknown error');
+      const errorMessage = err.message || 'Unknown error';
+      setError(errorMessage);
+      
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }
@@ -1663,6 +1681,34 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         </h1>
       </div>
       <div className="max-w-6xl mx-auto">
+        {/* Error Message Banner */}
+        {error && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-md">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-red-800 dark:text-red-400">
+                  {t('common.error', 'Error')}
+                </h3>
+                <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                  {error}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setError(null)}
+                className="ml-3 text-red-500 hover:text-red-700 dark:hover:text-red-300"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+        
         {/* ...existing code... */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

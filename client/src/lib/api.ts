@@ -191,13 +191,18 @@ class ApiClient {
       });
 
       if (response.status === 401) {
-      // Unauthorized: clear token and redirect to login
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
+        // Unauthorized: clear token and redirect to login
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          const currentPath = window.location.pathname;
+          // Only redirect if not already on login page
+          if (!currentPath.includes('/login')) {
+            window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}&error=session_expired`;
+          }
+        }
+        throw new Error('Session expired. Please login again.');
       }
-      throw new Error('HTTP 401: Unauthorized');
-    }
 
     if (response.status === 403) {
       // Forbidden: Access denied

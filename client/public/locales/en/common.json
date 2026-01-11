@@ -49,6 +49,7 @@
     "emailAddress": "Email address",
     "creatingAccount": "Creating account...",
     "passwordsNotMatch": "Passwords do not match",
+    "sessionExpired": "Your session has expired. Please login again.",
     "demo": {
       "title": "Try the Demo Account:",
       "fillCredentials": "Fill Demo Credentials"
