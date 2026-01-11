@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "oauth_states" ALTER COLUMN "codeVerifier" SET DATA TYPE VARCHAR(256),
+ALTER COLUMN "codeChallenge" SET DATA TYPE VARCHAR(256);
