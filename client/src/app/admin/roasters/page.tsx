@@ -235,7 +235,7 @@ const AdminRoastersPage: React.FC = () => {
   let content: React.ReactNode = null;
   if (editingId || showAddForm) {
     const roaster = editingId ? roasters.find(r => r.id === editingId) : undefined;
-    content = <RoasterForm roaster={roaster} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
+    content = <RoasterForm roaster={roaster} roasterId={editingId || undefined} onSuccess={onFormSuccess} onCancel={onFormCancel} />;
   } else {
     content = (
       <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
@@ -709,14 +709,17 @@ const AdminRoastersPage: React.FC = () => {
 
 interface RoasterFormProps {
   roaster?: Roaster;
+  roasterId?: string;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel }) => {
+const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, roasterId, onSuccess, onCancel }) => {
+  const effectiveRoasterId = roaster?.id || roasterId;
+  
   // Fetch suggestions for this roaster
   const fetchSuggestions = async () => {
-    if (!roaster?.id) return;
+    if (!effectiveRoasterId) return;
     try {
       const token = localStorage.getItem('token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -725,7 +728,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       });
       if (res.ok) {
         const allSuggestions = await res.json();
-        const roasterSuggestions = allSuggestions.filter((s: any) => s.roasterId === roaster.id);
+        const roasterSuggestions = allSuggestions.filter((s: any) => s.roasterId === effectiveRoasterId);
         setSuggestions(roasterSuggestions);
       }
     } catch (error) {
@@ -735,11 +738,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   // Fetch and set selected source countries when editing a roaster
   useEffect(() => {
-    if (roaster?.id) {
+    if (effectiveRoasterId) {
       fetchSourceCountries();
       fetchSuggestions();
     }
-  }, [roaster?.id]);
+  }, [effectiveRoasterId]);
   // Fetch available countries when form mounts
   useEffect(() => {
     fetchCountries();
@@ -821,12 +824,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   });
   const router = useRouter();
   useEffect(() => {
-    if (roaster?.id) {
+    if (effectiveRoasterId) {
       const fetchRoaster = async () => {
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
           const token = localStorage.getItem('token');
-          const res = await fetch(`${apiUrl}/api/roasters/${roaster.id}`, {
+          const res = await fetch(`${apiUrl}/api/roasters/${effectiveRoasterId}`, {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {},
           });
           if (res.ok) {
@@ -881,14 +884,14 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       };
       fetchRoaster();
     }
-  }, [roaster?.id]);
+  }, [effectiveRoasterId]);
 
   // Fetch images when editing existing roaster
   useEffect(() => {
-    if (roaster?.id) {
+    if (effectiveRoasterId) {
       fetchImages();
     }
-  }, [roaster?.id]);
+  }, [effectiveRoasterId]);
   // Handles input changes for all fields
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
@@ -975,7 +978,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
   // Section expand/collapse state
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const [locationExpanded, setLocationExpanded] = useState(true);
-  const [contactsExpanded, setContactsExpanded] = useState(!!roaster?.id); // Collapsed for new roasters
+  const [contactsExpanded, setContactsExpanded] = useState(!!effectiveRoasterId); // Collapsed for new roasters
   const [specialtiesExpanded, setSpecialtiesExpanded] = useState(true);
   const [settingsExpanded, setSettingsExpanded] = useState(true);
   const [urlImagesExpanded, setUrlImagesExpanded] = useState(false);
@@ -1149,11 +1152,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   // Fetch images when editing existing roaster
   const fetchImages = async () => {
-    if (!roaster?.id) return;
+    if (!effectiveRoasterId) return;
     
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/roasters/${roaster.id}/images`);
+      const response = await fetch(`${apiUrl}/api/roasters/${effectiveRoasterId}/images`);
       if (response.ok) {
         const data = await response.json();
         setImages(data.images || []);
@@ -1184,11 +1187,11 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   // Fetch roaster's current source countries
   const fetchSourceCountries = async () => {
-    if (!roaster?.id) return;
+    if (!effectiveRoasterId) return;
     
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/roasters/${roaster.id}/source-countries`);
+      const response = await fetch(`${apiUrl}/api/roasters/${effectiveRoasterId}/source-countries`);
       if (response.ok) {
         const countries = await response.json();
         setSelectedCountries(countries.map((c: any) => c.id));
@@ -1318,7 +1321,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       }
 
       const savedRoaster = await res.json();
-      const roasterId = roaster?.id || savedRoaster.id;
+      const roasterId = effectiveRoasterId || savedRoaster.id;
 
       // Update source countries if roaster was saved successfully
       if (roasterId) {
@@ -1390,7 +1393,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         }
 
         // If this is a new roaster and contact info is filled, save the contact
-        if (!roaster?.id && personForm.firstName) {
+        if (!effectiveRoasterId && personForm.firstName) {
           try {
             const personPayload = { ...personForm, roasterId: roasterId };
             const personResponse = await fetch(`${apiUrl}/api/people`, {
@@ -1438,12 +1441,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
   // person management functions
   const fetchPeople = async () => {
-    if (!roaster?.id) return;
+    if (!effectiveRoasterId) return;
     
     try {
       const token = localStorage.getItem('token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/people/roaster/${roaster.id}`, {
+      const response = await fetch(`${apiUrl}/api/people/roaster/${effectiveRoasterId}`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
       
@@ -1522,7 +1525,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     // If personData is provided (from AddPersonForm), use it; otherwise fall back to personForm state
     const dataToSave = personData || personForm;
     
-    if (!roaster?.id && !formData.name) return;
+    if (!effectiveRoasterId && !formData.name) return;
     
     try {
       const token = localStorage.getItem('token');
@@ -1547,7 +1550,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
       
       const payload = editingPerson
         ? { ...sanitizedData }
-        : { ...sanitizedData, roasterId: roaster?.id || 'temp' };
+        : { ...sanitizedData, roasterId: effectiveRoasterId || 'temp' };
 
       const response = await fetch(url, {
         method,
@@ -1563,7 +1566,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
         setEditingPerson(null);
         setShowAddPerson(false);
         resetPersonForm();
-        if (roaster?.id) {
+        if (effectiveRoasterId) {
           fetchPeople(); // Only fetch if roaster exists
         }
       } else {
@@ -1610,12 +1613,12 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     let isMounted = true;
     
     const loadPeople = async () => {
-      if (!roaster?.id || !isMounted) return;
+      if (!effectiveRoasterId || !isMounted) return;
       
       try {
         const token = localStorage.getItem('token');
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${apiUrl}/api/people/roaster/${roaster.id}`, {
+        const response = await fetch(`${apiUrl}/api/people/roaster/${effectiveRoasterId}`, {
           headers: token ? { 'Authorization': `Bearer ${token}` } : {},
         });
         
@@ -1635,7 +1638,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
     return () => {
       isMounted = false;
     };
-  }, [roaster?.id]);
+  }, [effectiveRoasterId]);
 
   const getRoleBadgeColor = (role: PersonRole) => {
     switch (role) {
@@ -1815,7 +1818,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  {roaster?.id && suggestions.length > 0 && (
+                  {effectiveRoasterId && suggestions.length > 0 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t('adminForms.roasters.suggestions', 'Suggestions')}
@@ -2219,10 +2222,10 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           <div className="mt-6 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
-                {roaster?.id ? t('adminForms.roasters.contacts', 'Contacts') : t('adminForms.roasters.contact', 'Contact')}
+                {effectiveRoasterId ? t('adminForms.roasters.contacts', 'Contacts') : t('adminForms.roasters.contact', 'Contact')}
               </h3>
               <div className="flex items-center gap-2">
-                {roaster?.id && (
+                {effectiveRoasterId && (
                   <button
                     type="button"
                     onClick={handleAddPerson}
@@ -2258,7 +2261,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                       <div key={person.id} className="w-full">
                         {editingPerson && editingPerson.id === person.id ? (
                           <AddPersonForm
-                            roasterId={roaster?.id}
+                            roasterId={effectiveRoasterId}
                             initialPerson={personForm}
                             mode="edit"
                             onSave={submitPerson}
@@ -2297,14 +2300,14 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     ))}
                   </div>
                 ) : (
-                  roaster?.id && (
+                  effectiveRoasterId && (
                     <div className="text-gray-500 mb-4">{t('adminForms.roasters.noContactsFound', 'No contacts found for this roaster.')}</div>
                   )
                 )}
                 {/* Inline add contact form - shown by default when adding new roaster, or when "Add Contact" clicked when editing */}
-                {(!roaster?.id || showAddPerson) && !editingPerson && (
+                {(!effectiveRoasterId || showAddPerson) && !editingPerson && (
                   <AddPersonForm
-                    roasterId={roaster?.id}
+                    roasterId={effectiveRoasterId}
                     initialPerson={personForm}
                     mode="add"
                     onSave={submitPerson}
@@ -2535,7 +2538,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           )}
 
           {/* Images Section - Only show when editing existing roaster and images are loaded */}
-          {roaster?.id && imagesLoaded && (
+          {effectiveRoasterId && imagesLoaded && (
             <div className="mt-8 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
@@ -2562,7 +2565,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               {imagesExpanded && (
                 <div>
                   <SimpleImageUpload
-                    roasterId={roaster?.id ?? ""}
+                    roasterId={effectiveRoasterId ?? ""}
                     existingImages={images}
                     onImagesUpdated={(updatedImages) => setImages(updatedImages)}
                     canEdit={true}
@@ -2573,7 +2576,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           )}
 
           {/* URL Images Section - Show when editing existing roaster with URL images */}
-          {roaster?.id && (
+          {effectiveRoasterId && (
             <div className="mt-8 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
@@ -2707,7 +2710,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
           {/* Form Actions */}
           <div className="mt-8 flex flex-row items-center w-full flex-wrap">
             {/* Left: Delete button (edit only) */}
-            {roaster?.id && (
+            {effectiveRoasterId && (
               <button
                 type="button"
                 onClick={async () => {
@@ -2715,7 +2718,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
                     try {
                       const token = localStorage.getItem('token');
                       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-                      const response = await fetch(`${apiUrl}/api/roasters/${roaster.id}`, {
+                      const response = await fetch(`${apiUrl}/api/roasters/${effectiveRoasterId}`, {
                         method: 'DELETE',
                         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
                       });
@@ -2737,7 +2740,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
               </button>
             )}
             {/* Right: Cancel and Save buttons (always right aligned) */}
-              <div className={roaster?.id ? "flex flex-row gap-3 ml-auto" : "flex flex-row gap-3 justify-end w-full"}>
+              <div className={effectiveRoasterId ? "flex flex-row gap-3 ml-auto" : "flex flex-row gap-3 justify-end w-full"}>
               <button
                 type="button"
                 onClick={onCancel}
@@ -2748,7 +2751,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, onSuccess, onCancel 
 
               <button
                 type="button"
-                onClick={() => handleSubmit(undefined, `/admin/roasters/${roaster?.id}/post`)}
+                onClick={() => handleSubmit(undefined, `/admin/roasters/${effectiveRoasterId}/post`)}
                 disabled={!formData.verified}
                 className="min-w-[110px] px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
