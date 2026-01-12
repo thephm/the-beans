@@ -858,7 +858,13 @@
       "all": "All",
       "unverified": "Unverified",
       "topCountries": "Top Countries",
-      "topCities": "Top Cities"
+      "topCities": "Top Cities",
+      "importCSV": "Import CSV",
+      "import": "Import",
+      "importing": "Importing...",
+      "importResults": "Import Results",
+      "selectCSVFile": "Select CSV File",
+      "csvFormat": "CSV Format Requirements"
     },
     "coordinates": {
       "title": "Set Roaster Coordinates",

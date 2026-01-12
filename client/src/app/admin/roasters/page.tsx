@@ -11,6 +11,7 @@ import SimpleImageUpload from '@/components/SimpleImageUpload';
 import SpecialtyPillSelector from '@/components/SpecialtyPillSelector';
 import AddPersonForm from '@/components/AddPersonForm';
 import PersonRoleButtons from '@/components/PersonRoleButtons';
+import CSVImportDialog from '@/components/CSVImportDialog';
 
 
 const AdminRoastersPage: React.FC = () => {
@@ -44,6 +45,7 @@ const AdminRoastersPage: React.FC = () => {
   const [showAllCountries, setShowAllCountries] = useState<boolean>(false);
   const [showAllCities, setShowAllCities] = useState<boolean>(false);
   const [hasUserSetFilter, setHasUserSetFilter] = useState<boolean>(false);
+  const [showCSVImport, setShowCSVImport] = useState<boolean>(false);
   // person management state
   const [people, setPeople] = useState<RoasterPerson[]>([]);
   const [showAddPerson, setShowAddPerson] = useState(false);
@@ -241,12 +243,23 @@ const AdminRoastersPage: React.FC = () => {
       <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
         <div className="mb-6 max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roasters')}</h1>
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            onClick={() => setShowAddForm(true)}
-          >
-            {t('common.add', 'Add')}
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
+              onClick={() => setShowCSVImport(true)}
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              {t('admin.roasters.importCSV', 'Import CSV')}
+            </button>
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              onClick={() => setShowAddForm(true)}
+            >
+              {t('common.add', 'Add')}
+            </button>
+          </div>
         </div>
         
         {/* Scorecard Grid */}
@@ -700,6 +713,16 @@ const AdminRoastersPage: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* CSV Import Dialog */}
+        <CSVImportDialog
+          isOpen={showCSVImport}
+          onClose={() => setShowCSVImport(false)}
+          onSuccess={() => {
+            setShowCSVImport(false);
+            fetchRoasters();
+          }}
+        />
       </div>
     );
   }
@@ -2723,7 +2746,6 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, roasterId, onSuccess
                         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
                       });
                       if (response.ok) {
-                        alert('Roaster deleted successfully.');
                         onSuccess();
                       } else {
                         const errorData = await response.json();
