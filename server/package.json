@@ -14,8 +14,8 @@
     "db:seed": "ts-node src/seed.ts",
     "migrate:hours": "ts-node prisma/migrate-hours-to-json.ts",
     "test:analytics": "ts-node --transpile-only test/testAnalytics.ts",
-    "test:dateutils": "ts-node --transpile-only test/testDateUtils.ts"
-    ,"test:audit-date": "ts-node --transpile-only test/testAuditDateFilter.ts"
+    "test:dateutils": "ts-node --transpile-only test/testDateUtils.ts",
+    "test:audit-date": "ts-node --transpile-only test/testAuditDateFilter.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"
@@ -36,6 +36,7 @@
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
+    "csv-parse": "^6.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
     "express-rate-limit": "^7.4.1",
@@ -43,7 +44,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "multer": "^2.0.0",
+    "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^6.10.1",
     "swagger-jsdoc": "^6.2.8",

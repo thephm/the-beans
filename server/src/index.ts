@@ -38,6 +38,7 @@ import redditRoutes from './routes/reddit';
 import oauthRoutes from './routes/oauth';
 import oauthNewRoutes from './routes/oauthNew';
 import postsRoutes from './routes/posts';
+import csvImportRoutes from './routes/csvImport';
 
 import forgotPasswordRoutes from './routes/forgotPassword';
 
@@ -165,6 +166,7 @@ app.use('/api/reddit', redditRoutes);
 app.use('/api/oauth', oauthRoutes); // Legacy Reddit OAuth
 app.use('/api/auth/oauth', oauthNewRoutes); // New OAuth 2.0 system
 app.use('/api/posts', postsRoutes);
+app.use('/api/roasters', csvImportRoutes); // CSV import endpoint
 app.use('/api', forgotPasswordRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 // Analytics event capture route

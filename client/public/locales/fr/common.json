@@ -609,7 +609,13 @@
       "unverified": "Non vérifié",
       "total": "Total",
       "topCountries": "Pays Principaux",
-      "topCities": "Villes Principales"
+      "topCities": "Villes Principales",
+      "importCSV": "Importer CSV",
+      "import": "Importer",
+      "importing": "Importation...",
+      "importResults": "Résultats de l'importation",
+      "selectCSVFile": "Sélectionner un fichier CSV",
+      "csvFormat": "Exigences du format CSV"
     },
     "specialties": {
       "title": "Spécialités",
