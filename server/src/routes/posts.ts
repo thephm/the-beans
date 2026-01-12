@@ -43,6 +43,8 @@ function inferSocialNetwork(url: string): string {
   
   if (urlLower.includes('instagram.com') || urlLower.includes('instagr.am')) {
     return 'Instagram';
+  } else if (urlLower.includes('threads.net') || urlLower.includes('threads.com')) {
+    return 'Threads';
   } else if (urlLower.includes('reddit.com')) {
     return 'Reddit';
   } else if (urlLower.includes('facebook.com') || urlLower.includes('fb.com')) {
