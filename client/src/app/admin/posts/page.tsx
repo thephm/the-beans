@@ -150,10 +150,14 @@ const AdminPostsPage: React.FC = () => {
         const network = post.socialNetwork?.toLowerCase() || '';
         if (socialNetworkFilter === 'instagram') {
           return network === 'instagram';
+        } else if (socialNetworkFilter === 'threads') {
+          return network === 'threads';
         } else if (socialNetworkFilter === 'reddit') {
           return network === 'reddit';
+        } else if (socialNetworkFilter === 'facebook') {
+          return network === 'facebook';
         } else if (socialNetworkFilter === 'other') {
-          return network !== 'instagram' && network !== 'reddit';
+          return network !== 'instagram' && network !== 'threads' && network !== 'reddit' && network !== 'facebook';
         }
         return true;
       });
@@ -205,6 +209,7 @@ const AdminPostsPage: React.FC = () => {
   const handleEdit = (post: Post) => {
     setEditingPost(post);
     setSelectedRoaster(post.roaster);
+    setRoasterSearchTerm(post.roaster.name);
     setFormData({
       roasterId: post.roasterId,
       url: post.url,
@@ -354,7 +359,7 @@ const AdminPostsPage: React.FC = () => {
                   try {
                     const url = new URL(pastedText);
                     // Remove UTM and tracking parameters
-                    const paramsToRemove = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'msclkid', 'mc_cid', 'mc_eid', '_ga', 'igsh', 'igshid'];
+                    const paramsToRemove = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'msclkid', 'mc_cid', 'mc_eid', '_ga', 'igsh', 'igshid', 'xmt', 'slof'];
                     paramsToRemove.forEach(param => url.searchParams.delete(param));
                     // Remove trailing slash from pathname
                     let pathname = url.pathname;
@@ -460,6 +465,16 @@ const AdminPostsPage: React.FC = () => {
             {t('admin.posts.instagram', 'Instagram')}
           </button>
           <button
+            onClick={() => setSocialNetworkFilter('threads')}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              socialNetworkFilter === 'threads'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            {t('admin.posts.threads', 'Threads')}
+          </button>
+          <button
             onClick={() => setSocialNetworkFilter('reddit')}
             className={`px-4 py-2 rounded-lg transition-colors ${
               socialNetworkFilter === 'reddit'
@@ -468,6 +483,16 @@ const AdminPostsPage: React.FC = () => {
             }`}
           >
             {t('admin.posts.reddit', 'Reddit')}
+          </button>
+          <button
+            onClick={() => setSocialNetworkFilter('facebook')}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              socialNetworkFilter === 'facebook'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            {t('admin.posts.facebook', 'Facebook')}
           </button>
           <button
             onClick={() => setSocialNetworkFilter('other')}
