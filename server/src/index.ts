@@ -34,8 +34,6 @@ import contactRouter from './routes/contact'; // Import contact router
 import favouritesRoutes from './routes/favourites';
 import suggestionsRoutes from './routes/suggestions';
 import backupRoutes from './routes/backup';
-import redditRoutes from './routes/reddit';
-import oauthRoutes from './routes/oauth';
 import oauthNewRoutes from './routes/oauthNew';
 import postsRoutes from './routes/posts';
 import csvImportRoutes from './routes/csvImport';
@@ -162,9 +160,7 @@ app.use('/api/contact', contactRouter);
 app.use('/api/favourites', favouritesRoutes);
 app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/backup', backupRoutes);
-app.use('/api/reddit', redditRoutes);
-app.use('/api/oauth', oauthRoutes); // Legacy Reddit OAuth
-app.use('/api/auth/oauth', oauthNewRoutes); // New OAuth 2.0 system
+app.use('/api/auth/oauth', oauthNewRoutes); // OAuth 2.0 system
 app.use('/api/posts', postsRoutes);
 app.use('/api/roasters', csvImportRoutes); // CSV import endpoint
 app.use('/api', forgotPasswordRoutes);

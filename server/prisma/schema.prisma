@@ -128,7 +128,6 @@ model Roaster {
     Suggestion
     Google
     GoogleMaps
-    Reddit
     ChatGPT
     Claude
     YouTube
@@ -405,7 +404,7 @@ model Post {
   id             String   @id @default(cuid())
   roasterId      String
   url            String
-  socialNetwork  String   @db.VarChar(20) // Instagram, Reddit, Other
+  socialNetwork  String   @db.VarChar(20) // Instagram, Other
   postedAt       DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

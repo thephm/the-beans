@@ -175,16 +175,11 @@ const AdminRoastersPage: React.FC = () => {
     router.push('/admin/roasters');
   };
 
-  const handleVerify = async (roaster: Roaster, postToRedditPrompt = true) => {
+  const handleVerify = async (roaster: Roaster) => {
     if (!roaster?.id) return;
     try {
       const token = localStorage.getItem('token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
-      let postToReddit = false;
-      if (postToRedditPrompt) {
-        postToReddit = window.confirm(`Also post ${roaster.name} to configured Reddit communities?`);
-      }
 
       setVerifyingId(roaster.id);
 
@@ -194,7 +189,6 @@ const AdminRoastersPage: React.FC = () => {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: postToReddit ? JSON.stringify({ postToReddit: true }) : undefined,
       });
 
       if (!res.ok) {

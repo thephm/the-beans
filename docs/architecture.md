@@ -124,7 +124,7 @@ AuditLog (many:1)
 
 ### Key Models (`prisma/schema.prisma`)
 - **User**: Authentication, profiles, role-based access
-- **Roaster**: Coffee shop data, location, specialties, founded year, social media links (Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X, Reddit), owner contact fields (ownerName, ownerEmail, ownerBio, ownerMobile) (with audit tracking)
+- **Roaster**: Coffee shop data, location, specialties, founded year, social media links (Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X), owner contact fields (ownerName, ownerEmail, ownerBio, ownerMobile) (with audit tracking)
 - **Review**: User ratings and feedback (with audit tracking)
 - **Bean**: Coffee product information (with audit tracking)
 - **Favourite**: User's saved roasters
