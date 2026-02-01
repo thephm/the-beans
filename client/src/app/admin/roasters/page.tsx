@@ -566,7 +566,7 @@ const AdminRoastersPage: React.FC = () => {
                       {!roaster.verified && (
                         <button
                           className="bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 mr-2"
-                          onClick={() => handleVerify(roaster, true)}
+                          onClick={() => handleVerify(roaster)}
                           disabled={verifyingId === roaster.id}
                         >
                           {verifyingId === roaster.id ? t('roasters.verifying', 'Verifying...') : t('roasters.verify', 'Verify')}
