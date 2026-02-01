@@ -68,8 +68,7 @@ Create a new roaster (requires authentication).
 	"threads": "https://threads.net/@...",
 	"pinterest": "https://pinterest.com/...",
 	"bluesky": "https://bsky.app/profile/...",
-	"x": "https://x.com/...",
-	"reddit": "https://reddit.com/r/..."
+	"x": "https://x.com/..."
 }
 ```
 
@@ -110,7 +109,7 @@ Delete an image (requires authentication and ownership).
 ## Roaster Object Fields
 
 - `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `founded`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `people`, `_count`
-- **Social Networks:** `instagram`, `tiktok`, `facebook`, `linkedin`, `youtube`, `threads`, `pinterest`, `bluesky`, `x`, `reddit`
+- **Social Networks:** `instagram`, `tiktok`, `facebook`, `linkedin`, `youtube`, `threads`, `pinterest`, `bluesky`, `x`
 
 **Note:** `people` field contains RoasterPerson objects (contacts/roles). Legacy owner contact fields are deprecated.
 

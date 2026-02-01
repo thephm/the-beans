@@ -44,7 +44,6 @@ All social media fields are optional:
 - **Pinterest URL**
 - **BlueSky URL**
 - **X URL**
-- **Reddit URL**
 
 ### Contact Person Information
 If provided, a person will be created and associated with the roaster:

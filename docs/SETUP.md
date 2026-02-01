@@ -161,47 +161,6 @@ PORT="5000"
 NODE_ENV="development"
 ```
 
-### Optional: Reddit Posting (admin feature)
-
-If you want the server to optionally post a welcome message to Reddit when an admin verifies a roaster, add these environment variables to `server/.env`. Posting is disabled unless you provide credentials and configure `REDDIT_COMMUNITIES`.
-
-```env
-# Reddit posting (optional)
-REDDIT_CLIENT_ID="your_reddit_app_client_id"
-REDDIT_CLIENT_SECRET="your_reddit_app_client_secret"
-REDDIT_USERNAME="reddit_username_used_for_posts"
-REDDIT_PASSWORD="reddit_password_for_that_account"
-REDDIT_COMMUNITIES="r/coffee,r/roasters"
-REDDIT_USER_AGENT="the-beans-bot/1.0 by your_reddit_username"
-# Optional site name used in post titles
-SITE_NAME="thebeans.ca"
-NEXT_PUBLIC_SITE_URL="https://thebeans.ca"
-```
-
-Notes:
-- Create a Reddit "script" app under your Reddit account to get `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET`.
-- `REDDIT_COMMUNITIES` should be a comma-separated list of subreddits to post to.
-- The app uses the script (password) grant to obtain a token server-side; keep these values secret.
-
-## **Admin Checklist: Reddit Posting Best Practices**
-
-- **Verify subreddit rules before posting:** Some subreddits prohibit promotional posts or require specific flair; check rules and moderator guidance for each subreddit in `REDDIT_COMMUNITIES`.
-- **Use a dedicated account:** Use a single, trusted account for automated posts and keep credentials secure; avoid personal accounts to prevent accidental bans.
-- **Rate limits & frequency:** Reddit enforces rate limits. Do not post the same content to many subreddits at once — prefer 1–3 relevant communities and space out posts.
-- **Post content quality:** Ensure the post includes a useful description and a link to the roaster page; avoid copy-paste promotional language that appears spammy.
-- **Include attribution:** The post title includes the site name by default; adjust `SITE_NAME` if needed to match your domain.
-- **Monitor moderator feedback:** Watch for removal or moderator messages after posting; if a post is removed, investigate before reposting elsewhere.
-- **Logging and error handling:** Server logs will record Reddit post results; failures do not block verification but should be reviewed and retried manually if needed.
-
-Follow these quick steps when verifying and posting:
-
-1. Confirm the roaster details in the admin UI.
-2. Click `Verify` and confirm the prompt to post to Reddit.
-3. Check the backend logs for `Reddit post results:` output to see success/failure per subreddit.
-4. If posting failed due to authentication, ensure the `REDDIT_*` env vars are correct and the Reddit app is a `script` type.
-
-
-
 ### Client Configuration (`client/.env.local`)
 
 ```env
@@ -217,9 +176,6 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="your_google_maps_api_key"
 # App Configuration
 NEXT_PUBLIC_APP_NAME="The Beans"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
-
-# Social Links (Footer)
-NEXT_PUBLIC_REDDIT_URL="https://www.reddit.com/r/thebeans"
 ```
 
 ## Manual Database Setup (Local Development Only)

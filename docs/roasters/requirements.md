@@ -9,7 +9,7 @@ List of requirements and user stories for roasters.
 - Users can view detailed information for each roaster.
 - Users can favourite/unfavourite roasters and see their favourites.
 - Roaster profiles display ratings, review counts, specialties, contact info, hours, and founding year.
-- Roaster profiles include links to social media accounts (Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X/Twitter, Reddit).
+- Roaster profiles include links to social media accounts (Instagram, TikTok, Facebook, LinkedIn, YouTube, Threads, Pinterest, BlueSky, X/Twitter).
 - Authenticated users can create new roasters.
 - Roaster data is available in multiple languages.
 - Roaster owners can provide detailed contact information (name, email, bio, mobile).
