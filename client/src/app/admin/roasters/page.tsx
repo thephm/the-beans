@@ -242,7 +242,8 @@ const AdminRoastersPage: React.FC = () => {
               href="/admin/instagram-import"
               className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center"
             >
-              {t('admin.roasters.importInstagram', 'Import Instagram')}
+              <span className="sm:hidden">Instagram</span>
+              <span className="hidden sm:inline">{t('admin.roasters.importInstagram', 'Import Instagram')}</span>
             </Link>
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
@@ -251,7 +252,8 @@ const AdminRoastersPage: React.FC = () => {
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              {t('admin.roasters.importCSV', 'Import CSV')}
+              <span className="sm:hidden">CSV</span>
+              <span className="hidden sm:inline">{t('admin.roasters.importCSV', 'Import CSV')}</span>
             </button>
             <button
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
