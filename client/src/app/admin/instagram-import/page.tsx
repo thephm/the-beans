@@ -24,6 +24,8 @@ interface CandidateAccount {
   value: string;
 }
 
+type ParseValidationResult = { parsed: ParsedAccount[] } | { error: string };
+
 const getEntriesFromExport = (data: any): { entries: InstagramRawEntry[]; source: string } | { error: string } => {
   if (Array.isArray(data)) {
     return { entries: data, source: 'array' };
@@ -43,7 +45,7 @@ const getEntriesFromExport = (data: any): { entries: InstagramRawEntry[]; source
   };
 };
 
-const validateAndParseEntries = (entries: InstagramRawEntry[]) => {
+const validateAndParseEntries = (entries: InstagramRawEntry[]): ParseValidationResult => {
   const parsed: ParsedAccount[] = [];
   for (let i = 0; i < entries.length; i += 1) {
     const entry = entries[i];
