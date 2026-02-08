@@ -13,6 +13,23 @@ export async function resetPassword(token: string, password: string) {
 }
 import { CreateRoasterFromSuggestionResponse, RoasterExistsResponse } from '../types';
 
+export interface InstagramImportCandidate {
+  title: string;
+  instagramUrl: string;
+  handle: string;
+  originalHref: string;
+  value: string;
+}
+
+export interface InstagramImportScanResponse {
+  candidates: InstagramImportCandidate[];
+  total: number;
+  skipped?: number;
+  existing: number;
+  ignored: number;
+  unverified: number;
+}
+
 
 // Determine API base URL with fallback for production
 const getApiBaseUrl = () => {
@@ -333,8 +350,10 @@ class ApiClient {
     });
   }
 
-  async scanInstagramAccounts(accounts: Array<{ title?: string; href: string; value?: string }>) {
-    return this.request('/admin/instagram-import/scan', {
+  async scanInstagramAccounts(
+    accounts: Array<{ title?: string; href: string; value?: string }>
+  ): Promise<InstagramImportScanResponse> {
+    return this.request<InstagramImportScanResponse>('/admin/instagram-import/scan', {
       method: 'POST',
       body: JSON.stringify({ accounts })
     });
