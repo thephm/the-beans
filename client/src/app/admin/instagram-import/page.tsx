@@ -179,7 +179,7 @@ export default function AdminInstagramImportPage() {
       }
 
       setIsScanning(true);
-      setScanMessage(`Analyzing account 1 of ${parsed.length}`);
+      setScanMessage('Analyzing accounts...');
       await runProgress(parsed.length);
 
       const result = await apiClient.scanInstagramAccounts(parsed);
@@ -210,7 +210,7 @@ export default function AdminInstagramImportPage() {
 
   useEffect(() => {
     if (analysisTotal > 0 && analysisIndex > 0 && analysisIndex <= analysisTotal) {
-      setScanMessage(`Analyzing account ${analysisIndex} of ${analysisTotal}`);
+      setScanMessage('Analyzing accounts...');
     }
   }, [analysisIndex, analysisTotal]);
 
@@ -311,7 +311,7 @@ export default function AdminInstagramImportPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28">
       <div className="w-full max-w-4xl">
-        <div className="mb-6">
+        <div className="mb-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             {t('admin.instagramImport.title', 'Import from Insta')}
           </h1>
@@ -319,7 +319,7 @@ export default function AdminInstagramImportPage() {
 
         <div className="mb-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-4 gap-2 w-full sm:w-auto">
               {[
                 { label: t('admin.instagramImport.total', 'Total'), value: counts.total, accent: 'text-blue-500' },
                 { label: t('admin.instagramImport.exist', 'Exist'), value: counts.existing, accent: 'text-emerald-500' },
@@ -328,19 +328,19 @@ export default function AdminInstagramImportPage() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="min-w-[110px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 px-4 py-3 shadow-sm text-center"
+                  className="min-w-0 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 px-2 py-2 shadow-sm text-center"
                 >
-                  <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {stat.label}
                   </div>
-                  <div className={`text-2xl font-semibold ${stat.accent}`}>
+                  <div className={`text-xl font-semibold ${stat.accent}`}>
                     {stat.value}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 justify-end">
+            <div className="flex flex-wrap items-center gap-3 justify-end w-full sm:w-auto">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -355,7 +355,10 @@ export default function AdminInstagramImportPage() {
                 }}
                 className="hidden"
               />
-              <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2 w-full justify-end sm:w-auto">
+                <span className="text-sm text-gray-700 dark:text-gray-200 font-mono max-w-[180px] truncate">
+                  {selectedFileName || t('admin.instagramImport.noFile', 'No file chosen')}
+                </span>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -363,9 +366,6 @@ export default function AdminInstagramImportPage() {
                 >
                   {t('admin.instagramImport.chooseFile', 'Choose File')}
                 </button>
-                <span className="text-sm text-gray-700 dark:text-gray-200 font-mono">
-                  {selectedFileName || t('admin.instagramImport.noFile', 'No file chosen')}
-                </span>
               </div>
               {isScanning && (
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -385,30 +385,23 @@ export default function AdminInstagramImportPage() {
 
         {current ? (
           <div className="bg-white dark:bg-gray-900 rounded-lg py-6">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <span className="text-base sm:text-lg text-blue-600 dark:text-blue-400 font-medium">
-              {t('admin.instagramImport.progress', 'Account')} {currentIndex + 1} {t('admin.instagramImport.of', 'of')} {counts.unverified}
-            </span>
-            <div className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100">
-              {t('admin.instagramImport.instagramUrl', 'URL').replace('Instagram ', '')}: {
-                /* eslint-disable-next-line jsx-a11y/anchor-is-valid */
-                <a
-                  href={current.instagramUrl}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    window.open(current.instagramUrl, 'insta-review', 'noopener,noreferrer');
-                  }}
-                  className="text-blue-600 dark:text-blue-400 underline break-all"
-                >
-                  {current.instagramUrl}
-                </a>
-              }
-            </div>
-          </div>
-          <div className="mb-4">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {t('admin.instagramImport.formTitle', 'Add Roaster')}
             </h2>
+            <div className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100">
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a
+                href={current.instagramUrl}
+                onClick={(event) => {
+                  event.preventDefault();
+                  window.open(current.instagramUrl, 'insta-review', 'noopener,noreferrer');
+                }}
+                className="text-blue-600 dark:text-blue-400 underline break-all"
+              >
+                {current.handle || current.instagramUrl.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/\/+$/, '')}
+              </a>
+            </div>
           </div>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
