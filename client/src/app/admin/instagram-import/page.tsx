@@ -270,6 +270,7 @@ export default function AdminInstagramImportPage() {
       const payload: any = {
         name: roasterName.trim(),
         verified: false,
+        showHours: false,
         socialNetworks: { instagram: current.instagramUrl },
         sourceType: 'Instagram',
         sourceDetails: 'Instagram import'

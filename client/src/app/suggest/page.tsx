@@ -82,36 +82,22 @@ export default function SuggestRoaster() {
     }
   };
 
-  // Check if URL exists and is not a duplicate
+  // Check if URL is a duplicate in the database
   const checkWebsite = async (website: string) => {
     setWebsiteError('');
     setWebsiteFieldClass('');
     if (!website.trim()) return;
     setWebsiteChecking(true);
-    // 1. Check if URL exists (HEAD request)
-    let urlExists = false;
-    try {
-      // Use a CORS proxy for client-side check (best effort, not 100% reliable)
-      const proxyUrl = 'https://corsproxy.io/?';
-      const res = await fetch(proxyUrl + encodeURIComponent(website), { method: 'HEAD' });
-      urlExists = res.ok;
-    } catch {
-      urlExists = false;
-    }
-    if (!urlExists) {
-      setWebsiteError(t('suggest.errors.websiteNotReachable', 'Website could not be reached'));
-      setWebsiteFieldClass('border-red-500');
-      setWebsiteChecking(false);
-      return;
-    }
-    // 2. Check for duplicate domain
+    // Check for duplicate domain in DB
     try {
       const { apiClient } = await import('@/lib/api');
-      // Explicitly cast to RoastersResponse to satisfy TypeScript
-      const allRoasters = await apiClient.getRoasters({ limit: 1000 }) as import('@/types').RoastersResponse;
       const domain = extractDomain(website);
-      const duplicate = allRoasters.roasters?.find((r: any) => extractDomain(r.website || '') === domain);
-      if (duplicate) {
+      if (!domain) {
+        setWebsiteChecking(false);
+        return;
+      }
+      const domainCheck = await apiClient.checkRoasterDomain(domain);
+      if (domainCheck?.exists) {
         setWebsiteError(t('suggest.errors.duplicateDomain', 'This roaster is already in the system'));
         setWebsiteFieldClass('border-red-500');
         setWebsiteChecking(false);
