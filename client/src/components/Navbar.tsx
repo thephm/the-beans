@@ -54,30 +54,33 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-lg flex items-center justify-center">
-              <Coffee sx={{ color: 'white', fontSize: 16 }} />
+          <div className="flex items-center space-x-6">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-orchid-500 rounded-lg flex items-center justify-center">
+                <Coffee sx={{ color: 'white', fontSize: 16 }} />
+              </div>
+              <span className="font-bold text-xl bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent">
+                {t('app.name')}
+              </span>
+            </Link>
+            <div className="hidden md:flex items-center space-x-6">
+              <Link href="/discover" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                {t('nav.discover')}
+              </Link>
+              <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                {t('nav.about')}
+              </Link>
+              <Link href="/favourites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                {t('nav.favourites', 'Favourites')}
+              </Link>
+              <Link href="/suggest" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                {t('nav.suggest')}
+              </Link>
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-transparent">
-              {t('app.name')}
-            </span>
-          </Link>
+          </div>
 
-          {/* Desktop Navigation - COMPLETELY HIDDEN ON MOBILE */}
-          <div className="hidden md:flex items-center space-x-8 flex-1 justify-end">
-            <Link href="/discover" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              {t('nav.discover')}
-            </Link>
-            <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              {t('nav.about')}
-            </Link>
-            <Link href="/favourites" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              {t('nav.favourites', 'Favourites')}
-            </Link>
-            <Link href="/suggest" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              {t('nav.suggest')}
-            </Link>
+          <div className="hidden md:flex items-center space-x-4">
             {user?.role === 'admin' && (
               <div className="relative" ref={adminMenuRef}>
                 <button
@@ -180,7 +183,6 @@ export function Navbar() {
                 )}
               </div>
             )}
-            
 
             {/* Dark Mode Toggle */}
             <button
