@@ -184,8 +184,8 @@ class ApiClient {
       headers.Authorization = `Bearer ${currentToken}`;
     }
 
-    try {
-      const response = await fetch(url, {
+    const executeRequest = async (targetUrl: string): Promise<T> => {
+      const response = await fetch(targetUrl, {
         ...options,
         headers,
       });
@@ -204,18 +204,22 @@ class ApiClient {
         throw new Error('Session expired. Please login again.');
       }
 
-    if (response.status === 403) {
-      // Forbidden: Access denied
-      throw new Error('HTTP 403: Forbidden');
-    }
+      if (response.status === 403) {
+        // Forbidden: Access denied
+        throw new Error('HTTP 403: Forbidden');
+      }
 
-    // Handle other error status codes
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'An error occurred' }));
-      const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
-      throw new Error(errorMessage);
-    }
+      // Handle other error status codes
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'An error occurred' }));
+        const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
       return response.json();
+    };
+
+    try {
+      return await executeRequest(url);
     } catch (err: any) {
       // Log helpful debugging info for both browser and SSR (server-side)
       // eslint-disable-next-line no-console
@@ -228,6 +232,16 @@ class ApiClient {
       // Only treat as a network failure for low-level fetch/network problems.
       if (message && !message.includes('Failed to fetch') && !message.includes('NetworkError')) {
         throw new Error(message);
+      }
+
+      if (url.includes('localhost') && !url.includes('127.0.0.1')) {
+        const fallbackUrl = url.replace('localhost', '127.0.0.1');
+        try {
+          return await executeRequest(fallbackUrl);
+        } catch (fallbackError: any) {
+          const fallbackMessage = fallbackError?.message || String(fallbackError);
+          throw new Error(`Network error contacting ${url}: ${fallbackMessage}`);
+        }
       }
 
       throw new Error(`Network error contacting ${url}: ${message}`);
@@ -316,6 +330,20 @@ class ApiClient {
     return this.request('/roasters', {
       method: 'POST',
       body: JSON.stringify(roasterData),
+    });
+  }
+
+  async scanInstagramAccounts(accounts: Array<{ title?: string; href: string; value?: string }>) {
+    return this.request('/admin/instagram-import/scan', {
+      method: 'POST',
+      body: JSON.stringify({ accounts })
+    });
+  }
+
+  async ignoreInstagramAccount(payload: { instagramUrl: string; title?: string; handle?: string }) {
+    return this.request('/admin/instagram-import/ignore', {
+      method: 'POST',
+      body: JSON.stringify(payload)
     });
   }
 

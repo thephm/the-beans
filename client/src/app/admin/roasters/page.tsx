@@ -238,6 +238,12 @@ const AdminRoastersPage: React.FC = () => {
         <div className="mb-6 max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roasters')}</h1>
           <div className="flex gap-2">
+            <Link
+              href="/admin/instagram-import"
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center"
+            >
+              {t('admin.roasters.importInstagram', 'Import Instagram')}
+            </Link>
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
               onClick={() => setShowCSVImport(true)}

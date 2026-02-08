@@ -60,8 +60,21 @@ model User {
   passwordResetTokens PasswordResetToken[]
   oauthAccounts   OAuthAccount[]
   oauthStates     OAuthState[]
+  createdRoasterIgnores RoasterIgnore[] @relation("RoasterIgnoreCreatedBy")
 
   @@map("users")
+}
+
+model RoasterIgnore {
+  id           String   @id @default(cuid())
+  title        String?
+  instagramUrl String   @unique
+  handle       String?
+  createdAt    DateTime @default(now())
+  createdById  String?
+  createdBy    User?    @relation("RoasterIgnoreCreatedBy", fields: [createdById], references: [id])
+
+  @@map("roaster_ignore")
 }
 
 
@@ -128,6 +141,7 @@ model Roaster {
     Suggestion
     Google
     GoogleMaps
+    Reddit
     ChatGPT
     Claude
     YouTube

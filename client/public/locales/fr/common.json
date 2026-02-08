@@ -437,6 +437,32 @@
   },
   "admin": {
     "title": "Admin",
+    "instagramImport": {
+      "title": "Importer depuis Instagram",
+      "subtitle": "Téléchargez les exports JSON des abonnés ou des abonnements pour trier les nouveaux torréfacteurs.",
+      "adminRequired": "Accès administrateur requis.",
+      "uploadLabel": "Télécharger followers.json ou following.json",
+      "chooseFile": "Choisir un fichier",
+      "noFile": "Aucun fichier choisi",
+      "scanning": "Analyse de l'export...",
+      "total": "Total",
+      "exist": "Existants",
+      "unverified": "Non vérifiés",
+      "ignored": "Ignorés",
+      "formTitle": "Ajouter un torréfacteur",
+      "roasterName": "Nom du torréfacteur",
+      "instagramUrl": "URL Instagram",
+      "website": "Site web",
+      "city": "Ville",
+      "country": "Pays",
+      "add": "Ajouter",
+      "ignore": "Ignorer",
+      "skip": "Passer",
+      "progress": "Compte",
+      "of": "sur",
+      "preview": "Aperçu du profil Instagram",
+      "noAccounts": "Téléchargez un fichier pour commencer l'examen des comptes."
+    },
     "analytics": {
       "title": "Statistiques",
       "adminRequired": "Accès administrateur requis.",
@@ -760,7 +786,8 @@
       "all": "Tous",
       "unverified": "Non vérifiés",
       "topCountries": "Principaux Pays",
-      "topCities": "Principales Villes"
+      "topCities": "Principales Villes",
+      "importInstagram": "Importer Instagram"
     },
     "coordinates": {
       "title": "Définir les Coordonnées des Torréfacteurs",

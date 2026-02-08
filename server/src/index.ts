@@ -37,6 +37,7 @@ import backupRoutes from './routes/backup';
 import oauthNewRoutes from './routes/oauthNew';
 import postsRoutes from './routes/posts';
 import csvImportRoutes from './routes/csvImport';
+import instagramImportRoutes from './routes/instagramImport';
 
 import forgotPasswordRoutes from './routes/forgotPassword';
 
@@ -60,7 +61,9 @@ const corsOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',')
   : [
       'http://localhost:3000', 
+      'http://127.0.0.1:3000',
       'http://localhost:5000',
+      'http://127.0.0.1:5000',
       'https://the-beans-frontend.onrender.com', // Render frontend
       'https://thebeans.ca' // Production custom domain
     ];
@@ -165,6 +168,7 @@ app.use('/api/posts', postsRoutes);
 app.use('/api/roasters', csvImportRoutes); // CSV import endpoint
 app.use('/api', forgotPasswordRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
+app.use('/api/admin', instagramImportRoutes);
 // Analytics event capture route
 app.use('/api/analytics', analyticsRouter);
 // Analytics admin stats route
