@@ -235,9 +235,9 @@ const AdminRoastersPage: React.FC = () => {
   } else {
     content = (
       <div className="p-4 pt-20 sm:pt-28 px-4 sm:px-8 lg:px-32">
-        <div className="mb-6 max-w-7xl mx-auto flex justify-between items-center">
+        <div className="mb-6 max-w-7xl mx-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{t('adminSection.roasters', 'Roasters')}</h1>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 justify-end self-end sm:self-auto">
             <Link
               href="/admin/instagram-import"
               className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center"
