@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 // Approved specialties list
 const approvedSpecialties = [
   'Direct Trade',
+  'Fair Trade',
   'Organic',
   'Light Roast',
   'Dark Roast',
@@ -16,9 +17,11 @@ const approvedSpecialties = [
   'Espresso',
   'Omni Roast',
   'Awards',
+  'Sustainable',
   'Subscription',
   'Carbon Neutral',
-  'Decaf'
+  'Decaf',
+  'Education'
 ];
 
 async function cleanupSpecialties() {
