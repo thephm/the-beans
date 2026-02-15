@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 
 const router = Router();
@@ -40,14 +41,21 @@ const extractInstagramHandle = (url: string): string | null => {
     const parsed = new URL(normalized);
     const pathSegments = parsed.pathname.split('/').filter(Boolean);
     if (pathSegments.length === 0) return null;
-    return pathSegments[0].toLowerCase();
+    return pathSegments[0];
   } catch {
     return null;
   }
 };
 
+const normalizeInstagramHandle = (handle: string | null): string | null => {
+  if (!handle) return null;
+  const normalized = handle.trim();
+  if (!normalized) return null;
+  return normalized.toLowerCase();
+};
+
 const normalizeInstagramUrl = (url: string): string | null => {
-  const handle = extractInstagramHandle(url);
+  const handle = normalizeInstagramHandle(extractInstagramHandle(url));
   if (!handle) return null;
   return `https://www.instagram.com/${handle}`;
 };
@@ -71,7 +79,7 @@ router.post(
     const normalizedAccounts = accounts
       .map((account) => {
         const instagramUrl = normalizeInstagramUrl(account.href);
-        const handle = extractInstagramHandle(account.href);
+        const handle = normalizeInstagramHandle(extractInstagramHandle(account.href));
         if (!instagramUrl || !handle) return null;
         return {
           title: account.title ?? '',
@@ -107,21 +115,21 @@ router.post(
       select: { instagramUrl: true, handle: true }
     });
 
-    const ignoreUrlSet = new Set(ignored.map((item) => item.instagramUrl));
-    const ignoreHandleSet = new Set(ignored.map((item) => item.handle).filter(Boolean) as string[]);
+    const ignoreUrlSet = new Set(ignored.map((item) => normalizeInstagramUrl(item.instagramUrl) || item.instagramUrl));
+    const ignoreHandleSet = new Set(
+      ignored
+        .map((item) => normalizeInstagramHandle(item.handle || ''))
+        .filter(Boolean) as string[]
+    );
 
-    const roasterFilters = handles.flatMap((handle) => ([
-      { socialNetworks: { path: ['instagram'], string_contains: `instagram.com/${handle}` } },
-      { socialNetworks: { path: ['instagram'], equals: `https://www.instagram.com/${handle}` } },
-      { socialNetworks: { path: ['instagram'], equals: `https://instagram.com/${handle}` } },
-    ]));
-
-    const existingRoasters = roasterFilters.length > 0
-      ? await prisma.roaster.findMany({
-          where: { OR: roasterFilters },
-          select: { socialNetworks: true }
-        })
-      : [];
+    const existingRoasters = await prisma.roaster.findMany({
+      where: {
+        socialNetworks: {
+          not: Prisma.DbNull
+        }
+      },
+      select: { socialNetworks: true }
+    });
 
     const existingHandleSet = new Set<string>();
     const existingUrlSet = new Set<string>();
@@ -130,7 +138,7 @@ router.post(
       const instagramValue = (roaster.socialNetworks as any)?.instagram as string | undefined;
       if (instagramValue) {
         const normalizedUrl = normalizeInstagramUrl(instagramValue);
-        const handle = extractInstagramHandle(instagramValue);
+        const handle = normalizeInstagramHandle(extractInstagramHandle(instagramValue));
         if (normalizedUrl) existingUrlSet.add(normalizedUrl);
         if (handle) existingHandleSet.add(handle);
       }
@@ -180,7 +188,10 @@ router.post(
       return res.status(400).json({ error: 'Invalid instagramUrl' });
     }
 
-    const handle = req.body.handle || extractInstagramHandle(instagramUrl) || undefined;
+    const handle =
+      normalizeInstagramHandle(req.body.handle) ||
+      normalizeInstagramHandle(extractInstagramHandle(instagramUrl)) ||
+      undefined;
 
     const ignore = await prisma.roasterIgnore.upsert({
       where: { instagramUrl },
