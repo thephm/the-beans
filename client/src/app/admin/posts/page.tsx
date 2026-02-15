@@ -355,25 +355,14 @@ const AdminPostsPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                 onPaste={(e) => {
                   e.preventDefault();
-                  const pastedText = e.clipboardData.getData('text');
+                  const pastedText = e.clipboardData.getData('text').trim();
                   try {
                     const url = new URL(pastedText);
-                    // Remove UTM and tracking parameters
-                    const paramsToRemove = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'msclkid', 'mc_cid', 'mc_eid', '_ga', 'igsh', 'igshid', 'xmt', 'slof'];
-                    paramsToRemove.forEach(param => url.searchParams.delete(param));
-                    // Remove trailing slash from pathname
                     let pathname = url.pathname;
                     if (pathname.endsWith('/') && pathname.length > 1) {
                       pathname = pathname.slice(0, -1);
                     }
-                    // Clean up the URL - remove query string if empty
-                    let cleanUrl = url.origin + pathname;
-                    if (url.searchParams.toString()) {
-                      cleanUrl += '?' + url.searchParams.toString();
-                    }
-                    if (url.hash) {
-                      cleanUrl += url.hash;
-                    }
+                    const cleanUrl = url.origin + pathname;
                     setFormData({ ...formData, url: cleanUrl });
                   } catch {
                     // If not a valid URL, just paste as-is
