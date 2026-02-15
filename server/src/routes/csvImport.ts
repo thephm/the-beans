@@ -37,7 +37,16 @@ const requireAdmin = async (req: any, res: any, next: any) => {
 // Helper function to parse semicolon-separated values
 const parseSemicolonList = (value: string | undefined): string[] => {
   if (!value || value.trim() === '') return [];
-  return value.split(';').map(item => item.trim()).filter(item => item !== '');
+
+  const stripWrappingQuotes = (input: string): string => {
+    return input.replace(/^("+)|("+)$/g, '').trim();
+  };
+
+  const normalized = stripWrappingQuotes(value.trim());
+  return normalized
+    .split(';')
+    .map(item => stripWrappingQuotes(item))
+    .filter(item => item !== '');
 };
 
 // Helper function to parse Yes/No values
