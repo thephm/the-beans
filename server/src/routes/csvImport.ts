@@ -34,7 +34,7 @@ const requireAdmin = async (req: any, res: any, next: any) => {
   }
 };
 
-// Helper function to parse semicolon-separated values
+// Helper function to parse list values (semicolon or comma separated)
 const parseSemicolonList = (value: string | undefined): string[] => {
   if (!value || value.trim() === '') return [];
 
@@ -43,9 +43,12 @@ const parseSemicolonList = (value: string | undefined): string[] => {
   };
 
   const normalized = stripWrappingQuotes(value.trim());
-  return normalized
-    .split(';')
+  const delimiter = normalized.includes(';') ? ';' : (normalized.includes(',') ? ',' : null);
+  const parts = delimiter ? normalized.split(delimiter) : [normalized];
+
+  return parts
     .map(item => stripWrappingQuotes(item))
+    .map(item => item.trim())
     .filter(item => item !== '');
 };
 
