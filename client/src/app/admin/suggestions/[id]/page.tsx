@@ -217,7 +217,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
         <div className="text-red-600">{t('error', 'Error')}: {error || 'Suggestion not found'}</div>
         <button
           onClick={() => router.push('/admin/suggestions')}
-          className="mt-4 text-blue-600 hover:underline"
+          className="mt-4 text-primary-600 dark:text-primary-400 hover:underline"
         >
           ← {t('admin.suggestions.backToList', 'Back to Suggestions')}
         </button>
@@ -265,7 +265,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
       <div className="mb-6">
         <button
           onClick={() => router.push('/admin/suggestions')}
-          className="text-blue-600 dark:text-blue-400 hover:underline mb-4 flex items-center"
+          className="text-primary-600 dark:text-primary-400 hover:underline mb-4 flex items-center"
         >
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

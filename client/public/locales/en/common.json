@@ -296,6 +296,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
+    "remove": "Remove",
     "edit": "Edit",
     "view": "View",
     "add": "Add",
@@ -757,6 +758,7 @@
   },
   "adminForms": {
     "roasters": {
+      "addTitle": "Add Roaster",
       "editRoaster": "Edit Roaster",
       "basicInformation": "Basic Information",
       "name": "Name",
@@ -790,6 +792,22 @@
       "imageGuidelines": "Recommended: 800×450px minimum • JPG, PNG, WebP • Max 5MB each",
       "aboutUrlImages": "About URL Images:",
       "urlImagesFallback": "Image URLs serve as fallback images when uploaded images are not accessible.",
+      "savedToast": "Roaster saved",
+      "sectionPlaceholder": "Fields will appear here when you select a section.",
+      "imageUrl": "Image URL",
+      "collapseSection": "Collapse section",
+      "expandSection": "Expand section",
+      "sections": {
+        "basic": "Basic",
+        "location": "Location",
+        "socials": "Socials",
+        "contacts": "Contacts",
+        "specialties": "Specialties",
+        "countries": "Countries",
+        "images": "Images",
+        "urlImages": "URL Images",
+        "hours": "Hours"
+      },
       "add": "Add",
       "cancel": "Cancel",
       "save": "Save",
@@ -828,6 +846,8 @@
       "contacts": "Contacts",
       "contact": "Contact",
       "showHours": "Show Hours",
+      "hoursHidden": "Enable Show Hours to edit hours.",
+      "hoursOnlineOnly": "Online-only roasters do not display opening hours.",
       "firstName": "First Name",
       "lastName": "Last Name",
       "mobile": "Mobile",
@@ -855,6 +875,8 @@
       "selectedCountriesCount": "Selected countries: {{count}}",
       "noCountriesAvailable": "No countries available",
       "noCountriesMatch": "No countries match this filter",
+      "saveBeforeImages": "Save the roaster first to enable image uploads.",
+      "saveBeforeUrlImages": "Save the roaster first to manage URL images.",
       "addImageUrl": "Add image URL..."
     }
   },
@@ -888,6 +910,10 @@
     "roasters": {
       "all": "All",
       "unverified": "Unverified",
+      "country": "Country",
+      "zipCode": "Zip Code",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
       "topCountries": "Top Countries",
       "topCities": "Top Cities",
       "importInstagram": "Import Instagram",
