@@ -915,6 +915,11 @@
       "noContactsFound": "Aucun contact trouvé pour ce torréfacteur.",
       "sourceCountries": "Pays d'origine",
       "sourceCountriesDescription": "Sélectionnez les pays d'origine du café que ce torréfacteur s'approvisionne.",
+      "countrySearch": "Rechercher des pays",
+      "countrySearchPlaceholder": "Tapez pour filtrer",
+      "selectedCountriesCount": "Pays sélectionnés : {{count}}",
+      "noCountriesAvailable": "Aucun pays disponible",
+      "noCountriesMatch": "Aucun pays ne correspond à ce filtre",
       "addImageUrl": "Ajouter une URL d'image..."
     }
   },
