@@ -31,7 +31,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     : t('adminForms.roasters.addTitle', 'New Roaster');
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col">
       {/* Breadcrumbs */}
       <nav className="text-sm text-blue-600 dark:text-blue-400 px-8 py-4">
         <Link href="/admin" className="hover:text-blue-800 dark:hover:text-blue-300">{t('admin.title', 'Admin')}</Link> &gt;{' '}
@@ -40,14 +40,14 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         <span className="text-gray-700 dark:text-gray-300">{t('adminForms.roasters.basicInformation', 'Basic Information')}</span>
       </nav>
       {/* Page Title & Layout */}
-      <div className="flex flex-1 flex-col md:flex-row gap-8 pl-8 pt-12">
+      <div className="flex flex-1 flex-col md:flex-row gap-8 pl-8 pr-16 pt-12">
         {/* Left Navigation */}
-        <aside className="md:w-64 w-full md:border-r border-gray-200 dark:border-gray-700 py-8 flex-shrink-0">
+        <aside className="md:w-64 w-full md:border-r md:border-t border-gray-200 dark:border-gray-700 py-8 flex-shrink-0 -ml-8 pl-8">
           <ul className="space-y-2">
             {SECTIONS.map((section) => (
               <li key={section.key}>
                 <button
-                  className={`w-full flex items-center justify-between px-4 py-2 rounded-lg text-left font-medium transition-colors ${selected === section.key ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"}`}
+                  className={`w-full flex items-center justify-between px-4 py-2 rounded-lg text-left font-medium transition-colors ${selected === section.key ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"}`}
                   onClick={() => setSelected(section.key)}
                 >
                   <span>{section.label}</span>
@@ -66,8 +66,8 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
           </ul>
         </aside>
         {/* Right Pane */}
-        <main className="flex-1 flex flex-col justify-between">
-          <div className="relative p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow flex flex-col min-h-[400px]">
+        <main className="flex-1 flex flex-col">
+          <div className="relative p-4 bg-slate-100 dark:bg-slate-800 border border-black/90 dark:border-black rounded-lg shadow flex flex-col min-h-[400px]">
             {/* Page Title - always visible and prominent */}
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               {SECTIONS.find(s => s.key === selected)?.label}
@@ -81,6 +81,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
               </button>
             </div>
           </div>
+          <div className="flex-1 bg-black" />
         </main>
       </div>
     </div>
