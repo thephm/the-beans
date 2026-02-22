@@ -1741,7 +1741,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, roasterId, onSuccess
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Information */}
-            <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
+            <div className={`p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4 ${!effectiveRoasterId ? 'lg:order-2' : ''}`}>
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.basicInformation', 'Basic Information')}
@@ -1868,7 +1868,7 @@ const RoasterForm: React.FC<RoasterFormProps> = ({ roaster, roasterId, onSuccess
             </div>
 
             {/* Location & Details */}
-            <div data-section="location" className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
+            <div data-section="location" className={`p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4 ${!effectiveRoasterId ? 'lg:order-1' : ''}`}>
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 select-none">
                   {t('adminForms.roasters.locationDetails', 'Location & Details')}
