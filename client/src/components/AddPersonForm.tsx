@@ -64,6 +64,7 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
     }
   }, [initialPerson]);
   const safeRoasters = Array.isArray(roasters) ? roasters : [];
+  const showPrimaryToggle = !(editableAssociations && editableAssociations.length > 0);
   const handleChange = (field: string, value: any) => {
     setForm(f => ({ ...f, [field]: value }));
   };
@@ -131,8 +132,8 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
           <input type="text" placeholder={t('admin.people.jobTitle', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
         </div>
 
-        {/* Email and Mobile - side by side on medium+ screens */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Email, Mobile, Primary - side by side on medium+ screens */}
+        <div className={`grid grid-cols-1 ${showPrimaryToggle ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.people.email', 'Email')}
@@ -145,22 +146,37 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
             </label>
             <input type="text" placeholder={t('admin.people.mobile', 'Mobile')} value={form.mobile} onChange={e => handleChange('mobile', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
           </div>
+          {showPrimaryToggle && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('admin.people.primaryContact', 'Primary Contact')}
+              </label>
+              <button
+                type="button"
+                className={`w-full px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                onClick={() => handleChange('isPrimary', !form.isPrimary)}
+              >
+                {form.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* LinkedIn URL - full width */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('admin.people.linkedinUrl', 'LinkedIn URL')}
-          </label>
-          <input type="url" placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')} value={form.linkedinUrl} onChange={e => handleChange('linkedinUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
-        </div>
-
-        {/* Instagram URL - full width */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('admin.people.instagramUrl', 'Instagram URL')}
-          </label>
-          <input type="url" placeholder={t('admin.people.instagramUrlPlaceholder', 'https://www.instagram.com/username')} value={form.instagramUrl} onChange={e => handleChange('instagramUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+        {/* Instagram and LinkedIn - match Email/Mobile column widths */}
+        <div className={`grid grid-cols-1 ${showPrimaryToggle ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('admin.people.instagramUrl', 'Instagram URL')}
+            </label>
+            <input type="url" placeholder={t('admin.people.instagramUrlPlaceholder', 'https://www.instagram.com/username')} value={form.instagramUrl} onChange={e => handleChange('instagramUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('admin.people.linkedinUrl', 'LinkedIn URL')}
+            </label>
+            <input type="url" placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')} value={form.linkedinUrl} onChange={e => handleChange('linkedinUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+          </div>
+          {showPrimaryToggle && <div className="hidden md:block" />}
         </div>
 
         {/* Roaster associations - stacked */}
@@ -204,6 +220,8 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
                     <PersonRoleButtons 
                       selectedRoles={association.roles || []} 
                       onRoleToggle={(role) => handleAssociationRoleToggle(index, role)}
+                      size="sm"
+                      layout="wrap"
                     />
                   </div>
                 </div>
@@ -214,30 +232,18 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
           /* Single Roaster Selection for Add Mode or No Associations */
           <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
             <div className="space-y-4">
-              {/* Roaster and Primary */}
-              <div className="flex flex-col sm:flex-row items-end gap-4">
-                {!roasterId && roasters && (
-                  <div className="flex-1 w-full">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
-                      <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
-                      {safeRoasters.map(roaster => (
-                        <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                <div className={`w-full ${!roasterId && roasters ? 'sm:w-auto' : ''}`}>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.primaryContact', 'Primary Contact')}</label>
-                  <button
-                    type="button"
-                    className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                    onClick={() => handleChange('isPrimary', !form.isPrimary)}
-                  >
-                    {form.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
-                  </button>
+              {/* Roaster */}
+              {!roasterId && roasters && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
+                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
+                    <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
+                    {safeRoasters.map(roaster => (
+                      <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
+                    ))}
+                  </select>
                 </div>
-              </div>
+              )}
 
               {/* Role */}
               <div>
@@ -247,6 +253,8 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
                 <PersonRoleButtons 
                   selectedRoles={form.roles} 
                   onRoleToggle={handleRoleToggle} 
+                  size="sm"
+                  layout="wrap"
                 />
               </div>
             </div>
