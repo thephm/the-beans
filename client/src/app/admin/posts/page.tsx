@@ -44,7 +44,6 @@ const AdminPostsPage: React.FC = () => {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
   
-  const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,6 +80,12 @@ const AdminPostsPage: React.FC = () => {
         page: currentPage.toString(),
         limit: limit.toString(),
       });
+      if (searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+      }
+      if (socialNetworkFilter !== 'all') {
+        params.append('socialNetwork', socialNetworkFilter);
+      }
       if (sortConfig) {
         params.append('sortBy', sortConfig.key);
         params.append('sortOrder', sortConfig.direction);
@@ -93,7 +98,6 @@ const AdminPostsPage: React.FC = () => {
       const data = await res.json();
       
       if (data.posts && data.pagination) {
-        setPosts(data.posts);
         setFilteredPosts(data.posts);
         setTotalPages(data.pagination.pages || 1);
       }
@@ -130,41 +134,11 @@ const AdminPostsPage: React.FC = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, [currentPage, sortConfig]);
+  }, [currentPage, sortConfig, searchTerm, socialNetworkFilter, limit]);
 
   useEffect(() => {
-    let filtered = posts;
-    
-    // Apply search filter
-    if (searchTerm.trim()) {
-      filtered = filtered.filter(post => 
-        post.roaster.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.url?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.socialNetwork?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Apply social network filter
-    if (socialNetworkFilter !== 'all') {
-      filtered = filtered.filter(post => {
-        const network = post.socialNetwork?.toLowerCase() || '';
-        if (socialNetworkFilter === 'instagram') {
-          return network === 'instagram';
-        } else if (socialNetworkFilter === 'threads') {
-          return network === 'threads';
-        } else if (socialNetworkFilter === 'reddit') {
-          return network === 'reddit';
-        } else if (socialNetworkFilter === 'facebook') {
-          return network === 'facebook';
-        } else if (socialNetworkFilter === 'other') {
-          return network !== 'instagram' && network !== 'threads' && network !== 'reddit' && network !== 'facebook';
-        }
-        return true;
-      });
-    }
-    
-    setFilteredPosts(filtered);
-  }, [searchTerm, socialNetworkFilter, posts]);
+    setCurrentPage(1);
+  }, [searchTerm, socialNetworkFilter, limit]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
