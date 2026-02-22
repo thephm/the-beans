@@ -87,6 +87,16 @@ function inferSocialNetwork(url: string): string {
  *           type: string
  *         description: Filter by roaster ID
  *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by roaster name, URL, or social network
+ *       - in: query
+ *         name: socialNetwork
+ *         schema:
+ *           type: string
+ *         description: Filter by social network
+ *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string
@@ -107,12 +117,53 @@ router.get('/', requireAdmin, async (req: any, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
     const roasterId = req.query.roasterId as string;
+    const search = (req.query.search as string)?.trim();
+    const socialNetwork = (req.query.socialNetwork as string)?.trim();
     const sortBy = (req.query.sortBy as string) || 'postedAt';
     const sortOrder = (req.query.sortOrder as string) || 'desc';
 
     const where: any = {};
     if (roasterId) {
       where.roasterId = roasterId;
+    }
+
+    if (socialNetwork && socialNetwork !== 'all') {
+      if (socialNetwork.toLowerCase() === 'other') {
+        where.socialNetwork = {
+          notIn: ['Instagram', 'Threads', 'Reddit', 'Facebook'],
+          mode: 'insensitive'
+        };
+      } else {
+        where.socialNetwork = {
+          equals: socialNetwork,
+          mode: 'insensitive'
+        };
+      }
+    }
+
+    if (search) {
+      where.OR = [
+        {
+          roaster: {
+            name: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          url: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          socialNetwork: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      ];
     }
 
     // Handle sorting by roaster (relation) - need to sort by roaster.name
@@ -144,13 +195,15 @@ router.get('/', requireAdmin, async (req: any, res: Response) => {
       prisma.post.count({ where })
     ]);
 
+    const pages = Math.max(1, Math.ceil(total / limit));
+
     res.json({
       posts,
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
+        pages
       }
     });
   } catch (error: any) {
