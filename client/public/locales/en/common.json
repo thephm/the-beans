@@ -850,6 +850,11 @@
       "noContactsFound": "No contacts found for this roaster.",
       "sourceCountries": "Source Countries",
       "sourceCountriesDescription": "Select the coffee origin countries that this roaster sources from.",
+      "countrySearch": "Search countries",
+      "countrySearchPlaceholder": "Type to filter",
+      "selectedCountriesCount": "Selected countries: {{count}}",
+      "noCountriesAvailable": "No countries available",
+      "noCountriesMatch": "No countries match this filter",
       "addImageUrl": "Add image URL..."
     }
   },
