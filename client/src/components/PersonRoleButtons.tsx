@@ -25,7 +25,7 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
   ];
 
   const sizeClasses = size === 'sm'
-    ? 'px-3 py-1.5 text-xs'
+    ? 'px-3 py-1.5 text-sm'
     : 'px-4 py-2 text-sm';
 
   const containerClasses = layout === 'wrap'
@@ -42,21 +42,40 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
 
   return (
     <div className={containerClasses}>
-      {roles.map(role => (
+      {roles.map(role => {
+        const isSelected = selectedRoles.includes(role.value);
+
+        return (
         <button
           key={role.value}
           type="button"
-          className={`${widthClasses} ${sizeClasses} rounded-lg border font-semibold transition-colors duration-150 focus:outline-none ${
-            selectedRoles.includes(role.value) 
-              ? 'bg-blue-600 text-white border-blue-600' 
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'
+          aria-pressed={isSelected}
+          className={`${widthClasses} ${sizeClasses} rounded-full border font-medium transition-all duration-200 focus:outline-none inline-flex items-center gap-2 ${
+            isSelected
+              ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
+              : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
           } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
           onClick={() => !disabled && onRoleToggle(role.value)}
           disabled={disabled}
         >
-          {role.label}
+          <span>{role.label}</span>
+          {isSelected && (
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 16 16"
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3.5 8.5l3 3 6-7" />
+            </svg>
+          )}
         </button>
-      ))}
+        );
+      })}
     </div>
   );
 }
