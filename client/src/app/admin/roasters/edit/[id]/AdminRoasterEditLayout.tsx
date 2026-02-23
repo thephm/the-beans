@@ -663,7 +663,9 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
 
       if (savedRoasterId && hasContactData()) {
         try {
-          const tokenHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+          const tokenHeaders: HeadersInit | undefined = token
+            ? { Authorization: `Bearer ${token}` }
+            : undefined;
           const peopleResponse = await fetch(`${apiUrl}/api/people/roaster/${savedRoasterId}`, {
             headers: tokenHeaders,
           });
