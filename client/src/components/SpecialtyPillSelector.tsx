@@ -168,7 +168,7 @@ export default function SpecialtyPillSelector({
                                       'Unknown';
           // Get the translation key and use it to get the translated name
           const translationKey = getSpecialtyTranslationKey(specialtyNameFromDb);
-          const specialtyName = t<string>(`specialties.${translationKey}`, { defaultValue: specialtyNameFromDb });
+          const specialtyName = t(`specialties.${translationKey}`, { defaultValue: specialtyNameFromDb });
           
           return (
             <button
