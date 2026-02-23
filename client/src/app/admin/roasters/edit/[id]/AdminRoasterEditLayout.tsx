@@ -14,6 +14,34 @@ type HoursDay = {
   closed: boolean;
 };
 
+type ContactForm = {
+  id?: string;
+  firstName: string;
+  lastName: string;
+  title: string;
+  email: string;
+  mobile: string;
+  linkedinUrl: string;
+  instagramUrl: string;
+  roles: PersonRole[];
+  isPrimary: boolean;
+  bio: string;
+};
+
+const buildEmptyContact = (): ContactForm => ({
+  id: undefined,
+  firstName: "",
+  lastName: "",
+  title: "",
+  email: "",
+  mobile: "",
+  linkedinUrl: "",
+  instagramUrl: "",
+  roles: [],
+  isPrimary: false,
+  bio: "",
+});
+
 const buildDefaultHours = (): Record<string, HoursDay> => ({
   monday: { open: "08:00", close: "18:00", closed: false },
   tuesday: { open: "08:00", close: "18:00", closed: false },
@@ -129,18 +157,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     x: "",
     reddit: "",
   });
-  const [contactInfo, setContactInfo] = useState({
-    firstName: "",
-    lastName: "",
-    title: "",
-    email: "",
-    mobile: "",
-    linkedinUrl: "",
-    instagramUrl: "",
-    roles: [] as PersonRole[],
-    isPrimary: false,
-    bio: "",
-  });
+  const [contactPeople, setContactPeople] = useState<ContactForm[]>([buildEmptyContact()]);
   const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<string[]>([]);
   const [availableCountries, setAvailableCountries] = useState<Country[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
@@ -165,21 +182,24 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const canShowHours = !onlineOnly && showHours;
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const contactCount = useMemo(() => {
+  const hasContactData = (contact: ContactForm) => {
     const hasText = (value: string) => value.trim().length > 0;
-    const hasAnyText = [
-      contactInfo.firstName,
-      contactInfo.lastName,
-      contactInfo.title,
-      contactInfo.email,
-      contactInfo.mobile,
-      contactInfo.linkedinUrl,
-      contactInfo.instagramUrl,
-      contactInfo.bio,
-    ].some(hasText);
+    const textFields = [
+      contact.firstName,
+      contact.lastName,
+      contact.title,
+      contact.email,
+      contact.mobile,
+      contact.linkedinUrl,
+      contact.instagramUrl,
+      contact.bio,
+    ];
+    return textFields.some(hasText) || contact.roles.length > 0 || contact.isPrimary;
+  };
 
-    return hasAnyText || contactInfo.roles.length > 0 || contactInfo.isPrimary ? 1 : 0;
-  }, [contactInfo]);
+  const contactCount = useMemo(() => {
+    return contactPeople.filter(hasContactData).length;
+  }, [contactPeople]);
 
   const socialCount = useMemo(() => {
     return Object.values(socialInfo).filter((value) => value.trim().length > 0).length;
@@ -251,17 +271,65 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     const { name, value } = e.target;
     setSocialInfo((prev) => ({ ...prev, [name]: value }));
   };
-  const handleContactInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleContactInfoChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setContactInfo((prev) => ({ ...prev, [name]: value }));
+    setContactPeople((prev) =>
+      prev.map((contact, contactIndex) =>
+        contactIndex === index
+          ? { ...contact, [name]: value }
+          : contact
+      )
+    );
   };
-  const handleContactRoleToggle = (role: PersonRole) => {
-    setContactInfo((prev) => ({
-      ...prev,
-      roles: prev.roles.includes(role)
-        ? prev.roles.filter((existingRole) => existingRole !== role)
-        : [...prev.roles, role],
-    }));
+
+  const handleContactRoleToggle = (index: number, role: PersonRole) => {
+    setContactPeople((prev) =>
+      prev.map((contact, contactIndex) => {
+        if (contactIndex !== index) return contact;
+        const nextRoles = contact.roles.includes(role)
+          ? contact.roles.filter((existingRole) => existingRole !== role)
+          : [...contact.roles, role];
+        return { ...contact, roles: nextRoles };
+      })
+    );
+  };
+
+  const handlePrimaryToggle = (index: number) => {
+    setContactPeople((prev) =>
+      prev.map((contact, contactIndex) => {
+        if (contactIndex === index) {
+          return { ...contact, isPrimary: !contact.isPrimary };
+        }
+        return { ...contact, isPrimary: false };
+      })
+    );
+  };
+
+  const handleAddContact = () => {
+    setContactPeople((prev) => [...prev, buildEmptyContact()]);
+  };
+
+  const handleDeleteContact = async (index: number) => {
+    const contactToDelete = contactPeople[index];
+    const nextContacts = contactPeople.filter((_, contactIndex) => contactIndex !== index);
+    setContactPeople(nextContacts.length > 0 ? nextContacts : [buildEmptyContact()]);
+
+    if (!contactToDelete?.id) return;
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/api/people/${contactToDelete.id}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (!response.ok) {
+        showToast(t('adminForms.roasters.deleteFailed', 'Failed to delete contact.'), "error");
+      }
+    } catch (error) {
+      showToast(t('adminForms.roasters.deleteFailed', 'Failed to delete contact.'), "error");
+    }
   };
 
   const handleDelete = async () => {
@@ -456,9 +524,12 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   }, [roasterId]);
 
   useEffect(() => {
-    if (!roasterId) return;
+    if (!roasterId) {
+      setContactPeople([buildEmptyContact()]);
+      return;
+    }
 
-    const fetchPrimaryContact = async () => {
+    const fetchContacts = async () => {
       try {
         setIsContactLoading(true);
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -467,7 +538,10 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
 
-        if (!response.ok) return;
+        if (!response.ok) {
+          setContactPeople([buildEmptyContact()]);
+          return;
+        }
 
         const data = await response.json();
         const peopleList = Array.isArray(data)
@@ -476,30 +550,41 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
             ? data.data
             : [];
 
-        if (peopleList.length === 0) return;
+        if (peopleList.length === 0) {
+          setContactPeople([buildEmptyContact()]);
+          return;
+        }
 
-        const primaryPerson = peopleList.find((person: any) => person.isPrimary) || peopleList[0];
-
-        setContactInfo({
-          firstName: primaryPerson.firstName || "",
-          lastName: primaryPerson.lastName || "",
-          title: primaryPerson.title || "",
-          email: primaryPerson.email || "",
-          mobile: primaryPerson.mobile || "",
-          linkedinUrl: primaryPerson.linkedinUrl || "",
-          instagramUrl: primaryPerson.instagramUrl || "",
-          roles: primaryPerson.roles || [],
-          isPrimary: Boolean(primaryPerson.isPrimary),
-          bio: primaryPerson.bio || "",
+        const sortedPeople = [...peopleList].sort((a: any, b: any) => {
+          const aPrimary = a?.isPrimary ? 1 : 0;
+          const bPrimary = b?.isPrimary ? 1 : 0;
+          return bPrimary - aPrimary;
         });
+
+        setContactPeople(
+          sortedPeople.map((person: any) => ({
+            id: person.id,
+            firstName: person.firstName || "",
+            lastName: person.lastName || "",
+            title: person.title || "",
+            email: person.email || "",
+            mobile: person.mobile || "",
+            linkedinUrl: person.linkedinUrl || "",
+            instagramUrl: person.instagramUrl || "",
+            roles: person.roles || [],
+            isPrimary: Boolean(person.isPrimary),
+            bio: person.bio || "",
+          }))
+        );
       } catch (error) {
-        console.error("Error fetching contact person:", error);
+        console.error("Error fetching contact people:", error);
+        setContactPeople([buildEmptyContact()]);
       } finally {
         setIsContactLoading(false);
       }
     };
 
-    fetchPrimaryContact();
+    fetchContacts();
   }, [roasterId]);
 
   useEffect(() => {
@@ -588,35 +673,21 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     setToastMessage(message);
   };
 
-  const hasContactData = () => {
-    const hasText = (value: string) => value.trim().length > 0;
-    const textFields = [
-      contactInfo.firstName,
-      contactInfo.lastName,
-      contactInfo.title,
-      contactInfo.email,
-      contactInfo.mobile,
-      contactInfo.linkedinUrl,
-      contactInfo.instagramUrl,
-      contactInfo.bio,
-    ];
-    return textFields.some(hasText) || contactInfo.roles.length > 0 || contactInfo.isPrimary;
-  };
 
   const toOptionalString = (value: string) => value.trim();
 
-  const buildContactPayload = (effectiveRoasterId: string) => ({
+  const buildContactPayload = (effectiveRoasterId: string, contact: ContactForm) => ({
     roasterId: effectiveRoasterId,
-    firstName: contactInfo.firstName.trim(),
-    lastName: toOptionalString(contactInfo.lastName),
-    title: toOptionalString(contactInfo.title),
-    email: toOptionalString(contactInfo.email),
-    mobile: toOptionalString(contactInfo.mobile),
-    linkedinUrl: toOptionalString(contactInfo.linkedinUrl),
-    instagramUrl: toOptionalString(contactInfo.instagramUrl),
-    bio: toOptionalString(contactInfo.bio),
-    roles: contactInfo.roles,
-    isPrimary: contactInfo.isPrimary,
+    firstName: contact.firstName.trim(),
+    lastName: toOptionalString(contact.lastName),
+    title: toOptionalString(contact.title),
+    email: toOptionalString(contact.email),
+    mobile: toOptionalString(contact.mobile),
+    linkedinUrl: toOptionalString(contact.linkedinUrl),
+    instagramUrl: toOptionalString(contact.instagramUrl),
+    bio: toOptionalString(contact.bio),
+    roles: contact.roles,
+    isPrimary: contact.isPrimary,
   });
 
   const handleSave = async () => {
@@ -638,7 +709,10 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       return;
     }
 
-    if (hasContactData() && !contactInfo.firstName.trim()) {
+    const contactMissingFirstName = contactPeople.find(
+      (contact) => hasContactData(contact) && !contact.firstName.trim()
+    );
+    if (contactMissingFirstName) {
       const contactMessage = t('adminForms.roasters.contactFirstNameRequired', 'Contact first name is required');
       setSaveError(contactMessage);
       showToast(contactMessage, "error");
@@ -737,55 +811,31 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         }
       }
 
-      if (savedRoasterId && hasContactData()) {
+      const contactsToSave = contactPeople.filter(hasContactData);
+      if (savedRoasterId && contactsToSave.length > 0) {
         try {
-          const tokenHeaders: HeadersInit | undefined = token
-            ? { Authorization: `Bearer ${token}` }
-            : undefined;
-          const peopleResponse = await fetch(`${apiUrl}/api/people/roaster/${savedRoasterId}`, {
-            headers: tokenHeaders,
-          });
+          for (const contact of contactsToSave) {
+            const contactPayload = buildContactPayload(savedRoasterId, contact);
+            const contactUrl = contact.id
+              ? `${apiUrl}/api/people/${contact.id}`
+              : `${apiUrl}/api/people`;
+            const contactMethod = contact.id ? "PUT" : "POST";
 
-          let existingPersonId: string | null = null;
-          if (peopleResponse.ok) {
-            const peopleData = await peopleResponse.json();
-            const peopleList = Array.isArray(peopleData)
-              ? peopleData
-              : Array.isArray(peopleData?.data)
-                ? peopleData.data
-                : [];
+            const contactResponse = await fetch(contactUrl, {
+              method: contactMethod,
+              headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify(contactPayload),
+            });
 
-            const normalizedEmail = contactInfo.email.trim().toLowerCase();
-            const matchedByEmail = normalizedEmail
-              ? peopleList.find((person: any) => String(person.email || '').toLowerCase() === normalizedEmail)
-              : null;
-            const matchedByPrimary = contactInfo.isPrimary
-              ? peopleList.find((person: any) => person.isPrimary)
-              : null;
-
-            existingPersonId = matchedByEmail?.id || matchedByPrimary?.id || peopleList[0]?.id || null;
-          }
-
-          const contactPayload = buildContactPayload(savedRoasterId);
-          const contactUrl = existingPersonId
-            ? `${apiUrl}/api/people/${existingPersonId}`
-            : `${apiUrl}/api/people`;
-          const contactMethod = existingPersonId ? "PUT" : "POST";
-
-          const contactResponse = await fetch(contactUrl, {
-            method: contactMethod,
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify(contactPayload),
-          });
-
-          if (!contactResponse.ok) {
-            console.error("Failed to save contact person");
+            if (!contactResponse.ok) {
+              console.error("Failed to save contact person");
+            }
           }
         } catch (contactError) {
-          console.error("Error saving contact person:", contactError);
+          console.error("Error saving contact people:", contactError);
         }
       }
 
@@ -1197,135 +1247,160 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
 
     if (sectionKey === "contacts") {
       return (
-        <div className="space-y-3 max-w-4xl">
+        <div className="space-y-4 max-w-5xl">
           {isContactLoading && (
             <div className="text-sm text-gray-500 dark:text-gray-400">
               {t('common.loading', 'Loading...')}
             </div>
           )}
-          <div className="grid grid-cols-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px] gap-2 items-start">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.firstName', 'First Name')} *
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={contactInfo.firstName}
-                onChange={handleContactInfoChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.lastName', 'Last Name')}
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={contactInfo.lastName}
-                onChange={handleContactInfoChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div className="col-span-2 md:col-auto md:row-span-5">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('admin.people.role', 'Role')}
-              </label>
-              <PersonRoleButtons
-                selectedRoles={contactInfo.roles}
-                onRoleToggle={handleContactRoleToggle}
-                size="sm"
-                layout="wrap"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.jobTitle', 'Title')}
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={contactInfo.title}
-                onChange={handleContactInfoChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('admin.people.primaryContact', 'Primary Contact')}
-              </label>
-              <button
-                type="button"
-                className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${contactInfo.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                onClick={() => setContactInfo((prev) => ({ ...prev, isPrimary: !prev.isPrimary }))}
+          <div className="space-y-4">
+            {contactPeople.map((contact, index) => (
+              <div
+                key={contact.id ?? `contact-${index}`}
+                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800"
               >
-                {contactInfo.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
-              </button>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.email', 'Email')}
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={contactInfo.email}
-                onChange={handleContactInfoChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.mobile', 'Mobile')}
-              </label>
-              <input
-                type="text"
-                name="mobile"
-                value={contactInfo.mobile}
-                onChange={handleContactInfoChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.instagramUrl', 'Instagram URL')}
-              </label>
-              <input
-                type="url"
-                name="instagramUrl"
-                value={contactInfo.instagramUrl}
-                onChange={handleContactInfoChange}
-                placeholder={t('admin.people.instagramUrlPlaceholder', 'https://www.instagram.com/username')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.linkedinUrl', 'LinkedIn URL')}
-              </label>
-              <input
-                type="url"
-                name="linkedinUrl"
-                value={contactInfo.linkedinUrl}
-                onChange={handleContactInfoChange}
-                placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.people.bio', 'Bio')}
-              </label>
-              <textarea
-                name="bio"
-                value={contactInfo.bio}
-                onChange={handleContactInfoChange}
-                rows={2}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
+                {contact.isPrimary && (
+                  <div className="flex items-center justify-end mb-3">
+                    <span className="text-xs font-semibold uppercase text-blue-600 dark:text-blue-400">
+                      {t('adminForms.roasters.primaryContact', 'Primary Contact')}
+                    </span>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px] gap-2 items-start">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.firstName', 'First Name')} *
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={contact.firstName}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.lastName', 'Last Name')}
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={contact.lastName}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-auto md:row-span-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {t('admin.people.role', 'Role')}
+                    </label>
+                    <PersonRoleButtons
+                      selectedRoles={contact.roles}
+                      onRoleToggle={(role) => handleContactRoleToggle(index, role)}
+                      size="sm"
+                      layout="wrap"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.jobTitle', 'Title')}
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={contact.title}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {t('admin.people.primaryContact', 'Primary Contact')}
+                    </label>
+                    <button
+                      type="button"
+                      className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${contact.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                      onClick={() => handlePrimaryToggle(index)}
+                    >
+                      {contact.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.email', 'Email')}
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={contact.email}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.mobile', 'Mobile')}
+                    </label>
+                    <input
+                      type="text"
+                      name="mobile"
+                      value={contact.mobile}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.instagramUrl', 'Instagram URL')}
+                    </label>
+                    <input
+                      type="url"
+                      name="instagramUrl"
+                      value={contact.instagramUrl}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      placeholder={t('admin.people.instagramUrlPlaceholder', 'https://www.instagram.com/username')}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.linkedinUrl', 'LinkedIn URL')}
+                    </label>
+                    <input
+                      type="url"
+                      name="linkedinUrl"
+                      value={contact.linkedinUrl}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('admin.people.bio', 'Bio')}
+                    </label>
+                    <textarea
+                      name="bio"
+                      value={contact.bio}
+                      onChange={(e) => handleContactInfoChange(index, e)}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1 md:flex md:items-end md:justify-end">
+                    <button
+                      type="button"
+                      className="text-red-600 hover:text-red-700 text-sm font-semibold"
+                      onClick={() => handleDeleteContact(index)}
+                    >
+                      {t('common.delete', 'Delete')} {t('adminForms.roasters.contact', 'Contact')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       );
@@ -1346,20 +1421,6 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     if (sectionKey === "countries") {
       return (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.countrySearch', 'Search countries')}
-              </label>
-              <input
-                type="text"
-                value={countriesFilter}
-                onChange={(e) => setCountriesFilter(e.target.value)}
-                placeholder={t('adminForms.roasters.countrySearchPlaceholder', 'Type to filter')}
-                className="w-full md:max-w-sm px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-          </div>
           {countriesLoading ? (
             <div className="text-sm text-gray-500 dark:text-gray-400">
               {t('common.loading', 'Loading...')}
@@ -1532,7 +1593,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       return (
         <div className="space-y-5">
           {!canShowHours && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
               {onlineOnly
                 ? t('adminForms.roasters.hoursOnlineOnly', 'Online-only roasters do not display opening hours.')
                 : t('adminForms.roasters.hoursHidden', 'Enable Show Hours in Settings to edit hours.')}
@@ -1675,41 +1736,56 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {sections.find(s => s.key === selected)?.label}
                   </h1>
-                  <div
-                    className={`flex items-center gap-4 ${selected === "hours" ? "" : "invisible pointer-events-none"}`}
-                    aria-hidden={selected !== "hours"}
-                  >
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showHours}
-                        onChange={(e) => setShowHours(e.target.checked)}
-                        disabled={onlineOnly}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                      <span className={`text-sm font-medium ${onlineOnly ? "text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-300"}`}>
-                        {t('adminForms.roasters.showHours', 'Show Hours')}
-                      </span>
-                    </label>
-                    {canShowHours && (
-                      <button
-                        type="button"
-                        onClick={() => setHoursExpanded((prev) => !prev)}
-                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                        title={hoursExpanded
-                          ? t('adminForms.roasters.collapseSection', 'Collapse section')
-                          : t('adminForms.roasters.expandSection', 'Expand section')}
-                      >
-                        <svg
-                          className="w-4 h-4 transition-transform duration-200"
-                          style={{ transform: hoursExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
+                  <div className="flex items-center gap-4">
+                    {selected === "countries" && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t('adminForms.roasters.countrySearchShort', 'Search')}
+                        </span>
+                        <input
+                          type="text"
+                          value={countriesFilter}
+                          onChange={(e) => setCountriesFilter(e.target.value)}
+                          placeholder={t('adminForms.roasters.countrySearchPlaceholder', 'Type to filter')}
+                          className="w-52 md:w-64 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        />
+                      </div>
+                    )}
+                    {selected === "hours" && (
+                      <div className="flex items-center gap-4">
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={showHours}
+                            onChange={(e) => setShowHours(e.target.checked)}
+                            disabled={onlineOnly}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className={`text-sm font-medium ${onlineOnly ? "text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-300"}`}>
+                            {t('adminForms.roasters.showHours', 'Show Hours')}
+                          </span>
+                        </label>
+                        {canShowHours && (
+                          <button
+                            type="button"
+                            onClick={() => setHoursExpanded((prev) => !prev)}
+                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                            title={hoursExpanded
+                              ? t('adminForms.roasters.collapseSection', 'Collapse section')
+                              : t('adminForms.roasters.expandSection', 'Expand section')}
+                          >
+                            <svg
+                              className="w-4 h-4 transition-transform duration-200"
+                              style={{ transform: hoursExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1763,6 +1839,19 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                           )}
                         </div>
                       </div>
+                    ) : section.key === "countries" ? (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                          {section.label}
+                        </h2>
+                        <input
+                          type="text"
+                          value={countriesFilter}
+                          onChange={(e) => setCountriesFilter(e.target.value)}
+                          placeholder={t('adminForms.roasters.countrySearchPlaceholder', 'Type to filter')}
+                          className="w-full sm:w-64 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        />
+                      </div>
                     ) : (
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                         {section.label}
@@ -1775,6 +1864,16 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
               {/* Save button */}
               <div className="mt-6 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
+                  {isEditing && selected === "contacts" && (
+                    <button
+                      type="button"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed"
+                      onClick={handleAddContact}
+                      disabled={isSaving || isDeleting}
+                    >
+                      {t('adminForms.roasters.add', 'Add')} {t('adminForms.roasters.contact', 'Contact')}
+                    </button>
+                  )}
                   {isEditing && selected === "basic" && (
                     <button
                       className="hidden md:inline-flex bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed"

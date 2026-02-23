@@ -871,6 +871,7 @@
       "sourceCountries": "Source Countries",
       "sourceCountriesDescription": "Select the coffee origin countries that this roaster sources from.",
       "countrySearch": "Search countries",
+      "countrySearchShort": "Search",
       "countrySearchPlaceholder": "Type to filter",
       "selectedCountriesCount": "Selected countries: {{count}}",
       "noCountriesAvailable": "No countries available",
