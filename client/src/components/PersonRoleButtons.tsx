@@ -25,11 +25,11 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
   ];
 
   const sizeClasses = size === 'sm'
-    ? 'px-3 py-1.5 text-sm'
-    : 'px-4 py-2 text-sm';
+    ? 'px-3 py-1.5 text-sm min-w-[104px]'
+    : 'px-4 py-2 text-sm min-w-[112px]';
 
   const containerClasses = layout === 'wrap'
-    ? 'flex flex-wrap gap-2'
+    ? 'flex flex-wrap gap-2 w-full'
     : layout === 'column'
       ? 'flex flex-col items-start gap-2 w-full'
       : layout === 'two-column'
@@ -50,7 +50,7 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
           key={role.value}
           type="button"
           aria-pressed={isSelected}
-          className={`${widthClasses} ${sizeClasses} rounded-full border font-medium transition-all duration-200 focus:outline-none inline-flex items-center gap-2 ${
+          className={`${widthClasses} ${sizeClasses} rounded-full border font-medium transition-all duration-200 focus:outline-none inline-flex items-center justify-center gap-2 ${
             isSelected
               ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
               : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
@@ -59,7 +59,7 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
           disabled={disabled}
         >
           <span>{role.label}</span>
-          {isSelected && (
+          <span className={`${isSelected ? 'opacity-100' : 'opacity-0'} inline-flex items-center justify-center w-4 h-4`}>
             <svg
               aria-hidden="true"
               viewBox="0 0 16 16"
@@ -72,7 +72,7 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
             >
               <path d="M3.5 8.5l3 3 6-7" />
             </svg>
-          )}
+          </span>
         </button>
         );
       })}

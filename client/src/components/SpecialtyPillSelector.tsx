@@ -175,22 +175,22 @@ export default function SpecialtyPillSelector({
               key={specialty.id}
               type="button"
               onClick={() => handleToggleSpecialty(specialty.id)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+              className={`px-4 py-1.5 min-w-[96px] rounded-full text-sm font-medium transition-all duration-200 inline-flex items-center justify-center gap-2 border ${
                 isSelected
                   ? isDeprecated
-                    ? 'bg-red-600 text-white hover:bg-red-700'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                    ? 'bg-red-600 text-white hover:bg-red-700 border-transparent'
+                    : 'bg-purple-600 text-white hover:bg-purple-700 border-transparent'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300'
               }`}
               title={isDeprecated ? t('admin.specialties.deprecatedWarning', 'This specialty is deprecated. Consider removing it.') : ''}
             >
-              {specialtyName}
-              {isDeprecated && isSelected && (
-                <span className="ml-1.5" title={t('admin.specialties.deprecated', 'Deprecated')}>⚠️</span>
-              )}
-              {!isDeprecated && isSelected && (
-                <span className="ml-1.5">✓</span>
-              )}
+              <span>{specialtyName}</span>
+              <span
+                className={`${isSelected ? 'opacity-100' : 'opacity-0'} inline-flex items-center justify-center w-4 h-4`}
+                aria-hidden="true"
+              >
+                {isDeprecated ? '⚠️' : '✓'}
+              </span>
             </button>
           );
         })}

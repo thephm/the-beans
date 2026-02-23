@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
 import SpecialtyPillSelector from "@/components/SpecialtyPillSelector";
 import SimpleImageUpload from "@/components/SimpleImageUpload";
@@ -96,6 +96,8 @@ interface AdminRoasterEditLayoutProps {
 export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roaster Name]" }: AdminRoasterEditLayoutProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [selected, setSelected] = useState("basic");
   const isEditing = Boolean(roasterId);
   const [basicInfo, setBasicInfo] = useState({
@@ -160,6 +162,8 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastVariant, setToastVariant] = useState<"success" | "error">("success");
   const [isContactLoading, setIsContactLoading] = useState(false);
+  const canShowHours = !onlineOnly && showHours;
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const contactCount = useMemo(() => {
     const hasText = (value: string) => value.trim().length > 0;
@@ -177,23 +181,61 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     return hasAnyText || contactInfo.roles.length > 0 || contactInfo.isPrimary ? 1 : 0;
   }, [contactInfo]);
 
+  const socialCount = useMemo(() => {
+    return Object.values(socialInfo).filter((value) => value.trim().length > 0).length;
+  }, [socialInfo]);
+
+  const hoursCount = useMemo(() => {
+    return Object.values(hours).filter((dayHours) => {
+      if (!dayHours || dayHours.closed) return false;
+      return Boolean(dayHours.open?.trim() || dayHours.close?.trim());
+    }).length;
+  }, [hours]);
+
   const filteredCountries = useMemo(() => {
     const normalizedFilter = countriesFilter.trim().toLowerCase();
     if (!normalizedFilter) return availableCountries;
     return availableCountries.filter((country) => country.name.toLowerCase().includes(normalizedFilter));
   }, [availableCountries, countriesFilter]);
 
-  const sections = useMemo(() => [
-    { key: "basic", label: t('adminForms.roasters.sections.basic', 'Basic') },
-    { key: "location", label: t('adminForms.roasters.sections.location', 'Location') },
-    { key: "socials", label: t('adminForms.roasters.sections.socials', 'Socials'), count: 2 },
-    { key: "contacts", label: t('adminForms.roasters.sections.contacts', 'Contacts'), count: contactCount },
-    { key: "specialties", label: t('adminForms.roasters.sections.specialties', 'Specialties'), count: selectedSpecialtyIds.length },
-    { key: "countries", label: t('adminForms.roasters.sections.countries', 'Countries'), count: selectedCountries.length },
-    { key: "images", label: t('adminForms.roasters.sections.images', 'Images'), count: images.length },
-    { key: "urlImages", label: t('adminForms.roasters.sections.urlImages', 'URL Images'), count: urlImages.length },
-    { key: "hours", label: t('adminForms.roasters.sections.hours', 'Hours') },
-  ], [contactCount, images.length, selectedCountries.length, selectedSpecialtyIds.length, t, urlImages.length]);
+  const sections = useMemo(() => {
+    const baseSections = [
+      { key: "basic", label: t('adminForms.roasters.sections.basic', 'Basic') },
+      { key: "location", label: t('adminForms.roasters.sections.location', 'Location') },
+      { key: "socials", label: t('adminForms.roasters.sections.socials', 'Socials'), count: socialCount },
+      { key: "contacts", label: t('adminForms.roasters.sections.contacts', 'Contacts'), count: contactCount },
+      { key: "specialties", label: t('adminForms.roasters.sections.specialties', 'Specialties'), count: selectedSpecialtyIds.length },
+      { key: "countries", label: t('adminForms.roasters.sections.countries', 'Countries'), count: selectedCountries.length },
+    ];
+
+    if (isEditing) {
+      baseSections.push({ key: "images", label: t('adminForms.roasters.sections.images', 'Images'), count: images.length });
+    }
+
+    if (isEditing) {
+      baseSections.push({ key: "urlImages", label: t('adminForms.roasters.sections.urlImages', 'URL Images'), count: urlImages.length });
+    }
+
+    baseSections.push({ key: "hours", label: t('adminForms.roasters.sections.hours', 'Hours'), count: hoursCount });
+
+    return baseSections;
+  }, [contactCount, hoursCount, images.length, isEditing, selectedCountries.length, selectedSpecialtyIds.length, socialCount, t, urlImages.length]);
+
+  const sectionKeys = useMemo(() => new Set(sections.map((section) => section.key)), [sections]);
+
+  useEffect(() => {
+    const urlTab = searchParams.get("tab");
+    if (urlTab && sectionKeys.has(urlTab) && urlTab !== selected) {
+      setSelected(urlTab);
+    }
+  }, [searchParams, sectionKeys, selected]);
+
+  const handleTabSelect = (sectionKey: string) => {
+    setSelected(sectionKey);
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("tab", sectionKey);
+    router.replace(`${pathname}?${nextParams.toString()}`);
+  };
 
   const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -220,6 +262,38 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         ? prev.roles.filter((existingRole) => existingRole !== role)
         : [...prev.roles, role],
     }));
+  };
+
+  const handleDelete = async () => {
+    if (!roasterId || isDeleting) return;
+
+    const confirmed = window.confirm(
+      t('adminForms.roasters.deleteConfirm', 'Are you sure you want to delete this roaster? This action cannot be undone.')
+    );
+    if (!confirmed) return;
+
+    try {
+      setIsDeleting(true);
+      setSaveError(null);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/api/roasters/${roasterId}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (response.ok) {
+        router.push("/admin/roasters");
+        return;
+      }
+
+      const errorData = await response.json().catch(() => null);
+      setSaveError(errorData?.error || t('adminForms.roasters.deleteFailed', 'Failed to delete roaster.'));
+    } catch (error) {
+      setSaveError(t('adminForms.roasters.deleteFailed', 'Failed to delete roaster.'));
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleHoursChange = (day: string, field: keyof HoursDay, value: string | boolean) => {
@@ -529,16 +603,18 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     return textFields.some(hasText) || contactInfo.roles.length > 0 || contactInfo.isPrimary;
   };
 
+  const toOptionalString = (value: string) => value.trim();
+
   const buildContactPayload = (effectiveRoasterId: string) => ({
     roasterId: effectiveRoasterId,
     firstName: contactInfo.firstName.trim(),
-    lastName: toNullIfEmpty(contactInfo.lastName),
-    title: toNullIfEmpty(contactInfo.title),
-    email: toNullIfEmpty(contactInfo.email),
-    mobile: toNullIfEmpty(contactInfo.mobile),
-    linkedinUrl: toNullIfEmpty(contactInfo.linkedinUrl),
-    instagramUrl: toNullIfEmpty(contactInfo.instagramUrl),
-    bio: toNullIfEmpty(contactInfo.bio),
+    lastName: toOptionalString(contactInfo.lastName),
+    title: toOptionalString(contactInfo.title),
+    email: toOptionalString(contactInfo.email),
+    mobile: toOptionalString(contactInfo.mobile),
+    linkedinUrl: toOptionalString(contactInfo.linkedinUrl),
+    instagramUrl: toOptionalString(contactInfo.instagramUrl),
+    bio: toOptionalString(contactInfo.bio),
     roles: contactInfo.roles,
     isPrimary: contactInfo.isPrimary,
   });
@@ -1258,9 +1334,6 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     if (sectionKey === "specialties") {
       return (
         <div className="space-y-4">
-          <div className="text-sm text-gray-600 dark:text-gray-300">
-            {t('adminForms.roasters.specialties', 'Specialties')}
-          </div>
           <SpecialtyPillSelector
             selectedSpecialtyIds={selectedSpecialtyIds}
             onChange={setSelectedSpecialtyIds}
@@ -1456,43 +1529,8 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     }
 
     if (sectionKey === "hours") {
-      const canShowHours = !onlineOnly && showHours;
       return (
         <div className="space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={showHours}
-                onChange={(e) => setShowHours(e.target.checked)}
-                disabled={onlineOnly}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              <span className={`text-sm font-medium ${onlineOnly ? "text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-300"}`}>
-                {t('adminForms.roasters.showHours', 'Show Hours')}
-              </span>
-            </label>
-            {canShowHours && (
-              <button
-                type="button"
-                onClick={() => setHoursExpanded((prev) => !prev)}
-                className="self-end sm:self-auto p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                title={hoursExpanded
-                  ? t('adminForms.roasters.collapseSection', 'Collapse section')
-                  : t('adminForms.roasters.expandSection', 'Expand section')}
-              >
-                <svg
-                  className="w-4 h-4 transition-transform duration-200"
-                  style={{ transform: hoursExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            )}
-          </div>
           {!canShowHours && (
             <div className="text-sm text-gray-600 dark:text-gray-400">
               {onlineOnly
@@ -1594,13 +1632,16 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 </Link>
               </nav>
             </div>
-            <div className="flex-1 md:pl-4">
+            <div className="flex-1 md:pl-4 flex items-center justify-between gap-4">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {isEditing
                   ? t('adminForms.roasters.editRoaster', 'Edit Roaster')
                   : t('admin.roasters.addTitle', 'Add Roaster')
                 }
               </h1>
+              <div className="text-right text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 truncate max-w-[50%]">
+                {basicInfo.name?.trim() || roasterName || t('adminForms.roasters.namePlaceholder', 'Roaster Name')}
+              </div>
             </div>
           </div>
         </div>
@@ -1613,8 +1654,8 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 {sections.map((section) => (
                   <li key={section.key}>
                     <button
-                      className={`w-full flex items-center justify-between px-4 py-1.5 rounded-lg text-left font-medium transition-colors ${selected === section.key ? "bg-purple-700/20 text-white border border-purple-500" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"}`}
-                      onClick={() => setSelected(section.key)}
+                      className={`w-full flex items-center justify-between px-4 py-1.5 rounded-lg text-left font-medium transition-colors ${selected === section.key ? "bg-purple-700/20 text-primary-700 dark:text-white border border-purple-500" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"}`}
+                      onClick={() => handleTabSelect(section.key)}
                     >
                       <span>{section.label}</span>
                       {typeof section.count === "number" && (
@@ -1630,9 +1671,48 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
             {/* Right Pane */}
             <main className="flex-1 flex flex-col">
               <div className="hidden md:flex relative p-4 bg-slate-100 dark:bg-slate-800 border border-black/90 dark:border-black rounded-lg shadow flex-col min-h-[400px]">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-                  {sections.find(s => s.key === selected)?.label}
-                </h1>
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {sections.find(s => s.key === selected)?.label}
+                  </h1>
+                  <div
+                    className={`flex items-center gap-4 ${selected === "hours" ? "" : "invisible pointer-events-none"}`}
+                    aria-hidden={selected !== "hours"}
+                  >
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={showHours}
+                        onChange={(e) => setShowHours(e.target.checked)}
+                        disabled={onlineOnly}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
+                      <span className={`text-sm font-medium ${onlineOnly ? "text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-300"}`}>
+                        {t('adminForms.roasters.showHours', 'Show Hours')}
+                      </span>
+                    </label>
+                    {canShowHours && (
+                      <button
+                        type="button"
+                        onClick={() => setHoursExpanded((prev) => !prev)}
+                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                        title={hoursExpanded
+                          ? t('adminForms.roasters.collapseSection', 'Collapse section')
+                          : t('adminForms.roasters.expandSection', 'Expand section')}
+                      >
+                        <svg
+                          className="w-4 h-4 transition-transform duration-200"
+                          style={{ transform: hoursExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
                 <div className="flex-1">
                   {renderSectionContent(selected)}
                 </div>
@@ -1643,40 +1723,118 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     key={section.key}
                     className="space-y-4 rounded-lg bg-slate-100 dark:bg-slate-800 border border-black/90 dark:border-black shadow p-4"
                   >
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                      {section.label}
-                    </h2>
+                    {section.key === "hours" ? (
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                          {section.label}
+                        </h2>
+                        <div className="flex items-center gap-3">
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={showHours}
+                              onChange={(e) => setShowHours(e.target.checked)}
+                              disabled={onlineOnly}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                            <span className={`text-sm font-medium ${onlineOnly ? "text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-300"}`}>
+                              {t('adminForms.roasters.showHours', 'Show Hours')}
+                            </span>
+                          </label>
+                          {canShowHours && (
+                            <button
+                              type="button"
+                              onClick={() => setHoursExpanded((prev) => !prev)}
+                              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                              title={hoursExpanded
+                                ? t('adminForms.roasters.collapseSection', 'Collapse section')
+                                : t('adminForms.roasters.expandSection', 'Expand section')}
+                            >
+                              <svg
+                                className="w-4 h-4 transition-transform duration-200"
+                                style={{ transform: hoursExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                        {section.label}
+                      </h2>
+                    )}
                     {renderSectionContent(section.key)}
                   </section>
                 ))}
               </div>
               {/* Save button */}
-              <div className="mt-6 flex justify-end">
-                {saveError && (
-                  <div className="mr-auto text-sm text-red-600 dark:text-red-400">
-                    {saveError}
-                  </div>
-                )}
-                <button
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed"
-                  type="button"
-                  onClick={handleSave}
-                  disabled={isSaving}
-                >
-                  <span className="flex items-center space-x-2">
-                    {isSaving && (
-                      <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                      </svg>
-                    )}
-                    <span>
-                      {isSaving
-                        ? t('adminForms.roasters.saving', 'Saving...')
-                        : t('adminForms.roasters.save', 'Save')}
+              <div className="mt-6 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  {isEditing && selected === "basic" && (
+                    <button
+                      className="hidden md:inline-flex bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed"
+                      type="button"
+                      onClick={handleDelete}
+                      disabled={isDeleting || isSaving}
+                    >
+                      {isDeleting
+                        ? t('adminForms.roasters.deleting', 'Deleting...')
+                        : t('adminForms.roasters.delete', 'Delete')}
+                    </button>
+                  )}
+                  {isEditing && (
+                    <button
+                      className="md:hidden bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed"
+                      type="button"
+                      onClick={handleDelete}
+                      disabled={isDeleting || isSaving}
+                    >
+                      {isDeleting
+                        ? t('adminForms.roasters.deleting', 'Deleting...')
+                        : t('adminForms.roasters.delete', 'Delete')}
+                    </button>
+                  )}
+                  {saveError && (
+                    <div className="text-sm text-red-600 dark:text-red-400">
+                      {saveError}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    type="button"
+                    onClick={() => router.push("/admin/roasters")}
+                    disabled={isSaving || isDeleting}
+                  >
+                    {t('adminForms.roasters.cancel', 'Cancel')}
+                  </button>
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed"
+                    type="button"
+                    onClick={handleSave}
+                    disabled={isSaving || isDeleting}
+                  >
+                    <span className="flex items-center space-x-2">
+                      {isSaving && (
+                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" aria-hidden="true">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                        </svg>
+                      )}
+                      <span>
+                        {isSaving
+                          ? t('adminForms.roasters.saving', 'Saving...')
+                          : t('adminForms.roasters.save', 'Save')}
+                      </span>
                     </span>
-                  </span>
-                </button>
+                  </button>
+                </div>
               </div>
             </main>
           </div>
