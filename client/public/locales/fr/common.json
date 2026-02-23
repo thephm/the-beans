@@ -953,6 +953,7 @@
       "sourceCountries": "Pays d'origine",
       "sourceCountriesDescription": "Sélectionnez les pays d'origine du café que ce torréfacteur s'approvisionne.",
       "countrySearch": "Rechercher des pays",
+      "countrySearchShort": "Rechercher",
       "countrySearchPlaceholder": "Tapez pour filtrer",
       "selectedCountriesCount": "Pays sélectionnés : {{count}}",
       "noCountriesAvailable": "Aucun pays disponible",
