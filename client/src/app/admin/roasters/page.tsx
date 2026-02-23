@@ -259,8 +259,14 @@ const AdminRoastersPage: React.FC = () => {
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               onClick={() => setShowAddForm(true)}
             >
-              {t('common.add', 'Add')}
+              {t('common.add', 'Add')} (old)
             </button>
+            <Link
+              href="/admin/roasters/new-admin"
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              {t('common.add', 'Add')}
+            </Link>
           </div>
         </div>
         
@@ -512,12 +518,20 @@ const AdminRoastersPage: React.FC = () => {
                   <div key={roaster.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm dark:shadow-gray-900/50">
                     {/* Roaster Header */}
                     <div className="mb-3">
-                      <button
-                        className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline text-left"
-                        onClick={() => setEditingId(roaster.id)}
-                      >
-                        {roaster.name}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline text-left"
+                          onClick={() => setEditingId(roaster.id)}
+                        >
+                          {roaster.name}
+                        </button>
+                        <Link
+                          href={`/admin/roasters/edit/${roaster.id}`}
+                          className="text-sm text-purple-600 hover:underline"
+                        >
+                          [edit]
+                        </Link>
+                      </div>
                       {/* Status Badges */}
                       <div className="flex flex-wrap gap-2 mt-2">
                         {roaster.verified && (
@@ -630,12 +644,20 @@ const AdminRoastersPage: React.FC = () => {
                       <tr key={roaster.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-6 py-4 font-medium">
                           <div className="flex items-center gap-3">
-                            <button
-                              className="text-primary-600 dark:text-primary-400 hover:underline text-left"
-                              onClick={() => setEditingId(roaster.id)}
-                            >
-                              {roaster.name}
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                className="text-primary-600 dark:text-primary-400 hover:underline text-left"
+                                onClick={() => setEditingId(roaster.id)}
+                              >
+                                {roaster.name}
+                              </button>
+                              <Link
+                                href={`/admin/roasters/edit/${roaster.id}`}
+                                className="text-sm text-purple-600 hover:underline"
+                              >
+                                [edit]
+                              </Link>
+                            </div>
                             {/* Verify button removed from desktop Name column per request */}
                           </div>
                         </td>
