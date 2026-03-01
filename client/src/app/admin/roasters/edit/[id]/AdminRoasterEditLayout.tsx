@@ -127,6 +127,9 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [selected, setSelected] = useState("basic");
+  const [mobileExpandedSections, setMobileExpandedSections] = useState<Record<string, boolean>>({
+    basic: true,
+  });
   const isEditing = Boolean(roasterId);
   const [basicInfo, setBasicInfo] = useState({
     name: "",
@@ -169,6 +172,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const [newUrlImage, setNewUrlImage] = useState("");
   const [hours, setHours] = useState<Record<string, HoursDay>>(buildDefaultHours());
   const [showHours, setShowHours] = useState(isEditing);
+  const [showAllSocials, setShowAllSocials] = useState(false);
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [rating, setRating] = useState(0);
   const [verified, setVerified] = useState(false);
@@ -244,6 +248,18 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const sectionKeys = useMemo(() => new Set(sections.map((section) => section.key)), [sections]);
 
   useEffect(() => {
+    setMobileExpandedSections((prev) => {
+      const next = { ...prev };
+      sections.forEach((section) => {
+        if (!(section.key in next)) {
+          next[section.key] = section.key === "basic";
+        }
+      });
+      return next;
+    });
+  }, [sections]);
+
+  useEffect(() => {
     const urlTab = searchParams.get("tab");
     if (urlTab && sectionKeys.has(urlTab) && urlTab !== selected) {
       setSelected(urlTab);
@@ -255,6 +271,20 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set("tab", sectionKey);
     router.replace(`${pathname}?${nextParams.toString()}`);
+  };
+
+  const toggleMobileSection = (sectionKey: string) => {
+    setMobileExpandedSections((prev) => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  };
+
+  const isMobileSectionExpanded = (sectionKey: string) => {
+    if (sectionKey in mobileExpandedSections) {
+      return mobileExpandedSections[sectionKey];
+    }
+    return sectionKey === "basic";
   };
 
   const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -865,7 +895,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       return (
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-5">
+            <div className="md:col-span-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.name', 'Name')} *
               </label>
@@ -890,33 +920,49 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <div className="md:col-span-3 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-3 sm:space-y-0 pt-1">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={verified}
-                  onChange={(e) => setVerified(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('adminForms.roasters.verified', 'Verified')}
-                </span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={featured}
-                  onChange={(e) => setFeatured(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('adminForms.roasters.featured', 'Featured')}
-                </span>
-              </label>
+            <div className="md:col-span-4 flex flex-wrap gap-3 sm:flex-nowrap sm:items-center sm:space-x-4 sm:gap-0 pt-1">
+              <button
+                type="button"
+                onClick={() => setVerified((prev) => !prev)}
+                aria-pressed={verified}
+                className={`inline-flex items-center gap-3 rounded-full border px-3 py-2 text-sm font-semibold transition-colors ${verified
+                  ? "bg-purple-600 text-white border-purple-600"
+                  : "bg-white text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"}`}
+              >
+                <span>{t('adminForms.roasters.verified', 'Verified')}</span>
+                {verified && (
+                  <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M16.704 5.296a1 1 0 010 1.414l-7.5 7.5a1 1 0 01-1.414 0l-3.5-3.5a1 1 0 011.414-1.414L8.5 12.086l6.793-6.79a1 1 0 011.411 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeatured((prev) => !prev)}
+                aria-pressed={featured}
+                className={`inline-flex items-center gap-3 rounded-full border px-3 py-2 text-sm font-semibold transition-colors ml-auto sm:ml-0 ${featured
+                  ? "bg-purple-600 text-white border-purple-600"
+                  : "bg-white text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"}`}
+              >
+                <span>{t('adminForms.roasters.featured', 'Featured')}</span>
+                {featured && (
+                  <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M16.704 5.296a1 1 0 010 1.414l-7.5 7.5a1 1 0 01-1.414 0l-3.5-3.5a1 1 0 011.414-1.414L8.5 12.086l6.793-6.79a1 1 0 011.411 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-5">
+            <div className="md:col-span-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.email', 'Email')}
               </label>
@@ -940,8 +986,8 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <div className="md:col-span-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="md:col-span-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('adminForms.roasters.founded', 'Founded')}
@@ -1062,7 +1108,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
               />
             </div>
           </div>
-          <div className="flex flex-col md:flex-row md:items-end gap-4">
+          <div className="space-y-4 md:flex md:items-end md:gap-4 md:space-y-0">
             <div className="w-full md:w-auto">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('admin.roasters.zipCode', 'Zip Code')}
@@ -1075,31 +1121,33 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 className="w-full md:w-[8rem] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <div className="w-full md:w-auto">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.roasters.latitude', 'Latitude')}
-              </label>
-              <input
-                type="number"
-                step="any"
-                name="latitude"
-                value={locationInfo.latitude}
-                onChange={handleLocationInfoChange}
-                className="w-full md:w-[10rem] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div className="w-full md:w-auto">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.roasters.longitude', 'Longitude')}
-              </label>
-              <input
-                type="number"
-                step="any"
-                name="longitude"
-                value={locationInfo.longitude}
-                onChange={handleLocationInfoChange}
-                className="w-full md:w-[10rem] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
+            <div className="grid grid-cols-2 gap-4 md:flex md:gap-4">
+              <div className="w-full md:w-auto">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('admin.roasters.latitude', 'Latitude')}
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  name="latitude"
+                  value={locationInfo.latitude}
+                  onChange={handleLocationInfoChange}
+                  className="w-full md:w-[10rem] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+              </div>
+              <div className="w-full md:w-auto">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('admin.roasters.longitude', 'Longitude')}
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  name="longitude"
+                  value={locationInfo.longitude}
+                  onChange={handleLocationInfoChange}
+                  className="w-full md:w-[10rem] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -1107,139 +1155,63 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     }
 
     if (sectionKey === "socials") {
+      const primarySocialFields = [
+        { name: "instagram", label: t('adminForms.roasters.instagram', 'Instagram'), placeholder: "https://instagram.com/" },
+        { name: "facebook", label: t('adminForms.roasters.facebook', 'Facebook'), placeholder: "https://facebook.com/" },
+        { name: "tiktok", label: t('adminForms.roasters.tiktok', 'TikTok'), placeholder: "https://tiktok.com/@" },
+        { name: "linkedin", label: t('adminForms.roasters.linkedin', 'LinkedIn'), placeholder: "https://linkedin.com/" },
+        { name: "youtube", label: t('adminForms.roasters.youtube', 'YouTube'), placeholder: "https://youtube.com/" },
+      ];
+
+      const secondarySocialFields = [
+        { name: "x", label: t('adminForms.roasters.x', 'X'), placeholder: "https://x.com/" },
+        { name: "threads", label: t('adminForms.roasters.threads', 'Threads'), placeholder: "https://threads.net/" },
+        { name: "pinterest", label: t('adminForms.roasters.pinterest', 'Pinterest'), placeholder: "https://pinterest.com/" },
+        { name: "bluesky", label: t('adminForms.roasters.bluesky', 'Bluesky'), placeholder: "https://bsky.app/" },
+        { name: "reddit", label: t('adminForms.roasters.reddit', 'Reddit'), placeholder: "https://reddit.com/" },
+      ];
+
+      const renderSocialField = (field: { name: string; label: string; placeholder: string }) => (
+        <div key={field.name}>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {field.label}
+          </label>
+          <input
+            type="url"
+            name={field.name}
+            value={(socialInfo as Record<string, string>)[field.name] || ""}
+            onChange={handleSocialInfoChange}
+            placeholder={field.placeholder}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+          />
+        </div>
+      );
+
       return (
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.instagram', 'Instagram')}
-              </label>
-              <input
-                type="url"
-                name="instagram"
-                value={socialInfo.instagram}
-                onChange={handleSocialInfoChange}
-                placeholder="https://instagram.com/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.tiktok', 'TikTok')}
-              </label>
-              <input
-                type="url"
-                name="tiktok"
-                value={socialInfo.tiktok}
-                onChange={handleSocialInfoChange}
-                placeholder="https://tiktok.com/@"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.facebook', 'Facebook')}
-              </label>
-              <input
-                type="url"
-                name="facebook"
-                value={socialInfo.facebook}
-                onChange={handleSocialInfoChange}
-                placeholder="https://facebook.com/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.linkedin', 'LinkedIn')}
-              </label>
-              <input
-                type="url"
-                name="linkedin"
-                value={socialInfo.linkedin}
-                onChange={handleSocialInfoChange}
-                placeholder="https://linkedin.com/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.youtube', 'YouTube')}
-              </label>
-              <input
-                type="url"
-                name="youtube"
-                value={socialInfo.youtube}
-                onChange={handleSocialInfoChange}
-                placeholder="https://youtube.com/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.x', 'X')}
-              </label>
-              <input
-                type="url"
-                name="x"
-                value={socialInfo.x}
-                onChange={handleSocialInfoChange}
-                placeholder="https://x.com/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.threads', 'Threads')}
-              </label>
-              <input
-                type="url"
-                name="threads"
-                value={socialInfo.threads}
-                onChange={handleSocialInfoChange}
-                placeholder="https://threads.net/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.pinterest', 'Pinterest')}
-              </label>
-              <input
-                type="url"
-                name="pinterest"
-                value={socialInfo.pinterest}
-                onChange={handleSocialInfoChange}
-                placeholder="https://pinterest.com/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.bluesky', 'Bluesky')}
-              </label>
-              <input
-                type="url"
-                name="bluesky"
-                value={socialInfo.bluesky}
-                onChange={handleSocialInfoChange}
-                placeholder="https://bsky.app/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.reddit', 'Reddit')}
-              </label>
-              <input
-                type="url"
-                name="reddit"
-                value={socialInfo.reddit}
-                onChange={handleSocialInfoChange}
-                placeholder="https://reddit.com/"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
+            {primarySocialFields.map(renderSocialField)}
+            {secondarySocialFields.map((field) => (
+              <div
+                key={field.name}
+                className={`${showAllSocials ? "block" : "hidden"} md:block`}
+              >
+                {renderSocialField(field)}
+              </div>
+            ))}
+            {secondarySocialFields.length > 0 && (
+              <div className="md:hidden">
+                <button
+                  type="button"
+                  onClick={() => setShowAllSocials((prev) => !prev)}
+                  className="text-sm font-semibold text-primary-600 dark:text-primary-300 hover:underline"
+                >
+                  {showAllSocials
+                    ? t('adminForms.roasters.showLessSocials', 'Show less')
+                    : t('adminForms.roasters.showMoreSocials', 'Show more')}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -1266,7 +1238,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     </span>
                   </div>
                 )}
-                <div className="grid grid-cols-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px] gap-2 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px] gap-4 items-start">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.people.firstName', 'First Name')} *
@@ -1292,7 +1264,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  <div className="col-span-2 md:col-auto md:row-span-4">
+                  <div className="md:col-auto md:row-span-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t('admin.people.role', 'Role')}
                     </label>
@@ -1377,7 +1349,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  <div className="col-span-2">
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.people.bio', 'Bio')}
                     </label>
@@ -1385,18 +1357,20 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                       name="bio"
                       value={contact.bio}
                       onChange={(e) => handleContactInfoChange(index, e)}
-                      rows={2}
+                      rows={4}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  <div className="col-span-2 md:col-span-1 md:flex md:items-end md:justify-end">
-                    <button
-                      type="button"
-                      className="text-red-600 hover:text-red-700 text-sm font-semibold"
-                      onClick={() => handleDeleteContact(index)}
-                    >
-                      {t('common.delete', 'Delete')} {t('adminForms.roasters.contact', 'Contact')}
-                    </button>
+                  <div className="md:col-span-1 md:flex md:items-end md:justify-end">
+                    {contact.id && (
+                      <button
+                        type="button"
+                        className="text-red-600 hover:text-red-700 text-sm font-semibold"
+                        onClick={() => handleDeleteContact(index)}
+                      >
+                        {t('common.delete', 'Delete')} {t('adminForms.roasters.contact', 'Contact')}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1695,14 +1669,10 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
             </div>
             <div className="flex-1 md:pl-4 flex items-center justify-between gap-4">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-                {isEditing
-                  ? t('adminForms.roasters.editRoaster', 'Edit Roaster')
-                  : t('admin.roasters.addTitle', 'Add Roaster')
-                }
+                {basicInfo.name?.trim()
+                  || roasterName
+                  || t('adminForms.roasters.namePlaceholder', 'Roaster Name')}
               </h1>
-              <div className="text-right text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 truncate max-w-[50%]">
-                {basicInfo.name?.trim() || roasterName || t('adminForms.roasters.namePlaceholder', 'Roaster Name')}
-              </div>
             </div>
           </div>
         </div>
@@ -1794,72 +1764,147 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 </div>
               </div>
               <div className="md:hidden space-y-6">
-                {sections.map((section) => (
-                  <section
-                    key={section.key}
-                    className="space-y-4 rounded-lg bg-slate-100 dark:bg-slate-800 border border-black/90 dark:border-black shadow p-4"
-                  >
-                    {section.key === "hours" ? (
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                          {section.label}
-                        </h2>
-                        <div className="flex items-center gap-3">
-                          <label className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={showHours}
-                              onChange={(e) => setShowHours(e.target.checked)}
-                              disabled={onlineOnly}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
-                            <span className={`text-sm font-medium ${onlineOnly ? "text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-300"}`}>
-                              {t('adminForms.roasters.showHours', 'Show Hours')}
+                {sections.map((section) => {
+                  const isExpanded = isMobileSectionExpanded(section.key);
+                  return (
+                    <section
+                      key={section.key}
+                      className="space-y-4 rounded-lg bg-slate-100 dark:bg-slate-800 border border-black/90 dark:border-purple-400/70 shadow p-4"
+                    >
+                      {section.key === "hours" ? (
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleMobileSection(section.key)}
+                            className="flex items-center justify-between gap-3 text-left w-full"
+                            aria-expanded={isExpanded}
+                            aria-controls={`mobile-section-${section.key}`}
+                          >
+                            <span className="text-xl font-semibold text-primary-700 dark:text-primary-300">
+                              {section.label}
                             </span>
-                          </label>
-                          {canShowHours && (
-                            <button
-                              type="button"
-                              onClick={() => setHoursExpanded((prev) => !prev)}
-                              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                              title={hoursExpanded
-                                ? t('adminForms.roasters.collapseSection', 'Collapse section')
-                                : t('adminForms.roasters.expandSection', 'Expand section')}
+                            <svg
+                              className="w-4 h-4 text-primary-700 dark:text-primary-300 transition-transform duration-200"
+                              style={{ transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
                             >
-                              <svg
-                                className="w-4 h-4 transition-transform duration-200"
-                                style={{ transform: hoursExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          <div className="flex items-center gap-3">
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={showHours}
+                                onChange={(e) => setShowHours(e.target.checked)}
+                                disabled={onlineOnly}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                              />
+                              <span className={`text-sm font-medium ${onlineOnly ? "text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-300"}`}>
+                                {t('adminForms.roasters.showHours', 'Show Hours')}
+                              </span>
+                            </label>
+                            {canShowHours && isExpanded && (
+                              <button
+                                type="button"
+                                onClick={() => setHoursExpanded((prev) => !prev)}
+                                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                title={hoursExpanded
+                                  ? t('adminForms.roasters.collapseSection', 'Collapse section')
+                                  : t('adminForms.roasters.expandSection', 'Expand section')}
                               >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </button>
+                                <svg
+                                  className="w-4 h-4 transition-transform duration-200"
+                                  style={{ transform: hoursExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ) : section.key === "countries" ? (
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleMobileSection(section.key)}
+                            className="flex items-center justify-between gap-3 text-left w-full"
+                            aria-expanded={isExpanded}
+                            aria-controls={`mobile-section-${section.key}`}
+                          >
+                            <span className="text-xl font-semibold text-primary-700 dark:text-primary-300">
+                              {section.label}
+                            </span>
+                            <svg
+                              className="w-4 h-4 text-primary-700 dark:text-primary-300 transition-transform duration-200"
+                              style={{ transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          {isExpanded && (
+                            <input
+                              type="text"
+                              value={countriesFilter}
+                              onChange={(e) => setCountriesFilter(e.target.value)}
+                              placeholder={t('adminForms.roasters.countrySearchPlaceholder', 'Type to filter')}
+                              className="w-full sm:w-64 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            />
                           )}
                         </div>
-                      </div>
-                    ) : section.key === "countries" ? (
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                          {section.label}
-                        </h2>
-                        <input
-                          type="text"
-                          value={countriesFilter}
-                          onChange={(e) => setCountriesFilter(e.target.value)}
-                          placeholder={t('adminForms.roasters.countrySearchPlaceholder', 'Type to filter')}
-                          className="w-full sm:w-64 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        />
-                      </div>
-                    ) : (
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                        {section.label}
-                      </h2>
-                    )}
-                    {renderSectionContent(section.key)}
-                  </section>
-                ))}
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => toggleMobileSection(section.key)}
+                          className="flex items-center justify-between gap-3 text-left w-full"
+                          aria-expanded={isExpanded}
+                          aria-controls={`mobile-section-${section.key}`}
+                        >
+                          <span className="text-xl font-semibold text-primary-700 dark:text-primary-300">
+                            {section.label}
+                          </span>
+                          <svg
+                            className="w-4 h-4 text-primary-700 dark:text-primary-300 transition-transform duration-200"
+                            style={{ transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                      )}
+                      {isExpanded && (
+                        <div id={`mobile-section-${section.key}`}>
+                          {renderSectionContent(section.key)}
+                          {isEditing && section.key === "contacts" && (
+                            <div className="pt-4">
+                              <button
+                                type="button"
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed"
+                                onClick={handleAddContact}
+                                disabled={isSaving || isDeleting}
+                              >
+                                {t('adminForms.roasters.add', 'Add')} {t('adminForms.roasters.contact', 'Contact')}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </section>
+                  );
+                })}
               </div>
               {/* Save button */}
               <div className="mt-6 flex items-center justify-between gap-4">
