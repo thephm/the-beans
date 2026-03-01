@@ -138,13 +138,6 @@ export function Navbar() {
                       {t('adminSection.roasters', 'Roasters')}
                     </Link>
                     <Link 
-                      href="/admin/roasters/new-admin" 
-                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-green-700 dark:hover:text-green-400 transition-colors font-semibold"
-                      onClick={() => setIsAdminMenuOpen(false)}
-                    >
-                      {t('adminSection.roastersNew', 'Roasters (New)')}
-                    </Link>
-                    <Link 
                       href="/admin/coordinates" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
                       onClick={() => setIsAdminMenuOpen(false)}
@@ -308,13 +301,6 @@ export function Navbar() {
                         }}
                       >
                         {t('adminSection.roasters', 'Roasters')}
-                      </Link>
-                      <Link 
-                        href="/admin/roasters/new-admin" 
-                        className="block text-gray-600 dark:text-gray-300 hover:text-green-700 dark:hover:text-green-400 py-1 font-semibold" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {t('adminSection.roastersNew', 'Roasters (New)')}
                       </Link>
                       <Link 
                         href="/admin/coordinates" 
