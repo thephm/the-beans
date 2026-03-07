@@ -439,16 +439,17 @@ const AdminRoastersPage: React.FC = () => {
             {/* Mobile Card View */}
             <div className="md:hidden space-y-3">
               {filteredRoasters.map((roaster) => (
-                <div key={roaster.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm dark:shadow-gray-900/50">
+                <Link
+                  key={roaster.id}
+                  href={`/admin/roasters/edit/${roaster.id}`}
+                  className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm dark:shadow-gray-900/50"
+                >
                   {/* Roaster Header */}
                   <div className="mb-2">
                     <div className="flex items-center gap-2">
-                      <Link
-                        href={`/admin/roasters/edit/${roaster.id}`}
-                        className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline text-left"
-                      >
+                      <span className="text-lg font-semibold text-primary-600 dark:text-primary-400 text-left">
                         {roaster.name}
-                      </Link>
+                      </span>
                     </div>
                     {/* Status Badges */}
                     <div className="flex flex-wrap gap-2 mt-1">
@@ -501,19 +502,7 @@ const AdminRoastersPage: React.FC = () => {
                       </div>
                     </div>
                   )}
-                  {/* Actions */}
-                  <div className="mt-2">
-                    {!roaster.verified && (
-                      <button
-                        className="bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 mr-2"
-                        onClick={() => handleVerify(roaster)}
-                        disabled={verifyingId === roaster.id}
-                      >
-                        {verifyingId === roaster.id ? t('roasters.verifying', 'Verifying...') : t('roasters.verify', 'Verify')}
-                      </button>
-                    )}
-                  </div>
-                </div>
+                </Link>
               ))}
             </div>
             {/* Desktop Table View */}
