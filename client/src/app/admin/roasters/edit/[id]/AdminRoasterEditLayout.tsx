@@ -1632,6 +1632,17 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     );
   };
 
+  const renderMobileSectionLabel = (section: { label: string; count?: number }) => (
+    <span className="flex items-center gap-2 text-xl font-semibold text-primary-700 dark:text-primary-300">
+      <span>{section.label}</span>
+      {typeof section.count === "number" && (
+        <span className="rounded-full px-2 py-0.5 text-xs font-semibold bg-purple-600 text-white">
+          {section.count}
+        </span>
+      )}
+    </span>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col">
       {toastMessage && (
@@ -1773,9 +1784,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                             aria-expanded={isExpanded}
                             aria-controls={`mobile-section-${section.key}`}
                           >
-                            <span className="text-xl font-semibold text-primary-700 dark:text-primary-300">
-                              {section.label}
-                            </span>
+                              {renderMobileSectionLabel(section)}
                             <svg
                               className="w-4 h-4 text-primary-700 dark:text-primary-300 transition-transform duration-200"
                               style={{ transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
@@ -1831,9 +1840,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                             aria-expanded={isExpanded}
                             aria-controls={`mobile-section-${section.key}`}
                           >
-                            <span className="text-xl font-semibold text-primary-700 dark:text-primary-300">
-                              {section.label}
-                            </span>
+                              {renderMobileSectionLabel(section)}
                             <svg
                               className="w-4 h-4 text-primary-700 dark:text-primary-300 transition-transform duration-200"
                               style={{ transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
@@ -1863,9 +1870,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                           aria-expanded={isExpanded}
                           aria-controls={`mobile-section-${section.key}`}
                         >
-                          <span className="text-xl font-semibold text-primary-700 dark:text-primary-300">
-                            {section.label}
-                          </span>
+                          {renderMobileSectionLabel(section)}
                           <svg
                             className="w-4 h-4 text-primary-700 dark:text-primary-300 transition-transform duration-200"
                             style={{ transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
