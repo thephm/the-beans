@@ -365,7 +365,6 @@ const AdminRoastersPage: React.FC = () => {
                   key={item.city}
                   onClick={() => {
                     setCityFilter(item.city);
-                    setCountryFilter('');
                     setCurrentPage(1);
                     setHasUserSetFilter(true);
                   }}

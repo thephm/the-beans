@@ -450,6 +450,10 @@
       "period": "Period",
       "eventType": "Event Type",
       "count": "Count",
+      "topRoasters": {
+        "more": "{{count}} more",
+        "showLess": "Show less"
+      },
       "eventTypes": {
         "page_view": "Page View",
         "signup": "Signup",
