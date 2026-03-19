@@ -97,6 +97,7 @@ export default function AnalyticsDashboard() {
 	const [totals, setTotals] = useState({ totalPageViews: 0, discover: 0, about: 0, roasters: 0 });
 	const [topPages, setTopPages] = useState([] as Array<{ label: string; page: string; count: number }>);
 	const [topPagesDays, setTopPagesDays] = useState(30);
+	const [topPagesExpanded, setTopPagesExpanded] = useState(false);
 
 	useEffect(() => {
 		// detect light/dark mode on client and keep a simple state for react-select styles
@@ -172,7 +173,52 @@ export default function AnalyticsDashboard() {
 	};
 
 	useEffect(() => { fetchStats(); }, [user, eventType, startDateFilter, endDateFilter]);
-	useEffect(() => { applyClientFilters(undefined, 1); }, [selectedPages, searchFilter, stats, topPagesDays]);
+	useEffect(() => { applyClientFilters(undefined, 1); }, [selectedPages, searchFilter, stats]);
+
+	const fetchTopPages = async () => {
+		if (!user || user.role !== 'admin') return;
+		try {
+			const cutoff = new Date();
+			cutoff.setUTCDate(cutoff.getUTCDate() - Math.max(0, Number(topPagesDays || 0)));
+			const params: Record<string, string> = {
+				eventType: 'page_view',
+				from: cutoff.toISOString().slice(0, 10),
+			};
+			const res = await apiClient.getAdminAnalyticsStats(params);
+			const rows = res as any[];
+
+			const pageCounts: Record<string, number> = {};
+			rows.filter((r: any) => String(r.event_type) === 'page_view').forEach((r: any) => {
+				const p = (r.page || '').toString() || '/';
+				if (!p.startsWith('/roasters')) return;
+				pageCounts[p] = (pageCounts[p] || 0) + (Number(r.count) || 0);
+			});
+			const pagesArr = Object.keys(pageCounts).map(p => ({ page: p, count: pageCounts[p] }));
+			pagesArr.sort((a, b) => b.count - a.count);
+			const top10 = pagesArr.slice(0, 10);
+			const resolved: Array<{ label: string; page: string; count: number }> = [];
+			for (const it of top10) {
+				let label = it.page === '/' ? 'home' : (it.page.startsWith('/') ? it.page.slice(1) : it.page);
+				const m = String(it.page).match(/^\/roasters\/([^\/\?]+)/);
+				if (m && m[1]) {
+					const id = m[1];
+					try {
+						const r: any = await apiClient.getRoaster(id);
+						if (r && (r.name || r.roasterName || r.roaster_name)) label = r.name || r.roasterName || r.roaster_name;
+					} catch (e) {
+						// leave label as path fallback
+					}
+				}
+				resolved.push({ label, page: it.page, count: it.count });
+			}
+			setTopPages(resolved);
+		} catch (e) {
+			setTopPages([]);
+		}
+	};
+
+	useEffect(() => { fetchTopPages(); }, [user, topPagesDays]);
+	useEffect(() => { setTopPagesExpanded(false); }, [topPagesDays]);
 
 	const applyClientFilters = (rowsParam?: any[], page = 1) => {
 		const rows = rowsParam || stats || [];
@@ -207,48 +253,6 @@ export default function AnalyticsDashboard() {
 			const roasters = filtered.filter((r: any) => { const p = (r.page || '').toString(); return (p === '/roasters' || p.startsWith('/roasters/')) && String(r.event_type) === 'page_view'; }).reduce((acc: number, r: any) => acc + (Number(r.count) || 0), 0);
 				setTotals({ totalPageViews, discover, about, roasters });
 
-				// compute top pages
-				try {
-					const pageCounts: Record<string, number> = {};
-					const cutoff = new Date();
-					cutoff.setUTCDate(cutoff.getUTCDate() - Math.max(0, Number(topPagesDays || 0)));
-					filtered.filter((r: any) => String(r.event_type) === 'page_view').forEach((r: any) => {
-						// each row has a `period` like 'YYYY-MM-DD' or 'YYYY-MM-DD HH'
-						const periodRaw = String(r.period || '').split(' ')[0];
-						if (!periodRaw) return;
-						const rowDate = new Date(periodRaw + 'T00:00:00Z');
-						if (isNaN(rowDate.getTime())) return;
-						if (rowDate < cutoff) return; // skip rows outside timeframe
-						const p = (r.page || '').toString() || '/';
-						// Only count roaster pages for Top Roasters
-						if (!p.startsWith('/roasters')) return;
-						pageCounts[p] = (pageCounts[p] || 0) + (Number(r.count) || 0);
-					});
-					const pagesArr = Object.keys(pageCounts).map(p => ({ page: p, count: pageCounts[p] }));
-					pagesArr.sort((a, b) => b.count - a.count);
-					const top3 = pagesArr.slice(0, 3); // only top 3 roaster pages
-					// Resolve roaster names for these top 3
-					(async () => {
-						const resolved: Array<{ label: string; page: string; count: number }> = [];
-						for (const it of top3) {
-							let label = it.page === '/' ? 'home' : (it.page.startsWith('/') ? it.page.slice(1) : it.page);
-							const m = String(it.page).match(/^\/roasters\/([^\/\?]+)/);
-							if (m && m[1]) {
-								const id = m[1];
-								try {
-									const r: any = await apiClient.getRoaster(id);
-									if (r && (r.name || r.roasterName || r.roaster_name)) label = r.name || r.roasterName || r.roaster_name;
-								} catch (e) {
-									// leave label as path fallback
-								}
-							}
-							resolved.push({ label, page: it.page, count: it.count });
-						}
-						setTopPages(resolved);
-					})();
-				} catch (e) {
-					setTopPages([]);
-				}
 		} catch (e) {
 			setTotals({ totalPageViews: 0, discover: 0, about: 0, roasters: 0 });
 		}
@@ -393,12 +397,21 @@ export default function AnalyticsDashboard() {
 					</div>
 					<div className="space-y-2">
 						{topPages.length === 0 && <div className="text-sm text-gray-500 dark:text-gray-400">No data</div>}
-						{topPages.slice(0,3).map((p) => (
+						{topPages.slice(0, topPagesExpanded ? 10 : 2).map((p) => (
 							<div key={p.page} className="flex items-center justify-between">
 								<Link href={p.page} className="truncate text-sm text-gray-800 dark:text-gray-200 mr-4 hover:underline">{p.label}</Link>
 								<span className="font-semibold text-sm text-gray-700 dark:text-gray-300">{p.count.toLocaleString()}</span>
 							</div>
 						))}
+						{topPages.length > 2 && (
+							<button
+								type="button"
+								onClick={() => setTopPagesExpanded((prev) => !prev)}
+								className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+							>
+								{topPagesExpanded ? 'Show less' : `${Math.min(8, Math.max(0, topPages.length - 2))} more`}
+							</button>
+						)}
 					</div>
 				</div>
 				</div>
