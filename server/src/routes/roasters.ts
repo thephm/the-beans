@@ -336,6 +336,9 @@ router.get('/', [
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
+        { city: { contains: search, mode: 'insensitive' } },
+        { state: { contains: search, mode: 'insensitive' } },
+        { country: { contains: search, mode: 'insensitive' } },
         { roasterSpecialties: { 
             some: { 
               specialty: { 

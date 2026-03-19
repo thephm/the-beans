@@ -133,6 +133,7 @@ router.get('/', [
         { description: { contains: searchQuery, mode: 'insensitive' } },
         { city: { contains: searchQuery, mode: 'insensitive' } },
         { state: { contains: searchQuery, mode: 'insensitive' } },
+        { country: { contains: searchQuery, mode: 'insensitive' } },
       ],
     };
 
@@ -190,6 +191,7 @@ router.get('/', [
         || (roaster.description && roaster.description.toLowerCase().includes(qLower))
         || (roaster.city && roaster.city.toLowerCase().includes(qLower))
         || (roaster.state && roaster.state.toLowerCase().includes(qLower))
+        || (roaster.country && roaster.country.toLowerCase().includes(qLower))
       );
     }
 
@@ -347,6 +349,7 @@ router.get('/roasters', [
           { description: { contains: qLower, mode: 'insensitive' } },
           { city: { contains: qLower, mode: 'insensitive' } },
           { state: { contains: qLower, mode: 'insensitive' } },
+          { country: { contains: qLower, mode: 'insensitive' } },
           {
             roasterSpecialties: {
               some: {
@@ -369,6 +372,7 @@ router.get('/roasters', [
           { city: { contains: location as string, mode: 'insensitive' } },
           { state: { contains: location as string, mode: 'insensitive' } },
           { address: { contains: location as string, mode: 'insensitive' } },
+          { country: { contains: location as string, mode: 'insensitive' } },
         ]
       });
     }
