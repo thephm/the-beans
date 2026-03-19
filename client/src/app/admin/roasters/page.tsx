@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { ArrowUpward } from '@mui/icons-material';
 import { SortArrow } from '@/components/SortArrow';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { apiClient } from '@/lib/api';
@@ -172,8 +173,9 @@ const AdminRoastersPage: React.FC = () => {
             href="/admin/instagram-import"
             className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center"
           >
+            <ArrowUpward className="mr-2" fontSize="small" aria-hidden="true" />
             <span className="sm:hidden">Instagram</span>
-            <span className="hidden sm:inline">{t('admin.roasters.importInstagram', 'Import Instagram')}</span>
+            <span className="hidden sm:inline">{t('admin.roasters.importInstagram', 'Instagram')}</span>
           </Link>
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"

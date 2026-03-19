@@ -871,8 +871,8 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
 
       showToast(t('adminForms.roasters.savedToast', 'Roaster saved'), "success");
 
-      if (!roasterId && savedRoasterId) {
-        router.push(`/admin/roasters/edit/${savedRoasterId}`);
+      if (!roasterId) {
+        router.push("/admin/roasters");
       }
     } catch (error: any) {
       const message = error?.message || "Failed to save roaster";
