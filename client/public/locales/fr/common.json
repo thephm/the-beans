@@ -473,6 +473,10 @@
       "period": "Période",
       "eventType": "Type d'événement",
       "count": "Nombre",
+      "topRoasters": {
+        "more": "{{count}} de plus",
+        "showLess": "Afficher moins"
+      },
       "eventTypes": {
         "page_view": "Vue de page",
         "signup": "Inscription",

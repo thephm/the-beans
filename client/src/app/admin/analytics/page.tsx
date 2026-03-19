@@ -409,7 +409,12 @@ export default function AnalyticsDashboard() {
 								onClick={() => setTopPagesExpanded((prev) => !prev)}
 								className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
 							>
-								{topPagesExpanded ? 'Show less' : `${Math.min(8, Math.max(0, topPages.length - 2))} more`}
+								{topPagesExpanded
+									? tr('admin.analytics.topRoasters.showLess', 'Show less')
+									: tr('admin.analytics.topRoasters.more', '{{count}} more').replace(
+										'{{count}}',
+										String(Math.min(8, Math.max(0, topPages.length - 2)))
+									)}
 							</button>
 						)}
 					</div>
