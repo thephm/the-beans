@@ -8,6 +8,7 @@ import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { apiClient } from '@/lib/api';
 import { Roaster } from '@/types';
 import CSVImportDialog from '@/components/CSVImportDialog';
+import { useSearchParams } from 'next/navigation';
 
 
 const AdminRoastersPage: React.FC = () => {
@@ -15,12 +16,14 @@ const AdminRoastersPage: React.FC = () => {
   // All hooks and state declarations must come first
   const { t } = useTranslation();
   const { showRatings } = useFeatureFlags();
+  const searchParams = useSearchParams();
+  const initialSearch = (searchParams.get('search') || '').trim();
   const [roasters, setRoasters] = useState<Roaster[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('all');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -35,6 +38,13 @@ const AdminRoastersPage: React.FC = () => {
   const [showAllCities, setShowAllCities] = useState<boolean>(false);
   const [hasUserSetFilter, setHasUserSetFilter] = useState<boolean>(false);
   const [showCSVImport, setShowCSVImport] = useState<boolean>(false);
+
+  useEffect(() => {
+    const normalizedSearch = (searchParams.get('search') || '').trim();
+    if (normalizedSearch === searchQuery) return;
+    setSearchQuery(normalizedSearch);
+    setCurrentPage(1);
+  }, [searchParams, searchQuery]);
 
   // Calculate completeness score for a roaster (out of 39 possible points)
   function calculateCompleteness(r: Roaster) {
@@ -393,6 +403,7 @@ const AdminRoastersPage: React.FC = () => {
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
+              setHasUserSetFilter(true);
             }}
             placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
             className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
@@ -415,6 +426,7 @@ const AdminRoastersPage: React.FC = () => {
               onClick={() => {
                 setSearchQuery('');
                 setCurrentPage(1);
+                setHasUserSetFilter(true);
               }}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               aria-label={t('common.clear', 'Clear')}
