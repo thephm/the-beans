@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { body, validationResult, param, query } from 'express-validator';
 import { prisma } from '../lib/prisma';
+import { getAccentInsensitiveRoasterIds } from '../lib/searchText';
 import { upload, deleteImage, uploadImageFromUrl } from '../lib/cloudinary';
 import { canEditRoaster } from '../middleware/roasterAuth';
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
@@ -333,25 +334,30 @@ router.get('/', [
     }
     
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { city: { contains: search, mode: 'insensitive' } },
-        { state: { contains: search, mode: 'insensitive' } },
-        { country: { contains: search, mode: 'insensitive' } },
-        { roasterSpecialties: { 
-            some: { 
-              specialty: { 
-                translations: { 
-                  some: { 
-                    name: { contains: search, mode: 'insensitive' } 
+      const accentIds = await getAccentInsensitiveRoasterIds(prisma, String(search));
+      if (accentIds) {
+        where.id = { in: accentIds };
+      } else {
+        where.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { city: { contains: search, mode: 'insensitive' } },
+          { state: { contains: search, mode: 'insensitive' } },
+          { country: { contains: search, mode: 'insensitive' } },
+          { roasterSpecialties: { 
+              some: { 
+                specialty: { 
+                  translations: { 
+                    some: { 
+                      name: { contains: search, mode: 'insensitive' } 
+                    } 
                   } 
                 } 
               } 
             } 
-          } 
-        },
-      ];
+          },
+        ];
+      }
     }
     
     if (city) {

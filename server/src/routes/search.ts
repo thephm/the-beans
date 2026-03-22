@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { query, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
+import { getAccentInsensitiveRoasterIds, normalizeForSearch } from '../lib/searchText';
 
 // Updated search routes with image URL support - roasters only
 const router = Router();
@@ -127,15 +128,22 @@ router.get('/', [
     }
 
     // Build where clause for search
-    let whereClause: any = {
-      OR: [
-        { name: { contains: searchQuery, mode: 'insensitive' } },
-        { description: { contains: searchQuery, mode: 'insensitive' } },
-        { city: { contains: searchQuery, mode: 'insensitive' } },
-        { state: { contains: searchQuery, mode: 'insensitive' } },
-        { country: { contains: searchQuery, mode: 'insensitive' } },
-      ],
-    };
+    let whereClause: any = {};
+
+    if (searchQuery) {
+      const accentIds = await getAccentInsensitiveRoasterIds(prisma, searchQuery);
+      if (accentIds) {
+        whereClause.id = { in: accentIds };
+      } else {
+        whereClause.OR = [
+          { name: { contains: searchQuery, mode: 'insensitive' } },
+          { description: { contains: searchQuery, mode: 'insensitive' } },
+          { city: { contains: searchQuery, mode: 'insensitive' } },
+          { state: { contains: searchQuery, mode: 'insensitive' } },
+          { country: { contains: searchQuery, mode: 'insensitive' } },
+        ];
+      }
+    }
 
     // Only show verified roasters to non-admin users
     if (userRole !== 'admin') {
@@ -182,16 +190,25 @@ router.get('/', [
 
     // Filter by specialty (case-insensitive) if searchQuery is present
     if (searchQuery) {
-      const qLower = searchQuery.trim().toLowerCase();
+      const qNormalized = normalizeForSearch(searchQuery.trim());
+      const includesNormalized = (value?: string | null) => {
+        if (!value) return false;
+        return normalizeForSearch(value).includes(qNormalized);
+      };
+      const equalsNormalized = (value?: string | null) => {
+        if (!value) return false;
+        return normalizeForSearch(value) === qNormalized;
+      };
+
       roasters = roasters.filter(roaster =>
         (roaster.roasterSpecialties && roaster.roasterSpecialties.some((rs: any) => 
-          rs.specialty.translations.some((t: any) => t.name.toLowerCase() === qLower || t.name.toLowerCase().includes(qLower))
+          rs.specialty.translations.some((t: any) => equalsNormalized(t.name) || includesNormalized(t.name))
         ))
-        || roaster.name.toLowerCase().includes(qLower)
-        || (roaster.description && roaster.description.toLowerCase().includes(qLower))
-        || (roaster.city && roaster.city.toLowerCase().includes(qLower))
-        || (roaster.state && roaster.state.toLowerCase().includes(qLower))
-        || (roaster.country && roaster.country.toLowerCase().includes(qLower))
+        || includesNormalized(roaster.name)
+        || includesNormalized(roaster.description)
+        || includesNormalized(roaster.city)
+        || includesNormalized(roaster.state)
+        || includesNormalized(roaster.country)
       );
     }
 
@@ -203,11 +220,11 @@ router.get('/', [
       const lat = parseFloat(latitude as string);
       const lng = parseFloat(longitude as string);
       const maxRadius = typeof radius === 'number' ? radius : parseFloat(radius as string);
-      const qLower = searchQuery.trim().toLowerCase();
+      const qNormalized = normalizeForSearch(searchQuery.trim());
       
       roasters.forEach((roaster: any) => {
         // Check if this is an exact city match
-        const isExactCityMatch = roaster.city && roaster.city.toLowerCase().includes(qLower);
+        const isExactCityMatch = roaster.city && normalizeForSearch(roaster.city).includes(qNormalized);
         
         // Calculate distance if coordinates exist
         if (roaster.latitude && roaster.longitude) {
@@ -342,27 +359,32 @@ router.get('/roasters', [
     const andClauses: any[] = [];
 
     if (q && typeof q === 'string') {
-      const qLower = q.trim();
-      andClauses.push({
-        OR: [
-          { name: { contains: qLower, mode: 'insensitive' } },
-          { description: { contains: qLower, mode: 'insensitive' } },
-          { city: { contains: qLower, mode: 'insensitive' } },
-          { state: { contains: qLower, mode: 'insensitive' } },
-          { country: { contains: qLower, mode: 'insensitive' } },
-          {
-            roasterSpecialties: {
-              some: {
-                specialty: {
-                  translations: {
-                    some: { name: { contains: qLower, mode: 'insensitive' } }
+      const accentIds = await getAccentInsensitiveRoasterIds(prisma, q);
+      if (accentIds) {
+        whereClause.id = { in: accentIds };
+      } else {
+        const qLower = q.trim();
+        andClauses.push({
+          OR: [
+            { name: { contains: qLower, mode: 'insensitive' } },
+            { description: { contains: qLower, mode: 'insensitive' } },
+            { city: { contains: qLower, mode: 'insensitive' } },
+            { state: { contains: qLower, mode: 'insensitive' } },
+            { country: { contains: qLower, mode: 'insensitive' } },
+            {
+              roasterSpecialties: {
+                some: {
+                  specialty: {
+                    translations: {
+                      some: { name: { contains: qLower, mode: 'insensitive' } }
+                    }
                   }
                 }
               }
             }
-          }
-        ]
-      });
+          ]
+        });
+      }
     }
     
     // Only add location text filter if no coordinates provided (otherwise we'll do radius filtering)
