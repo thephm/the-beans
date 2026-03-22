@@ -40,12 +40,23 @@ import csvImportRoutes from './routes/csvImport';
 import instagramImportRoutes from './routes/instagramImport';
 
 import forgotPasswordRoutes from './routes/forgotPassword';
+import { prisma } from './lib/prisma';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
+
+const ensureUnaccentExtension = async () => {
+  try {
+    await prisma.$executeRaw`CREATE EXTENSION IF NOT EXISTS unaccent`;
+  } catch (error) {
+    console.warn('Failed to ensure unaccent extension, accent search will fallback.', error);
+  }
+};
+
+void ensureUnaccentExtension();
 
 // Trust proxy - Required when behind Render's load balancer or any reverse proxy
 app.set('trust proxy', 1);
