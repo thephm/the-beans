@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { ArrowUpward } from '@mui/icons-material';
@@ -38,13 +38,17 @@ const AdminRoastersPage: React.FC = () => {
   const [showAllCities, setShowAllCities] = useState<boolean>(false);
   const [hasUserSetFilter, setHasUserSetFilter] = useState<boolean>(false);
   const [showCSVImport, setShowCSVImport] = useState<boolean>(false);
+  const lastAppliedSearchParam = useRef<string | null>(searchParams.get('search'));
 
   useEffect(() => {
-    const normalizedSearch = (searchParams.get('search') || '').trim();
-    if (normalizedSearch === searchQuery) return;
+    const rawSearch = searchParams.get('search');
+    if (rawSearch === lastAppliedSearchParam.current) return;
+
+    lastAppliedSearchParam.current = rawSearch;
+    const normalizedSearch = rawSearch ? rawSearch.trim() : '';
     setSearchQuery(normalizedSearch);
     setCurrentPage(1);
-  }, [searchParams, searchQuery]);
+  }, [searchParams]);
 
   // Calculate completeness score for a roaster (out of 39 possible points)
   function calculateCompleteness(r: Roaster) {
