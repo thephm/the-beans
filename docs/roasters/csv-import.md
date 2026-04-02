@@ -11,7 +11,7 @@ The CSV import feature allows administrators to bulk import roasters from a CSV 
 
 ### Required Columns
 - **Roaster Name**: The name of the roaster (must be unique)
-- **Country**: Country name (e.g., "USA", "Canada", "United Kingdom")
+- **Country**: Country name (must exist in the countries list, e.g., "United States of America", "Canada", "United Kingdom")
 
 ### Optional Roaster Information
 - **Description**: Full text description of the roaster
@@ -28,7 +28,7 @@ The CSV import feature allows administrators to bulk import roasters from a CSV 
 - **Postal Code**: Postal/ZIP code
 
 ### Coffee Information
-- **Source Countries**: Semicolon-separated list in double quotes
+- **Source Countries**: Semicolon-separated list in double quotes (origin countries only)
   - Example: `"Ethiopia;Colombia;Brazil"`
 - **Specialties**: Semicolon-separated list in double quotes
   - Example: `"Light Roast;Medium Roast;Single Origin"`
@@ -50,7 +50,8 @@ If provided, a person will be created and associated with the roaster:
 - **First Name**: Required if adding a person
 - **Last Name**: Optional
 - **Title**: Job title (e.g., "Master Roaster")
-- **Mobile**: Mobile phone number
+- **Contact Email**: Contact email for the person
+- **Contact Mobile**: Mobile phone number
 - **LinkedIn URL**: Personal LinkedIn profile
 - **Instagram URL**: Personal Instagram profile
 - **Bio**: Personal biography
@@ -68,12 +69,16 @@ If provided, a person will be created and associated with the roaster:
 - **createdById**: Set to the admin user performing the import
 
 ### Duplicate Handling
-- If a roaster with the same name already exists, it will be skipped
+- If a roaster with the same name already exists and is **verified**, it will be skipped
+- If a roaster with the same name exists and is **unverified**, missing fields will be filled in
+- Existing non-empty values are never overwritten
 - The import summary will show which rows were skipped and why
 
 ### Source Countries and Specialties
-- New countries and specialties are automatically created if they don't exist
-- Existing countries and specialties are matched by name (case-insensitive)
+- Source countries must be marked as origin countries (location-only countries like Canada/USA are rejected)
+- Countries must already exist in the database (unknown countries are rejected and reported)
+- Country names are normalized for common variants (e.g., "U.S.A." -> "United States of America")
+- Specialties are still created on demand if they don't exist
 
 ### Error Handling
 - Import continues even if individual rows fail
@@ -97,6 +102,7 @@ Body: file={csv_file}
   "results": {
     "total": 10,
     "created": 8,
+    "updated": 1,
     "skipped": 2,
     "errors": [
       "Row 3: Roaster 'Duplicate Name' already exists",

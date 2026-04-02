@@ -28,9 +28,13 @@ const router = Router();
  */
 router.get('/', async (req: any, res: any) => {
   try {
-    const { regionId } = req.query;
+    const { regionId, originOnly } = req.query;
+    const originFilter = originOnly === 'true' ? { isOrigin: true } : {};
     
-    const whereClause = regionId ? { regionId } : {};
+    const whereClause = {
+      ...(regionId ? { regionId } : {}),
+      ...originFilter
+    };
     
     const countries = await prisma.country.findMany({
       where: whereClause,

@@ -459,6 +459,15 @@ async function main() {
     }
   });
 
+  const northAmerica = await prisma.region.upsert({
+    where: { name: 'North America' },
+    update: {},
+    create: {
+      name: 'North America',
+      description: 'North American coffee growing regions'
+    }
+  });
+
   // Create countries with ISO codes and flag SVGs using flagpedia.net CDN
   const countries = [
     // Latin America
@@ -502,6 +511,11 @@ async function main() {
     { name: 'Haiti', code: 'HT', regionId: caribbean.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ht.webp' },
     { name: 'Dominican Republic', code: 'DO', regionId: caribbean.id, flagSvg: 'https://flagpedia.net/data/flags/w580/do.webp' },
     { name: 'Puerto Rico', code: 'PR', regionId: caribbean.id, flagSvg: 'https://flagpedia.net/data/flags/w580/pr.webp' },
+
+    // North America
+    { name: 'United States of America', code: 'US', regionId: northAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/us.webp', isOrigin: false },
+    { name: 'Canada', code: 'CA', regionId: northAmerica.id, flagSvg: 'https://flagpedia.net/data/flags/w580/ca.webp', isOrigin: false },
+    { name: 'Hawaii', code: 'HI', regionId: northAmerica.id, flagSvg: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Hawaii.svg', isOrigin: true },
   ];
 
   for (const country of countries) {

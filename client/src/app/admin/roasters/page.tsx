@@ -661,7 +661,6 @@ const AdminRoastersPage: React.FC = () => {
         isOpen={showCSVImport}
         onClose={() => setShowCSVImport(false)}
         onSuccess={() => {
-          setShowCSVImport(false);
           fetchRoasters();
         }}
       />

@@ -456,7 +456,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       try {
         setCountriesLoading(true);
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-        const response = await fetch(`${apiUrl}/api/countries`);
+        const response = await fetch(`${apiUrl}/api/countries?originOnly=true`);
         if (response.ok) {
           const data = await response.json();
           setAvailableCountries(data);

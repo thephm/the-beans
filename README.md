@@ -137,6 +137,7 @@ Comprehensive documentation is maintained in the [`docs/`](./docs/) directory fo
 - [Authentication System](./docs/auth/README.md)
 - [Search & Discovery](./docs/search/README.md)
 - [Roaster Management](./docs/roasters/README.md)
+- [CSV Import (Roasters)](./docs/roasters/csv-import.md)
 - [Favourites & Reviews](./docs/favourites/README.md)
 - [User Profiles](./docs/profile/README.md)
 - [Settings & Preferences](./docs/settings/README.md)

@@ -113,6 +113,7 @@ export interface Country {
   name: string;
   code: string; // ISO 2-letter country code
   flagSvg?: string; // Scalable vector flag (SVG content or URL)
+  isOrigin?: boolean;
   createdAt: string;
   updatedAt: string;
   regionId: string;

@@ -296,6 +296,7 @@ model Country {
   name      String                 @unique
   code      String                 @unique @db.VarChar(2)
   flagSvg   String?
+  isOrigin  Boolean                @default(true)
   createdAt DateTime               @default(now())
   updatedAt DateTime               @updatedAt
   regionId  String
