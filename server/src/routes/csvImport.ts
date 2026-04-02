@@ -93,38 +93,62 @@ const getOrCreateSpecialty = async (name: string, language: string = 'en'): Prom
   return specialty.id;
 };
 
-// Helper function to get or create country by name
-const getOrCreateCountry = async (name: string): Promise<string> => {
-  // Try to find existing country by name
+// Normalize common country name variants to canonical names.
+const normalizeCountryName = (name: string): string => {
+  const trimmed = name.trim();
+  const normalized = trimmed.toLowerCase();
+  const aliases: Record<string, string> = {
+    'u.s.a.': 'United States of America',
+    'u.s.a': 'United States of America',
+    'usa': 'United States of America',
+    'u.s.': 'United States of America',
+    'u.s': 'United States of America',
+    'united states': 'United States of America',
+    'united states of america': 'United States of America',
+    'uk': 'United Kingdom',
+    'u.k.': 'United Kingdom',
+    'united kingdom': 'United Kingdom',
+    'south korea': 'Korea, South',
+    'north korea': 'Korea, North',
+    'dr congo': 'Democratic Republic of Congo',
+    'drc': 'Democratic Republic of Congo',
+    'democratic republic of the congo': 'Democratic Republic of Congo',
+    'republic of the congo': 'Congo',
+    'czech republic': 'Czechia'
+  };
+
+  return aliases[normalized] || trimmed;
+};
+
+// Helper function to resolve country by name (no auto-create)
+const findCountryIdByName = async (name: string): Promise<string | null> => {
+  const normalizedName = normalizeCountryName(name);
   const existingCountry = await prisma.country.findFirst({
     where: {
       name: {
-        equals: name,
+        equals: normalizedName,
         mode: 'insensitive'
       }
     }
   });
 
-  if (existingCountry) {
-    return existingCountry.id;
-  }
+  return existingCountry ? existingCountry.id : null;
+};
 
-  // Get a default region (we'll use the first one, or you can make this smarter)
-  const defaultRegion = await prisma.region.findFirst();
-  if (!defaultRegion) {
-    throw new Error('No regions found in database. Please create at least one region first.');
-  }
-
-  // Create new country
-  const country = await prisma.country.create({
-    data: {
-      code: name.substring(0, 2).toUpperCase(),
-      name: name,
-      regionId: defaultRegion.id
+// Helper function to resolve origin country by name (no auto-create)
+const findOriginCountryIdByName = async (name: string): Promise<string | null> => {
+  const normalizedName = normalizeCountryName(name);
+  const existingCountry = await prisma.country.findFirst({
+    where: {
+      name: {
+        equals: normalizedName,
+        mode: 'insensitive'
+      },
+      isOrigin: true
     }
   });
 
-  return country.id;
+  return existingCountry ? existingCountry.id : null;
 };
 
 /**
@@ -180,6 +204,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
     const results = {
       total: records.length,
       created: 0,
+      updated: 0,
       skipped: 0,
       errors: [] as string[]
     };
@@ -210,12 +235,6 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
           where: { name: roasterName }
         });
 
-        if (existingRoaster) {
-          results.skipped++;
-          results.errors.push(`Row ${i + 1}: Roaster "${roasterName}" already exists`);
-          continue;
-        }
-
         // Parse social networks
         const socialNetworks: any = {};
         if (row['Instagram URL']) socialNetworks.instagram = row['Instagram URL'];
@@ -241,40 +260,120 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         // Parse online only
         const onlineOnlyValue = parseYesNo(row['Online Only']);
 
-        // Create roaster
-        const roaster = await prisma.roaster.create({
-          data: {
-            name: roasterName,
-            description: row['Description']?.trim() || null,
-            website: row['Web URL']?.trim() || null,
-            email: row['Email']?.trim() || null,
-            phone: row['Phone']?.trim() || null,
-            founded: founded,
-            address: row['Address'] || null,
-            city: row['City'] || null,
-            state: row['Province'] || null,
-            zipCode: row['Postal Code'] || null,
-            country: row['Country'].trim(),
-            onlineOnly: onlineOnlyValue !== null ? onlineOnlyValue : false,
-            verified: false, // Always set to unverified for imports
-            showHours: false, // Default to false for imports
-            socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : null,
-            createdById: req.userId,
-            updatedById: req.userId
+        const roasterCountry = normalizeCountryName(row['Country']);
+        const roasterCountryId = await findCountryIdByName(roasterCountry);
+        if (!roasterCountryId) {
+          results.skipped++;
+          results.errors.push(`Row ${i + 1}: Unknown country "${roasterCountry}"`);
+          continue;
+        }
+
+        let roasterId: string;
+        let didUpdate = false;
+
+        if (existingRoaster) {
+          if (existingRoaster.verified) {
+            results.skipped++;
+            results.errors.push(`Row ${i + 1}: Roaster "${roasterName}" already exists (verified)`);
+            continue;
           }
-        });
+
+          const updateData: any = {};
+          const setIfMissing = (key: keyof typeof existingRoaster, value: any) => {
+            const current = existingRoaster[key] as any;
+            if ((current === null || current === '') && value !== null && value !== undefined && value !== '') {
+              updateData[key] = value;
+            }
+          };
+
+          setIfMissing('description', row['Description']?.trim() || null);
+          setIfMissing('website', row['Web URL']?.trim() || null);
+          setIfMissing('email', row['Email']?.trim() || null);
+          setIfMissing('phone', row['Phone']?.trim() || null);
+          setIfMissing('founded', founded ?? null);
+          setIfMissing('address', row['Address'] || null);
+          setIfMissing('city', row['City'] || null);
+          setIfMissing('state', row['Province'] || null);
+          setIfMissing('zipCode', row['Postal Code'] || null);
+
+          const existingSocial = (existingRoaster.socialNetworks as any) || {};
+          const mergedSocial: any = { ...existingSocial };
+          let socialChanged = false;
+          for (const [key, value] of Object.entries(socialNetworks)) {
+            if (value && !mergedSocial[key]) {
+              mergedSocial[key] = value;
+              socialChanged = true;
+            }
+          }
+          if (socialChanged) {
+            updateData.socialNetworks = mergedSocial;
+          }
+
+          if (Object.keys(updateData).length > 0) {
+            updateData.updatedById = req.userId;
+            await prisma.roaster.update({
+              where: { id: existingRoaster.id },
+              data: updateData
+            });
+            didUpdate = true;
+          }
+
+          roasterId = existingRoaster.id;
+        } else {
+          const roaster = await prisma.roaster.create({
+            data: {
+              name: roasterName,
+              description: row['Description']?.trim() || null,
+              website: row['Web URL']?.trim() || null,
+              email: row['Email']?.trim() || null,
+              phone: row['Phone']?.trim() || null,
+              founded: founded,
+              address: row['Address'] || null,
+              city: row['City'] || null,
+              state: row['Province'] || null,
+              zipCode: row['Postal Code'] || null,
+              country: roasterCountry,
+              onlineOnly: onlineOnlyValue !== null ? onlineOnlyValue : false,
+              verified: false, // Always set to unverified for imports
+              showHours: false, // Default to false for imports
+              socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : null,
+              createdById: req.userId,
+              updatedById: req.userId
+            }
+          });
+
+          roasterId = roaster.id;
+        }
 
         // Process source countries
         const sourceCountries = parseSemicolonList(row['Source Countries']);
-        for (const countryName of sourceCountries) {
+        for (const rawCountryName of sourceCountries) {
+          const countryName = normalizeCountryName(rawCountryName);
+          const countryId = await findOriginCountryIdByName(countryName);
+          if (!countryId) {
+            results.errors.push(`Row ${i + 1}: Unknown source country "${countryName}"`);
+            continue;
+          }
+
           try {
-            const countryId = await getOrCreateCountry(countryName);
-            await prisma.roasterSourceCountry.create({
-              data: {
-                roasterId: roaster.id,
-                countryId: countryId
+            const existingLink = await prisma.roasterSourceCountry.findUnique({
+              where: {
+                roasterId_countryId: {
+                  roasterId: roasterId,
+                  countryId: countryId
+                }
               }
             });
+
+            if (!existingLink) {
+              await prisma.roasterSourceCountry.create({
+                data: {
+                  roasterId: roasterId,
+                  countryId: countryId
+                }
+              });
+              didUpdate = true;
+            }
           } catch (countryError) {
             console.error(`Error adding source country "${countryName}" for roaster "${roasterName}":`, countryError);
           }
@@ -285,12 +384,24 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         for (const specialtyName of specialties) {
           try {
             const specialtyId = await getOrCreateSpecialty(specialtyName);
-            await prisma.roasterSpecialty.create({
-              data: {
-                roasterId: roaster.id,
-                specialtyId: specialtyId
+            const existingSpecialty = await prisma.roasterSpecialty.findUnique({
+              where: {
+                roasterId_specialtyId: {
+                  roasterId: roasterId,
+                  specialtyId: specialtyId
+                }
               }
             });
+
+            if (!existingSpecialty) {
+              await prisma.roasterSpecialty.create({
+                data: {
+                  roasterId: roasterId,
+                  specialtyId: specialtyId
+                }
+              });
+              didUpdate = true;
+            }
           } catch (specialtyError) {
             console.error(`Error adding specialty "${specialtyName}" for roaster "${roasterName}":`, specialtyError);
           }
@@ -303,46 +414,126 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
             const rolesList = parseSemicolonList(row['Role']);
             const isPrimary = parseYesNo(row['Primary']) === true;
 
-            await prisma.roasterPerson.create({
-              data: {
-                roasterId: roaster.id,
-                firstName: row['First Name'].trim(),
-                lastName: row['Last Name'] || null,
-                title: row['Title'] || null,
-                email: row['Email'] || null, // Using Email column for person email
-                mobile: row['Mobile'] || null,
-                linkedinUrl: row['LinkedIn URL'] || null, // Person's LinkedIn
-                instagramUrl: row['Instagram URL'] || null, // Person's Instagram
-                bio: row['Bio'] || null,
-                roles: rolesList.length > 0 ? rolesList : ['Owner'], // Default to Owner if no roles specified
-                isPrimary: isPrimary,
-                createdById: req.userId,
-                updatedById: req.userId
+            const personEmail = row['Contact Email'] || row['Email'] || null;
+            const personFirstName = row['First Name'].trim();
+            const personLastName = row['Last Name'] || null;
+            const personTitle = row['Title'] || null;
+            const personMobile = row['Contact Mobile'] || row['Mobile'] || null;
+            const personLinkedIn = row['LinkedIn URL'] || null;
+            const personInstagram = row['Instagram URL'] || null;
+            const personBio = row['Bio'] || null;
+            const personRoles = rolesList.length > 0 ? rolesList : ['Owner'];
+
+            let existingPerson = null;
+            if (personEmail) {
+              existingPerson = await prisma.roasterPerson.findUnique({
+                where: {
+                  roasterId_email: {
+                    roasterId: roasterId,
+                    email: personEmail
+                  }
+                }
+              });
+            } else {
+              existingPerson = await prisma.roasterPerson.findFirst({
+                where: {
+                  roasterId: roasterId,
+                  firstName: { equals: personFirstName, mode: 'insensitive' },
+                  ...(personLastName ? { lastName: { equals: personLastName, mode: 'insensitive' } } : {}),
+                  ...(personTitle ? { title: { equals: personTitle, mode: 'insensitive' } } : {})
+                }
+              });
+            }
+
+            if (existingPerson) {
+              const personUpdate: any = {};
+              const setPersonIfMissing = (key: keyof typeof existingPerson, value: any) => {
+                const current = existingPerson?.[key] as any;
+                if ((current === null || current === '') && value !== null && value !== undefined && value !== '') {
+                  personUpdate[key] = value;
+                }
+              };
+
+              setPersonIfMissing('lastName', personLastName);
+              setPersonIfMissing('title', personTitle);
+              setPersonIfMissing('mobile', personMobile);
+              setPersonIfMissing('linkedinUrl', personLinkedIn);
+              setPersonIfMissing('instagramUrl', personInstagram);
+              setPersonIfMissing('bio', personBio);
+              if (!existingPerson.email && personEmail) {
+                personUpdate.email = personEmail;
               }
-            });
+
+              if (personRoles.length > 0 && (!existingPerson.roles || existingPerson.roles.length === 0)) {
+                personUpdate.roles = personRoles;
+              }
+              if (isPrimary && !existingPerson.isPrimary) {
+                personUpdate.isPrimary = true;
+              }
+
+              if (Object.keys(personUpdate).length > 0) {
+                personUpdate.updatedById = req.userId;
+                await prisma.roasterPerson.update({
+                  where: { id: existingPerson.id },
+                  data: personUpdate
+                });
+                didUpdate = true;
+              }
+            } else {
+              await prisma.roasterPerson.create({
+                data: {
+                  roasterId: roasterId,
+                  firstName: personFirstName,
+                  lastName: personLastName,
+                  title: personTitle,
+                  // Prefer explicit contact fields, fall back to legacy columns for compatibility.
+                  email: personEmail,
+                  mobile: personMobile,
+                  linkedinUrl: personLinkedIn,
+                  instagramUrl: personInstagram,
+                  bio: personBio,
+                  roles: personRoles,
+                  isPrimary: isPrimary,
+                  createdById: req.userId,
+                  updatedById: req.userId
+                }
+              });
+              didUpdate = true;
+            }
           } catch (personError: any) {
             // Log but don't fail the import if person creation fails
             console.error(`Error adding person for roaster "${roasterName}":`, personError);
-            results.errors.push(`Row ${i + 1}: Roaster created but person data failed: ${personError.message}`);
+            results.errors.push(`Row ${i + 1}: Person data failed: ${personError.message}`);
           }
         }
 
         // Create audit log
-        try {
-          await createAuditLog({
-            action: 'CREATE',
-            entityType: 'roaster',
-            entityId: roaster.id,
-            entityName: roaster.name,
-            userId: req.userId,
-            ipAddress: getClientIP(req),
-            userAgent: getUserAgent(req)
-          });
-        } catch (auditError) {
-          console.error('Failed to create audit log:', auditError);
+        if (!existingRoaster || didUpdate) {
+          try {
+            await createAuditLog({
+              action: existingRoaster ? 'UPDATE' : 'CREATE',
+              entityType: 'roaster',
+              entityId: roasterId,
+              entityName: roasterName,
+              userId: req.userId,
+              ipAddress: getClientIP(req),
+              userAgent: getUserAgent(req)
+            });
+          } catch (auditError) {
+            console.error('Failed to create audit log:', auditError);
+          }
         }
 
-        results.created++;
+        if (existingRoaster) {
+          if (didUpdate) {
+            results.updated++;
+          } else {
+            results.skipped++;
+            results.errors.push(`Row ${i + 1}: Roaster "${roasterName}" already exists`);
+          }
+        } else {
+          results.created++;
+        }
 
       } catch (rowError: any) {
         console.error(`Error processing row ${i + 1}:`, rowError);

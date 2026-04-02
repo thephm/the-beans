@@ -15,6 +15,7 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
   const [importing, setImporting] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,17 +81,50 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
     setFile(null);
     setResults(null);
     setError(null);
+    setCopied(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     onClose();
   };
 
+  const buildResultsText = () => {
+    if (!results) return '';
+    const lines = [
+      `Total Rows: ${results.total}`,
+      `Successfully Created: ${results.created}`,
+    ];
+
+    if (typeof results.updated === 'number') {
+      lines.push(`Updated (unverified): ${results.updated}`);
+    }
+
+    lines.push(`Skipped: ${results.skipped}`);
+
+    if (results.errors && results.errors.length > 0) {
+      lines.push('Errors/Warnings:');
+      results.errors.forEach((err: string) => lines.push(`- ${err}`));
+    }
+
+    return lines.join('\n');
+  };
+
+  const handleCopyResults = async () => {
+    if (!results) return;
+    try {
+      await navigator.clipboard.writeText(buildResultsText());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      setError('Failed to copy results');
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -106,26 +140,19 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
             </button>
           </div>
 
-          {/* CSV Format Instructions */}
+          {/* CSV Template */}
           <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-              {t('admin.roasters.csvFormat', 'CSV Format Requirements')}
-            </h3>
-            <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-              <p><strong>Required Column:</strong> Roaster Name</p>
-              <p><strong>Optional Columns:</strong></p>
-              <ul className="list-disc list-inside ml-2 space-y-0.5">
-                <li>Description, Web URL, Email, Phone, Founded</li>
-                <li>Address, City, Province, Country, Postal Code</li>
-                <li>Source Countries (semicolon-separated, in quotes)</li>
-                <li>Specialties (semicolon-separated, in quotes)</li>
-                <li>Social URLs: Instagram URL, TikTok URL, Facebook URL, LinkedIn URL, YouTube URL, Threads URL, Pinterest URL, BlueSky URL, X URL, Reddit URL</li>
-                <li>Person Details: First Name, Last Name, Title, Mobile, LinkedIn URL, Instagram URL, Bio</li>
-                <li>Role (semicolon-separated, in quotes): Owner, Employee, Roaster, Admin, Marketing, Scout, Customer</li>
-                <li>Primary: Yes or No</li>
-                <li>Online Only: Yes or No (or blank)</li>
-              </ul>
-              <p className="mt-2"><strong>Note:</strong> All imported roasters are set to unverified status by default.</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-sm text-blue-800 dark:text-blue-200">
+                {t('admin.roasters.csvTemplateHint', 'Download the CSV template with a sample row, then fill it in.')}
+              </div>
+              <a
+                href="/roasters-import-template.csv"
+                download
+                className="inline-flex items-center justify-center px-3 py-2 text-sm font-semibold text-blue-700 dark:text-blue-200 bg-white/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-700 rounded hover:bg-white dark:hover:bg-blue-900/60"
+              >
+                {t('admin.roasters.downloadTemplate', 'Download template')}
+              </a>
             </div>
           </div>
 
@@ -165,21 +192,38 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
 
           {/* Results */}
           {results && (
-            <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">
-                {t('admin.roasters.importResults', 'Import Results')}
-              </h3>
-              <div className="text-sm text-green-800 dark:text-green-200 space-y-1">
+            <div className="mb-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                  {t('admin.roasters.importResults', 'Import Results')}
+                </h3>
+                <button
+                  type="button"
+                  onClick={handleCopyResults}
+                  className="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+                  title="Copy results"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  <span>{copied ? 'Copied' : 'Copy'}</span>
+                </button>
+              </div>
+              <div className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
                 <p>Total Rows: {results.total}</p>
                 <p>Successfully Created: {results.created}</p>
+                {typeof results.updated === 'number' && (
+                  <p>Updated (unverified): {results.updated}</p>
+                )}
                 <p>Skipped: {results.skipped}</p>
                 
                 {results.errors && results.errors.length > 0 && (
-                  <div className="mt-3">
+                  <div className="mt-3 p-3 rounded bg-yellow-50 dark:bg-yellow-900/20 text-yellow-900 dark:text-yellow-100">
                     <p className="font-semibold mb-1">Errors/Warnings:</p>
-                    <ul className="list-disc list-inside ml-2 max-h-40 overflow-y-auto space-y-0.5">
+                    <ul className="list-disc list-inside ml-2 max-h-40 overflow-y-auto space-y-0.5 text-xs">
                       {results.errors.map((err: string, idx: number) => (
-                        <li key={idx} className="text-xs">{err}</li>
+                        <li key={idx}>{err}</li>
                       ))}
                     </ul>
                   </div>
