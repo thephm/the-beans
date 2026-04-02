@@ -24,10 +24,20 @@ SET "flagSvg" = 'https://flagpedia.net/data/flags/w580/us.webp',
 WHERE LOWER(name) = LOWER('United States of America')
   AND ("flagSvg" IS NULL OR "flagSvg" = '');
 
-UPDATE countries
-SET "isOrigin" = false,
-    "updatedAt" = NOW()
-WHERE LOWER(name) = LOWER('United States of America');
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'countries'
+      AND column_name = 'isOrigin'
+  ) THEN
+    UPDATE countries
+    SET "isOrigin" = false,
+        "updatedAt" = NOW()
+    WHERE LOWER(name) = LOWER('United States of America');
+  END IF;
+END $$;
 
 -- Fix common misspelling if present (avoid unique conflicts).
 UPDATE countries
