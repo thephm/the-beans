@@ -1617,8 +1617,12 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                         <label className="text-sm font-bold text-gray-700 dark:text-gray-300 capitalize">
                           {t(`adminForms.roasters.hours.${day}`, day.charAt(0).toUpperCase() + day.slice(1))}
                         </label>
-                        <div className="flex items-center space-x-2">
+                        <label
+                          htmlFor={`hours-${day}-closed`}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
                           <input
+                            id={`hours-${day}-closed`}
                             type="checkbox"
                             checked={dayHours?.closed || false}
                             onChange={(e) => handleHoursChange(day, "closed", e.target.checked)}
@@ -1627,30 +1631,30 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                           <span className="text-sm text-gray-600 dark:text-gray-400">
                             {t('adminForms.roasters.hours.closed', 'Closed')}
                           </span>
-                        </div>
+                        </label>
                       </div>
                       {!dayHours?.closed && (
-                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <label className="text-sm text-gray-600 dark:text-gray-300 w-12 shrink-0">
+                        <div className="mt-3 grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <label className="text-sm text-gray-600 dark:text-gray-300 w-auto sm:w-12 shrink-0">
                               {t('adminForms.roasters.hours.open', 'Open')}:
                             </label>
                             <input
                               type="time"
                               value={dayHours?.open || "08:00"}
                               onChange={(e) => handleHoursChange(day, "open", e.target.value)}
-                              className="flex-1 min-w-0 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                              className="w-full min-w-[160px] px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                             />
                           </div>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <label className="text-sm text-gray-600 dark:text-gray-300 w-12 shrink-0">
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <label className="text-sm text-gray-600 dark:text-gray-300 w-auto sm:w-12 shrink-0">
                               {t('adminForms.roasters.hours.close', 'Close')}:
                             </label>
                             <input
                               type="time"
                               value={dayHours?.close || "18:00"}
                               onChange={(e) => handleHoursChange(day, "close", e.target.value)}
-                              className="flex-1 min-w-0 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                              className="w-full min-w-[160px] px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                             />
                           </div>
                         </div>
