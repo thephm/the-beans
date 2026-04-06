@@ -83,7 +83,7 @@ app.use(cors({
   origin: corsOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Timezone'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 // Convert BigInt values returned by raw SQL queries to safe JSON types
 app.use(bigintSerializer);

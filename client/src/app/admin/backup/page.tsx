@@ -55,13 +55,11 @@ export default function BackupPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const response = await fetch(`${API_BASE_URL}/api/backup/database`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-          'X-Timezone': timeZone,
         },
       });
 
