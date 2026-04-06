@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
+import { stripToRootUrl } from '@/lib/url';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -424,6 +425,10 @@ export default function AdminInstagramImportPage() {
                   type="text"
                   value={website}
                   onChange={(event) => setWebsite(event.target.value)}
+                  onPaste={(event) => {
+                    event.preventDefault();
+                    setWebsite(stripToRootUrl(event.clipboardData.getData('text')));
+                  }}
                   className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2"
                 />
               </div>
