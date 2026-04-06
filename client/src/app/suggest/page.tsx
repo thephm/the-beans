@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { stripToRootUrl } from '@/lib/url';
 
 export default function SuggestRoaster() {
   const { t } = useTranslation();
@@ -323,6 +324,10 @@ export default function SuggestRoaster() {
                     name="website"
                     value={formData.website}
                     onChange={handleChange}
+                    onPaste={(event) => {
+                      event.preventDefault();
+                      setFormData((prev) => ({ ...prev, website: stripToRootUrl(event.clipboardData.getData('text')) }));
+                    }}
                     placeholder="https://example.com"
                     className={`w-full px-4 py-2 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${websiteFieldClass}`}
                     required

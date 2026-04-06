@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
 import SpecialtyPillSelector from "@/components/SpecialtyPillSelector";
 import SimpleImageUpload from "@/components/SimpleImageUpload";
+import { stripToRootUrl } from "@/lib/url";
 import { Country, PersonRole, RoasterImage } from "@/types";
 
 type HoursDay = {
@@ -918,6 +919,11 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 name="website"
                 value={basicInfo.website}
                 onChange={handleBasicInfoChange}
+                onPaste={(event) => {
+                  event.preventDefault();
+                  const cleanUrl = stripToRootUrl(event.clipboardData.getData("text"));
+                  setBasicInfo((prev) => ({ ...prev, website: cleanUrl }));
+                }}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
@@ -1182,6 +1188,11 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
             name={field.name}
             value={(socialInfo as Record<string, string>)[field.name] || ""}
             onChange={handleSocialInfoChange}
+            onPaste={(event) => {
+              event.preventDefault();
+              const cleanUrl = stripToRootUrl(event.clipboardData.getData("text"));
+              setSocialInfo((prev) => ({ ...prev, [field.name]: cleanUrl }));
+            }}
             placeholder={field.placeholder}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
@@ -1326,6 +1337,17 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                       name="instagramUrl"
                       value={contact.instagramUrl}
                       onChange={(e) => handleContactInfoChange(index, e)}
+                      onPaste={(event) => {
+                        event.preventDefault();
+                        const cleanUrl = stripToRootUrl(event.clipboardData.getData("text"));
+                        setContactPeople((prev) =>
+                          prev.map((person, personIndex) =>
+                            personIndex === index
+                              ? { ...person, instagramUrl: cleanUrl }
+                              : person
+                          )
+                        );
+                      }}
                       placeholder={t('admin.people.instagramUrlPlaceholder', 'https://www.instagram.com/username')}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
@@ -1339,6 +1361,17 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                       name="linkedinUrl"
                       value={contact.linkedinUrl}
                       onChange={(e) => handleContactInfoChange(index, e)}
+                      onPaste={(event) => {
+                        event.preventDefault();
+                        const cleanUrl = stripToRootUrl(event.clipboardData.getData("text"));
+                        setContactPeople((prev) =>
+                          prev.map((person, personIndex) =>
+                            personIndex === index
+                              ? { ...person, linkedinUrl: cleanUrl }
+                              : person
+                          )
+                        );
+                      }}
                       placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
