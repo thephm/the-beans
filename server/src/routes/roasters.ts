@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { Prisma } from '@prisma/client';
 import { body, validationResult, param, query } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { getAccentInsensitiveRoasterIds, getAccentInsensitiveRoasterNameIds } from '../lib/searchText';
@@ -222,6 +223,7 @@ router.get('/', [
   query('sort').optional().isString(),
   query('sortBy').optional().isString(),
   query('sortOrder').optional().isIn(['asc', 'desc']),
+  query('deprecated').optional().isIn(['true', 'false', '1', '0']),
 ], optionalAuth, async (req: any, res: any) => {
   try {
     const errors = validationResult(req);
@@ -233,7 +235,7 @@ router.get('/', [
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
-    const { search, searchNameOnly, city, state, country, specialty, latitude, longitude, radius = 50, sort, sortBy, sortOrder, featured, verified, topCitiesCountry } = req.query;
+    const { search, searchNameOnly, city, state, country, specialty, latitude, longitude, radius = 50, sort, sortBy, sortOrder, featured, verified, deprecated, topCitiesCountry } = req.query;
 
     // Build orderBy clause based on sortBy/sortOrder or legacy sort parameter
     let orderBy: any[] = [];
@@ -312,15 +314,26 @@ router.get('/', [
       }
     }
     
+    const deprecatedFilter = deprecated === 'true' || deprecated === '1'
+      ? true
+      : deprecated === 'false' || deprecated === '0'
+        ? false
+        : undefined;
+
     // Only show verified roasters to non-admin users by default
     if (userRole !== 'admin') {
       where.verified = true;
+      where.deprecated = false;
     } else {
       // Allow admin to filter by verified/unverified via query param
       if (verified === 'true' || verified === '1') {
         where.verified = true;
       } else if (verified === 'false' || verified === '0') {
         where.verified = false;
+      }
+
+      if (deprecatedFilter !== undefined) {
+        where.deprecated = deprecatedFilter;
       }
     }
 
@@ -527,11 +540,13 @@ router.get('/', [
     });
 
     // Get global counts for filter badges (not affected by pagination/search)
+    const deprecatedWhere = typeof where.deprecated === 'boolean' ? { deprecated: where.deprecated } : {};
+
     const [globalTotal, globalVerified, globalUnverified, globalFeatured] = await Promise.all([
-      prisma.roaster.count(),
-      prisma.roaster.count({ where: { verified: true } }),
-      prisma.roaster.count({ where: { verified: false } }),
-      prisma.roaster.count({ where: { featured: true, verified: true } })
+      prisma.roaster.count({ where: deprecatedWhere }),
+      prisma.roaster.count({ where: { ...deprecatedWhere, verified: true } }),
+      prisma.roaster.count({ where: { ...deprecatedWhere, verified: false } }),
+      prisma.roaster.count({ where: { ...deprecatedWhere, featured: true, verified: true } })
     ]);
 
     // Get top countries and cities (only for admin users)
@@ -539,11 +554,15 @@ router.get('/', [
     let topCities: Array<{ city: string; count: number }> = [];
     
     if (userRole === 'admin') {
+      const deprecatedClause = typeof where.deprecated === 'boolean'
+        ? Prisma.sql` AND deprecated = ${where.deprecated} `
+        : Prisma.sql``;
+
       // Get top countries using raw query to avoid TypeScript issues
       const countryResult: Array<{ country: string; _count: string }> = await prisma.$queryRaw`
         SELECT country, COUNT(*)::text as "_count"
         FROM roasters
-        WHERE country IS NOT NULL
+        WHERE country IS NOT NULL${deprecatedClause}
         GROUP BY country
         ORDER BY COUNT(*) DESC
         LIMIT 10
@@ -558,7 +577,7 @@ router.get('/', [
         ? await prisma.$queryRaw`
             SELECT city, COUNT(*)::text as "_count"
             FROM roasters
-            WHERE city IS NOT NULL AND country = ${topCitiesCountry}
+            WHERE city IS NOT NULL AND country = ${topCitiesCountry}${deprecatedClause}
             GROUP BY city
             ORDER BY COUNT(*) DESC
             LIMIT 10
@@ -566,7 +585,7 @@ router.get('/', [
         : await prisma.$queryRaw`
             SELECT city, COUNT(*)::text as "_count"
             FROM roasters
-            WHERE city IS NOT NULL
+            WHERE city IS NOT NULL${deprecatedClause}
             GROUP BY city
             ORDER BY COUNT(*) DESC
             LIMIT 10
@@ -782,7 +801,7 @@ router.get('/:id', [
     }
     
     // Non-admin users can only see verified roasters
-    if (userRole !== 'admin' && !roaster.verified) {
+    if (userRole !== 'admin' && (!roaster.verified || roaster.deprecated)) {
       return res.status(404).json({ error: 'Roaster not found' });
     }
 
@@ -911,6 +930,7 @@ router.post('/', [
   body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
   body('verified').optional().toBoolean(),
   body('featured').optional().toBoolean(),
+  body('deprecated').optional().isBoolean().withMessage('Deprecated must be a boolean'),
   // New nested owner contact validation
   body('ownerContact.email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   body('ownerContact.name').optional().isLength({ max: 100 }).withMessage('Owner name must be less than 100 characters'),
@@ -972,6 +992,8 @@ router.post('/', [
       Object.assign(socialNetworks, req.body.socialNetworks);
     }
 
+    const isDeprecated = req.body.deprecated === true || req.body.deprecated === 'true' || req.body.deprecated === '1';
+
     const roasterData = {
       ...req.body,
       ownerId: ownerId,
@@ -980,6 +1002,7 @@ router.post('/', [
       socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined,
       // Allow admin to set verified flag, otherwise default to false
       verified: isAdmin && req.body.verified === true ? true : false,
+      deprecated: isAdmin ? isDeprecated : false,
     };
     // Normalize `hours` field: if client sent a stringified JSON, parse it
     if (roasterData.hours && typeof roasterData.hours === 'string') {
@@ -1198,6 +1221,7 @@ router.put('/:id', [
   body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
   body('verified').optional().toBoolean(),
   body('featured').optional().toBoolean(),
+  body('deprecated').optional().isBoolean().withMessage('Deprecated must be a boolean'),
   body('rating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
   body('ownerEmail').optional({ nullable: true, checkFalsy: true }).isEmail().withMessage('Please enter a valid owner email address'),
   

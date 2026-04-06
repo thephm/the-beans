@@ -178,6 +178,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const [rating, setRating] = useState(0);
   const [verified, setVerified] = useState(false);
   const [featured, setFeatured] = useState(false);
+  const [deprecated, setDeprecated] = useState(false);
   const [hoursExpanded, setHoursExpanded] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -543,6 +544,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         setRating(typeof data.rating === "number" ? data.rating : 0);
         setVerified(Boolean(data.verified));
         setFeatured(Boolean(data.featured));
+        setDeprecated(Boolean(data.deprecated));
         setHours(normalizeHours(data.hours));
 
         setSelectedSpecialtyIds(data.specialties?.map((specialty: { id: string }) => specialty.id) || []);
@@ -784,6 +786,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         rating,
         verified,
         featured,
+        deprecated,
         onlineOnly,
         showHours: effectiveShowHours,
         hours: buildHoursPayload(normalizedHours),
@@ -957,6 +960,25 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
               >
                 <span>{t('adminForms.roasters.featured', 'Featured')}</span>
                 {featured && (
+                  <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M16.704 5.296a1 1 0 010 1.414l-7.5 7.5a1 1 0 01-1.414 0l-3.5-3.5a1 1 0 011.414-1.414L8.5 12.086l6.793-6.79a1 1 0 011.411 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeprecated((prev) => !prev)}
+                aria-pressed={deprecated}
+                className={`inline-flex items-center gap-3 rounded-full border px-3 py-2 text-sm font-semibold transition-colors ${deprecated
+                  ? "bg-yellow-500 text-white border-yellow-500"
+                  : "bg-white text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"}`}
+              >
+                <span>{t('adminForms.roasters.deprecated', 'Deprecated')}</span>
+                {deprecated && (
                   <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path
                       fillRule="evenodd"

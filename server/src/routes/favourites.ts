@@ -13,7 +13,12 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     const userId = authReq.user?.id;
 
     const favourites = await prisma.favourite.findMany({
-      where: { userId },
+      where: {
+        userId,
+        roaster: {
+          deprecated: false,
+        }
+      },
       include: {
         roaster: {
           include: {
@@ -99,7 +104,7 @@ router.post('/:roasterId', requireAuth, async (req: Request, res: Response) => {
     const roaster = await prisma.roaster.findUnique({
       where: { id: roasterId }
     });
-    if (!roaster) {
+    if (!roaster || roaster.deprecated) {
       return res.status(404).json({ error: 'Roaster not found' });
     }
     // Check if already favourited
