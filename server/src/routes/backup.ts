@@ -19,6 +19,27 @@ interface BackupProgress {
   message?: string;
 }
 
+const getTimestampForTimeZone = (timeZone: string) => {
+  try {
+    const formatter = new Intl.DateTimeFormat('sv-SE', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+    return formatter
+      .format(new Date())
+      .replace(' ', '_')
+      .replace(/:/g, '-');
+  } catch {
+    return new Date().toISOString().replace(/T/, '_').replace(/:/g, '-').split('.')[0];
+  }
+};
+
 /**
  * @swagger
  * /api/backup/database:
@@ -68,10 +89,10 @@ router.post('/database', async (req: Request, res: Response) => {
     
     // Step 1: Create timestamp for filename
     progress.push({ step: 'Create filename', status: 'in-progress' });
-    const timestamp = new Date().toISOString()
-      .replace(/T/, '_')
-      .replace(/:/g, '-')
-      .split('.')[0]; // Format: YYYY-MM-DD_HH-MM-SS
+    const requestTimeZone = (req.headers['x-timezone'] as string | undefined)?.trim();
+    const fallbackTimeZone = process.env.BACKUP_TIMEZONE || process.env.TZ || 'UTC';
+    const timeZone = requestTimeZone || fallbackTimeZone;
+    const timestamp = getTimestampForTimeZone(timeZone); // Format: YYYY-MM-DD_HH-MM-SS
     const filename = `the-beans-backup_${timestamp}.sql`;
     const backupPath = path.join('/tmp', filename);
     progress[0].status = 'success';
