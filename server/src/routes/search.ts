@@ -148,6 +148,7 @@ router.get('/', [
     // Only show verified roasters to non-admin users
     if (userRole !== 'admin') {
       whereClause.verified = true;
+      whereClause.deprecated = false;
     }
 
     // Search roasters in DB
@@ -445,6 +446,7 @@ router.get('/roasters', [
     // Only show verified roasters to non-admin users
     if (userRole !== 'admin') {
       whereClause.verified = true;
+      whereClause.deprecated = false;
     }
 
     // Add distance calculation and filtering if coordinates provided

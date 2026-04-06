@@ -25,6 +25,7 @@ const AdminRoastersPage: React.FC = () => {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   const [searchNameOnly, setSearchNameOnly] = useState<boolean>(true);
+  const [deprecatedFilter, setDeprecatedFilter] = useState<boolean>(false);
   const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('all');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -96,7 +97,7 @@ const AdminRoastersPage: React.FC = () => {
   // Fetch roasters when pagination, filters, search, or sorting change
   useEffect(() => {
     fetchRoasters();
-  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, searchNameOnly, sortConfig, countryFilter, cityFilter]);
+  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, searchNameOnly, deprecatedFilter, sortConfig, countryFilter, cityFilter]);
 
   const fetchRoasters = async () => {
     setLoading(true);
@@ -107,6 +108,7 @@ const AdminRoastersPage: React.FC = () => {
         params.search = searchQuery.trim();
         if (searchNameOnly) params.searchNameOnly = 'true';
       }
+      params.deprecated = deprecatedFilter ? 'true' : 'false';
       if (featuredFilter === 'featured') params.featured = 'true';
       if (verifiedFilter === 'verified') params.verified = 'true';
       if (countryFilter) {
@@ -450,19 +452,34 @@ const AdminRoastersPage: React.FC = () => {
               </button>
             )}
           </div>
-          <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 sm:ml-3">
-            <input
-              type="checkbox"
-              checked={searchNameOnly}
-              onChange={(e) => {
-                setSearchNameOnly(e.target.checked);
-                setCurrentPage(1);
-                setHasUserSetFilter(true);
-              }}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
-            />
-            {t('admin.roasters.searchNameOnly', 'Search name only')}
-          </label>
+          <div className="flex flex-wrap items-center gap-4 sm:ml-3">
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={searchNameOnly}
+                onChange={(e) => {
+                  setSearchNameOnly(e.target.checked);
+                  setCurrentPage(1);
+                  setHasUserSetFilter(true);
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+              />
+              {t('admin.roasters.searchNameOnly', 'Search name only')}
+            </label>
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={deprecatedFilter}
+                onChange={(e) => {
+                  setDeprecatedFilter(e.target.checked);
+                  setCurrentPage(1);
+                  setHasUserSetFilter(true);
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+              />
+              {t('admin.roasters.deprecatedFilter', 'Deprecated')}
+            </label>
+          </div>
         </div>
         {/* Search Results Count */}
         {searchQuery && (

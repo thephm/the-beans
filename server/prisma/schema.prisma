@@ -107,6 +107,7 @@ model Roaster {
   hours              Json?
   verified           Boolean                @default(false)
   featured           Boolean                @default(false)
+  deprecated         Boolean                @default(false)
   rating             Float                  @default(0)
   reviewCount        Int                    @default(0)
   createdAt          DateTime               @default(now())

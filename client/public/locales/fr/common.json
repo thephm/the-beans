@@ -798,6 +798,7 @@
       "topCities": "Principales Villes",
       "searchNameOnly": "Rechercher uniquement le nom",
       "searchPlaceholderNameOnly": "Rechercher par nom de torréfacteur...",
+      "deprecatedFilter": "Déprécié",
       "importInstagram": "Instagram"
     },
     "coordinates": {
@@ -853,6 +854,7 @@
       "rating": "Note",
       "verified": "Vérifié",
       "featured": "En vedette",
+      "deprecated": "Déprécié",
       "onlineOnly": "En ligne seulement",
       "locationDetails": "Localisation",
       "images": "Images",

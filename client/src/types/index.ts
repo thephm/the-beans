@@ -82,6 +82,7 @@ export interface Roaster {
   
   verified: boolean;
   featured: boolean;
+  deprecated?: boolean;
   rating: number;
   reviewCount: number;
   createdAt: string;
