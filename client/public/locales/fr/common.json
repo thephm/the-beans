@@ -796,6 +796,8 @@
       "unverified": "Non vérifiés",
       "topCountries": "Principaux Pays",
       "topCities": "Principales Villes",
+      "searchNameOnly": "Rechercher uniquement le nom",
+      "searchPlaceholderNameOnly": "Rechercher par nom de torréfacteur...",
       "importInstagram": "Instagram"
     },
     "coordinates": {

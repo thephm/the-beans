@@ -38,3 +38,26 @@ export const getAccentInsensitiveRoasterIds = async (
     return null;
   }
 };
+
+export const getAccentInsensitiveRoasterNameIds = async (
+  prisma: PrismaClient,
+  term: string
+): Promise<string[] | null> => {
+  const trimmed = term.trim();
+  if (!trimmed) {
+    return [];
+  }
+
+  try {
+    const rows = await prisma.$queryRaw<{ id: string }[]>`
+      SELECT DISTINCT r.id
+      FROM roasters r
+      WHERE unaccent(COALESCE(r.name, '')) ILIKE '%' || unaccent(${trimmed}) || '%'
+    `;
+
+    return rows.map((row) => row.id);
+  } catch (error) {
+    console.warn('Accent-insensitive name search unavailable, falling back.', error);
+    return null;
+  }
+};

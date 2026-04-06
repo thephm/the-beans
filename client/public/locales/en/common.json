@@ -921,6 +921,8 @@
       "longitude": "Longitude",
       "topCountries": "Top Countries",
       "topCities": "Top Cities",
+      "searchNameOnly": "Search name only",
+      "searchPlaceholderNameOnly": "Search by roaster name...",
       "importInstagram": "Instagram",
       "importCSV": "Import CSV",
       "import": "Import",

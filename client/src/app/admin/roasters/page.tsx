@@ -24,6 +24,7 @@ const AdminRoastersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
+  const [searchNameOnly, setSearchNameOnly] = useState<boolean>(true);
   const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('all');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -95,14 +96,17 @@ const AdminRoastersPage: React.FC = () => {
   // Fetch roasters when pagination, filters, search, or sorting change
   useEffect(() => {
     fetchRoasters();
-  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, sortConfig, countryFilter, cityFilter]);
+  }, [currentPage, limit, verifiedFilter, featuredFilter, searchQuery, searchNameOnly, sortConfig, countryFilter, cityFilter]);
 
   const fetchRoasters = async () => {
     setLoading(true);
     setError(null);
     try {
       const params: Record<string, any> = { page: currentPage, limit };
-      if (searchQuery && searchQuery.trim()) params.search = searchQuery.trim();
+      if (searchQuery && searchQuery.trim()) {
+        params.search = searchQuery.trim();
+        if (searchNameOnly) params.searchNameOnly = 'true';
+      }
       if (featuredFilter === 'featured') params.featured = 'true';
       if (verifiedFilter === 'verified') params.verified = 'true';
       if (countryFilter) {
@@ -400,46 +404,65 @@ const AdminRoastersPage: React.FC = () => {
 
       {/* Search bar */}
       <div className="mb-6 max-w-7xl mx-auto">
-        <div className="relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-              setHasUserSetFilter(true);
-            }}
-            placeholder={t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')}
-            className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-          />
-          <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          {searchQuery && (
-            <button
-              onClick={() => {
-                setSearchQuery('');
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
                 setCurrentPage(1);
                 setHasUserSetFilter(true);
               }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-              aria-label={t('common.clear', 'Clear')}
+              placeholder={
+                searchNameOnly
+                  ? t('admin.roasters.searchPlaceholderNameOnly', 'Search by roaster name...')
+                  : t('admin.roasters.searchPlaceholder', 'Search by name, description, city, or country...')
+              }
+              className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+            />
+            <svg
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                  setHasUserSetFilter(true);
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                aria-label={t('common.clear', 'Clear')}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 sm:ml-3">
+            <input
+              type="checkbox"
+              checked={searchNameOnly}
+              onChange={(e) => {
+                setSearchNameOnly(e.target.checked);
+                setCurrentPage(1);
+                setHasUserSetFilter(true);
+              }}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+            />
+            {t('admin.roasters.searchNameOnly', 'Search name only')}
+          </label>
         </div>
         {/* Search Results Count */}
         {searchQuery && (
