@@ -900,7 +900,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       return (
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-4">
+            <div className="md:col-span-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.name', 'Name')} *
               </label>
@@ -913,7 +913,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <div className="md:col-span-4">
+            <div className="md:col-span-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.website', 'Website')}
               </label>
@@ -930,7 +930,9 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <div className="md:col-span-4 flex flex-wrap gap-3 sm:flex-nowrap sm:items-center sm:space-x-4 sm:gap-0 pt-1">
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="md:col-span-6 flex flex-wrap items-center gap-3 pt-1">
               <button
                 type="button"
                 onClick={() => setVerified((prev) => !prev)}
@@ -954,7 +956,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 type="button"
                 onClick={() => setFeatured((prev) => !prev)}
                 aria-pressed={featured}
-                className={`inline-flex items-center gap-3 rounded-full border px-3 py-2 text-sm font-semibold transition-colors ml-auto sm:ml-0 ${featured
+                className={`inline-flex items-center gap-3 rounded-full border px-3 py-2 text-sm font-semibold transition-colors ${featured
                   ? "bg-purple-600 text-white border-purple-600"
                   : "bg-white text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"}`}
               >
@@ -989,9 +991,25 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 )}
               </button>
             </div>
+            <div className="md:col-span-6">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('adminForms.roasters.founded', 'Founded')}
+              </label>
+              <input
+                type="number"
+                name="founded"
+                value={basicInfo.founded}
+                onChange={handleBasicInfoChange}
+                placeholder="2020"
+                min="1800"
+                max="2100"
+                step="1"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-4">
+            <div className="md:col-span-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.email', 'Email')}
               </label>
@@ -1003,7 +1021,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <div className="md:col-span-4">
+            <div className="md:col-span-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.phone', 'Phone')}
               </label>
@@ -1014,40 +1032,6 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 onChange={handleBasicInfoChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
-            </div>
-            <div className="md:col-span-4">
-              <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('adminForms.roasters.founded', 'Founded')}
-                  </label>
-                  <input
-                    type="number"
-                    name="founded"
-                    value={basicInfo.founded}
-                    onChange={handleBasicInfoChange}
-                    placeholder="2020"
-                    min="1800"
-                    max="2100"
-                    step="1"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('adminForms.roasters.rating', 'Rating')}
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    value={rating}
-                    onChange={(e) => setRating(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-              </div>
             </div>
           </div>
           <div>
@@ -1646,27 +1630,27 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                         </div>
                       </div>
                       {!dayHours?.closed && (
-                        <div className="mt-3 flex flex-col gap-2 md:flex-row md:items-center md:space-x-6">
-                          <div className="flex items-center space-x-2">
-                            <label className="text-sm text-gray-600 dark:text-gray-300 w-12">
+                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <label className="text-sm text-gray-600 dark:text-gray-300 w-12 shrink-0">
                               {t('adminForms.roasters.hours.open', 'Open')}:
                             </label>
                             <input
                               type="time"
                               value={dayHours?.open || "08:00"}
                               onChange={(e) => handleHoursChange(day, "open", e.target.value)}
-                              className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                              className="flex-1 min-w-0 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                             />
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <label className="text-sm text-gray-600 dark:text-gray-300 w-12">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <label className="text-sm text-gray-600 dark:text-gray-300 w-12 shrink-0">
                               {t('adminForms.roasters.hours.close', 'Close')}:
                             </label>
                             <input
                               type="time"
                               value={dayHours?.close || "18:00"}
                               onChange={(e) => handleHoursChange(day, "close", e.target.value)}
-                              className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                              className="flex-1 min-w-0 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                             />
                           </div>
                         </div>
