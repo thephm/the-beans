@@ -121,6 +121,7 @@ model Roaster {
   // We keep legacy individual columns for backward compatibility during migration.
   socialNetworks     Json?
   founded            Int?
+  closedYear         Int?
   beans              Bean[]
   favourites          Favourite[]
   reviews            Review[]

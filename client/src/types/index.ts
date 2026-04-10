@@ -79,6 +79,7 @@ export interface Roaster {
   socialNetworks?: Record<string, string>;
   
   founded?: number;
+  closedYear?: number;
   
   verified: boolean;
   featured: boolean;

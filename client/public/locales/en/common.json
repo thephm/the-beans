@@ -780,6 +780,7 @@
       "latitude": "Latitude",
       "longitude": "Longitude",
       "founded": "Founded",
+      "closedYear": "Closed",
       "specialties": "Specialties",
       "specialtiesHint": "Specialties (comma separated)",
       "settings": "Settings",
