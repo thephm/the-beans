@@ -103,6 +103,9 @@ const requireAuth = async (req: any, res: any, next: any) => {
  *         founded:
  *           type: integer
  *           description: Year the roaster was founded
+ *         closedYear:
+ *           type: integer
+ *           description: Year the roaster closed
  *         socialNetworks:
  *           type: object
  *           additionalProperties:
@@ -928,6 +931,7 @@ router.post('/', [
   body('latitude').optional({ nullable: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
   body('longitude').optional({ nullable: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
+  body('closedYear').optional({ nullable: true }).isInt({ min: 1800, max: 2100 }).withMessage('Closed year must be a 4 digit year'),
   body('verified').optional().toBoolean(),
   body('featured').optional().toBoolean(),
   body('deprecated').optional().isBoolean().withMessage('Deprecated must be a boolean'),
@@ -993,6 +997,8 @@ router.post('/', [
     }
 
     const isDeprecated = req.body.deprecated === true || req.body.deprecated === 'true' || req.body.deprecated === '1';
+    const hasClosedYear = req.body.closedYear !== undefined && req.body.closedYear !== null && req.body.closedYear !== '';
+    const deprecatedValue = hasClosedYear ? true : (isAdmin ? isDeprecated : false);
 
     const roasterData = {
       ...req.body,
@@ -1002,7 +1008,7 @@ router.post('/', [
       socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : undefined,
       // Allow admin to set verified flag, otherwise default to false
       verified: isAdmin && req.body.verified === true ? true : false,
-      deprecated: isAdmin ? isDeprecated : false,
+      deprecated: deprecatedValue,
     };
     // Normalize `hours` field: if client sent a stringified JSON, parse it
     if (roasterData.hours && typeof roasterData.hours === 'string') {
@@ -1219,6 +1225,7 @@ router.put('/:id', [
   body('latitude').optional({ nullable: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitude must be between -90 and 90'),
   body('longitude').optional({ nullable: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitude must be between -180 and 180'),
   body('specialtyIds').optional().isArray().withMessage('Specialty IDs must be an array'),
+  body('closedYear').optional({ nullable: true }).isInt({ min: 1800, max: 2100 }).withMessage('Closed year must be a 4 digit year'),
   body('verified').optional().toBoolean(),
   body('featured').optional().toBoolean(),
   body('deprecated').optional().isBoolean().withMessage('Deprecated must be a boolean'),
@@ -1266,6 +1273,9 @@ router.put('/:id', [
   }
 
   const updateData = { ...req.body };
+    if (updateData.closedYear !== undefined && updateData.closedYear !== null && updateData.closedYear !== '') {
+      updateData.deprecated = true;
+    }
   // Normalize `hours` field on update: parse stringified JSON if necessary
   if (updateData.hours && typeof updateData.hours === 'string') {
     try {

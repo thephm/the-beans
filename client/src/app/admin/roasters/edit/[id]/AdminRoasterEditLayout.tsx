@@ -139,6 +139,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     phone: "",
     website: "",
     founded: "",
+    closedYear: "",
   });
   const [locationInfo, setLocationInfo] = useState({
     address: "",
@@ -292,6 +293,9 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setBasicInfo((prev) => ({ ...prev, [name]: value }));
+    if (name === "closedYear" && value.trim() !== "") {
+      setDeprecated(true);
+    }
   };
 
   const handleLocationInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -514,6 +518,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
           phone: data.phone || "",
           website: data.website || "",
           founded: data.founded ? String(data.founded) : "",
+          closedYear: data.closedYear ? String(data.closedYear) : "",
         });
 
         setLocationInfo({
@@ -776,6 +781,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         phone: toNullIfEmpty(basicInfo.phone),
         website: toNullIfEmpty(basicInfo.website),
         founded: basicInfo.founded ? parseInt(basicInfo.founded, 10) : undefined,
+        closedYear: basicInfo.closedYear.trim() !== "" ? parseInt(basicInfo.closedYear, 10) : null,
         address: toNullIfEmpty(locationInfo.address),
         city: toNullIfEmpty(locationInfo.city),
         state: toNullIfEmpty(locationInfo.state),
@@ -786,7 +792,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         rating,
         verified,
         featured,
-        deprecated,
+        deprecated: basicInfo.closedYear.trim() !== "" ? true : deprecated,
         onlineOnly,
         showHours: effectiveShowHours,
         hours: buildHoursPayload(normalizedHours),
@@ -992,20 +998,38 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
               </button>
             </div>
             <div className="md:col-span-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.founded', 'Founded')}
-              </label>
-              <input
-                type="number"
-                name="founded"
-                value={basicInfo.founded}
-                onChange={handleBasicInfoChange}
-                placeholder="2020"
-                min="1800"
-                max="2100"
-                step="1"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('adminForms.roasters.founded', 'Founded')}
+                  </label>
+                  <input
+                    type="number"
+                    name="founded"
+                    value={basicInfo.founded}
+                    onChange={handleBasicInfoChange}
+                    min="1800"
+                    max="2100"
+                    step="1"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('adminForms.roasters.closedYear', 'Closed')}
+                  </label>
+                  <input
+                    type="number"
+                    name="closedYear"
+                    value={basicInfo.closedYear}
+                    onChange={handleBasicInfoChange}
+                    min="1800"
+                    max="2100"
+                    step="1"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">

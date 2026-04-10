@@ -848,6 +848,7 @@
       "latitude": "Latitude",
       "longitude": "Longitude",
       "founded": "Fondé",
+      "closedYear": "Fermé",
       "specialties": "Spécialités",
       "specialtiesHint": "Spécialités (séparées par des virgules)",
       "settings": "Paramètres",
