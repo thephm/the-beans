@@ -17,7 +17,9 @@ The CSV import feature allows administrators to bulk import roasters from a CSV 
 - **Description**: Full text description of the roaster
 - **Web URL**: Website URL
 - **Email**: Contact email
+  - Also accepts `email address` / `Email Address`
 - **Phone**: Contact phone number
+  - Also accepts `Phone Number`
 - **Founded**: Year founded (numeric, e.g., 2010)
 - **Online Only**: Yes, No, or blank (defaults to No)
 
@@ -69,10 +71,14 @@ If provided, a person will be created and associated with the roaster:
 - **createdById**: Set to the admin user performing the import
 
 ### Duplicate Handling
-- If a roaster with the same name already exists and is **verified**, it will be skipped
-- If a roaster with the same name exists and is **unverified**, missing fields will be filled in
-- Existing non-empty values are never overwritten
-- The import summary will show which rows were skipped and why
+- If a matched roaster is **verified**, it will be skipped
+- Exact name matches prefer a matching **Web URL** or **Instagram URL** when those values are provided
+- If **Web URL** and **Instagram URL** are both missing, the importer falls back to exact **Roaster Name + Country** matching
+- URL matches can also update close name variants such as `Company`, `Company Coffee`, or `Company Roasters`
+- When a matched row contains different non-empty values, the roaster is updated
+- Blank CSV cells do **not** clear existing roaster values; empty import values are ignored
+- Slugs are not changed when an existing roaster name is updated by import
+- The import summary shows created, updated, skipped, warnings, and errors for each run
 
 ### Source Countries and Specialties
 - Source countries must be marked as origin countries (location-only countries like Canada/USA are rejected)
@@ -104,8 +110,11 @@ Body: file={csv_file}
     "created": 8,
     "updated": 1,
     "skipped": 2,
+    "warnings": [
+      "Row 2: Roaster \"Counterpart Coffee\" already exists, updated."
+    ],
     "errors": [
-      "Row 3: Roaster 'Duplicate Name' already exists",
+      "Row 3: Roaster 'Duplicate Name' already exists, no changes.",
       "Row 7: Missing roaster name"
     ]
   }

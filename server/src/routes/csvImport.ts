@@ -3,6 +3,7 @@ import multer from 'multer';
 import { parse } from 'csv-parse/sync';
 import { prisma } from '../lib/prisma';
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
+import { generateUniqueRoasterSlug } from '../lib/slug';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -58,6 +59,17 @@ const parseYesNo = (value: string | undefined): boolean | null => {
   const normalized = value.trim().toLowerCase();
   if (normalized === 'yes') return true;
   if (normalized === 'no') return false;
+  return null;
+};
+
+const getRowValue = (row: Record<string, any>, ...keys: string[]): string | null => {
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value.trim();
+    }
+  }
+
   return null;
 };
 
@@ -151,6 +163,102 @@ const findOriginCountryIdByName = async (name: string): Promise<string | null> =
   return existingCountry ? existingCountry.id : null;
 };
 
+const normalizeUrl = (value: string | undefined | null): string | null => {
+  if (!value) return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  return trimmed
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .replace(/\/$/, '');
+};
+
+const hasSecondaryIdentifierMatch = (
+  roaster: any,
+  website: string | null,
+  instagram: string | null
+): boolean => {
+  if (!website && !instagram) {
+    return false;
+  }
+
+  const roasterWebsite = normalizeUrl(roaster.website || null);
+  const roasterInstagram = normalizeUrl((roaster.socialNetworks as any)?.instagram || null);
+
+  if (website && roasterWebsite && website === roasterWebsite) {
+    return true;
+  }
+
+  if (instagram && roasterInstagram && instagram === roasterInstagram) {
+    return true;
+  }
+
+  return false;
+};
+
+const normalizeNameTokens = (value: string): string[] => {
+  const cleaned = value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleaned) return [];
+
+  const tokens = cleaned.split(' ');
+  const removableSuffixes = new Set([
+    'coffee',
+    'co',
+    'roaster',
+    'roasters',
+    'roastery',
+    'roasting',
+    'inc',
+    'llc',
+    'ltd'
+  ]);
+
+  while (tokens.length > 1 && removableSuffixes.has(tokens[tokens.length - 1])) {
+    tokens.pop();
+  }
+
+  return tokens;
+};
+
+const stripTrailingNumbers = (value: string): string => {
+  return value.replace(/\s*\d+$/, '').trim();
+};
+
+const isNameVariantMatch = (existingName: string, importedName: string): boolean => {
+  const existingTokens = normalizeNameTokens(existingName);
+  const importedTokens = normalizeNameTokens(importedName);
+
+  if (existingTokens.length === 0 || importedTokens.length === 0) {
+    return false;
+  }
+
+  if (existingTokens[0] !== importedTokens[0]) {
+    return false;
+  }
+
+  const existingNormalized = existingTokens.join(' ');
+  const importedNormalized = importedTokens.join(' ');
+  const existingWithoutTrailingNumbers = stripTrailingNumbers(existingNormalized);
+  const importedWithoutTrailingNumbers = stripTrailingNumbers(importedNormalized);
+
+  return (
+    existingNormalized === importedNormalized ||
+    existingWithoutTrailingNumbers === importedWithoutTrailingNumbers ||
+    existingNormalized.startsWith(`${importedNormalized} `) ||
+    importedNormalized.startsWith(`${existingNormalized} `) ||
+    existingWithoutTrailingNumbers.startsWith(`${importedWithoutTrailingNumbers} `) ||
+    importedWithoutTrailingNumbers.startsWith(`${existingWithoutTrailingNumbers} `)
+  );
+};
+
 /**
  * @swagger
  * /api/roasters/import/csv:
@@ -206,6 +314,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
       created: 0,
       updated: 0,
       skipped: 0,
+      warnings: [] as string[],
       errors: [] as string[]
     };
 
@@ -230,28 +339,103 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
 
         const roasterName = row['Roaster Name'].trim();
 
-        // Check if roaster already exists
-        const existingRoaster = await prisma.roaster.findUnique({
-          where: { name: roasterName }
+        const importedWebsite = getRowValue(row, 'Web URL');
+        const importedInstagram = getRowValue(row, 'Instagram URL');
+        const importedEmail = getRowValue(row, 'Email', 'email address', 'Email Address');
+        const importedPhone = getRowValue(row, 'Phone', 'Phone Number');
+        const importedAddress = getRowValue(row, 'Address');
+        const importedCity = getRowValue(row, 'City');
+        const importedState = getRowValue(row, 'Province', 'State');
+        const importedZipCode = getRowValue(row, 'Postal Code', 'Zip Code', 'ZIP Code');
+        const importedDescription = getRowValue(row, 'Description');
+        const normalizedImportedWebsite = normalizeUrl(importedWebsite);
+        const normalizedImportedInstagram = normalizeUrl(importedInstagram);
+
+        const sameNameRoasters = await prisma.roaster.findMany({
+          where: {
+            name: {
+              equals: roasterName,
+              mode: 'insensitive'
+            }
+          }
         });
+
+        let existingRoaster = sameNameRoasters.find((candidate) => {
+          return hasSecondaryIdentifierMatch(candidate, normalizedImportedWebsite, normalizedImportedInstagram);
+        }) || null;
+        const hasSecondaryIdentifiers = Boolean(normalizedImportedWebsite || normalizedImportedInstagram);
+
+        let matchedBySecondaryVariantName = false;
+        let matchSourceLabel = 'Web URL/Instagram URL';
+
+        if (!existingRoaster && hasSecondaryIdentifiers) {
+          const secondaryCandidates = await prisma.roaster.findMany();
+
+          const urlMatchedCandidates = secondaryCandidates.filter((candidate) => {
+            return hasSecondaryIdentifierMatch(candidate, normalizedImportedWebsite, normalizedImportedInstagram);
+          });
+
+          const variantNameCandidate = urlMatchedCandidates.find((candidate) => {
+            return isNameVariantMatch(candidate.name, roasterName);
+          });
+
+          if (variantNameCandidate) {
+            existingRoaster = variantNameCandidate;
+            matchedBySecondaryVariantName = true;
+
+            const matchedByWebsite = normalizedImportedWebsite
+              && normalizeUrl(variantNameCandidate.website || null) === normalizedImportedWebsite;
+            matchSourceLabel = matchedByWebsite ? 'Web URL' : 'Instagram URL';
+          } else if (urlMatchedCandidates.length > 0) {
+            results.skipped++;
+            results.errors.push(
+              `Row ${i + 1}: URL matched an existing roaster but name "${roasterName}" is not a close variant`
+            );
+            continue;
+          }
+        }
+
+        if (!existingRoaster && !hasSecondaryIdentifiers && sameNameRoasters.length > 0) {
+          const normalizedCountry = normalizeCountryName(row['Country']);
+          existingRoaster = sameNameRoasters.find((candidate) => {
+            return normalizeCountryName(candidate.country).toLowerCase() === normalizedCountry.toLowerCase();
+          }) || null;
+
+          if (!existingRoaster) {
+            results.skipped++;
+            results.errors.push(
+              `Row ${i + 1}: Roaster "${roasterName}" matched by name but country did not match and no Web URL/Instagram URL provided`
+            );
+            continue;
+          }
+        }
+
+        if (sameNameRoasters.length > 0 && !existingRoaster) {
+          results.skipped++;
+          results.errors.push(
+            `Row ${i + 1}: Roaster "${roasterName}" exists by name but does not match Web URL/Instagram URL`
+          );
+          continue;
+        }
 
         // Parse social networks
         const socialNetworks: any = {};
-        if (row['Instagram URL']) socialNetworks.instagram = row['Instagram URL'];
-        if (row['TikTok URL']) socialNetworks.tiktok = row['TikTok URL'];
-        if (row['Facebook URL']) socialNetworks.facebook = row['Facebook URL'];
-        if (row['LinkedIn URL']) socialNetworks.linkedin = row['LinkedIn URL'];
-        if (row['YouTube URL']) socialNetworks.youtube = row['YouTube URL'];
-        if (row['Threads URL']) socialNetworks.threads = row['Threads URL'];
-        if (row['Pinterest URL']) socialNetworks.pinterest = row['Pinterest URL'];
-        if (row['BlueSky URL']) socialNetworks.bluesky = row['BlueSky URL'];
-        if (row['X URL']) socialNetworks.x = row['X URL'];
-        if (row['Reddit URL']) socialNetworks.reddit = row['Reddit URL'];
+        if (getRowValue(row, 'Instagram URL')) socialNetworks.instagram = getRowValue(row, 'Instagram URL');
+        if (getRowValue(row, 'TikTok URL')) socialNetworks.tiktok = getRowValue(row, 'TikTok URL');
+        if (getRowValue(row, 'Facebook URL')) socialNetworks.facebook = getRowValue(row, 'Facebook URL');
+        if (getRowValue(row, 'LinkedIn URL')) socialNetworks.linkedin = getRowValue(row, 'LinkedIn URL');
+        if (getRowValue(row, 'YouTube URL')) socialNetworks.youtube = getRowValue(row, 'YouTube URL');
+        if (getRowValue(row, 'Threads URL')) socialNetworks.threads = getRowValue(row, 'Threads URL');
+        if (getRowValue(row, 'Pinterest URL')) socialNetworks.pinterest = getRowValue(row, 'Pinterest URL');
+        if (getRowValue(row, 'BlueSky URL')) socialNetworks.bluesky = getRowValue(row, 'BlueSky URL');
+        if (getRowValue(row, 'X URL')) socialNetworks.x = getRowValue(row, 'X URL');
+        if (getRowValue(row, 'Reddit URL')) socialNetworks.reddit = getRowValue(row, 'Reddit URL');
 
         // Parse founded year
         let founded: number | undefined;
-        if (row['Founded'] && row['Founded'].trim() !== '') {
-          founded = parseInt(row['Founded'], 10);
+        const foundedValue = getRowValue(row, 'Founded');
+        if (foundedValue) {
+          founded = parseInt(foundedValue, 10);
           if (isNaN(founded)) {
             founded = undefined;
           }
@@ -279,28 +463,48 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
           }
 
           const updateData: any = {};
-          const setIfMissing = (key: keyof typeof existingRoaster, value: any) => {
+          const setIfChanged = (
+            key: keyof typeof existingRoaster,
+            value: any,
+            normalize?: (input: any) => any
+          ) => {
             const current = existingRoaster[key] as any;
-            if ((current === null || current === '') && value !== null && value !== undefined && value !== '') {
+            if (value === null || value === undefined || value === '') {
+              return;
+            }
+
+            const currentComparable = normalize ? normalize(current) : current;
+            const valueComparable = normalize ? normalize(value) : value;
+
+            if (currentComparable !== valueComparable) {
               updateData[key] = value;
             }
           };
 
-          setIfMissing('description', row['Description']?.trim() || null);
-          setIfMissing('website', row['Web URL']?.trim() || null);
-          setIfMissing('email', row['Email']?.trim() || null);
-          setIfMissing('phone', row['Phone']?.trim() || null);
-          setIfMissing('founded', founded ?? null);
-          setIfMissing('address', row['Address'] || null);
-          setIfMissing('city', row['City'] || null);
-          setIfMissing('state', row['Province'] || null);
-          setIfMissing('zipCode', row['Postal Code'] || null);
+          setIfChanged('description', importedDescription);
+          setIfChanged('website', importedWebsite, normalizeUrl);
+          setIfChanged('email', importedEmail, (value) => typeof value === 'string' ? value.trim().toLowerCase() : value);
+          setIfChanged('phone', importedPhone, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('founded', founded ?? null);
+          setIfChanged('address', importedAddress, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('city', importedCity, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('state', importedState, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('zipCode', importedZipCode, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('country', roasterCountry, (value) => typeof value === 'string' ? normalizeCountryName(value).toLowerCase() : value);
+
+          const existingNameNormalized = existingRoaster.name.trim().toLowerCase();
+          const importedNameNormalized = roasterName.toLowerCase();
+          if (existingNameNormalized !== importedNameNormalized) {
+            updateData.name = roasterName;
+          }
 
           const existingSocial = (existingRoaster.socialNetworks as any) || {};
           const mergedSocial: any = { ...existingSocial };
           let socialChanged = false;
-          for (const [key, value] of Object.entries(socialNetworks)) {
-            if (value && !mergedSocial[key]) {
+          for (const [key, value] of Object.entries(socialNetworks as Record<string, string>)) {
+            const existingValue = mergedSocial[key];
+            const normalizedExistingValue = typeof existingValue === 'string' ? normalizeUrl(existingValue) : null;
+            if (normalizedExistingValue !== normalizeUrl(value)) {
               mergedSocial[key] = value;
               socialChanged = true;
             }
@@ -316,22 +520,31 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
               data: updateData
             });
             didUpdate = true;
+
+            if (matchedBySecondaryVariantName && updateData.name) {
+              results.warnings.push(
+                `Row ${i + 1}: Name updated from "${existingRoaster.name}" to "${roasterName}" via ${matchSourceLabel} variant match (slug unchanged)`
+              );
+            }
           }
 
           roasterId = existingRoaster.id;
         } else {
+          const slug = await generateUniqueRoasterSlug(prisma, roasterName);
+
           const roaster = await prisma.roaster.create({
             data: {
               name: roasterName,
-              description: row['Description']?.trim() || null,
-              website: row['Web URL']?.trim() || null,
-              email: row['Email']?.trim() || null,
-              phone: row['Phone']?.trim() || null,
+              slug,
+              description: importedDescription,
+              website: importedWebsite,
+              email: importedEmail,
+              phone: importedPhone,
               founded: founded,
-              address: row['Address'] || null,
-              city: row['City'] || null,
-              state: row['Province'] || null,
-              zipCode: row['Postal Code'] || null,
+              address: importedAddress,
+              city: importedCity,
+              state: importedState,
+              zipCode: importedZipCode,
               country: roasterCountry,
               onlineOnly: onlineOnlyValue !== null ? onlineOnlyValue : false,
               verified: false, // Always set to unverified for imports
@@ -414,11 +627,11 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
             const rolesList = parseSemicolonList(row['Role']);
             const isPrimary = parseYesNo(row['Primary']) === true;
 
-            const personEmail = row['Contact Email'] || row['Email'] || null;
+            const personEmail = getRowValue(row, 'Contact Email', 'Email', 'email address', 'Email Address');
             const personFirstName = row['First Name'].trim();
             const personLastName = row['Last Name'] || null;
             const personTitle = row['Title'] || null;
-            const personMobile = row['Contact Mobile'] || row['Mobile'] || null;
+            const personMobile = getRowValue(row, 'Contact Mobile', 'Mobile', 'Phone', 'Phone Number');
             const personLinkedIn = row['LinkedIn URL'] || null;
             const personInstagram = row['Instagram URL'] || null;
             const personBio = row['Bio'] || null;
@@ -527,9 +740,10 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         if (existingRoaster) {
           if (didUpdate) {
             results.updated++;
+            results.warnings.push(`Row ${i + 1}: Roaster "${roasterName}" already exists, updated.`);
           } else {
             results.skipped++;
-            results.errors.push(`Row ${i + 1}: Roaster "${roasterName}" already exists`);
+            results.errors.push(`Row ${i + 1}: Roaster "${roasterName}" already exists, no changes.`);
           }
         } else {
           results.created++;

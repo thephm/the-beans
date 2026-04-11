@@ -7,6 +7,7 @@ import { upload, deleteImage, uploadImageFromUrl } from '../lib/cloudinary';
 import { canEditRoaster } from '../middleware/roasterAuth';
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
+import { generateUniqueRoasterSlug } from '../lib/slug';
 
 const router = Router();
 // Use shared Prisma client
@@ -999,9 +1000,11 @@ router.post('/', [
     const isDeprecated = req.body.deprecated === true || req.body.deprecated === 'true' || req.body.deprecated === '1';
     const hasClosedYear = req.body.closedYear !== undefined && req.body.closedYear !== null && req.body.closedYear !== '';
     const deprecatedValue = hasClosedYear ? true : (isAdmin ? isDeprecated : false);
+    const slug = await generateUniqueRoasterSlug(prisma, req.body.name);
 
     const roasterData = {
       ...req.body,
+      slug,
       ownerId: ownerId,
       sourceType: req.body.sourceType,
       sourceDetails: req.body.sourceDetails,

@@ -92,6 +92,7 @@ model PasswordResetToken {
 model Roaster {
   id                 String                 @id @default(cuid())
   name               String                 @unique
+  slug               String                 @unique
   description        String?
   email              String?
   phone              String?
