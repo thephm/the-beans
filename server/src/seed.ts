@@ -52,6 +52,7 @@ async function main() {
     update: {},
     create: {
       name: 'Purple Mountain Coffee',
+      slug: 'purple-mountain-coffee',
       description: 'A roaster from the mountains.',
       ownerId: testUser.id,
       socialNetworks: {
@@ -65,6 +66,7 @@ async function main() {
     update: {},
     create: {
       name: 'Lavender Bean Co.',
+      slug: 'lavender-bean-co',
       description: 'Lavender-infused beans.',
       ownerId: testUser.id,
       socialNetworks: {
@@ -78,6 +80,7 @@ async function main() {
     update: {},
     create: {
       name: 'Violet Coffee Works',
+      slug: 'violet-coffee-works',
       description: 'Violet-inspired coffee blends.',
       ownerId: testUser.id,
       socialNetworks: {

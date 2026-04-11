@@ -234,6 +234,7 @@ async function main() {
     update: {},
     create: {
       name: 'Blue Bottle Coffee',
+      slug: 'blue-bottle-coffee',
       description: 'Artisanal coffee roaster focused on freshness and quality.',
       email: 'info@bluebottlecoffee.com',
       phone: '(510) 653-3394',
@@ -268,6 +269,7 @@ async function main() {
     update: {},
     create: {
       name: 'Stumptown Coffee Roasters',
+      slug: 'stumptown-coffee-roasters',
       description: 'Portland-based roaster known for direct trade relationships.',
       email: 'hello@stumptowncoffee.com',
       phone: '(503) 230-7794',
@@ -302,6 +304,7 @@ async function main() {
     update: {},
     create: {
       name: 'Intelligentsia Coffee',
+      slug: 'intelligentsia-coffee',
       description: 'Chicago-based specialty coffee roaster with a focus on education.',
       email: 'info@intelligentsiacoffee.com',
       phone: '(773) 348-8058',

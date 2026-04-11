@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma';
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 import { requireAuth } from '../middleware/requireAuth';
 import { sendSubmissionThankYouEmail, sendAdminSubmissionNotification } from '../lib/emailService';
+import { generateUniqueRoasterSlug } from '../lib/slug';
 
 const router = express.Router();
 
@@ -627,10 +628,13 @@ router.post('/:id/create-roaster', requireAdmin, async (req: Request, res: Respo
       where: { email: suggestion.submitterEmail }
     });
 
+    const slug = await generateUniqueRoasterSlug(prisma, suggestion.roasterName);
+
     // Create the roaster
     const roaster = await prisma.roaster.create({
       data: {
         name: suggestion.roasterName,
+        slug,
         city: suggestion.city,
         state: suggestion.state || undefined,
         country: suggestion.country,
