@@ -115,6 +115,78 @@ const getCsvParseErrorMessage = (parseError: unknown): string => {
   return `Invalid CSV format: ${parseError.message}${locationSuffix}`;
 };
 
+type ImportFieldChange = {
+  field: string;
+  from: string;
+  to: string;
+};
+
+type ImportCreatedItem = {
+  row: number;
+  id: string;
+  name: string;
+};
+
+type ImportUpdatedItem = {
+  row: number;
+  id: string;
+  name: string;
+  changes: ImportFieldChange[];
+};
+
+type ImportSkippedItem = {
+  row: number;
+  id?: string;
+  name: string;
+  reason: string;
+};
+
+const SOCIAL_NETWORK_FIELD_LABELS: Record<string, string> = {
+  instagram: 'Instagram URL',
+  tiktok: 'TikTok URL',
+  facebook: 'Facebook URL',
+  linkedin: 'LinkedIn URL',
+  youtube: 'YouTube URL',
+  threads: 'Threads URL',
+  pinterest: 'Pinterest URL',
+  bluesky: 'BlueSky URL',
+  x: 'X URL',
+  reddit: 'Reddit URL'
+};
+
+const sortUniqueValues = (values: string[]): string[] => {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right, undefined, { sensitivity: 'base' }));
+};
+
+const areStringListsEqual = (left: string[], right: string[]): boolean => {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return left.every((value, index) => value.localeCompare(right[index], undefined, { sensitivity: 'base' }) === 0);
+};
+
+const formatImportValue = (value: unknown): string => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No';
+  }
+
+  if (Array.isArray(value)) {
+    return sortUniqueValues(value.map((item) => String(item))).join('; ');
+  }
+
+  return String(value).trim();
+};
+
+const formatSkippedName = (name?: string | null): string => {
+  return name && name.trim() ? name.trim() : '(unnamed roaster)';
+};
+
 // Helper function to get or create specialty by name
 const getOrCreateSpecialty = async (name: string, language: string = 'en'): Promise<string> => {
   // Try to find existing specialty with this translation
@@ -365,26 +437,43 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
       created: 0,
       updated: 0,
       skipped: 0,
+      createdItems: [] as ImportCreatedItem[],
+      updatedItems: [] as ImportUpdatedItem[],
+      skippedItems: [] as ImportSkippedItem[],
       warnings: [] as string[],
       errors: [] as string[]
+    };
+
+    const addSkippedRow = (
+      rowNumber: number,
+      name: string | null | undefined,
+      reason: string,
+      id?: string
+    ) => {
+      results.skipped++;
+      results.skippedItems.push({
+        row: rowNumber,
+        id,
+        name: formatSkippedName(name),
+        reason
+      });
     };
 
     // Process each record
     for (let i = 0; i < records.length; i++) {
       const row: any = records[i];
+      const rowNumber = i + 1;
       
       try {
         // Skip if roaster name is missing
         if (!row['Roaster Name'] || row['Roaster Name'].trim() === '') {
-          results.skipped++;
-          results.errors.push(`Row ${i + 1}: Missing roaster name`);
+          addSkippedRow(rowNumber, null, 'Missing roaster name');
           continue;
         }
 
         // Skip if country is missing
         if (!row['Country'] || row['Country'].trim() === '') {
-          results.skipped++;
-          results.errors.push(`Row ${i + 1}: Missing country`);
+          addSkippedRow(rowNumber, row['Roaster Name'], 'Missing country');
           continue;
         }
 
@@ -438,9 +527,10 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
               && normalizeUrl(variantNameCandidate.website || null) === normalizedImportedWebsite;
             matchSourceLabel = matchedByWebsite ? 'Web URL' : 'Instagram URL';
           } else if (urlMatchedCandidates.length > 0) {
-            results.skipped++;
-            results.errors.push(
-              `Row ${i + 1}: URL matched an existing roaster but name "${roasterName}" is not a close variant`
+            addSkippedRow(
+              rowNumber,
+              roasterName,
+              `URL matched an existing roaster but name "${roasterName}" is not a close variant`
             );
             continue;
           }
@@ -453,18 +543,20 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
           }) || null;
 
           if (!existingRoaster) {
-            results.skipped++;
-            results.errors.push(
-              `Row ${i + 1}: Roaster "${roasterName}" matched by name but country did not match and no Web URL/Instagram URL provided`
+            addSkippedRow(
+              rowNumber,
+              roasterName,
+              'Matched by name but country did not match and no Web URL/Instagram URL provided'
             );
             continue;
           }
         }
 
         if (sameNameRoasters.length > 0 && !existingRoaster) {
-          results.skipped++;
-          results.errors.push(
-            `Row ${i + 1}: Roaster "${roasterName}" exists by name but does not match Web URL/Instagram URL`
+          addSkippedRow(
+            rowNumber,
+            roasterName,
+            'Roaster exists by name but does not match Web URL/Instagram URL'
           );
           continue;
         }
@@ -484,7 +576,13 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
 
         // Parse founded/closed years
         const founded = parseOptionalYear(getRowValue(row, 'Founded'));
-        const closedYear = parseOptionalYear(getRowValue(row, 'Closed Year', 'Closed year'));
+        const closedYear = parseOptionalYear(getRowValue(row, 'Closed Year', 'Closed year', 'Closed'));
+
+        // Parse deprecation state. Closed Year always wins if provided.
+        const deprecatedValue = parseYesNo(getRowValue(row, 'Deprecated') || undefined);
+        const effectiveDeprecated = closedYear !== undefined
+          ? true
+          : (deprecatedValue !== null ? deprecatedValue : undefined);
 
         // Parse online only
         const onlineOnlyValue = parseYesNo(row['Online Only']);
@@ -492,24 +590,60 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         const roasterCountry = normalizeCountryName(row['Country']);
         const roasterCountryId = await findCountryIdByName(roasterCountry);
         if (!roasterCountryId) {
-          results.skipped++;
-          results.errors.push(`Row ${i + 1}: Unknown country "${roasterCountry}"`);
+          addSkippedRow(rowNumber, roasterName, `Unknown country "${roasterCountry}"`);
           continue;
         }
 
         let roasterId: string;
         let didUpdate = false;
+        const rowChanges: ImportFieldChange[] = [];
+        const addFieldChange = (field: string, fromValue: unknown, toValue: unknown) => {
+          rowChanges.push({
+            field,
+            from: formatImportValue(fromValue),
+            to: formatImportValue(toValue)
+          });
+        };
+
+        let sourceCountriesBefore: string[] = [];
+        let sourceCountriesAfter: string[] = [];
+        let specialtiesBefore: string[] = [];
+        let specialtiesAfter: string[] = [];
 
         if (existingRoaster) {
           if (existingRoaster.verified) {
-            results.skipped++;
-            results.errors.push(`Row ${i + 1}: Roaster "${roasterName}" already exists (verified)`);
+            addSkippedRow(rowNumber, roasterName, 'Roaster exists (verified)', existingRoaster.id);
             continue;
           }
+
+          const [existingSourceCountryLinks, existingSpecialtyLinks] = await Promise.all([
+            prisma.roasterSourceCountry.findMany({
+              where: { roasterId: existingRoaster.id },
+              include: { country: true }
+            }),
+            prisma.roasterSpecialty.findMany({
+              where: { roasterId: existingRoaster.id },
+              include: {
+                specialty: {
+                  include: {
+                    translations: true
+                  }
+                }
+              }
+            })
+          ]);
+
+          sourceCountriesBefore = sortUniqueValues(existingSourceCountryLinks.map((link) => link.country.name));
+          sourceCountriesAfter = [...sourceCountriesBefore];
+          specialtiesBefore = sortUniqueValues(
+            existingSpecialtyLinks.map((link) => link.specialty.translations[0]?.name || 'Unknown')
+          );
+          specialtiesAfter = [...specialtiesBefore];
 
           const updateData: any = {};
           const setIfChanged = (
             key: keyof typeof existingRoaster,
+            label: string,
             value: any,
             normalize?: (input: any) => any
           ) => {
@@ -523,29 +657,32 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
 
             if (currentComparable !== valueComparable) {
               updateData[key] = value;
+              addFieldChange(label, current, value);
             }
           };
 
-          setIfChanged('description', importedDescription);
-          setIfChanged('website', importedWebsite, normalizeUrl);
-          setIfChanged('email', importedEmail, (value) => typeof value === 'string' ? value.trim().toLowerCase() : value);
-          setIfChanged('phone', importedPhone, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('founded', founded ?? null);
-          setIfChanged('closedYear', closedYear ?? null);
-          setIfChanged('address', importedAddress, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('city', importedCity, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('state', importedState, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('zipCode', importedZipCode, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('country', roasterCountry, (value) => typeof value === 'string' ? normalizeCountryName(value).toLowerCase() : value);
+          setIfChanged('description', 'Description', importedDescription);
+          setIfChanged('website', 'Web URL', importedWebsite, normalizeUrl);
+          setIfChanged('email', 'Email', importedEmail, (value) => typeof value === 'string' ? value.trim().toLowerCase() : value);
+          setIfChanged('phone', 'Phone', importedPhone, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('founded', 'Founded', founded ?? null);
+          setIfChanged('closedYear', 'Closed Year', closedYear ?? null);
+          setIfChanged('address', 'Address', importedAddress, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('city', 'City', importedCity, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('state', 'Province/State', importedState, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('zipCode', 'Postal Code', importedZipCode, (value) => typeof value === 'string' ? value.trim() : value);
+          setIfChanged('country', 'Country', roasterCountry, (value) => typeof value === 'string' ? normalizeCountryName(value).toLowerCase() : value);
 
-          if (closedYear !== undefined && existingRoaster.deprecated !== true) {
-            updateData.deprecated = true;
+          if (effectiveDeprecated !== undefined && existingRoaster.deprecated !== effectiveDeprecated) {
+            updateData.deprecated = effectiveDeprecated;
+            addFieldChange('Deprecated', existingRoaster.deprecated, effectiveDeprecated);
           }
 
           const existingNameNormalized = existingRoaster.name.trim().toLowerCase();
           const importedNameNormalized = roasterName.toLowerCase();
           if (existingNameNormalized !== importedNameNormalized) {
             updateData.name = roasterName;
+            addFieldChange('Roaster Name', existingRoaster.name, roasterName);
           }
 
           const existingSocial = (existingRoaster.socialNetworks as any) || {};
@@ -557,6 +694,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
             if (normalizedExistingValue !== normalizeUrl(value)) {
               mergedSocial[key] = value;
               socialChanged = true;
+              addFieldChange(SOCIAL_NETWORK_FIELD_LABELS[key] || key, existingValue, value);
             }
           }
           if (socialChanged) {
@@ -573,7 +711,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
 
             if (matchedBySecondaryVariantName && updateData.name) {
               results.warnings.push(
-                `Row ${i + 1}: Name updated from "${existingRoaster.name}" to "${roasterName}" via ${matchSourceLabel} variant match (slug unchanged)`
+                `Row ${rowNumber}: Name updated from "${existingRoaster.name}" to "${roasterName}" via ${matchSourceLabel} variant match (slug unchanged)`
               );
             }
           }
@@ -599,7 +737,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
               country: roasterCountry,
               onlineOnly: onlineOnlyValue !== null ? onlineOnlyValue : false,
               verified: false, // Always set to unverified for imports
-              deprecated: closedYear !== undefined,
+              deprecated: effectiveDeprecated ?? false,
               showHours: false, // Default to false for imports
               socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : null,
               createdById: req.userId,
@@ -616,7 +754,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
           const countryName = normalizeCountryName(rawCountryName);
           const countryId = await findOriginCountryIdByName(countryName);
           if (!countryId) {
-            results.errors.push(`Row ${i + 1}: Unknown source country "${countryName}"`);
+            results.errors.push(`Row ${rowNumber}: Unknown source country "${countryName}"`);
             continue;
           }
 
@@ -638,10 +776,15 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
                 }
               });
               didUpdate = true;
+              sourceCountriesAfter = sortUniqueValues([...sourceCountriesAfter, countryName]);
             }
           } catch (countryError) {
             console.error(`Error adding source country "${countryName}" for roaster "${roasterName}":`, countryError);
           }
+        }
+
+        if (existingRoaster && !areStringListsEqual(sourceCountriesBefore, sourceCountriesAfter)) {
+          addFieldChange('Source Countries', sourceCountriesBefore, sourceCountriesAfter);
         }
 
         // Process specialties
@@ -666,10 +809,15 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
                 }
               });
               didUpdate = true;
+              specialtiesAfter = sortUniqueValues([...specialtiesAfter, specialtyName]);
             }
           } catch (specialtyError) {
             console.error(`Error adding specialty "${specialtyName}" for roaster "${roasterName}":`, specialtyError);
           }
+        }
+
+        if (existingRoaster && !areStringListsEqual(specialtiesBefore, specialtiesAfter)) {
+          addFieldChange('Specialties', specialtiesBefore, specialtiesAfter);
         }
 
         // Process roaster person if data is provided
@@ -712,28 +860,32 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
 
             if (existingPerson) {
               const personUpdate: any = {};
-              const setPersonIfMissing = (key: keyof typeof existingPerson, value: any) => {
+              const setPersonIfMissing = (key: keyof typeof existingPerson, label: string, value: any) => {
                 const current = existingPerson?.[key] as any;
                 if ((current === null || current === '') && value !== null && value !== undefined && value !== '') {
                   personUpdate[key] = value;
+                  addFieldChange(label, current, value);
                 }
               };
 
-              setPersonIfMissing('lastName', personLastName);
-              setPersonIfMissing('title', personTitle);
-              setPersonIfMissing('mobile', personMobile);
-              setPersonIfMissing('linkedinUrl', personLinkedIn);
-              setPersonIfMissing('instagramUrl', personInstagram);
-              setPersonIfMissing('bio', personBio);
+              setPersonIfMissing('lastName', 'Contact Last Name', personLastName);
+              setPersonIfMissing('title', 'Contact Title', personTitle);
+              setPersonIfMissing('mobile', 'Contact Mobile', personMobile);
+              setPersonIfMissing('linkedinUrl', 'Contact LinkedIn URL', personLinkedIn);
+              setPersonIfMissing('instagramUrl', 'Contact Instagram URL', personInstagram);
+              setPersonIfMissing('bio', 'Contact Bio', personBio);
               if (!existingPerson.email && personEmail) {
                 personUpdate.email = personEmail;
+                addFieldChange('Contact Email', existingPerson.email, personEmail);
               }
 
               if (personRoles.length > 0 && (!existingPerson.roles || existingPerson.roles.length === 0)) {
                 personUpdate.roles = personRoles;
+                addFieldChange('Contact Roles', existingPerson.roles || [], personRoles);
               }
               if (isPrimary && !existingPerson.isPrimary) {
                 personUpdate.isPrimary = true;
+                addFieldChange('Primary Contact', existingPerson.isPrimary, true);
               }
 
               if (Object.keys(personUpdate).length > 0) {
@@ -764,11 +916,16 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
                 }
               });
               didUpdate = true;
+              addFieldChange(
+                'Contact Person',
+                '',
+                [personFirstName, personLastName].filter(Boolean).join(' ').trim()
+              );
             }
           } catch (personError: any) {
             // Log but don't fail the import if person creation fails
             console.error(`Error adding person for roaster "${roasterName}":`, personError);
-            results.errors.push(`Row ${i + 1}: Person data failed: ${personError.message}`);
+            results.errors.push(`Row ${rowNumber}: Person data failed: ${personError.message}`);
           }
         }
 
@@ -792,18 +949,27 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         if (existingRoaster) {
           if (didUpdate) {
             results.updated++;
-            results.warnings.push(`Row ${i + 1}: Roaster "${roasterName}" already exists, updated.`);
+            results.updatedItems.push({
+              row: rowNumber,
+              id: roasterId,
+              name: roasterName,
+              changes: rowChanges
+            });
           } else {
-            results.skipped++;
-            results.errors.push(`Row ${i + 1}: Roaster "${roasterName}" already exists, no changes.`);
+            addSkippedRow(rowNumber, roasterName, 'Roaster exists, no changes.', roasterId);
           }
         } else {
           results.created++;
+          results.createdItems.push({
+            row: rowNumber,
+            id: roasterId,
+            name: roasterName
+          });
         }
 
       } catch (rowError: any) {
-        console.error(`Error processing row ${i + 1}:`, rowError);
-        results.errors.push(`Row ${i + 1}: ${rowError.message}`);
+        console.error(`Error processing row ${rowNumber}:`, rowError);
+        results.errors.push(`Row ${rowNumber}: ${rowError.message}`);
       }
     }
 
