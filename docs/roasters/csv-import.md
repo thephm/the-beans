@@ -21,6 +21,7 @@ The CSV import feature allows administrators to bulk import roasters from a CSV 
 - **Phone**: Contact phone number
   - Also accepts `Phone Number`
 - **Founded**: Year founded (numeric, e.g., 2010)
+- **Closed Year**: Year the roaster closed (numeric, e.g., 2024)
 - **Online Only**: Yes, No, or blank (defaults to No)
 
 ### Address Information
@@ -69,13 +70,40 @@ If provided, a person will be created and associated with the roaster:
 - **showHours**: Set to `false` by default
 - **createdAt**: Set to current timestamp
 - **createdById**: Set to the admin user performing the import
+- **deprecated**: Automatically set to `true` when **Closed Year** is provided
 
 ### Duplicate Handling
 - If a matched roaster is **verified**, it will be skipped
 - Exact name matches prefer a matching **Web URL** or **Instagram URL** when those values are provided
 - If **Web URL** and **Instagram URL** are both missing, the importer falls back to exact **Roaster Name + Country** matching
-- URL matches can also update close name variants such as `Company`, `Company Coffee`, or `Company Roasters`
+- URL matches can also update close name variants such as `Company`, `Company Coffee`, `Company Roasters`, `Company Torréfacteur`, or `Company Brûlerie`
+- Name variant matching is comparison-only and does not change the stored display name unless the row is applied as an update
+- For comparison, roaster names are normalized by:
+  - lowercasing
+  - removing accents/diacritics (for example, `Torréfacteur` -> `torrefacteur`)
+  - removing punctuation
+  - collapsing repeated spaces
+  - ignoring trailing generic suffixes while preserving the core brand root
+- Ignored trailing suffixes currently include:
+  - `coffee`
+  - `co`
+  - `roaster`
+  - `roasters`
+  - `roastery`
+  - `roasting`
+  - `cafe`
+  - `cafes`
+  - `torrefacteur`
+  - `torrefacteurs`
+  - `torrefaction`
+  - `brulerie`
+  - `bruleries`
+  - `inc`
+  - `llc`
+  - `ltd`
+- Trailing numbers are also ignored for comparison, so variants such as `Company 2` can match `Company`
 - When a matched row contains different non-empty values, the roaster is updated
+- **Closed Year** is imported when present and marks the roaster as deprecated
 - Blank CSV cells do **not** clear existing roaster values; empty import values are ignored
 - Slugs are not changed when an existing roaster name is updated by import
 - The import summary shows created, updated, skipped, warnings, and errors for each run
