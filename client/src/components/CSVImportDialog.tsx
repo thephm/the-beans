@@ -1,7 +1,8 @@
 "use client";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Link from 'next/link';
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { apiClient } from '@/lib/api';
 
 interface CSVImportDialogProps {
   isOpen: boolean;
@@ -9,11 +10,168 @@ interface CSVImportDialogProps {
   onSuccess: () => void;
 }
 
+interface CSVImportFieldChange {
+  field: string;
+  from: string;
+  to: string;
+}
+
+interface CSVImportCreatedItem {
+  row: number;
+  id: string;
+  name: string;
+}
+
+interface CSVImportUpdatedItem {
+  row: number;
+  id: string;
+  name: string;
+  changes: CSVImportFieldChange[];
+}
+
+interface CSVImportSkippedItem {
+  row: number;
+  id?: string;
+  name: string;
+  reason: string;
+}
+
+interface CSVImportResults {
+  total: number;
+  created: number;
+  updated?: number;
+  skipped: number;
+  createdItems?: CSVImportCreatedItem[];
+  updatedItems?: CSVImportUpdatedItem[];
+  skippedItems?: CSVImportSkippedItem[];
+  warnings?: string[];
+  errors?: string[];
+}
+
+const escapeMarkdownText = (value: string) => value.replace(/[[\]\\]/g, '\\$&');
+
+const escapeHtmlText = (value: string) => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+const buildEditPath = (id: string) => `/admin/roasters/edit/${id}`;
+
+const buildMarkdownRoasterLink = (name: string, id: string) => `[${escapeMarkdownText(name)}](${buildEditPath(id)})`;
+
+const formatQuotedValue = (value: string) => `"${value}"`;
+
+const formatChangeText = (change: CSVImportFieldChange) => {
+  return `changed ${change.field} from ${formatQuotedValue(change.from)} to ${formatQuotedValue(change.to)}`;
+};
+
+const parseImportMessage = (message: string) => {
+  const roasterMatch = message.match(/^Row (\d+): Roaster "([^"]+)" (.+)$/);
+  if (roasterMatch) {
+    return {
+      row: Number(roasterMatch[1]),
+      roasterName: roasterMatch[2],
+      detail: roasterMatch[3],
+    };
+  }
+
+  const rowMatch = message.match(/^Row (\d+): (.+)$/);
+  if (rowMatch) {
+    return {
+      row: Number(rowMatch[1]),
+      roasterName: null,
+      detail: rowMatch[2],
+    };
+  }
+
+  return {
+    row: null,
+    roasterName: null,
+    detail: message,
+  };
+};
+
+const buildResultsHtml = (results: CSVImportResults, appOrigin: string) => {
+  const createdItems = results.createdItems || [];
+  const updatedItems = results.updatedItems || [];
+  const skippedItems = results.skippedItems || [];
+  const messages = [...(results.errors || []), ...(results.warnings || [])];
+
+  const renderSection = (title: string, body: string, background: string, text: string) => {
+    if (!body) {
+      return '';
+    }
+
+    return `<section style="margin-top:16px;padding:12px 14px;border-radius:10px;background:${background};color:${text};"><h2 style="margin:0 0 8px 0;font-size:16px;">${title}</h2><ul style="margin:0;padding-left:20px;">${body}</ul></section>`;
+  };
+
+  const buildAbsoluteEditPath = (id: string) => `${appOrigin}${buildEditPath(id)}`;
+
+  const createdHtml = createdItems.map((item) => {
+    return `<li style="margin:4px 0;"><a href="${buildAbsoluteEditPath(item.id)}" target="_blank" rel="noopener noreferrer" style="font-weight:600;color:#1d4ed8;text-decoration:none;">${escapeHtmlText(item.name)}</a> <span style="color:#6b7280;">(row ${item.row})</span></li>`;
+  }).join('');
+
+  const updatedHtml = updatedItems.map((item) => {
+    const changeSummary = item.changes.map(formatChangeText).map(escapeHtmlText).join('; ');
+    return `<li style="margin:4px 0;"><a href="${buildAbsoluteEditPath(item.id)}" target="_blank" rel="noopener noreferrer" style="font-weight:600;color:#047857;text-decoration:none;">${escapeHtmlText(item.name)}</a> <span style="color:#047857;">(row ${item.row})</span>: ${changeSummary}</li>`;
+  }).join('');
+
+  const skippedHtml = skippedItems.map((item) => {
+    const roasterName = item.id
+      ? `<a href="${buildAbsoluteEditPath(item.id)}" target="_blank" rel="noopener noreferrer" style="font-weight:600;color:#0369a1;text-decoration:none;">${escapeHtmlText(item.name)}</a>`
+      : `<span style="font-weight:600;">${escapeHtmlText(item.name)}</span>`;
+
+    return `<li style="margin:4px 0;">${roasterName} <span style="color:#0369a1;">(row ${item.row})</span>: ${escapeHtmlText(item.reason)}</li>`;
+  }).join('');
+
+  const messagesHtml = messages.map((message) => {
+    const parsedMessage = parseImportMessage(message);
+
+    if (parsedMessage.roasterName && parsedMessage.row !== null) {
+      return `<li style="margin:4px 0;"><span style="font-weight:600;">${escapeHtmlText(parsedMessage.roasterName)}</span> <span style="color:#a16207;">(row ${parsedMessage.row})</span>: ${escapeHtmlText(parsedMessage.detail)}</li>`;
+    }
+
+    if (parsedMessage.row !== null) {
+      return `<li style="margin:4px 0;"><span style="color:#a16207;">(row ${parsedMessage.row})</span>: ${escapeHtmlText(parsedMessage.detail)}</li>`;
+    }
+
+    return `<li style="margin:4px 0;">${escapeHtmlText(parsedMessage.detail)}</li>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Import Results</title>
+  </head>
+  <body style="margin:0;padding:24px;background:#f8fafc;color:#111827;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+    <main style="max-width:960px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(15,23,42,0.08);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+        <div>
+          <h1 style="margin:0 0 12px 0;font-size:28px;">Import Results</h1>
+          <p style="margin:0 0 6px 0;">Total Rows: ${results.total}</p>
+          <p style="margin:0 0 6px 0;">Successfully Created: ${results.created}</p>
+          ${typeof results.updated === 'number' ? `<p style="margin:0 0 6px 0;">Updated (unverified): ${results.updated}</p>` : ''}
+          <p style="margin:0;">Skipped: ${results.skipped}</p>
+        </div>
+      </div>
+      ${renderSection('Created', createdHtml, '#ffffff', '#111827')}
+      ${renderSection('Updated', updatedHtml, '#ecfdf5', '#065f46')}
+      ${renderSection('Skipped', skippedHtml, '#f0f9ff', '#0c4a6e')}
+      ${renderSection('Errors/Warnings', messagesHtml, '#fefce8', '#713f12')}
+    </main>
+  </body>
+</html>`;
+};
+
 const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSuccess }) => {
   const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<CSVImportResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,7 +223,7 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
 
       setResults(data.results);
       
-      if (data.results.created > 0) {
+      if (data.results.created > 0 || data.results.updated > 0) {
         setTimeout(() => {
           onSuccess();
         }, 2000);
@@ -91,9 +249,14 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
   const buildResultsText = () => {
     if (!results) return '';
     const lines = [
+      'Import Results',
       `Total Rows: ${results.total}`,
       `Successfully Created: ${results.created}`,
     ];
+
+    const createdItems = results.createdItems || [];
+    const updatedItems = results.updatedItems || [];
+    const skippedItems = results.skippedItems || [];
 
     if (typeof results.updated === 'number') {
       lines.push(`Updated (unverified): ${results.updated}`);
@@ -101,9 +264,39 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
 
     lines.push(`Skipped: ${results.skipped}`);
 
+    if (createdItems.length > 0) {
+      lines.push('', 'Created:');
+      createdItems.forEach((item) => {
+        lines.push(`- ${buildMarkdownRoasterLink(item.name, item.id)} (row ${item.row})`);
+      });
+    }
+
+    if (updatedItems.length > 0) {
+      lines.push('', 'Updated:');
+      updatedItems.forEach((item) => {
+        const changeSummary = item.changes.map(formatChangeText).join('; ');
+        lines.push(`- ${buildMarkdownRoasterLink(item.name, item.id)} (row ${item.row}): ${changeSummary}`);
+      });
+    }
+
+    if (skippedItems.length > 0) {
+      lines.push('', 'Skipped:');
+      skippedItems.forEach((item) => {
+        const label = item.id ? buildMarkdownRoasterLink(item.name, item.id) : item.name;
+        lines.push(`- ${label} (row ${item.row}): ${item.reason}`);
+      });
+    }
+
     if (results.errors && results.errors.length > 0) {
-      lines.push('Errors/Warnings:');
+      lines.push('', 'Errors/Warnings:');
       results.errors.forEach((err: string) => lines.push(`- ${err}`));
+    }
+
+    if (results.warnings && results.warnings.length > 0) {
+      if (!results.errors || results.errors.length === 0) {
+        lines.push('', 'Errors/Warnings:');
+      }
+      results.warnings.forEach((warning: string) => lines.push(`- ${warning}`));
     }
 
     return lines.join('\n');
@@ -120,7 +313,31 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
     }
   };
 
+  const handleOpenResultsInNewTab = () => {
+    if (!results) return;
+
+    const html = buildResultsHtml(results, window.location.origin);
+    const blob = new Blob([html], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+    const newWindow = window.open(blobUrl, '_blank');
+
+    if (!newWindow) {
+      URL.revokeObjectURL(blobUrl);
+      setError('Failed to open results in a new tab');
+      return;
+    }
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 60000);
+  };
+
   if (!isOpen) return null;
+
+  const createdItems = results?.createdItems || [];
+  const updatedItems = results?.updatedItems || [];
+  const skippedItems = results?.skippedItems || [];
+  const messages = [...(results?.errors || []), ...(results?.warnings || [])];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -176,11 +393,6 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
                 cursor-pointer"
               disabled={importing}
             />
-            {file && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Selected: {file.name} ({(file.size / 1024).toFixed(2)} KB)
-              </p>
-            )}
           </div>
 
           {/* Error Message */}
@@ -197,6 +409,15 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                   {t('admin.roasters.importResults', 'Import Results')}
                 </h3>
+                <button
+                  type="button"
+                  onClick={handleOpenResultsInNewTab}
+                  className="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+                  title="Open results in new tab"
+                >
+                  <OpenInNewIcon sx={{ fontSize: 16 }} />
+                  <span>Open</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleCopyResults}
@@ -217,13 +438,107 @@ const CSVImportDialog: React.FC<CSVImportDialogProps> = ({ isOpen, onClose, onSu
                   <p>Updated (unverified): {results.updated}</p>
                 )}
                 <p>Skipped: {results.skipped}</p>
-                
-                {results.errors && results.errors.length > 0 && (
+
+                {createdItems.length > 0 && (
+                  <div className="mt-3 p-3 rounded bg-lime-50 dark:bg-lime-900/20 text-lime-900 dark:text-lime-100">
+                    <p className="font-semibold mb-1">Created:</p>
+                    <ul className="list-disc list-inside ml-2 max-h-40 overflow-y-auto space-y-0.5 text-xs">
+                      {createdItems.map((item) => (
+                        <li key={`created-${item.row}-${item.id}`}>
+                          <Link
+                            href={buildEditPath(item.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-lime-700 hover:text-lime-800 hover:underline dark:text-lime-200 dark:hover:text-lime-50"
+                          >
+                            {item.name}
+                          </Link>{' '}
+                          <span className="text-lime-700 dark:text-lime-200">(row {item.row})</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {updatedItems.length > 0 && (
+                  <div className="mt-3 p-3 rounded bg-emerald-50 dark:bg-emerald-900/20 text-emerald-900 dark:text-emerald-100">
+                    <p className="font-semibold mb-1">Updated:</p>
+                    <ul className="list-disc list-inside ml-2 max-h-40 overflow-y-auto space-y-0.5 text-xs">
+                      {updatedItems.map((item) => (
+                        <li key={`updated-${item.row}-${item.id}`}>
+                          <Link
+                            href={buildEditPath(item.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-emerald-700 hover:text-emerald-800 hover:underline dark:text-emerald-200 dark:hover:text-emerald-50"
+                          >
+                            {item.name}
+                          </Link>{' '}
+                          <span className="text-emerald-700 dark:text-emerald-200">(row {item.row})</span>
+                          <span>: {item.changes.map(formatChangeText).join('; ')}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {skippedItems.length > 0 && (
+                  <div className="mt-3 p-3 rounded bg-sky-50 dark:bg-sky-900/20 text-sky-900 dark:text-sky-100">
+                    <p className="font-semibold mb-1">Skipped:</p>
+                    <ul className="list-disc list-inside ml-2 max-h-40 overflow-y-auto space-y-0.5 text-xs">
+                      {skippedItems.map((item, idx) => (
+                        <li key={`skipped-${item.row}-${idx}`}>
+                          {item.id ? (
+                            <Link
+                              href={buildEditPath(item.id)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-sky-700 hover:text-sky-800 hover:underline dark:text-sky-200 dark:hover:text-sky-50"
+                            >
+                              {item.name}
+                            </Link>
+                          ) : (
+                            <span className="font-medium">{item.name}</span>
+                          )}{' '}
+                          <span className="text-sky-700 dark:text-sky-200">(row {item.row})</span>
+                          <span>: {item.reason}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {messages.length > 0 && (
                   <div className="mt-3 p-3 rounded bg-yellow-50 dark:bg-yellow-900/20 text-yellow-900 dark:text-yellow-100">
                     <p className="font-semibold mb-1">Errors/Warnings:</p>
                     <ul className="list-disc list-inside ml-2 max-h-40 overflow-y-auto space-y-0.5 text-xs">
-                      {results.errors.map((err: string, idx: number) => (
-                        <li key={idx}>{err}</li>
+                      {messages.map((err: string, idx: number) => (
+                        <li key={idx}>
+                          {(() => {
+                            const parsedMessage = parseImportMessage(err);
+
+                            if (parsedMessage.roasterName && parsedMessage.row !== null) {
+                              return (
+                                <>
+                                  <span className="font-medium">{parsedMessage.roasterName}</span>{' '}
+                                  <span className="text-yellow-700 dark:text-yellow-200">(row {parsedMessage.row})</span>
+                                  <span>: {parsedMessage.detail}</span>
+                                </>
+                              );
+                            }
+
+                            if (parsedMessage.row !== null) {
+                              return (
+                                <>
+                                  <span className="text-yellow-700 dark:text-yellow-200">(row {parsedMessage.row})</span>
+                                  <span>: {parsedMessage.detail}</span>
+                                </>
+                              );
+                            }
+
+                            return <span>{parsedMessage.detail}</span>;
+                          })()}
+                        </li>
                       ))}
                     </ul>
                   </div>

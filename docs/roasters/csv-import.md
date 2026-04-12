@@ -22,7 +22,10 @@ The CSV import feature allows administrators to bulk import roasters from a CSV 
   - Also accepts `Phone Number`
 - **Founded**: Year founded (numeric, e.g., 2010)
 - **Closed Year**: Year the roaster closed (numeric, e.g., 2024)
+  - Also accepts `Closed`
 - **Online Only**: Yes, No, or blank (defaults to No)
+- **Deprecated**: Yes, No, or blank
+  - If **Closed Year** is provided, the roaster is always imported as deprecated
 
 ### Address Information
 - **Address**: Street address
@@ -70,7 +73,7 @@ If provided, a person will be created and associated with the roaster:
 - **showHours**: Set to `false` by default
 - **createdAt**: Set to current timestamp
 - **createdById**: Set to the admin user performing the import
-- **deprecated**: Automatically set to `true` when **Closed Year** is provided
+- **deprecated**: Defaults to `false` unless **Deprecated** is `Yes` or **Closed Year** is provided
 
 ### Duplicate Handling
 - If a matched roaster is **verified**, it will be skipped
@@ -104,6 +107,7 @@ If provided, a person will be created and associated with the roaster:
 - Trailing numbers are also ignored for comparison, so variants such as `Company 2` can match `Company`
 - When a matched row contains different non-empty values, the roaster is updated
 - **Closed Year** is imported when present and marks the roaster as deprecated
+- **Deprecated** can explicitly set deprecation on import, but **Closed Year** takes precedence when both are present
 - Blank CSV cells do **not** clear existing roaster values; empty import values are ignored
 - Slugs are not changed when an existing roaster name is updated by import
 - The import summary shows created, updated, skipped, warnings, and errors for each run
@@ -138,11 +142,41 @@ Body: file={csv_file}
     "created": 8,
     "updated": 1,
     "skipped": 2,
-    "warnings": [
-      "Row 2: Roaster \"Counterpart Coffee\" already exists, updated."
+    "createdItems": [
+      {
+        "row": 1,
+        "id": "cm123",
+        "name": "New Roaster"
+      }
     ],
+    "updatedItems": [
+      {
+        "row": 2,
+        "id": "cm456",
+        "name": "Counterpart Coffee",
+        "changes": [
+          {
+            "field": "Web URL",
+            "from": "https://old.example.com",
+            "to": "https://new.example.com"
+          },
+          {
+            "field": "City",
+            "from": "Montreal",
+            "to": "Toronto"
+          }
+        ]
+      }
+    ],
+    "skippedItems": [
+      {
+        "row": 3,
+        "name": "Duplicate Name",
+        "reason": "Roaster exists, no changes."
+      }
+    ],
+    "warnings": [],
     "errors": [
-      "Row 3: Roaster 'Duplicate Name' already exists, no changes.",
       "Row 7: Missing roaster name"
     ]
   }
