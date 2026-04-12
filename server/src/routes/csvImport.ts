@@ -246,21 +246,6 @@ const normalizeCountryName = (name: string): string => {
   return aliases[normalized] || trimmed;
 };
 
-// Helper function to resolve country by name (no auto-create)
-const findCountryIdByName = async (name: string): Promise<string | null> => {
-  const normalizedName = normalizeCountryName(name);
-  const existingCountry = await prisma.country.findFirst({
-    where: {
-      name: {
-        equals: normalizedName,
-        mode: 'insensitive'
-      }
-    }
-  });
-
-  return existingCountry ? existingCountry.id : null;
-};
-
 // Helper function to resolve origin country by name (no auto-create)
 const findOriginCountryIdByName = async (name: string): Promise<string | null> => {
   const normalizedName = normalizeCountryName(name);
@@ -588,11 +573,6 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         const onlineOnlyValue = parseYesNo(row['Online Only']);
 
         const roasterCountry = normalizeCountryName(row['Country']);
-        const roasterCountryId = await findCountryIdByName(roasterCountry);
-        if (!roasterCountryId) {
-          addSkippedRow(rowNumber, roasterName, `Unknown country "${roasterCountry}"`);
-          continue;
-        }
 
         let roasterId: string;
         let didUpdate = false;
