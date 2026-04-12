@@ -62,6 +62,17 @@ const parseYesNo = (value: string | undefined): boolean | null => {
   return null;
 };
 
+const parseOptionalYear = (value: string | null): number | undefined => {
+  if (!value) return undefined;
+
+  const parsed = parseInt(value, 10);
+  if (isNaN(parsed) || parsed < 1800 || parsed > 2100) {
+    return undefined;
+  }
+
+  return parsed;
+};
+
 const getRowValue = (row: Record<string, any>, ...keys: string[]): string | null => {
   for (const key of keys) {
     const value = row[key];
@@ -71,6 +82,37 @@ const getRowValue = (row: Record<string, any>, ...keys: string[]): string | null
   }
 
   return null;
+};
+
+const getCsvParseErrorMessage = (parseError: unknown): string => {
+  if (!(parseError instanceof Error)) {
+    return 'Invalid CSV format';
+  }
+
+  const errorWithContext = parseError as Error & {
+    code?: string;
+    lines?: number;
+    records?: number;
+    column?: string | number;
+  };
+
+  const details: string[] = [];
+
+  if (typeof errorWithContext.lines === 'number') {
+    details.push(`line ${errorWithContext.lines}`);
+  }
+
+  if (typeof errorWithContext.records === 'number') {
+    details.push(`record ${errorWithContext.records + 1}`);
+  }
+
+  if (typeof errorWithContext.column === 'string' || typeof errorWithContext.column === 'number') {
+    details.push(`column ${errorWithContext.column}`);
+  }
+
+  const locationSuffix = details.length > 0 ? ` (${details.join(', ')})` : '';
+
+  return `Invalid CSV format: ${parseError.message}${locationSuffix}`;
 };
 
 // Helper function to get or create specialty by name
@@ -201,6 +243,8 @@ const hasSecondaryIdentifierMatch = (
 
 const normalizeNameTokens = (value: string): string[] => {
   const cleaned = value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -210,12 +254,19 @@ const normalizeNameTokens = (value: string): string[] => {
 
   const tokens = cleaned.split(' ');
   const removableSuffixes = new Set([
+    'cafe',
+    'cafes',
     'coffee',
     'co',
     'roaster',
     'roasters',
     'roastery',
     'roasting',
+    'torrefacteur',
+    'torrefacteurs',
+    'torrefaction',
+    'brulerie',
+    'bruleries',
     'inc',
     'llc',
     'ltd'
@@ -306,7 +357,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
       });
     } catch (parseError) {
       console.error('CSV parse error:', parseError);
-      return res.status(400).json({ error: 'Invalid CSV format' });
+      return res.status(400).json({ error: getCsvParseErrorMessage(parseError) });
     }
 
     const results = {
@@ -431,15 +482,9 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         if (getRowValue(row, 'X URL')) socialNetworks.x = getRowValue(row, 'X URL');
         if (getRowValue(row, 'Reddit URL')) socialNetworks.reddit = getRowValue(row, 'Reddit URL');
 
-        // Parse founded year
-        let founded: number | undefined;
-        const foundedValue = getRowValue(row, 'Founded');
-        if (foundedValue) {
-          founded = parseInt(foundedValue, 10);
-          if (isNaN(founded)) {
-            founded = undefined;
-          }
-        }
+        // Parse founded/closed years
+        const founded = parseOptionalYear(getRowValue(row, 'Founded'));
+        const closedYear = parseOptionalYear(getRowValue(row, 'Closed Year', 'Closed year'));
 
         // Parse online only
         const onlineOnlyValue = parseYesNo(row['Online Only']);
@@ -486,11 +531,16 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
           setIfChanged('email', importedEmail, (value) => typeof value === 'string' ? value.trim().toLowerCase() : value);
           setIfChanged('phone', importedPhone, (value) => typeof value === 'string' ? value.trim() : value);
           setIfChanged('founded', founded ?? null);
+          setIfChanged('closedYear', closedYear ?? null);
           setIfChanged('address', importedAddress, (value) => typeof value === 'string' ? value.trim() : value);
           setIfChanged('city', importedCity, (value) => typeof value === 'string' ? value.trim() : value);
           setIfChanged('state', importedState, (value) => typeof value === 'string' ? value.trim() : value);
           setIfChanged('zipCode', importedZipCode, (value) => typeof value === 'string' ? value.trim() : value);
           setIfChanged('country', roasterCountry, (value) => typeof value === 'string' ? normalizeCountryName(value).toLowerCase() : value);
+
+          if (closedYear !== undefined && existingRoaster.deprecated !== true) {
+            updateData.deprecated = true;
+          }
 
           const existingNameNormalized = existingRoaster.name.trim().toLowerCase();
           const importedNameNormalized = roasterName.toLowerCase();
@@ -541,6 +591,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
               email: importedEmail,
               phone: importedPhone,
               founded: founded,
+              closedYear: closedYear,
               address: importedAddress,
               city: importedCity,
               state: importedState,
@@ -548,6 +599,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
               country: roasterCountry,
               onlineOnly: onlineOnlyValue !== null ? onlineOnlyValue : false,
               verified: false, // Always set to unverified for imports
+              deprecated: closedYear !== undefined,
               showHours: false, // Default to false for imports
               socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : null,
               createdById: req.userId,
