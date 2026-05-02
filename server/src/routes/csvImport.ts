@@ -188,11 +188,11 @@ const formatSkippedName = (name?: string | null): string => {
 };
 
 // Helper function to get or create specialty by name
-const getOrCreateSpecialty = async (name: string, language: string = 'en'): Promise<string> => {
-  // Try to find existing specialty with this translation
+const findExistingSpecialty = async (name: string, language: string = 'en'): Promise<string | null> => {
+  // Only find existing specialties — never create new ones from import data
   const existingTranslation = await prisma.specialtyTranslation.findFirst({
     where: {
-      name: name,
+      name: { equals: name, mode: 'insensitive' },
       language: language
     },
     include: {
@@ -200,23 +200,7 @@ const getOrCreateSpecialty = async (name: string, language: string = 'en'): Prom
     }
   });
 
-  if (existingTranslation) {
-    return existingTranslation.specialtyId;
-  }
-
-  // Create new specialty with translation
-  const specialty = await prisma.specialty.create({
-    data: {
-      translations: {
-        create: {
-          language: language,
-          name: name
-        }
-      }
-    }
-  });
-
-  return specialty.id;
+  return existingTranslation ? existingTranslation.specialtyId : null;
 };
 
 // Normalize common country name variants to canonical names.
@@ -771,7 +755,13 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         const specialties = parseSemicolonList(row['Specialties']);
         for (const specialtyName of specialties) {
           try {
-            const specialtyId = await getOrCreateSpecialty(specialtyName);
+            const specialtyId = await findExistingSpecialty(specialtyName);
+            if (specialtyId === null) {
+              results.warnings.push(
+                `Row ${rowNumber}: Unknown specialty "${specialtyName}" for roaster "${roasterName}" — skipped. Only existing specialties can be assigned via import.`
+              );
+              continue;
+            }
             const existingSpecialty = await prisma.roasterSpecialty.findUnique({
               where: {
                 roasterId_specialtyId: {
