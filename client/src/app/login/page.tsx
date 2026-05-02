@@ -23,7 +23,7 @@ export default function LoginPage() {
 
   // Check for error parameter on mount
   useEffect(() => {
-    const errorParam = searchParams.get('error')
+    const errorParam = searchParams?.get('error')
     if (errorParam === 'session_expired') {
       setError(t('auth.sessionExpired', 'Your session has expired. Please login again.'))
     }
@@ -40,7 +40,7 @@ export default function LoginPage() {
       trackAnalytics('login', { email: formData.email })
       
       // Check for redirect parameter
-      const redirect = searchParams.get('redirect')
+      const redirect = searchParams?.get('redirect')
       if (redirect) {
         router.push(redirect)
       } else {
