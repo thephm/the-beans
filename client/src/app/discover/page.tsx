@@ -49,9 +49,9 @@ export default function DiscoverPage() {
   // Initialize filters from URL parameters
   useEffect(() => {
     if (!searchParams) return;
-    const urlSearch = searchParams.get('search') || '';
-    const urlLocation = searchParams.get('location') || '';
-    const urlSpecialty = searchParams.get('specialty') || '';
+    const urlSearch = searchParams?.get('search') || '';
+    const urlLocation = searchParams?.get('location') || '';
+    const urlSpecialty = searchParams?.get('specialty') || '';
     
     // If specialty is provided, put it in the search field instead of separate filter
     const searchValue = urlSpecialty || urlSearch;
