@@ -17,7 +17,7 @@ const AdminRoastersPage: React.FC = () => {
   const { t } = useTranslation();
   const { showRatings } = useFeatureFlags();
   const searchParams = useSearchParams();
-  const initialSearch = (searchParams.get('search') || '').trim();
+  const initialSearch = (searchParams?.get('search') || '').trim();
   const [roasters, setRoasters] = useState<Roaster[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,10 +40,10 @@ const AdminRoastersPage: React.FC = () => {
   const [showAllCities, setShowAllCities] = useState<boolean>(false);
   const [hasUserSetFilter, setHasUserSetFilter] = useState<boolean>(false);
   const [showCSVImport, setShowCSVImport] = useState<boolean>(false);
-  const lastAppliedSearchParam = useRef<string | null>(searchParams.get('search'));
+  const lastAppliedSearchParam = useRef<string | null>(searchParams?.get('search') ?? null);
 
   useEffect(() => {
-    const rawSearch = searchParams.get('search');
+    const rawSearch = searchParams?.get('search') ?? null;
     if (rawSearch === lastAppliedSearchParam.current) return;
 
     lastAppliedSearchParam.current = rawSearch;
