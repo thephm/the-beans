@@ -263,7 +263,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   }, [sections]);
 
   useEffect(() => {
-    const urlTab = searchParams.get("tab");
+    const urlTab = searchParams?.get("tab");
     if (urlTab && sectionKeys.has(urlTab) && urlTab !== selected) {
       setSelected(urlTab);
     }
@@ -271,7 +271,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
 
   const handleTabSelect = (sectionKey: string) => {
     setSelected(sectionKey);
-    const nextParams = new URLSearchParams(searchParams.toString());
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? "");
     nextParams.set("tab", sectionKey);
     router.replace(`${pathname}?${nextParams.toString()}`);
   };

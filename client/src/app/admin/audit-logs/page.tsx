@@ -152,14 +152,16 @@ export default function AuditLogsPage() {
   };
 
   const getEntityLink = (log: AuditLog) => {
-    switch (log.entityType) {
+    const entityType = String(log.entityType || '').toLowerCase();
+
+    switch (entityType) {
       case 'roaster':
-        return `/roasters/${log.entityId}`;
+        return `/admin/roasters/edit/${log.entityId}`;
       case 'user':
         return `/admin/users/${log.entityId}/edit`;
       case 'person':
         return `/admin/people/edit/${log.entityId}`;
-      case 'RoasterSuggestion':
+      case 'roastersuggestion':
         return `/admin/suggestions/${log.entityId}`;
       default:
         return '#';
