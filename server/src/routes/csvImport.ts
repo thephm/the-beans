@@ -84,6 +84,59 @@ const getRowValue = (row: Record<string, any>, ...keys: string[]): string | null
   return null;
 };
 
+// Maps lowercase column name variants to canonical names expected by the import logic.
+// This allows CSV files with different casing or minor naming variations to work correctly.
+const COLUMN_NAME_ALIASES: Record<string, string> = {
+  'roaster name': 'Roaster Name',
+  'name': 'Roaster Name',
+  'country': 'Country',
+  'web url': 'Web URL',
+  'website': 'Web URL',
+  'url': 'Web URL',
+  'email': 'Email',
+  'email address': 'Email',
+  'phone': 'Phone',
+  'phone number': 'Phone',
+  'founded': 'Founded',
+  'closed year': 'Closed Year',
+  'closed': 'Closed Year',
+  'address': 'Address',
+  'city': 'City',
+  'province': 'Province',
+  'state': 'State',
+  'postal code': 'Postal Code',
+  'zip code': 'Postal Code',
+  'zip': 'Postal Code',
+  'description': 'Description',
+  'online only': 'Online Only',
+  'deprecated': 'Deprecated',
+  'source countries': 'Source Countries',
+  'specialties': 'Specialties',
+  'instagram url': 'Instagram URL',
+  'tiktok url': 'TikTok URL',
+  'facebook url': 'Facebook URL',
+  'linkedin url': 'LinkedIn URL',
+  'youtube url': 'YouTube URL',
+  'threads url': 'Threads URL',
+  'pinterest url': 'Pinterest URL',
+  'bluesky url': 'BlueSky URL',
+  'x url': 'X URL',
+  'reddit url': 'Reddit URL',
+  'first name': 'First Name',
+  'last name': 'Last Name',
+  'title': 'Title',
+  'role': 'Role',
+  'primary': 'Primary',
+  'contact email': 'Contact Email',
+  'contact mobile': 'Contact Mobile',
+  'bio': 'Bio',
+};
+
+const canonicalizeColumnName = (header: string): string => {
+  const trimmed = header.trim();
+  return COLUMN_NAME_ALIASES[trimmed.toLowerCase()] ?? trimmed;
+};
+
 const getCsvParseErrorMessage = (parseError: unknown): string => {
   if (!(parseError instanceof Error)) {
     return 'Invalid CSV format';
@@ -391,7 +444,7 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
     let records;
     try {
       records = parse(fileContent, {
-        columns: true,
+        columns: (headers: string[]) => headers.map(canonicalizeColumnName),
         skip_empty_lines: true,
         trim: true,
         bom: true // Handle UTF-8 BOM if present
