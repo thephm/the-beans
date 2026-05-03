@@ -144,10 +144,10 @@ export default function AuditLogsPage() {
 
   const getActionColor = (action: string) => {
     switch (action) {
-      case 'CREATE': return 'text-green-600 bg-green-100';
-      case 'UPDATE': return 'text-blue-600 bg-blue-100';
-      case 'DELETE': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'CREATE': return 'text-green-800 bg-green-100 dark:text-green-900 dark:bg-green-300';
+      case 'UPDATE': return 'text-blue-800 bg-blue-100 dark:text-blue-900 dark:bg-blue-300';
+      case 'DELETE': return 'text-red-800 bg-red-100 dark:text-red-900 dark:bg-red-300';
+      default: return 'text-gray-800 bg-gray-100 dark:text-gray-900 dark:bg-gray-300';
     }
   };
 
