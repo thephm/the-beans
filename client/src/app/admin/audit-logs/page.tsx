@@ -649,8 +649,9 @@ export default function AuditLogsPage() {
                   <div className="space-y-4">
                     {Object.entries(selectedLog.changes).map(([field, change]) => {
                       // Check if the field contains long content (like URLs or images)
-                      const oldStr = typeof change.old === 'object' ? JSON.stringify(change.old) : String(change.old || 'null');
-                      const newStr = typeof change.new === 'object' ? JSON.stringify(change.new) : String(change.new || 'null');
+                      const formatVal = (v: any, fallback = 'null') => typeof v === 'object' ? JSON.stringify(v) : (v === null || v === undefined ? fallback : String(v));
+                      const oldStr = formatVal(change.old);
+                      const newStr = formatVal(change.new);
                       
                       const hasLongContent = ['images', 'imageUrl', 'photos'].includes(field.toLowerCase()) || 
                         oldStr.length > 50 || 
@@ -668,10 +669,7 @@ export default function AuditLogsPage() {
                           {selectedLog.action === 'CREATE' ? (
                             <div className="text-sm">
                               <div className="p-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded text-gray-900 dark:text-gray-100 break-all">
-                                {typeof change.new === 'object' ? 
-                                  JSON.stringify(change.new, null, 2) : 
-                                  String(change.new || '')
-                                }
+                                {formatVal(change.new, '')}
                               </div>
                             </div>
                           ) : (
@@ -682,19 +680,13 @@ export default function AuditLogsPage() {
                                   <div>
                                     <span className="text-red-600 dark:text-red-400 font-medium block mb-1">Old Value:</span>
                                     <div className="p-2 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded text-gray-900 dark:text-gray-100 break-all">
-                                      {typeof change.old === 'object' ? 
-                                        JSON.stringify(change.old, null, 2) : 
-                                        String(change.old || 'null')
-                                      }
+                                      {formatVal(change.old)}
                                     </div>
                                   </div>
                                   <div>
                                     <span className="text-green-600 dark:text-green-400 font-medium block mb-1">New Value:</span>
                                     <div className="p-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded text-gray-900 dark:text-gray-100 break-all">
-                                      {typeof change.new === 'object' ? 
-                                        JSON.stringify(change.new, null, 2) : 
-                                        String(change.new || 'null')
-                                      }
+                                      {formatVal(change.new)}
                                     </div>
                                   </div>
                                 </div>
@@ -707,16 +699,10 @@ export default function AuditLogsPage() {
                                   </div>
                                   <div className="grid grid-cols-2 gap-2">
                                     <div className="p-2 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded text-gray-900 dark:text-gray-100 break-words">
-                                      {typeof change.old === 'object' ? 
-                                        JSON.stringify(change.old, null, 2) : 
-                                        String(change.old || 'null')
-                                      }
+                                      {formatVal(change.old)}
                                     </div>
                                     <div className="p-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded text-gray-900 dark:text-gray-100 break-words">
-                                      {typeof change.new === 'object' ? 
-                                        JSON.stringify(change.new, null, 2) : 
-                                        String(change.new || 'null')
-                                      }
+                                      {formatVal(change.new)}
                                     </div>
                                   </div>
                                 </div>

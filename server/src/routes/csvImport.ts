@@ -561,6 +561,8 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         let roasterId: string;
         let didUpdate = false;
         const rowChanges: ImportFieldChange[] = [];
+        let auditOldValues: Record<string, any> | undefined;
+        let auditNewValues: Record<string, any> | undefined;
         const addFieldChange = (field: string, fromValue: unknown, toValue: unknown) => {
           rowChanges.push({
             field,
@@ -666,6 +668,13 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
           }
 
           if (Object.keys(updateData).length > 0) {
+            const auditKeys = Object.keys(updateData);
+            auditOldValues = {};
+            auditNewValues = {};
+            for (const key of auditKeys) {
+              auditOldValues[key] = (existingRoaster as any)[key];
+              auditNewValues[key] = updateData[key];
+            }
             updateData.updatedById = req.userId;
             await prisma.roaster.update({
               where: { id: existingRoaster.id },
@@ -684,31 +693,38 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
         } else {
           const slug = await generateUniqueRoasterSlug(prisma, roasterName);
 
-          const roaster = await prisma.roaster.create({
-            data: {
-              name: roasterName,
-              slug,
-              description: importedDescription,
-              website: importedWebsite,
-              email: importedEmail,
-              phone: importedPhone,
-              founded: founded,
-              closedYear: closedYear,
-              address: importedAddress,
-              city: importedCity,
-              state: importedState,
-              zipCode: importedZipCode,
-              country: roasterCountry,
-              onlineOnly: onlineOnlyValue !== null ? onlineOnlyValue : false,
-              verified: false, // Always set to unverified for imports
-              deprecated: effectiveDeprecated ?? false,
-              showHours: false, // Default to false for imports
-              socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : null,
-              createdById: req.userId,
-              updatedById: req.userId
-            }
-          });
+          const createData = {
+            name: roasterName,
+            slug,
+            description: importedDescription,
+            website: importedWebsite,
+            email: importedEmail,
+            phone: importedPhone,
+            founded: founded,
+            closedYear: closedYear,
+            address: importedAddress,
+            city: importedCity,
+            state: importedState,
+            zipCode: importedZipCode,
+            country: roasterCountry,
+            onlineOnly: onlineOnlyValue !== null ? onlineOnlyValue : false,
+            verified: false, // Always set to unverified for imports
+            deprecated: effectiveDeprecated ?? false,
+            showHours: false, // Default to false for imports
+            socialNetworks: Object.keys(socialNetworks).length > 0 ? socialNetworks : null,
+            createdById: req.userId,
+            updatedById: req.userId
+          };
 
+          const roaster = await prisma.roaster.create({ data: createData });
+
+          // Only include fields with meaningful CSV data (exclude system defaults)
+          const auditSkipFields = new Set(['slug', 'createdById', 'updatedById', 'verified', 'showHours']);
+          auditNewValues = Object.fromEntries(
+            Object.entries(createData).filter(([k, v]) =>
+              !auditSkipFields.has(k) && v !== null && v !== undefined && v !== false && v !== ''
+            )
+          );
           roasterId = roaster.id;
         }
 
@@ -909,7 +925,9 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
               entityName: roasterName,
               userId: req.userId,
               ipAddress: getClientIP(req),
-              userAgent: getUserAgent(req)
+              userAgent: getUserAgent(req),
+              oldValues: auditOldValues,
+              newValues: auditNewValues
             });
           } catch (auditError) {
             console.error('Failed to create audit log:', auditError);
