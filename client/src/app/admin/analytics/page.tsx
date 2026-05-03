@@ -436,8 +436,8 @@ export default function AnalyticsDashboard() {
 				</div>
 				{!filtersCollapsed && (
 					<div className="flex flex-col gap-4">
-						<div className="grid grid-cols-1 xl:grid-cols-[140px_auto_160px_160px_200px_auto] gap-3 items-end">
-							<div className="xl:col-span-1 col-span-1">
+						<div className="flex flex-wrap gap-3 items-end">
+							<div className="w-[140px] shrink-0">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.eventType', 'Event Type')}</label>
 								<select value={eventType} onChange={(e) => setEventType(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
 									<option value="page_view">{tr('admin.analytics.eventTypes.page_view', 'Page View')}</option>
@@ -448,10 +448,10 @@ export default function AnalyticsDashboard() {
 								</select>
 							</div>
 							{eventType === 'page_view' && (
-								<div className="xl:col-span-1 col-span-1">
+								<div className="flex-1 min-w-[280px]">
 									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.page', 'Page')}</label>
 									<div className="flex items-center gap-2">
-										<div className="min-w-[300px]">
+										<div className="flex-1">
 											<Select
 												components={{
 													ValueContainer: ({ children, ...props }: any) => {
@@ -520,25 +520,19 @@ export default function AnalyticsDashboard() {
 									</div>
 								</div>
 							)}
-							<div className="xl:col-span-1 col-span-1 grid grid-cols-2 xl:grid-cols-1 gap-3 xl:block">
-								<div>
-									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.startDate', 'Start Date')}</label>
-									<input type="date" value={startDateFilter} onChange={(e) => setStartDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
-								</div>
-								<div className="xl:hidden">
-									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.endDate', 'End Date')}</label>
-									<input type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
-								</div>
+							<div className="w-[155px] shrink-0">
+								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.startDate', 'Start Date')}</label>
+								<input type="date" value={startDateFilter} onChange={(e) => setStartDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
 							</div>
-							<div className="xl:col-span-1 hidden xl:block">
+							<div className="w-[155px] shrink-0">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.endDate', 'End Date')}</label>
 								<input type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]" />
 							</div>
-							<div className="xl:col-span-1 col-span-1">
+							<div className="flex-1 min-w-[180px]">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{tr('admin.analytics.filters.search', 'Search')}</label>
 								<input value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder={tr('admin.analytics.filters.searchPlaceholder', 'search term...')} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
 							</div>
-							<div className="xl:col-span-1 col-span-1 flex justify-end">
+							<div className="flex items-end">
 								<Tooltip title={tr('admin.analytics.filters.resetTooltip', 'Reset filters to defaults')}>
 									<IconButton type="button" onClick={resetFilters} size="small" aria-label={tr('admin.analytics.filters.reset', 'Reset')} className="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500">
 										<RefreshIcon fontSize="small" />
