@@ -101,7 +101,7 @@ async function cleanupSpecialties() {
 
 cleanupSpecialties()
   .catch((e) => {
-    console.error('❌ Cleanup failed:', e);
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
