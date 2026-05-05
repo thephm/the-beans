@@ -127,12 +127,12 @@ async function main() {
       fr: { name: "Biologique", description: "Café cultivé sans engrais ni pesticides synthétiques, certifié biologique." }
     },
     {
-      en: { name: "Light Roast", description: "Coffee roasted to a lighter color to highlight origin characteristics and acidity." },
-      fr: { name: "Torréfaction Claire", description: "Café torréfié à une couleur plus claire pour mettre en valeur les caractéristiques d'origine et l'acidité." }
+      en: { name: "Fair Trade", description: "Coffee certified to ensure farmers receive fair prices and ethical working conditions." },
+      fr: { name: "Commerce Équitable", description: "Café certifié pour garantir que les agriculteurs reçoivent des prix équitables et des conditions de travail éthiques." }
     },
     {
-      en: { name: "Dark Roast", description: "Coffee roasted longer for a bolder, richer flavor with chocolatey or smoky notes." },
-      fr: { name: "Torréfaction Foncée", description: "Café torréfié plus longtemps pour une saveur plus audacieuse et riche avec des notes chocolatées ou fumées." }
+      en: { name: "Light Roast", description: "Coffee roasted to a lighter color to highlight origin characteristics and acidity." },
+      fr: { name: "Torréfaction Claire", description: "Café torréfié à une couleur plus claire pour mettre en valeur les caractéristiques d'origine et l'acidité." }
     },
     {
       en: { name: "Single Origin", description: "Coffee sourced from a single farm, region, or country, showcasing unique flavors." },
@@ -145,14 +145,6 @@ async function main() {
     {
       en: { name: "Experimental", description: "Coffee roasted or processed with innovative or unconventional methods." },
       fr: { name: "Expérimental", description: "Café torréfié ou traité avec des méthodes innovantes ou non conventionnelles." }
-    },
-    {
-      en: { name: "Natural", description: "Coffee dried with the cherry intact, producing fruity and complex flavor profiles." },
-      fr: { name: "Nature", description: "Café séché avec la cerise intacte, produisant des profils de saveur fruités et complexes." }
-    },
-    {
-      en: { name: "Washed", description: "Coffee processed by removing the cherry before drying, highlighting clarity and acidity." },
-      fr: { name: "Lavé", description: "Café traité en enlevant la cerise avant le séchage, mettant en valeur la clarté et l'acidité." }
     },
     {
       en: { name: "Espresso", description: "Coffee specifically roasted and blended to perform well as espresso." },
@@ -177,6 +169,18 @@ async function main() {
     {
       en: { name: "Decaf", description: "Coffee with most caffeine removed while preserving flavor." },
       fr: { name: "Décaféiné", description: "Café avec la plupart de la caféine enlevée tout en préservant la saveur." }
+    },
+    {
+      en: { name: "Education", description: "Roasters focused on educating customers about coffee origins, brewing methods, and the craft of roasting." },
+      fr: { name: "Éducation", description: "Torréfacteurs axés sur l'éducation des clients sur les origines du café, les méthodes d'infusion et l'art de la torréfaction." }
+    },
+    {
+      en: { name: "Sustainable", description: "Coffee produced with environmentally and socially sustainable farming and business practices." },
+      fr: { name: "Durable", description: "Café produit avec des pratiques agricoles et commerciales durables sur le plan environnemental et social." }
+    },
+    {
+      en: { name: "Wholesale", description: "Roasters offering wholesale supply of coffee beans or products to cafes, restaurants, and businesses." },
+      fr: { name: "Vente en Gros", description: "Torréfacteurs offrant la fourniture en gros de grains de café ou de produits aux cafés, restaurants et entreprises." }
     }
   ];
 
