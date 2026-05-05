@@ -1,1 +1,0 @@
-#!/bin/bash`necho "Waiting for database..."`nsleep 10`necho "Starting server..."`nnpx prisma generate`nnpx prisma migrate deploy`nexec npm run dev
