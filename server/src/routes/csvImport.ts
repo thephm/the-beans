@@ -857,6 +857,10 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
 
         if (existingRoaster && !areStringListsEqual(specialtiesBefore, specialtiesAfter)) {
           addFieldChange('Specialties', specialtiesBefore, specialtiesAfter);
+          auditOldValues = auditOldValues || {};
+          auditNewValues = auditNewValues || {};
+          auditOldValues['specialties'] = specialtiesBefore;
+          auditNewValues['specialties'] = specialtiesAfter;
         }
 
         // Process roaster person if data is provided
