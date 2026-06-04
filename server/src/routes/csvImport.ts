@@ -686,11 +686,55 @@ router.post('/import/csv', requireAdmin, upload.single('file'), async (req: any,
           setIfChanged('phone', 'Phone', importedPhone, (value) => typeof value === 'string' ? value.trim() : value);
           setIfChanged('founded', 'Founded', founded ?? null);
           setIfChanged('closedYear', 'Closed Year', closedYear ?? null);
-          setIfChanged('address', 'Address', importedAddress, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('city', 'City', importedCity, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('state', 'Province/State', importedState, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('zipCode', 'Postal Code', importedZipCode, (value) => typeof value === 'string' ? value.trim() : value);
-          setIfChanged('country', 'Country', roasterCountry, (value) => typeof value === 'string' ? normalizeCountryName(value).toLowerCase() : value);
+          // Country and address fields are treated as an atomic group.
+          // If the existing roaster already has a country, the imported country must match it
+          // before any address-related field (including country itself) is updated. This prevents
+          // a mismatched country from silently leaving the roaster with a contradictory address.
+          const existingCountry = existingRoaster.country || '';
+          const existingCountryNormalized = normalizeCountryName(existingCountry).toLowerCase();
+          const importedCountryNormalized = roasterCountry.toLowerCase();
+
+          // No existing country means there is nothing to conflict with — all address fields safe to import.
+          const countriesMatch = !existingCountry || existingCountryNormalized === importedCountryNormalized;
+
+          if (countriesMatch) {
+            // Country and address/city always update when they match (or when no prior country exists).
+            setIfChanged('country', 'Country', roasterCountry, (value) => typeof value === 'string' ? normalizeCountryName(value).toLowerCase() : value);
+            setIfChanged('address', 'Address', importedAddress, (value) => typeof value === 'string' ? value.trim() : value);
+            setIfChanged('city', 'City', importedCity, (value) => typeof value === 'string' ? value.trim() : value);
+
+            // Province/State and Postal Code are only updated when the address and city are
+            // unchanged (or absent in the import), confirming this is the same physical location.
+            const existingAddressNorm = typeof existingRoaster.address === 'string' ? existingRoaster.address.trim().toLowerCase() : '';
+            const existingCityNorm = typeof existingRoaster.city === 'string' ? existingRoaster.city.trim().toLowerCase() : '';
+            const incomingAddressNorm = importedAddress ? importedAddress.trim().toLowerCase() : '';
+            const incomingCityNorm = importedCity ? importedCity.trim().toLowerCase() : '';
+
+            const addressUnchanged = !importedAddress || existingAddressNorm === incomingAddressNorm;
+            const cityUnchanged = !importedCity || existingCityNorm === incomingCityNorm;
+
+            if (addressUnchanged && cityUnchanged) {
+              setIfChanged('state', 'Province/State', importedState, (value) => typeof value === 'string' ? value.trim() : value);
+              setIfChanged('zipCode', 'Postal Code', importedZipCode, (value) => typeof value === 'string' ? value.trim() : value);
+            } else if (importedState || importedZipCode) {
+              results.warnings.push(
+                `Row ${rowNumber}: Postal Code/Province not imported for "${roasterName}" because the address or city is changing`
+              );
+            }
+          } else {
+            // Countries differ — skip the entire address block (including country) to avoid
+            // leaving the roaster with contradictory location data.
+            const skippedFields = [
+              'Country',
+              importedAddress && 'Address',
+              importedCity && 'City',
+              importedState && 'Province/State',
+              importedZipCode && 'Postal Code'
+            ].filter(Boolean).join(', ');
+            results.warnings.push(
+              `Row ${rowNumber}: ${skippedFields} not imported for "${roasterName}" because existing country ("${existingCountry}") does not match imported country ("${roasterCountry}")`
+            );
+          }
 
           if (effectiveDeprecated !== undefined && existingRoaster.deprecated !== effectiveDeprecated) {
             updateData.deprecated = effectiveDeprecated;
