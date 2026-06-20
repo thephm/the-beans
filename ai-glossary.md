@@ -5,10 +5,8 @@
 - 1980-01: Expert system - rule-based AI system using symbolic logic rather than learned representations
 - 1986-09: Backpropagation - algorithm for training neural networks by propagating error gradients backward through layers; popularized by Rumelhart, Hinton & Williams
 - 1990-01: Heuristic - rule-based approximation strategy for solving complex problems where exact solutions are computationally infeasible
-2003-01: Embeddings (word embeddings) - mapping discrete tokens into dense numerical vector spaces that capture semantic relationships; term coined by Bengio et al.; later popularized by Word2Vec (2013)
+- 2003-01: Embeddings (word embeddings) - mapping discrete tokens into dense numerical vector spaces that capture semantic relationships; term coined by Bengio et al.; later popularized by Word2Vec (2013)
 - 2006-01: Model compression - techniques for reducing model size while preserving performance; includes pruning, quantization, and distillation
-- 2006-01: Deep learning - subset of machine learning using multi-layer neural networks to learn hierarchical representations; term coined by Hinton et al.
-2006-01: Model compression - techniques for reducing model size while preserving performance; includes pruning, quantization, and distillation
 - 2006-01: Deep learning - subset of machine learning using multi-layer neural networks to learn hierarchical representations; term coined by Hinton et al.
 - 2010-01: Training data - datasets used to fit machine learning model parameters
 - 2014-06: Generative Adversarial Network (GAN) - generative model using competing generator and discriminator networks; Goodfellow et al.
