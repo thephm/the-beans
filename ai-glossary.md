@@ -1,0 +1,62 @@
+# AI Terms Glossary
+
+- 1847-01: Compute - general term for computational resources (CPU/GPU/TPU cycles, memory, and energy) used for training or running algorithms
+- 1950-01: Gradient descent - optimization method for minimizing functions by iteratively moving in the direction of steepest descent; foundational to all neural network training
+- 1980-01: Expert system - rule-based AI system using symbolic logic rather than learned representations
+- 1986-09: Backpropagation - algorithm for training neural networks by propagating error gradients backward through layers; popularized by Rumelhart, Hinton & Williams
+- 1990-01: Heuristic - rule-based approximation strategy for solving complex problems where exact solutions are computationally infeasible
+2003-01: Embeddings (word embeddings) - mapping discrete tokens into dense numerical vector spaces that capture semantic relationships; term coined by Bengio et al.; later popularized by Word2Vec (2013)
+- 2006-01: Model compression - techniques for reducing model size while preserving performance; includes pruning, quantization, and distillation
+- 2006-01: Deep learning - subset of machine learning using multi-layer neural networks to learn hierarchical representations; term coined by Hinton et al.
+2006-01: Model compression - techniques for reducing model size while preserving performance; includes pruning, quantization, and distillation
+- 2006-01: Deep learning - subset of machine learning using multi-layer neural networks to learn hierarchical representations; term coined by Hinton et al.
+- 2010-01: Training data - datasets used to fit machine learning model parameters
+- 2014-06: Generative Adversarial Network (GAN) - generative model using competing generator and discriminator networks; Goodfellow et al.
+- 2015-01: AI benchmark - standardized evaluation frameworks for comparing model performance across tasks
+- 2015-03: Knowledge distillation - technique where a smaller student model learns from a larger teacher model's output distributions; Hinton, Vinyals & Dean
+- 2016-01: Inference - executing a trained model at runtime to produce outputs from new inputs
+- 2017-06: Transformer - attention-based neural architecture for sequence modeling; Vaswani et al. "Attention Is All You Need"
+- 2017-06: RLHF (Reinforcement Learning from Human Feedback) - alignment method using human preference signals to train a reward model and fine-tune policy; Christiano et al.
+- 2018-01: Epoch - one complete pass through the full training dataset during model training
+- 2018-06: GPT (Generative Pretrained Transformer) - large-scale transformer language model trained by unsupervised pretraining then task-specific fine-tuning; OpenAI GPT-1
+- 2019-01: End-to-end learning - training models directly from raw inputs to final outputs without hand-engineered intermediate representations
+- 2019-10: Prompt engineering - practice of designing input text to elicit desired model behavior without changing model weights
+- 2020-05: RAG (Retrieval-Augmented Generation) - combining a retrieval system over external documents with a generative model; Lewis et al.
+- 2020-06: Diffusion models - generative models based on iterative denoising of Gaussian noise; Ho et al. (DDPM)
+- 2022-01: Chain-of-thought - prompting technique that elicits stepwise intermediate reasoning in language models before producing a final answer; Wei et al.
+- 2022-01: Hallucination - fluent but factually incorrect or fabricated model outputs
+- 2022-01: Constitutional AI (CAI) - alignment method using a written set of principles to guide AI self-critique and revision, reducing reliance on human labelers for every comparison; Anthropic
+- 2022-02: Bias - systematic skew in model outputs reflecting imbalances or harmful patterns in training data or objectives
+- 2022-11: ChatGPT - conversational LLM interface; OpenAI's RLHF-tuned GPT-3.5 released November 30, 2022; catalyzed mainstream AI adoption
+- 2023-03: Tool use / function calling - structured integration of external tools, APIs, and code execution within model inference
+- 2023-05: DPO (Direct Preference Optimization) - alignment method that directly optimizes on preference data using a classification loss, without requiring a separate reward model or RL; Rafailov et al.
+- 2023-05: LLM agents - systems that use LLMs to plan and execute multi-step tasks, often with tool access and memory
+- 2023-05: Evals - systematic evaluation frameworks for assessing AI system capabilities, safety, and alignment
+- 2023-06: Agentic loop - observe → plan → act → observe cycle in which an AI agent iteratively acts on an environment
+- 2023-06: Copilot - AI assistant embedded in a developer or productivity workflow to suggest, complete, or generate content
+- 2023-06: Human-in-the-loop - system design where human judgment or approval is incorporated at key decision or verification points
+- 2023-07: Coding agents - autonomous AI systems that write, modify, test, and debug code using tools and iterative execution loops
+- 2023-08: Context window - maximum token length a model can process in a single forward pass, covering both input and output
+- 2023-09: Skills (LLM skills) - modular capabilities such as reasoning, tool use, and retrieval that can be composed or invoked by an agent
+- 2023-10: Synthetic data - machine-generated training data used to augment, replace, or distill from real datasets
+- 2023-12: Mixture of Experts (MoE) - sparse routing architecture in which only a subset of model parameters are activated per token; popularized for LLMs by Mixtral
+- 2023-12: Token maxing - optimizing prompts or outputs to operate near the model's context limit
+- 2024-01: Multimodal LLM - models capable of processing and generating across multiple modalities including text, image, audio, and video
+- 2024-03: Guardrails - safety constraints, filters, or policy layers applied to model inputs or outputs to prevent harmful behavior
+- 2024-05: Agentic workflows - structured AI execution pipelines in which models autonomously plan, delegate, and complete multi-step tasks
+- 2024-06: Context engineering - the practice of optimizing what goes into a model's context window, including prompt design, memory selection, and retrieval strategy
+- 2024-09: Test-time compute / inference scaling - paradigm of allocating additional compute at inference time rather than only at training, enabling extended internal reasoning; popularized by OpenAI o1
+- 2024-10: Tool-augmented reasoning - combining LLM reasoning with dynamic invocation of external tools such as calculators, search engines, or code interpreters
+- 2024-11: MCP (Model Context Protocol) - open standard introduced by Anthropic on November 25, 2024 for connecting AI models to external tools, data sources, and services through a universal interface
+- 2024-11: Prompt caching - technique for storing and reusing computed key-value representations of prompt prefixes to reduce latency and cost in long-context applications
+- 2025-01: Large Reasoning Model (LRM) - category of models that use extended internal chain-of-thought at inference time to improve performance on complex tasks; exemplified by OpenAI o1, DeepSeek-R1, Claude 3.7
+- 2025-01: AI governance - regulatory frameworks, institutional policies, and standards bodies concerned with the oversight, accountability, and risk management of AI systems
+- 2025-01: AI ready - informal enterprise term describing whether an organisation's data, infrastructure, and processes are sufficiently clean, accessible, and governed to derive value from AI systems; typically applied to data quality, metadata completeness, and integration readiness
+- 2025-02: AI ethics - applied principles and practices for developing AI responsibly, covering fairness, transparency, accountability, and harm avoidance
+- 2025-02: Vibe coding - prompt-driven software development style in which a developer describes intent in natural language and delegates implementation entirely to an AI model; coined by Andrej Karpathy on February 2, 2025
+- 2025-03: Managed identities (agentic) - extension of cloud IAM managed identity concepts to AI agents, giving each agent its own scoped credentials, permissions, and audit trail rather than sharing human or service account tokens; enables least-privilege access control in multi-agent systems
+- 2025-05: AI red teaming - structured adversarial testing of AI systems to surface harmful outputs, safety failures, and exploitable vulnerabilities; practice formalized for LLMs from 2022, term widely adopted by 2025
+- 2025-06: Compute budget - explicitly allocated computational resources for a training run or inference workload, used to plan and constrain AI development costs
+- 2025-06: Skills files - structured markdown files (e.g. `CLAUDE.md`, `AGENTS.md`, `.cursorrules`) that define agent behaviour, conventions, available tools, and project context; loaded into an agent's context at runtime to provide persistent, repo-scoped instructions without prompt repetition
+- 2025-09: Agent harness - runtime orchestration layer that wires together models, tools, skills, memory, and routing logic for agent systems; analogous to a test harness in software engineering -  provides the scaffolding within which agents operate, manage state, and hand off between one another
+- 2026-01: OpenClaw - open-source personal AI assistant framework created by Peter Steinberger; runs locally on a user's machine and connects to messaging platforms (WhatsApp, Telegram, Discord, iMessage); notable for its skills-based extensibility, persistent memory, and ability to self-author new skills; launched publicly January 2026
