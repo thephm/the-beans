@@ -1,6 +1,5 @@
 # AI Terms Glossary
 
-- 1847-01: Compute - general term for computational resources (CPU/GPU/TPU cycles, memory, and energy) used for training or running algorithms
 - 1950-01: Gradient descent - optimization method for minimizing functions by iteratively moving in the direction of steepest descent; foundational to all neural network training
 - 1980-01: Expert system - rule-based AI system using symbolic logic rather than learned representations
 - 1986-09: Backpropagation - algorithm for training neural networks by propagating error gradients backward through layers; popularized by Rumelhart, Hinton & Williams
