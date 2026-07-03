@@ -40,6 +40,13 @@ const requireAdmin = async (req: any, res: any, next: any) => {
 // Helper function to infer social network from URL
 function inferSocialNetwork(url: string): string {
   const urlLower = url.toLowerCase();
+  let parsedUrl: URL | null = null;
+
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    parsedUrl = null;
+  }
   
   if (urlLower.includes('instagram.com') || urlLower.includes('instagr.am')) {
     return 'Instagram';
@@ -57,6 +64,20 @@ function inferSocialNetwork(url: string): string {
     return 'YouTube';
   } else if (urlLower.includes('linkedin.com')) {
     return 'LinkedIn';
+  } else if (parsedUrl) {
+    const hostname = parsedUrl.hostname.toLowerCase().replace(/^www\./, '');
+    const pathname = parsedUrl.pathname.toLowerCase();
+    const looksLikeMastodonPost = /^\/@[^/]+\/\d+(?:\/)?$/.test(pathname);
+
+    if (
+      hostname === 'mstdn.ca'
+      || hostname === 'mastodon.social'
+      || hostname.includes('mastodon')
+      || (hostname.includes('mstdn') && looksLikeMastodonPost)
+      || looksLikeMastodonPost
+    ) {
+      return 'Mastodon';
+    }
   }
   
   return 'Other';
@@ -139,7 +160,7 @@ router.get('/', requireAdmin, async (req: any, res: Response) => {
     if (socialNetwork && socialNetwork !== 'all') {
       if (socialNetwork.toLowerCase() === 'other') {
         where.socialNetwork = {
-          notIn: ['Instagram', 'Threads', 'Reddit', 'Facebook'],
+          notIn: ['Instagram', 'Threads', 'Reddit', 'Facebook', 'Mastodon'],
           mode: 'insensitive'
         };
       } else {

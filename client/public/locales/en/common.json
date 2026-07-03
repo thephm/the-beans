@@ -748,6 +748,7 @@
       "threads": "Threads",
       "reddit": "Reddit",
       "facebook": "Facebook",
+      "mastodon": "Mastodon",
       "other": "Other",
       "suggestion": "Suggestion",
       "loadingSuggestion": "Loading...",

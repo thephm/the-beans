@@ -780,6 +780,7 @@
       "threads": "Threads",
       "reddit": "Reddit",
       "facebook": "Facebook",
+      "mastodon": "Mastodon",
       "other": "Autre",
       "suggestion": "Suggestion",
       "loadingSuggestion": "Chargement...",
