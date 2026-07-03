@@ -8,7 +8,7 @@ The search feature allows users to find coffee roasters using a variety of filte
 - **Location Filter:** Filter by city, state, or address. Optionally, use geolocation (latitude/longitude) and radius.
 - **Popular Searches:** Quick access to common specialty searches via UI pills.
 - **Sorting:** Sort results by name, rating, review count, or city.
-- **Distance Filter:** Limit results to a radius (in miles) from a given location.
+- **Distance Filter:** Limit results to a radius (in kilometers) from a given location.
 
 ## User Flow
 1. User enters a search term and/or selects filters.

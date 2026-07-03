@@ -7,7 +7,7 @@ A beautiful, modern full-stack web application for discovering and exploring spe
 ### Core Features
 - **Location-based Discovery**: Find coffee roasters near you
 - **Roaster Profiles**: Detailed information including contact info, hours, and bean offerings
-- **Owner Contact Information**: Store roaster owner details (name, email, bio, mobile)
+- **People/CRM Contacts**: Manage roaster owners, staff, and other contacts with roles and contact details
 - **User Authentication**: Secure sign up and login system
 - **Reviews & Favourites**: Rate roasters and save your favourites
 - **Image Uploads**: Upload and share roaster photos

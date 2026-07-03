@@ -131,7 +131,7 @@ docker exec -it the-beans-database-1 psql -U beans_user -d the_beans_db -c "SELE
 
 ```env
 # Database
-DATABASE_URL="postgresql://beans_user:2w3E4r%T@localhost:5432/the_beans_db"
+DATABASE_URL="postgresql://beans_user:2w3E4r%25T@localhost:5432/the_beans_db"
 
 # Authentication
 JWT_SECRET="your-super-secure-jwt-secret-key-here"
@@ -160,6 +160,8 @@ CORS_ORIGIN="http://localhost:3000"                # Allowed CORS origins (comma
 PORT="5000"
 NODE_ENV="development"
 ```
+
+The database password contains `%`, so it must be percent-encoded as `%25` inside a URL.
 
 ### Client Configuration (`client/.env.local`)
 

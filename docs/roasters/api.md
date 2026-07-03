@@ -18,7 +18,7 @@ Returns a paginated list of roasters. Supports filtering and sorting.
 - `state` (string, optional)
 - `specialty` (string, optional)
 - `latitude`, `longitude` (number, optional) — for location-based filtering
-- `radius` (number, default: 50) — miles for location search
+- `radius` (number, default: 50) — kilometers for location search
 - `sort` (string, options: name, -name, -rating, -reviewCount, city)
 
 **Response:**
@@ -59,20 +59,22 @@ Create a new roaster (requires authentication).
 	"longitude": 0,
 	"founded": 2020,
 	"specialties": ["Espresso", ...],
-	"ownerEmail": "...",
-	"instagram": "https://instagram.com/...",
-	"tiktok": "https://tiktok.com/@...",
-	"facebook": "https://facebook.com/...",
-	"linkedin": "https://linkedin.com/company/...",
-	"youtube": "https://youtube.com/@...",
-	"threads": "https://threads.net/@...",
-	"pinterest": "https://pinterest.com/...",
-	"bluesky": "https://bsky.app/profile/...",
-	"x": "https://x.com/..."
+	"socialNetworks": {
+		"instagram": "https://instagram.com/...",
+		"tiktok": "https://tiktok.com/@...",
+		"facebook": "https://facebook.com/...",
+		"linkedin": "https://linkedin.com/company/...",
+		"youtube": "https://youtube.com/@...",
+		"threads": "https://threads.net/@...",
+		"mastodon": "https://mstdn.ca/@...",
+		"pinterest": "https://pinterest.com/...",
+		"bluesky": "https://bsky.app/profile/...",
+		"x": "https://x.com/..."
+	}
 }
 ```
 
-**Note:** Owner contact fields (ownerName, ownerBio, ownerMobile) are deprecated. Use the People/CRM API (`/api/people`) for managing roaster contacts. See [OWNER_CONTACT_FIELDS.md](OWNER_CONTACT_FIELDS.md) for details.
+**Note:** Legacy individual social fields are accepted as backward-compatible input and consolidated into `socialNetworks`. Owner contact fields (ownerName, ownerEmail, ownerBio, ownerMobile) are deprecated. Use the People/CRM API (`/api/people`) for managing roaster contacts. See [OWNER_CONTACT_FIELDS.md](OWNER_CONTACT_FIELDS.md) for details.
 
 **Response:**
 ```json
@@ -108,8 +110,8 @@ Delete an image (requires authentication and ownership).
 
 ## Roaster Object Fields
 
-- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `founded`, `images`, `hours`, `specialties`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `people`, `_count`
-- **Social Networks:** `instagram`, `tiktok`, `facebook`, `linkedin`, `youtube`, `threads`, `pinterest`, `bluesky`, `x`
+- `id`, `name`, `description`, `email`, `phone`, `website`, `address`, `city`, `state`, `zipCode`, `country`, `latitude`, `longitude`, `founded`, `images`, `hours`, `specialties`, `socialNetworks`, `verified`, `featured`, `rating`, `reviewCount`, `owner`, `beans`, `reviews`, `people`, `_count`
+- **Social Networks:** stored in `socialNetworks` with keys such as `instagram`, `tiktok`, `facebook`, `linkedin`, `youtube`, `threads`, `mastodon`, `pinterest`, `bluesky`, `x`
 
 **Note:** `people` field contains RoasterPerson objects (contacts/roles). Legacy owner contact fields are deprecated.
 

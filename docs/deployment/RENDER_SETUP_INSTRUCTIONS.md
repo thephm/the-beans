@@ -23,7 +23,7 @@ NODE_ENV=production
 
 ## Database Connection
 
-The `DATABASE_URL` should be automatically connected from the database service.
+The `DATABASE_URL` is connected from the Render database service referenced in `render.yaml`. The current `render.yaml` has its `databases:` block commented out, so create a PostgreSQL database named `the-beans-db` first or uncomment/add the database definition before applying the Blueprint.
 
 ## Deployment Steps
 

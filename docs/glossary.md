@@ -32,9 +32,9 @@
 
 **Notification**: A message sent to users about events like new roasters or reviews.
 
-**Owner Contact Fields**: Roaster-specific fields that store owner contact information (ownerName, ownerEmail, ownerBio, ownerMobile) independently of the User relationship.
+**People/CRM Contacts**: Roaster contact records stored as `RoasterPerson` entries, with optional user linking, roles, email, mobile, bio, title, and primary/active status.
 
-**Owner**: The person or entity who owns/operates a coffee roasting business, whose contact information can be stored in roaster profiles.
+**Owner**: The person or entity who owns/operates a coffee roasting business. Owner details are managed through People/CRM contacts rather than direct roaster fields.
 
 **PWA (Progressive Web App)**: A web application that can be installed on mobile devices and works offline.
 

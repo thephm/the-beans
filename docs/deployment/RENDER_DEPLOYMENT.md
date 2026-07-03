@@ -21,10 +21,11 @@ Ensure your repository includes the `render.yaml` file in the root directory.
 4. Select your `the-beans` repository
 
 ### 3. Review Services
-Render will automatically detect the `render.yaml` file and show three services:
+Render will automatically detect the `render.yaml` file and show two web services:
 - **the-beans-api** (Backend Express.js service)
-- **the-beans-frontend** (Next.js static site)  
-- **the-beans-db** (PostgreSQL database)
+- **the-beans-frontend** (Next.js web service)  
+
+The PostgreSQL database is referenced by `DATABASE_URL` in `render.yaml`, but the `databases:` block is currently commented out. Create a Render PostgreSQL database named `the-beans-db` first, or uncomment/add the database definition before applying the Blueprint.
 
 ### 4. Configure Environment Variables
 Before deploying, you need to set these environment variables:
@@ -53,14 +54,14 @@ NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 ```
 
 #### Auto-Generated Variables
-These are automatically handled by the `render.yaml`:
+These are automatically handled by the `render.yaml` when the referenced database exists:
 - `JWT_SECRET` (auto-generated)
 - `DATABASE_URL` (from database service)
 - `NODE_ENV` (set to "production")
 
 ### 5. Deploy
-Click "Apply" to create and deploy all services. Render will:
-1. Create the PostgreSQL database
+Click "Apply" to deploy the web services. Render will:
+1. Connect the backend to the existing PostgreSQL database reference
 2. Build and deploy the backend API
 3. Build and deploy the frontend
 

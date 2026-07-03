@@ -9,7 +9,7 @@ Authentication enables users to securely register, log in, and manage their acco
 - [🗄️ Database Schema](./oauth-schema.md) - Prisma models and migrations
 - [⚙️ Configuration](./oauth-configuration.md) - Provider setup guide
 - [🔒 Security](./oauth-security.md) - Security best practices
-- [🚀 Implementation](./oauth-implementation.md) - Step-by-step setup
+- [🚀 Implementation](./oauth-implementation.md) - Current implementation notes
 - [📚 Libraries](./oauth-libraries.md) - Library recommendations
 
 ### ✅ Supported Providers
@@ -27,9 +27,9 @@ Authentication enables users to securely register, log in, and manage their acco
 - Account linking support
 
 ### 🚀 Quick Start
-1. Add OAuth models to Prisma schema: [oauth-schema.md](./oauth-schema.md)
-2. Configure providers: [oauth-configuration.md](./oauth-configuration.md)
-3. Follow implementation guide: [oauth-implementation.md](./oauth-implementation.md)
+1. Review existing OAuth models: [oauth-schema.md](./oauth-schema.md)
+2. Configure provider credentials: [oauth-configuration.md](./oauth-configuration.md)
+3. Review implementation notes: [oauth-implementation.md](./oauth-implementation.md)
 
 ## Traditional Authentication
 

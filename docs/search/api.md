@@ -13,7 +13,7 @@ Search for roasters by query string and optional geolocation.
 - `type` (string, optional): Only `roasters` is supported
 - `latitude` (number, optional): Latitude for location-based filtering
 - `longitude` (number, optional): Longitude for location-based filtering
-- `radius` (number, optional, default: 25): Search radius in miles
+- `radius` (number, optional, default: 25): Search radius in kilometers
 
 **Response:**
 ```json
@@ -53,7 +53,7 @@ When both `latitude`, `longitude`, and `radius` are provided, results are split 
 - **`radius`**: Roasters within the radius that don't match the city name exactly (can be loaded progressively)
 - **`roasters`**: Combined array with exact matches first, then radius matches
 - **`matchType`**: Each roaster is tagged with either `'exact'` or `'radius'`
-- **`distance`**: Distance in miles from the search coordinates (when coordinates provided)
+- **`distance`**: Distance in kilometers from the search coordinates (when coordinates provided)
 - **`counts`**: Object containing count of exact and radius matches
 
 This enables fast initial rendering of exact city matches followed by progressive loading of nearby results.
@@ -70,7 +70,7 @@ Search for roasters by specialty, location, and other filters.
 - `sort` (string, optional): Sort by `name`, `-name`, `-rating`, `-reviewCount`, `city`
 - `latitude` (number, optional): Latitude for location-based filtering
 - `longitude` (number, optional): Longitude for location-based filtering
-- `radius` (number, optional, default: 25): Search radius in miles
+- `radius` (number, optional, default: 25): Search radius in kilometers
 
 **Response:**
 ```json

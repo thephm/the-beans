@@ -2,7 +2,7 @@
 
 ## Quick Start
 
-This guide will walk you through implementing OAuth 2.0 authentication in The Beans application.
+This guide documents the OAuth 2.0 authentication implementation in The Beans application.
 
 ## Prerequisites
 
@@ -11,11 +11,15 @@ This guide will walk you through implementing OAuth 2.0 authentication in The Be
 - Docker (for development environment)
 - Provider developer accounts (Facebook, Google, Microsoft)
 
-## Implementation Steps
+## Implementation Status
 
-### 1. Update Database Schema
+OAuth models, routes, and provider services are already implemented in the current codebase. Use this document as a maintenance reference for the existing implementation rather than a from-scratch checklist.
 
-Add OAuth models to your Prisma schema:
+## Historical Implementation Steps
+
+### 1. Database Schema
+
+The Prisma schema already includes OAuth models. To inspect or modify them:
 
 ```bash
 cd server
