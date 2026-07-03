@@ -31,6 +31,10 @@ interface Roaster {
   country: string;
 }
 
+interface PostSuggestionResponse {
+  suggestion: Roaster | null;
+}
+
 const AdminPostsPage: React.FC = () => {
   const { t } = useTranslation();
   
@@ -53,6 +57,10 @@ const AdminPostsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
+  const [suggestedRoaster, setSuggestedRoaster] = useState<Roaster | null>(null);
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
+  const [suggestionError, setSuggestionError] = useState<string | null>(null);
+  const [suggestionRequested, setSuggestionRequested] = useState(false);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -105,6 +113,29 @@ const AdminPostsPage: React.FC = () => {
       setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSuggestion = async () => {
+    setSuggestionLoading(true);
+    setSuggestionError(null);
+    setSuggestionRequested(true);
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+      const res = await fetch(`${apiUrl}/api/posts/suggestion`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('Failed to fetch suggestion');
+
+      const data: PostSuggestionResponse = await res.json();
+      setSuggestedRoaster(data.suggestion);
+    } catch (err: any) {
+      setSuggestedRoaster(null);
+      setSuggestionError(err.message || 'Unknown error');
+    } finally {
+      setSuggestionLoading(false);
     }
   };
 
@@ -470,14 +501,61 @@ const AdminPostsPage: React.FC = () => {
           </div>
         </div>
         {!showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
-          >
-            {t('common.add', 'Add')}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={fetchSuggestion}
+              disabled={suggestionLoading}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {suggestionLoading ? t('admin.posts.loadingSuggestion', 'Loading...') : t('admin.posts.suggestion', 'Suggestion')}
+            </button>
+            <button
+              onClick={() => setShowForm(true)}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
+            >
+              {t('common.add', 'Add')}
+            </button>
+          </div>
         )}
       </div>
+
+      {suggestionError && (
+        <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-100 px-4 py-3 rounded-lg mb-4">
+          {t('admin.posts.suggestionError', 'Failed to load suggestion: ')}{suggestionError}
+        </div>
+      )}
+
+      {suggestionRequested && !suggestionLoading && !suggestionError && (
+        <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          {suggestedRoaster ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  {t('admin.posts.suggestedRoaster', 'Suggested roaster')}
+                </div>
+                <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {suggestedRoaster.name}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {suggestedRoaster.city}, {suggestedRoaster.state || suggestedRoaster.country}
+                </div>
+              </div>
+              <Link
+                href={`/roasters/${suggestedRoaster.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-600 dark:text-primary-400 hover:underline font-medium whitespace-nowrap"
+              >
+                {t('admin.posts.openRoaster', 'Open roaster page')}
+              </Link>
+            </div>
+          ) : (
+            <div className="text-gray-700 dark:text-gray-300">
+              {t('admin.posts.noSuggestion', 'No eligible roaster suggestion found.')}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Loading/Error States */}
       {loading && (

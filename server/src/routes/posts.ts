@@ -62,6 +62,15 @@ function inferSocialNetwork(url: string): string {
   return 'Other';
 }
 
+function normalizeLocationValue(value?: string | null): string {
+  return (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function isUnitedStatesCountry(value?: string | null): boolean {
+  const normalized = normalizeLocationValue(value).replace(/\./g, '');
+  return ['us', 'usa', 'united states', 'united states of america', 'america'].includes(normalized);
+}
+
 /**
  * @swagger
  * /api/posts:
@@ -209,6 +218,70 @@ router.get('/', requireAdmin, async (req: any, res: Response) => {
   } catch (error: any) {
     console.error('Error fetching posts:', error);
     res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+});
+
+router.get('/suggestion', requireAdmin, async (_req: any, res: Response) => {
+  try {
+    const existingPosts = await prisma.post.findMany({
+      select: {
+        roasterId: true,
+        roaster: {
+          select: {
+            city: true,
+            country: true
+          }
+        }
+      }
+    });
+
+    const postedRoasterIds = new Set(existingPosts.map((post) => post.roasterId));
+    const postedCountries = new Set(
+      existingPosts
+        .map((post) => normalizeLocationValue(post.roaster.country))
+        .filter(Boolean)
+    );
+    const postedCities = new Set(
+      existingPosts
+        .map((post) => normalizeLocationValue(post.roaster.city))
+        .filter(Boolean)
+    );
+
+    const candidates = await prisma.roaster.findMany({
+      where: {
+        verified: true,
+        deprecated: false
+      },
+      select: {
+        id: true,
+        name: true,
+        city: true,
+        state: true,
+        country: true,
+        createdAt: true
+      },
+      orderBy: [
+        { createdAt: 'asc' },
+        { name: 'asc' }
+      ]
+    });
+
+    const suggestion = candidates.find((roaster) => {
+      const country = normalizeLocationValue(roaster.country);
+      const city = normalizeLocationValue(roaster.city);
+
+      return !postedRoasterIds.has(roaster.id)
+        && !isUnitedStatesCountry(roaster.country)
+        && !!country
+        && !!city
+        && !postedCountries.has(country)
+        && !postedCities.has(city);
+    });
+
+    res.json({ suggestion: suggestion || null });
+  } catch (error: any) {
+    console.error('Error fetching post suggestion:', error);
+    res.status(500).json({ error: 'Failed to fetch post suggestion' });
   }
 });
 
