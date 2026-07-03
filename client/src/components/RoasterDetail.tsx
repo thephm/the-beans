@@ -97,7 +97,12 @@ interface Roaster {
   isFavourited?: boolean
 }
 
-const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
+interface RoasterDetailProps {
+  id: string
+  hideShareHeart?: boolean
+}
+
+const RoasterDetail: React.FC<RoasterDetailProps> = ({ id, hideShareHeart = false }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showRatings } = useFeatureFlags();
@@ -383,25 +388,27 @@ const RoasterDetail: React.FC<{ id: string }> = ({ id }) => {
               )}
             </div>
             {/* Overlay share and favourite buttons on image */}
-            <div className="absolute top-4 right-4 flex gap-3 z-30">
-              <button
-                onClick={handleShare}
-                className="bg-white text-gray-700 hover:bg-gray-50 p-3 rounded-full shadow-lg transition-all transform hover:scale-110 pointer-events-auto"
-                aria-label="Share roaster"
-              >
-                <Share />
-              </button>
-              <button
-                onClick={toggleFavourited}
-                className={`p-3 rounded-full pointer-events-auto ${
-                  isFavourited
-                    ? 'bg-red-500 text-white'
-                    : 'bg-white text-red-500 hover:bg-red-50'
-                } shadow-lg transition-all transform hover:scale-110`}
-              >
-                {isFavourited ? <Favorite /> : <FavoriteBorder />}
-              </button>
-            </div>
+            {!hideShareHeart && (
+              <div className="absolute top-4 right-4 flex gap-3 z-30">
+                <button
+                  onClick={handleShare}
+                  className="bg-white text-gray-700 hover:bg-gray-50 p-3 rounded-full shadow-lg transition-all transform hover:scale-110 pointer-events-auto"
+                  aria-label="Share roaster"
+                >
+                  <Share />
+                </button>
+                <button
+                  onClick={toggleFavourited}
+                  className={`p-3 rounded-full pointer-events-auto ${
+                    isFavourited
+                      ? 'bg-red-500 text-white'
+                      : 'bg-white text-red-500 hover:bg-red-50'
+                  } shadow-lg transition-all transform hover:scale-110`}
+                >
+                  {isFavourited ? <Favorite /> : <FavoriteBorder />}
+                </button>
+              </div>
+            )}
           </div>
           {/* Content */}
           <div className="p-8">

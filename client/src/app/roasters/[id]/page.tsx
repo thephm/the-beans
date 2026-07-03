@@ -1,6 +1,12 @@
 import RoasterDetail from '@/components/RoasterDetail';
 import { notFound } from 'next/navigation';
 
+const isTruthySearchParam = (value: string | string[] | undefined) => {
+  const paramValue = Array.isArray(value) ? value[0] : value;
+  if (!paramValue) return false;
+  return ['1', 'true', 'yes'].includes(paramValue.toLowerCase());
+};
+
 const getApiBaseUrl = () => {
   let url: string | undefined = process.env.NEXT_PUBLIC_API_URL;
 
@@ -19,7 +25,13 @@ const getApiBaseUrl = () => {
   return url.includes('localhost') ? url.replace('localhost', 'server') : url;
 };
 
-export default async function RoasterDetailPage({ params }: { params: { id?: string } }) {
+export default async function RoasterDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id?: string };
+  searchParams?: { hideShareHeart?: string | string[]; hideActions?: string | string[] };
+}) {
   const id = params?.id || '';
   if (!id) {
     notFound();
@@ -38,5 +50,7 @@ export default async function RoasterDetailPage({ params }: { params: { id?: str
     throw new Error(`Failed to load roaster ${id}`);
   }
 
-  return <RoasterDetail id={id} />;
+  const hideShareHeart = isTruthySearchParam(searchParams?.hideShareHeart) || isTruthySearchParam(searchParams?.hideActions);
+
+  return <RoasterDetail id={id} hideShareHeart={hideShareHeart} />;
 }

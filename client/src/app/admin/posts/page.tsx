@@ -541,7 +541,7 @@ const AdminPostsPage: React.FC = () => {
                 </div>
               </div>
               <Link
-                href={`/roasters/${suggestedRoaster.id}`}
+                href={`/roasters/${suggestedRoaster.id}?hideShareHeart=true`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-600 dark:text-primary-400 hover:underline font-medium whitespace-nowrap"
