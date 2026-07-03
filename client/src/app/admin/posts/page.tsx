@@ -633,8 +633,10 @@ const AdminPostsPage: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                         post.socialNetwork === 'Instagram' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' :
+                        post.socialNetwork === 'Threads' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' :
                         post.socialNetwork === 'Reddit' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
                         post.socialNetwork === 'Facebook' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                        post.socialNetwork === 'Mastodon' ? 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200' :
                         post.socialNetwork === 'Twitter' ? 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200' :
                         'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                       }`}>
