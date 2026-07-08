@@ -31,7 +31,7 @@ const AdminRoastersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
-  const [globalCounts, setGlobalCounts] = useState<{ all: number; verified: number; unverified: number; featured: number } | null>(null);
+  const [globalCounts, setGlobalCounts] = useState<{ all: number; verified: number; unverified: number; featured: number; countries: number; cities: number } | null>(null);
   const [topCountries, setTopCountries] = useState<Array<{ country: string; count: number }>>([]);
   const [topCities, setTopCities] = useState<Array<{ city: string; count: number }>>([]);
   const [countryFilter, setCountryFilter] = useState<string>('');
@@ -221,7 +221,7 @@ const AdminRoastersPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_1fr] gap-2">
           {/* Count Cards Column - 2x2 Grid */}
           <div className="w-full lg:w-auto">
-            <div className="grid grid-cols-4 sm:grid-cols-2 lg:grid-cols-2 gap-2 h-full lg:min-w-[240px]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 h-full lg:min-w-[360px]">
               {/* Total Card */}
               <button
                 onClick={() => {
@@ -262,6 +262,12 @@ const AdminRoastersPage: React.FC = () => {
                 <div className="text-xl sm:text-2xl font-bold text-green-500 dark:text-green-300 text-center">{globalCounts?.verified || 0}</div>
               </button>
 
+              {/* Countries Card */}
+              <div className="p-2 rounded-lg border-2 bg-white border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 text-center flex flex-col items-center justify-center">
+                <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.uniqueCountries', 'Countries')}</div>
+                <div className="text-xl sm:text-2xl font-bold text-cyan-500 dark:text-cyan-300 text-center">{globalCounts?.countries || 0}</div>
+              </div>
+
               {/* Featured Card */}
               <button
                 onClick={() => {
@@ -301,6 +307,12 @@ const AdminRoastersPage: React.FC = () => {
                 <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.unverified', 'Unverified')}</div>
                 <div className="text-xl sm:text-2xl font-bold text-orange-500 dark:text-orange-300 text-center">{globalCounts?.unverified || 0}</div>
               </button>
+
+              {/* Cities Card */}
+              <div className="p-2 rounded-lg border-2 bg-white border-gray-300 dark:bg-gray-800/30 dark:border-gray-700 text-center flex flex-col items-center justify-center">
+                <div className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">{t('admin.roasters.uniqueCities', 'Cities')}</div>
+                <div className="text-xl sm:text-2xl font-bold text-pink-500 dark:text-pink-300 text-center">{globalCounts?.cities || 0}</div>
+              </div>
             </div>
           </div>
 
@@ -653,20 +665,20 @@ const AdminRoastersPage: React.FC = () => {
                 disabled={currentPage <= 1}
                 className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
               >
-                Previous
+                {t('admin.roasters.previous', 'Previous')}
               </button>
               <button
                 onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage >= totalPages}
                 className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
               >
-                Next
+                {t('admin.roasters.next', 'Next')}
               </button>
             </div>
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Page <span className="font-medium">{currentPage}</span> of{' '}
+                  {t('admin.roasters.page', 'Page')} <span className="font-medium">{currentPage}</span> {t('admin.roasters.of', 'of')}{' '}
                   <span className="font-medium">{totalPages}</span>
                 </p>
               </div>

@@ -546,11 +546,19 @@ router.get('/', [
     // Get global counts for filter badges (not affected by pagination/search)
     const deprecatedWhere = typeof where.deprecated === 'boolean' ? { deprecated: where.deprecated } : {};
 
-    const [globalTotal, globalVerified, globalUnverified, globalFeatured] = await Promise.all([
+    const [globalTotal, globalVerified, globalUnverified, globalFeatured, globalCountries, globalCities] = await Promise.all([
       prisma.roaster.count({ where: deprecatedWhere }),
       prisma.roaster.count({ where: { ...deprecatedWhere, verified: true } }),
       prisma.roaster.count({ where: { ...deprecatedWhere, verified: false } }),
-      prisma.roaster.count({ where: { ...deprecatedWhere, featured: true, verified: true } })
+      prisma.roaster.count({ where: { ...deprecatedWhere, featured: true, verified: true } }),
+      prisma.roaster.groupBy({
+        by: ['country'],
+        where: deprecatedWhere
+      }),
+      prisma.roaster.groupBy({
+        by: ['city'],
+        where: { ...deprecatedWhere, city: { not: null } }
+      })
     ]);
 
     // Get top countries and cities (only for admin users)
@@ -613,6 +621,8 @@ router.get('/', [
         verified: globalVerified,
         unverified: globalUnverified,
         featured: globalFeatured,
+        countries: globalCountries.filter((item) => item.country?.trim()).length,
+        cities: globalCities.filter((item) => item.city?.trim()).length,
       },
       topCountries,
       topCities
