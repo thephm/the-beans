@@ -99,6 +99,25 @@ export interface Roaster {
   updatedBy?: User;
   sourceType?: string;
   sourceDetails?: string;
+  discoveredThrough?: Array<{
+    resource: { id: string; name: string; slug: string; url: string };
+    sourceUrl?: string;
+    sourceTitle?: string;
+  }>;
+}
+
+export interface ResourceSummary {
+  id: string;
+  name: string;
+  slug: string;
+  url: string;
+  description?: string;
+  resourceType: string;
+  platform?: string;
+  state: string;
+  location?: string;
+  publisherOrganizationName?: string;
+  _count?: { roasters: number; people: number; links: number };
 }
 
 export interface Region {

@@ -68,6 +68,9 @@ export function Navbar() {
               <Link href="/discover" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                 {t('nav.discover')}
               </Link>
+              <Link href="/resources" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                {t('nav.resources', 'Resources')}
+              </Link>
               <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                 {t('nav.about')}
               </Link>
@@ -126,6 +129,13 @@ export function Navbar() {
                       onClick={() => setIsAdminMenuOpen(false)}
                     >
                       {t('adminSection.people', 'People')}
+                    </Link>
+                    <Link
+                      href="/admin/resources"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('nav.resources', 'Resources')}
                     </Link>
                     <Link 
                       href="/admin/roasters" 
@@ -241,6 +251,9 @@ export function Navbar() {
               <Link href="/discover" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.discover')}
               </Link>
+              <Link href="/resources" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                {t('nav.resources', 'Resources')}
+              </Link>
               <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('nav.about')}
               </Link>
@@ -291,6 +304,13 @@ export function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t('adminSection.people', 'People')}
+                      </Link>
+                      <Link
+                        href="/admin/resources"
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('nav.resources', 'Resources')}
                       </Link>
                       <Link 
                         href="/admin/roasters" 

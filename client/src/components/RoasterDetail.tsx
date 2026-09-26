@@ -95,6 +95,11 @@ interface Roaster {
   roasterImages?: RoasterImageData[]
   socialNetworks?: Record<string, string>
   isFavourited?: boolean
+  discoveredThrough?: Array<{
+    resource: { id: string; name: string; slug: string; url: string }
+    sourceUrl?: string
+    sourceTitle?: string
+  }>
 }
 
 interface RoasterDetailProps {
@@ -436,6 +441,19 @@ const RoasterDetail: React.FC<RoasterDetailProps> = ({ id, hideShareHeart = fals
                     </div>
                   )}
                 </div>
+                {roaster.discoveredThrough && roaster.discoveredThrough.length > 0 && (
+                  <section className="mb-8" aria-labelledby="discovered-through-heading">
+                    <h2 id="discovered-through-heading" className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{t('resources.discoveredThrough', 'Discovered through')}</h2>
+                    <div className="flex flex-wrap gap-3">
+                      {roaster.discoveredThrough.map((entry) => (
+                        <div key={entry.resource.id} className="rounded-xl border border-primary-100 bg-primary-50/70 px-4 py-3 dark:border-primary-900/50 dark:bg-primary-900/20">
+                          <Link href={`/resources/${entry.resource.slug}`} className="font-semibold text-primary-700 hover:underline dark:text-primary-300">{entry.resource.name}</Link>
+                          {entry.sourceUrl && <a href={entry.sourceUrl} target="_blank" rel="noopener noreferrer" className="ml-3 text-sm text-gray-600 hover:underline dark:text-gray-300">{entry.sourceTitle || t('resources.viewSource', 'View source')} ↗</a>}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
                 {/* Specialties */}
                 {roaster.specialties && roaster.specialties.length > 0 && (
                   <div className="mb-8">

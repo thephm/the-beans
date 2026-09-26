@@ -664,3 +664,1818 @@ If you ever want to build around it later, here are some things that will slot i
 * **Eagle Eye** — spotted a roaster before it became popular
 
 Just let me know if you want me to generate branding text or microcopy for the role.
+
+- Resources section for coffee roasters #219
+# thebeans.ca Resources Feature
+
+## 1. Purpose
+
+Add a **Resources** section to thebeans.ca for useful coffee-related websites, directories, communities, publications, books, videos, research resources, apps, discovery tools, and other content encountered while researching coffee roasters.
+
+Resources serve three purposes:
+
+1. Help visitors explore the wider coffee ecosystem.
+2. Give attribution to resources that helped discover roasters listed on thebeans.ca.
+3. Preserve useful coffee references without requiring thebeans.ca to reproduce or maintain the third party's data.
+    
+
+The primary product remains the roaster directory. Resource maintenance must remain lightweight.
+
+# 2. Navigation
+
+Add:
+
+**Discover → Resources**
+
+The Resources navigation item should appear immediately after Discover.
+
+Routes:
+
+```text
+/resources
+/resources/[slug]
+```
+
+Existing roaster pages should gain a small resource-attribution section:
+
+```text
+Discovered through
+```
+
+with links to the relevant Resource pages.
+
+# 3. Important Product Rules
+
+### 3.1 Do not copy third-party roaster data
+
+A resource may contain a directory of hundreds of roasters.
+
+thebeans.ca does **not** attempt to reproduce that directory.
+
+Example:
+
+Coffee Insurrection may have hundreds of roasters listed.
+
+If the user discovers 12 roasters through Coffee Insurrection and independently verifies those 12 using the roasters' own websites, only those 12 need to be linked to Coffee Insurrection.
+
+Do not create or maintain a complete:
+
+```text
+Resource → every roaster appearing on that resource
+```
+
+relationship.
+
+Instead:
+
+```text
+Resource → roasters actually discovered through this resource
+```
+
+### 3.2 Independent verification remains mandatory
+
+A resource can provide a lead.
+
+The roaster's own website, social account, contact page, location page, etc. must be used to independently verify the roaster record.
+
+The resource is an attribution/discovery source, not the authoritative source for the roaster's thebeans.ca record.
+
+### 3.3 Exact discovery URL should be retained
+
+If a specific page led to the discovery, retain that URL.
+
+Example:
+
+```text
+Coffee Insurrection
+    ↓
+Best Specialty Coffee Roasters in the World
+    ↓
+Roaster
+```
+
+The relationship should retain the specific Coffee Insurrection URL where possible rather than only the site's home page.
+
+### 3.4 Approximate resource counts are observations
+
+Resources may advertise or be observed to contain a certain number of roasters.
+
+Examples:
+
+```text
+300+ roasters
+400+ roasters
+487 roasters
+```
+
+Do not treat these as a permanent exact count maintained by thebeans.ca.
+
+Store the value as an attributed, dated observation.
+
+Example:
+
+```text
+Approximate coverage: 487 roasters
+Observed/published: 2024
+Source: RoastGuide
+```
+
+If displayed publicly, make the wording clear that it is approximate or historical.
+
+### 3.5 Research notes are not public resource descriptions
+
+Research observations such as:
+
+```text
+Google ads pop up
+Registration required to suggest a roaster
+100 km search returned 12 roasters
+```
+
+should not automatically become public content.
+
+Store them as private/admin research notes.
+
+# 4. Resource Data Model
+
+Use one primary `Resource` entity.
+
+Do NOT create separate first-class entities for:
+
+- Platform
+- Website
+- Directory
+- Community
+- Article
+- Book
+- Video
+- App
+- Blog
+- Publication
+    
+These are attributes/types of a Resource.
+
+The model should remain flexible.
+
+## Resource
+
+Suggested fields:
+
+```text
+id
+name
+slug
+url
+description
+resource_type
+platform
+state
+location
+publisher_organization_id
+parent_resource_id
+email
+phone
+created_at
+updated_at
+```
+
+### resource_type
+
+Use a small flexible vocabulary rather than forcing every resource into a rigid taxonomy.
+
+Initial values:
+
+```text
+website
+directory
+community
+app
+article
+book
+video
+blog
+publication
+research
+reference
+discovery_tool
+```
+
+Allow `other` if required.
+
+### platform
+
+Free/simple controlled value.
+
+Examples:
+
+```text
+Web
+Reddit
+Discord
+YouTube
+Apple App Store
+Wikipedia
+```
+
+Platform is deliberately **not** a database entity.
+
+### status
+
+```text
+active
+archived
+inactive
+closed
+unknown
+```
+
+This is particularly useful for resources such as INeedCoffee.com.
+
+### location
+
+Optional.
+
+This describes the resource organization/person/service where appropriate.
+
+It must not be confused with the locations of roasters listed by the resource.
+
+# 5. Resource People
+
+People should be reusable records rather than repeated strings.
+
+Use the existing person model if the application already has one.
+
+If no suitable model exists, create:
+
+```text
+Person
+-------
+id
+name
+slug
+email
+website_url
+notes
+created_at
+updated_at
+```
+
+Then:
+
+```text
+ResourcePerson
+--------------
+resource_id
+person_id
+role
+```
+
+Initial relationship roles:
+
+```text
+founder
+creator
+maintainer
+author
+publisher
+contact
+owner
+contributor
+```
+
+A person may have more than one role.
+
+Example:
+
+```text
+Coffee Review
+    → Kenneth Davids
+       founder
+
+Coffee Review
+    → Ron Walters
+       founder
+
+Coffee Review
+    → Kim Westerman
+       contact
+```
+
+Do not build a generalized knowledge graph.
+
+# 6. Resource Organizations
+
+If the existing application already has an organization/company entity, reuse it.
+
+Otherwise Resource can simply contain:
+
+```text
+publisher_organization_name
+```
+
+Do not create an organization system solely for Resources unless one already exists.
+
+Examples:
+
+```text
+World Coffee Research
+Alma Coffee
+Colonial Coffee
+The Coffee Maven
+```
+
+may act as publishers/organizations.
+
+Existing roasters can also publish resources.
+
+Example:
+
+```text
+Maple Creek Coffee
+    publishes
+Maple Creek Coffee's Roasting Blog
+```
+
+# 7. Parent / Child Resources
+
+A Resource may optionally belong to another Resource.
+
+Use:
+
+```text
+parent_resource_id
+```
+
+Examples:
+
+```text
+World Coffee Research
+    └── Sensory Lexicon
+
+The Coffee Maven
+    ├── 69 Top Coffee-Producing Countries...
+    └── Coffee Roaster - Local...
+
+YouTube
+    └── Alma Coffee video
+```
+
+Do not create a top-level resource solely because a URL happens to be nested under another site.
+
+Use the relationship when it improves navigation or attribution.
+
+# 8. Resource Links
+
+Some resources have specific pages that are useful without being independent Resources.
+
+Examples:
+
+```text
+Coffee Insurrection
+    Best Specialty Coffee Roasters in the World
+
+Roastful
+    Top Roasters
+
+CoffeeRoast
+    Top by Country / Spain
+
+LoffeeLabs
+    Roasters Registry
+```
+
+Create:
+
+```text
+ResourceLink
+------------
+id
+resource_id
+title
+url
+description
+link_type
+display_order
+```
+
+Suggested `link_type` values:
+
+```text
+discovery
+directory
+country
+city
+article
+registry
+channel
+reference
+other
+```
+
+This avoids turning every useful URL into another database record.
+
+# 9. Resource → Roaster Relationship
+
+Create:
+
+```text
+ResourceRoaster
+---------------
+id
+resource_id
+roaster_id
+source_url
+source_title
+discovered_at
+notes
+```
+
+`source_url` should contain the exact page that led to the discovery when available.
+
+`source_title` is optional.
+
+`discovered_at` records when the relationship was established.
+
+`notes` should normally remain administrative/private.
+
+The relationship means:
+
+> This resource was actually used to discover this roaster for thebeans.ca.
+
+It does **not** mean:
+
+> This roaster is officially listed by or endorsed by this resource.
+
+# 10. Resource Observations
+
+Use a small observation table for changing or historical resource statistics.
+
+```text
+ResourceObservation
+-------------------
+id
+resource_id
+observation_type
+value
+observed_at
+source_url
+notes
+```
+
+Initial observation types:
+
+```text
+roaster_count
+visitor_count
+other
+```
+
+Examples:
+
+```text
+resource = RoastGuide
+observation_type = roaster_count
+value = 487
+observed_at = 2024
+```
+
+or:
+
+```text
+resource = r/coffeerotation
+observation_type = visitor_count
+value = 1100
+observed_at = 2026-...
+```
+
+Do not expose every observation automatically.
+
+# 11. Resource Page
+
+## Mobile-first design
+
+The page should be visually rich and use existing thebeans.ca card styling.
+
+Avoid presenting Resources as a giant conventional table.
+
+On mobile, use horizontally scrollable/snap sections where appropriate.
+
+On desktop, those sections can become grids.
+
+Reuse existing roaster cards rather than inventing a second roaster-card design.
+
+## Resource detail layout
+
+Suggested order:
+
+### Header
+
+```text
+Resource name
+
+Short factual description
+
+Type / platform
+
+[Visit resource]
+```
+
+Optional:
+
+```text
+Active
+Archived
+```
+
+### About
+
+Description and basic information.
+
+### People
+
+Show linked people where present.
+
+Example:
+
+```text
+Kenneth Davids
+Founder
+
+Ron Walters
+Founder
+```
+
+### Useful links
+
+Display specific ResourceLinks.
+
+### Coverage
+
+Only display if useful data exists.
+
+Examples:
+
+```text
+300+ roasters
+```
+
+or:
+
+```text
+487 roasters
+2024 observation
+```
+
+Avoid presenting historical figures as current exact counts.
+
+### Roasters discovered through this resource
+
+Use exactly this conceptually:
+
+> **Roasters discovered through this resource**
+
+Do not call this:
+
+> All roasters from this resource
+
+Use existing roaster cards.
+
+Each card links to the existing thebeans.ca roaster page.
+
+### Related resources
+
+Show parent/child resources or other explicitly related resources when useful.
+
+# 12. Roaster Page Integration
+
+Existing roaster pages should display:
+
+## Discovered through
+
+Example:
+
+```text
+Discovered through
+
+Coffee Insurrection
+Best Specialty Coffee Roasters in the World
+```
+
+Clicking the resource opens:
+
+```text
+/resources/coffee-insurrection
+```
+
+If an exact source URL exists, provide an external link to it.
+
+This creates the bidirectional relationship:
+
+```text
+Resource
+   ↓
+thebeans.ca roaster
+
+Roaster
+   ↓
+Resource
+```
+
+# 13. Resources Index Page
+
+Route:
+
+```text
+/resources
+```
+
+Suggested introduction:
+
+```text
+Explore the coffee world
+
+Discover the people, communities, publications, tools and other resources that help us learn about coffee and find roasters.
+```
+
+Do not make the page feel like an administrative database.
+
+Use visually appealing resource cards.
+
+Each card may contain:
+
+```text
+Resource name
+short description
+type/platform
+approximate coverage when available
+people/publisher when useful
+```
+
+Avoid putting every available field on the card.
+
+# 14. Mobile Interaction
+
+Mobile is the primary design target.
+
+Use horizontal scrolling/snap sections for groups of resources where appropriate.
+
+For example:
+
+```text
+Featured resources
+[ card ][ card ][ card ] →
+```
+
+and:
+
+```text
+Roasters discovered through this resource
+[ roaster ][ roaster ][ roaster ] →
+```
+
+Desktop can use a responsive grid.
+
+Do not implement endless nested carousels.
+
+The interaction should remain easy to understand and accessible.
+
+# 15. API
+
+Follow the existing API conventions.
+
+Suggested endpoints:
+
+```text
+GET    /resources
+GET    /resources/:slug
+
+POST   /resources
+PATCH  /resources/:id
+DELETE /resources/:id
+
+POST   /resources/:id/people
+DELETE /resources/:id/people/:personId
+
+POST   /resources/:id/links
+PATCH  /resources/:id/links/:linkId
+DELETE /resources/:id/links/:linkId
+
+POST   /resources/:id/roasters
+DELETE /resources/:id/roasters/:roasterId
+
+POST   /resources/:id/observations
+DELETE /resources/:id/observations/:observationId
+```
+
+Public API responses should expose only fields intended for public display.
+
+Do not expose private research notes.
+
+# 16. Admin Workflow
+
+Adding a Resource should require as little work as possible.
+
+Recommended workflow:
+
+### Step 1 — Create resource
+
+Required:
+
+```text
+Name
+URL
+Resource type
+```
+
+Optional:
+
+```text
+Description
+Platform
+Status
+Location
+Email
+Phone
+Publisher
+Parent resource
+```
+
+### Step 2 — Add people
+
+Optional.
+
+Select an existing person or create a new one.
+
+Choose relationship:
+
+```text
+Founder
+Creator
+Maintainer
+Author
+Publisher
+Contact
+Owner
+Contributor
+```
+
+### Step 3 — Add useful links
+
+Optional.
+
+Example:
+
+```text
+Best Specialty Coffee Roasters in the World
+https://...
+```
+
+### Step 4 — Record approximate coverage
+
+Optional.
+
+Example:
+
+```text
+487
+Roaster count
+2024
+```
+
+### Step 5 — Link discovered roasters
+
+Only add roasters actually discovered through the resource.
+
+Select an existing roaster.
+
+Optionally enter:
+
+```text
+Source URL
+Source title
+```
+
+This should take seconds, not require maintaining a complete third-party directory.
+
+# 17. Privacy / Notes
+
+Separate:
+
+### Public information
+
+Suitable for visitors:
+
+- resource description
+- URL
+- people
+- publisher
+- location
+- resource type
+- platform
+- useful links
+- status
+- appropriately qualified coverage observations
+- discovered-through relationships
+
+### Private/admin information
+
+Not displayed publicly:
+
+- research notes
+- search results observed during research
+- subjective opinions
+- advertising observations
+- registration frustrations
+- temporary verification notes
+- internal decisions about whether a resource is useful
+    
+
+If the existing admin system has a notes field, reuse it.
+
+# 18. Attribution Semantics
+
+There are two different attribution paths and they must not be confused.
+
+### Resource discovery
+
+Example:
+
+```text
+Reddit post
+    ↓
+Coffee Insurrection
+```
+
+This says the Reddit post helped the user discover Coffee Insurrection.
+
+### Roaster discovery
+
+Example:
+
+```text
+Coffee Insurrection
+    ↓
+Roaster
+```
+
+This says Coffee Insurrection helped the user discover the roaster.
+
+These should be independently recordable.
+
+A Resource may itself have been discovered through another Resource or external source.
+
+# 19. Seed Data
+
+The following seed data is based on the examples supplied during the design discussion.
+
+Important:
+
+**Treat these records as research seeds, not automatically verified production facts.**
+
+The existing thebeans.ca verification rules still apply. Do not invent missing fields. Fields not supplied should remain blank/null until independently verified.
+
+## 19.1 Coffee Insurrection
+
+```yaml
+name: Coffee Insurrection
+slug: coffee-insurrection
+url: https://www.coffeeinsurrection.com
+resource_type: website
+platform: Web
+status: active
+location: Italy
+description: ""
+```
+
+People:
+
+```yaml
+- name: Tanya Nanetti
+  role: creator
+
+- name: Endri Nonaj
+  role: creator
+```
+
+Useful links:
+
+```yaml
+- title: Best Specialty Coffee Roasters in the World
+  url: https://www.coffeeinsurrection.com/best-specialty-coffee-roasters-in-the-world.html
+  link_type: discovery
+
+- title: Pages by Country
+  url: ""
+  link_type: country
+
+- title: Pages by City
+  url: ""
+  link_type: city
+```
+
+Social URLs supplied:
+
+```text
+https://www.facebook.com/
+https://www.instagram.com/
+https://www.linkedin.com/
+https://x.com/
+```
+
+These require verification of the exact Coffee Insurrection profiles before production import.
+
+Discovery relationship:
+
+```text
+discovered_through:
+  source: Reddit
+```
+
+## 19.2 Reddit — r/pourover
+
+```yaml
+name: r/pourover
+slug: r-pourover
+url: https://www.reddit.com/r/pourover/
+resource_type: community
+platform: Reddit
+status: active
+description: ""
+```
+
+## 19.3 Reddit — r/espresso
+
+```yaml
+name: r/espresso
+slug: r-espresso
+url: https://www.reddit.com/r/espresso/
+resource_type: community
+platform: Reddit
+status: active
+description: ""
+```
+
+## 19.4 Reddit — r/coffee_roasters
+
+```yaml
+name: r/coffee_roasters
+slug: r-coffee-roasters
+url: https://www.reddit.com/r/coffee_roasters/
+resource_type: community
+platform: Reddit
+status: active
+```
+
+## 19.5 Discord — Espresso Aficionado Community
+
+```yaml
+name: Espresso Aficionado Discord
+slug: espresso-aficionado-discord
+url: https://discord.com/invite/mysterycoffeeleague
+resource_type: community
+platform: Discord
+status: active
+```
+
+## 19.6 Google Maps
+
+```yaml
+name: Google Maps
+slug: google-maps
+url: https://maps.google.com/
+resource_type: discovery_tool
+platform: Web
+status: active
+```
+
+Private research note:
+
+```text
+Useful for geographic roaster discovery. User reports it works better for this purpose than plain Google search. Do not publish subjective comparison.
+```
+
+## 19.7 RoastGuide
+
+```yaml
+name: RoastGuide
+slug: roastguide
+url: https://apps.apple.com/gb/app/roastguide/id1454418262
+resource_type: app
+platform: Apple App Store
+status: active
+description: ""
+```
+
+Observation:
+
+```yaml
+- observation_type: roaster_count
+  value: 487
+  observed_at: 2024
+  notes: Reported/supplied as the number of roasters worldwide as of 2024.
+```
+
+## 19.8 r/coffeerotation
+
+```yaml
+name: r/coffeerotation
+slug: r-coffeerotation
+url: https://www.reddit.com/r/coffeerotation/
+resource_type: community
+platform: Reddit
+status: active
+```
+
+Person:
+
+```yaml
+name: DannyyDo
+role: contributor
+```
+
+Observation supplied:
+
+```yaml
+- observation_type: visitor_count
+  value: 1100
+  observed_at: ""
+  notes: User supplied weekly visitor figure; verify date before publication.
+```
+
+Creation date supplied:
+
+```text
+2024-10-31
+```
+
+Store as a community metadata field only if the application already supports creation dates, otherwise retain it as a dated observation.
+
+## 19.9 Roastful
+
+```yaml
+name: Roastful
+slug: roastful
+url: https://www.roastful.com/
+resource_type: website
+platform: Web
+status: active
+email: hello@roastful.com
+description: ""
+```
+
+Useful link:
+
+```yaml
+- title: Top Roasters
+  url: https://www.roastful.com/top-roasters
+  link_type: discovery
+```
+
+## 19.10 LoffeeLabs
+
+```yaml
+name: LoffeeLabs
+slug: loffeelabs
+url: https://www.loffeelabs.com/roasters-registry/
+resource_type: directory
+platform: Web
+status: active
+location: Oahu, Hawaii, USA
+email: loffeelabs@gmail.com
+description: ""
+```
+
+Useful links:
+
+```yaml
+- title: Instagram
+  url: https://www.instagram.com/loffeelabs/
+  link_type: other
+
+- title: YouTube
+  url: https://www.youtube.com/@LoffeeLabs
+  link_type: channel
+```
+
+Notes for verification:
+
+```text
+The supplied site text says the organization is located on Oahu and holds meetups with fellow coffee lovers.
+```
+
+## 19.11 CoffeeDrippd
+
+```yaml
+name: CoffeeDrippd
+slug: coffeedrippd
+url: https://coffeedrippd.com/
+resource_type: discovery_tool
+platform: Web
+status: active
+location: Reykjavik, Iceland
+email: support@coffeedrippd.com
+description: ""
+```
+
+Useful link:
+
+```yaml
+- title: LinkedIn
+  url: https://www.linkedin.com/company/coffeedrippd/about/
+  link_type: other
+```
+
+Private research observation:
+
+```text
+User tested a 100 km search and observed 12 roasters in NY. Do not publish without date/context.
+```
+
+## 19.12 CoffeeRoast
+
+```yaml
+name: CoffeeRoast
+slug: coffeeroast
+url: https://coffeeroast.com/
+resource_type: directory
+platform: Web
+status: active
+description: ""
+```
+
+Person:
+
+```yaml
+name: Theo C.
+role: creator
+```
+
+Useful link:
+
+```yaml
+- title: Top by Country — Spain
+  url: https://coffeeroast.com/top-by-country/spain
+  link_type: country
+```
+
+Private research notes:
+
+```text
+Google authentication observed.
+User reports advertising popups.
+User reports that suggesting a roaster requires registration.
+Do not publish these as resource facts unless independently verified and deliberately selected for publication.
+```
+
+## 19.13 Coffee Review
+
+```yaml
+name: Coffee Review
+slug: coffee-review
+url: https://www.coffeereview.com
+resource_type: publication
+platform: Web
+status: active
+location: Berkeley, CA, USA
+description: ""
+```
+
+People:
+
+```yaml
+- name: Kenneth Davids
+  role: founder
+
+- name: Ron Walters
+  role: founder
+
+- name: Kim Westerman
+  role: contact
+  email: Kim@CoffeeReview.com
+```
+
+Address supplied:
+
+```text
+2625 Alcatraz Avenue
+Berkeley, CA 94705
+USA
+```
+
+Features supplied:
+
+```text
+Chinese translations
+```
+
+Historical/publication claims supplied by Coffee Review should be independently verified before being used as public resource description.
+
+## 19.14 World Coffee Research
+
+```yaml
+name: World Coffee Research
+slug: world-coffee-research
+url: https://worldcoffeeresearch.org
+resource_type: research
+platform: Web
+status: active
+description: ""
+```
+
+Child resource:
+
+```yaml
+name: Sensory Lexicon
+slug: world-coffee-research-sensory-lexicon
+url: https://worldcoffeeresearch.org/resources/sensory-lexicon
+resource_type: reference
+platform: Web
+status: active
+parent_resource: world-coffee-research
+```
+
+# 20. Books
+
+## The Fair Trade Scandal
+
+```yaml
+name: The Fair Trade Scandal
+slug: the-fair-trade-scandal
+url: https://www.ohioswallow.com/9780821420928/the-fair-trade-scandal/
+resource_type: book
+platform: Web
+status: active
+```
+
+Person:
+
+```yaml
+name: Noonco Sylla
+role: author
+```
+
+## Organic Coffee
+
+```yaml
+name: Organic Coffee
+slug: organic-coffee
+url: https://www.ohioswallow.com/9780896802476/organic-coffee
+resource_type: book
+platform: Web
+status: active
+```
+
+Person:
+
+```yaml
+name: Maria Elena Martinez-Torres
+role: author
+```
+
+## Holy Grounds
+
+```yaml
+name: Holy Grounds - The Surprising Connection between Coffee and Faith
+slug: holy-grounds
+url: https://www.amazon.com/Holy-Grounds-Surprising-Connection-between/dp/1506448232
+resource_type: book
+platform: Web
+status: active
+```
+
+Person:
+
+```yaml
+name: Tim Schenck
+role: author
+```
+
+# 21. Articles
+
+## 69 Top Coffee-Producing Countries From A To Z
+
+```yaml
+name: 69 Top Coffee-Producing Countries From A To Z (That Means Angola To Zimbabwe)
+slug: 69-top-coffee-producing-countries
+url: https://www.thecoffeemaven.com/guide/top-coffee-producing-countries
+resource_type: article
+platform: Web
+status: active
+```
+
+Person:
+
+```yaml
+name: Bryan De Luca
+role: author
+```
+
+Publication date:
+
+```text
+2021-09-07
+```
+
+Parent resource:
+
+```text
+The Coffee Maven
+```
+
+## Coffee Roaster - Local - Coffee Roastery Near You
+
+```yaml
+name: Coffee Roaster - Local - Coffee Roastery Near You. Find Your Local Coffee Roaster
+slug: coffee-roaster-local
+url: https://www.thecoffeemaven.com/coffee-roaster-local
+resource_type: article
+platform: Web
+status: active
+```
+
+Person:
+
+```yaml
+name: Bryan Harrington
+role: author
+```
+
+Parent resource:
+
+```text
+The Coffee Maven
+```
+
+## 10 Steps to Coffee
+
+```yaml
+name: 10 Steps to Coffee
+slug: 10-steps-to-coffee
+url: https://www.colonialcoffee.ca/10steps
+resource_type: article
+platform: Web
+status: active
+```
+
+Parent resource:
+
+```text
+Colonial Coffee
+```
+## What is Coffee?
+
+```yaml
+name: What is Coffee?
+slug: what-is-coffee
+url: https://www.colonialcoffee.ca/whatiscoffee
+resource_type: article
+platform: Web
+status: active
+```
+
+Parent resource:
+
+```text
+Colonial Coffee
+```
+
+## Coffee around the world
+
+```yaml
+name: Coffee around the world
+slug: coffee-around-the-world
+url: https://www.colonialcoffee.ca/coffeearoundtheworld
+resource_type: article
+platform: Web
+status: active
+```
+
+Parent resource:
+
+```text
+Colonial Coffee
+```
+# 22. INeedCoffee.com
+
+```yaml
+name: INeedCoffee.com
+slug: ineedcoffee
+url: https://ineedcoffee.com/section/
+resource_type: publication
+platform: Web
+status: archived
+description: ""
+```
+
+Person:
+
+```yaml
+name: @digitalcolony
+role: maintainer
+```
+
+GitHub identity supplied:
+
+```text
+@digitalcolony
+```
+
+Do not imply that the site is currently maintained.
+
+# 23. Video
+
+## What Does Coffee Processing Look Like?
+
+```yaml
+name: What Does Coffee Processing Look Like? | Video Walkthrough
+slug: what-does-coffee-processing-look-like
+url: https://www.youtube.com/watch?v=Ux98IXer_UE
+resource_type: video
+platform: YouTube
+status: active
+```
+
+Parent/channel resource:
+
+```yaml
+name: Alma Coffee
+slug: alma-coffee-youtube
+url: https://www.youtube.com/@myalmacoffee
+resource_type: website
+platform: YouTube
+status: active
+```
+
+Organization:
+
+```text
+Alma Coffee
+```
+
+# 24. Maple Creek Coffee's Roasting Blog
+
+```yaml
+name: Maple Creek Coffee's Roasting Blog
+slug: maple-creek-coffee-roasting-blog
+url: https://maplecreekcoffee.ca/blog
+resource_type: blog
+platform: Web
+status: active
+```
+
+Publisher:
+
+```text
+Maple Creek Coffee
+```
+
+If Maple Creek Coffee already exists as a roaster in the database, link the Resource to that roaster rather than creating a duplicate organization.
+
+Relationship:
+
+```text
+Maple Creek Coffee
+    publishes
+Maple Creek Coffee's Roasting Blog
+```
+
+# 25. Commonly Coffee Blog
+
+```yaml
+name: Commonly Coffee Blog
+slug: commonly-coffee
+url: https://commonlycoffee.com
+resource_type: blog
+platform: Web
+status: active
+description: ""
+```
+
+# 26. Wikipedia — Economics of Coffee
+
+```yaml
+name: Economics of coffee
+slug: wikipedia-economics-of-coffee
+url: https://en.wikipedia.org/wiki/Economics_of_coffee
+resource_type: reference
+platform: Wikipedia
+status: active
+```
+
+# 27. Seed Data Implementation Rules
+
+The seed data should be imported as a development/research dataset first.
+
+Do not silently convert user-supplied information into verified production data.
+
+For every field:
+
+```text
+verified = true
+```
+
+only after the normal thebeans.ca verification process has independently confirmed it.
+
+For missing information:
+
+```text
+NULL
+```
+
+not:
+
+```text
+unknown
+N/A
+guess
+```
+
+unless the application specifically needs a status value.
+
+Do not fabricate:
+
+- emails
+- phone numbers
+- founders
+- addresses
+- social URLs
+- dates
+- descriptions
+- organization relationships
+
+# 28. Search / Filtering
+
+Do not initially build an elaborate filtering system.
+
+Resources should be searchable by:
+
+```text
+name
+description
+resource type
+platform
+```
+
+Optional future filtering:
+
+```text
+country/location
+has roaster discoveries
+```
+
+Do not make categories the central navigation mechanism.
+
+The content itself should drive discovery.
+
+# 29. Localization
+
+Resources should use the existing i18next architecture.
+
+Resource database content should initially be stored in its original factual form.
+
+UI strings must be localized through the existing translation system.
+
+Examples:
+
+```text
+Resources
+Explore the coffee world
+Visit resource
+People
+Useful links
+Roasters discovered through this resource
+Related resources
+Discovered through
+```
+
+Do not create a separate translation architecture just for Resources.
+
+# 30. Accessibility
+
+Required:
+
+- keyboard-accessible resource cards
+- visible focus states
+- semantic headings
+- accessible external-link indicators
+- horizontal scrolling must work without a mouse
+- cards must not rely solely on hover
+- adequate touch target sizes
+- screen-reader-friendly section labels
+- no auto-advancing carousels
+
+# 31. Performance
+
+Resources should not cause the application to load all associated roasters at once.
+
+Resource list:
+
+```text
+load resource summary
+```
+
+Resource detail:
+
+```text
+load resource
+load people
+load useful links
+load discovered roasters
+```
+
+Use existing React Query patterns.
+
+Use pagination or lazy loading if a resource eventually has a large number of discovered roasters.
+
+Images should not be required for a Resource record.
+
+Do not introduce image scraping.
+
+# 32. Security
+
+Admin operations must use the existing authentication/authorization system.
+
+Public users must not be able to:
+
+- create resources
+- modify resources
+- add discovery relationships
+- modify observations
+- view private research notes
+
+Validate URLs before storing them.
+
+External links should open safely according to existing application conventions.
+
+# 33. Non-Goals
+
+Do not build:
+
+- a generalized knowledge graph
+- a complete mirror of third-party directories
+- automatic scraping of resource websites
+- automatic synchronization with third-party directories
+- a social network for resource owners
+- a review/rating system for resources
+- resource rankings
+- resource quality scores
+- complex platform entities
+- an exhaustive taxonomy
+- a second independent roaster database
+
+The purpose is **curation, discovery and attribution**.
+
+# 34. Acceptance Criteria
+
+### Navigation
+
+- Resources appears immediately after Discover.
+- `/resources` works.
+- `/resources/[slug]` works.
+
+### Resources
+
+- Resources can be created and edited by an administrator.
+- Each Resource has a name, URL, type and lifecycle state.
+- Platform is a simple Resource attribute.
+- Resources can optionally have people.
+- Resources can optionally have a publisher/organization.
+- Resources can optionally have a parent Resource.
+- Resources can have useful links.
+- Resources can have dated observations.
+- Resources can be archived without deleting historical attribution.
+
+### Discovery attribution
+
+- A Resource can be linked to an existing roaster.
+- The relationship can retain the exact source URL.
+- Resource pages display “Roasters discovered through this resource.”
+- Roaster pages display “Discovered through.”
+- No requirement exists to enumerate every roaster contained by a third-party resource.
+
+### Data quality
+
+- No third-party roaster information is automatically copied into the roaster database.
+- Missing information remains blank/null.
+- No unverifiable data is fabricated.
+- Approximate/historical counts are dated and attributed.
+- Private research notes are not exposed publicly.
+
+### UX
+
+- Mobile-first layout.
+- Existing roaster cards are reused.
+- Resource cards are visually consistent with thebeans.ca.
+- Horizontal sections work on mobile.
+- Desktop uses an appropriate responsive layout.
+- No inaccessible carousel behavior.
+
+### Localization
+
+- Resource UI strings use i18next.
+- Existing language-selector architecture remains unchanged.
+    
+# 35. Recommended Implementation Order
+
+Implement in this order:
+
+```text
+1. Database migration
+2. Resource model
+3. Resource/person relationships
+4. Resource links
+5. Resource/roaster relationships
+6. Resource observations
+7. API endpoints
+8. Admin UI
+9. /resources index
+10. /resources/[slug] detail page
+11. Roaster "Discovered through" section
+12. Seed development data
+13. Responsive/mobile refinement
+14. Localization
+15. Accessibility testing
+16. Production verification/import
+```
+
+The initial production version should deliberately remain small. The most important capability is:
+
+```text
+Resource
+   ↓
+specific source page
+   ↓
+roaster discovered
+   ↓
+verified independently
+   ↓
+thebeans.ca roaster page
+```
+
+That attribution chain provides the practical value without creating a maintenance-heavy directory of directories.
+
+# 36. Current Implementation Status
+
+The Resources feature is implemented as a first production slice.
+
+## Public experience
+
+- `Discover -> Resources` is available in the desktop and mobile navigation.
+- `/resources` displays resource cards with type, platform, location, description, and discovered-roaster counts where available.
+- `/resources/[slug]` displays resource details, people, useful links, coverage observations, and roasters discovered through the resource. Parent and child resource data is available in the API response for future public navigation.
+- Resource detail pages include a `Back` button beside `Visit`. Back uses browser history to return to the previous Resources index position and falls back to `/resources` for direct visits.
+- External links use a new tab and safe opener settings.
+- Existing `RoasterCard` components are reused for discovered roasters.
+- Roaster detail pages display `Discovered through` links and exact source-page links when recorded.
+
+## Data and API
+
+The Prisma schema and migration include:
+
+- `Resource`
+- `Person`
+- `ResourcePerson`
+- `ResourceLink`
+- `ResourceRoaster`
+- `ResourceObservation`
+
+Public endpoints are available at:
+
+```text
+GET /api/resources
+GET /api/resources/:slug
+```
+
+Administrator-only endpoints support resource creation, updates, archival, people, useful links, discovered-roaster relationships, and observations. Archived resources are retained so historical attribution is not deleted. Private resource notes, relationship notes, and person notes are removed from public responses.
+
+Resource and source URLs are restricted to HTTP and HTTPS. Empty successful responses such as archive operations are handled by the shared client API without attempting to parse an empty JSON body.
+
+## Admin workflow currently available
+
+The admin Resources page supports:
+
+- Creating a resource with name, generated slug, URL, resource type, platform, and description.
+- Archiving an existing resource.
+- Platform selection from `Web`, `Reddit`, `Discord`, `YouTube`, `Wikipedia`, `Apple App Store`, and `Google Play Store`.
+- URL-based platform inference with manual override.
+- Platform-to-type inference in the create and edit forms: `Web` sets `website`, `Reddit` and `Discord` set `community`, `YouTube` sets `video`, and `Apple App Store` and `Google Play Store` set `app`.
+- Resource type pills use clearly distinct, high-contrast colors by type across public cards, detail pages, and the admin table. The palette must remain readable in light and dark mode and must not collapse into one nearly identical color.
+- Automatic URL-safe slug generation from the name, including numeric suffixes for collisions.
+- A multi-line description field at the bottom of the form.
+- A Resource list using the established admin table layout with name, type, platform, state, and actions.
+- The admin list is the default view; the creation form opens from a green `Add resource` button and closes after saving or cancellation.
+- Resource names in the admin table open `/admin/resources/[id]` for editing instead of opening the external resource URL. The edit page supports core metadata, platform, type, description, lifecycle state, and save.
+- The edit Resource form has only a Save action. After a successful save, it returns to the Admin Resources list, matching the navigation behavior of the other admin editors.
+- Edit Resource includes a searchable lookup of existing roasters to select the roaster providing the resource. The public resource detail page displays that provider as a link to the roaster page. The separate “Roasters discovered through this resource” UI is not part of the current Resource workflow.
+- Reversible resource deprecation. Deprecation sets the lifecycle state to `archived` and retains attribution; administrators can undeprecate a resource to restore its `active` state and public visibility.
+- Resource lifecycle is stored as `state` (`active`, `archived`, `inactive`, `closed`, or `unknown`).
+
+The relationship and observation API is available for administrative tooling. Dedicated admin controls for adding people, useful links, observations, and discovered roasters remain follow-up work.
+
+## Seed data
+
+The supplied research seed records are included in `server/prisma/seed.ts`, including resources, people, useful links, observations, parent relationships, lifecycle states, and private research notes. Missing values remain null. The seed does not create third-party roaster records or imply independent verification.
+
+## Localization and current UX scope
+
+Resource UI strings are present in English and French through the existing i18next files. The public index uses the established centered, large purple gradient heading style. The current index and detail layouts use responsive grids; a dedicated horizontal snap carousel has not been added.

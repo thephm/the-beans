@@ -130,6 +130,8 @@ model Roaster {
   people             RoasterPerson[]
   posts              Post[]
   sourceCountries    RoasterSourceCountry[]
+  resourceRoasters   ResourceRoaster[]
+  publishedResources Resource[]          @relation("ResourcePublisherRoaster")
   roasterSpecialties RoasterSpecialty[]
   suggestions        RoasterSuggestion[]
   createdBy          User?                  @relation("RoasterCreatedBy", fields: [createdById], references: [id])
@@ -492,4 +494,106 @@ model OAuthState {
   @@index([state])
   @@index([expiresAt])
   @@map("oauth_states")
+}
+
+model Resource {
+  id                      String                @id @default(cuid())
+  name                    String
+  slug                    String                @unique
+  url                     String
+  description             String?
+  resourceType            String                @db.VarChar(32)
+  platform                String?
+  state                   String                @default("active") @db.VarChar(16)
+  location                String?
+  publisherOrganizationName String?
+  publisherRoasterId       String?
+  parentResourceId        String?
+  email                   String?
+  phone                   String?
+  adminNotes              String?
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  parentResource          Resource?             @relation("ResourceHierarchy", fields: [parentResourceId], references: [id], onDelete: SetNull)
+  childResources          Resource[]            @relation("ResourceHierarchy")
+  publisherRoaster        Roaster?              @relation("ResourcePublisherRoaster", fields: [publisherRoasterId], references: [id], onDelete: SetNull)
+  people                  ResourcePerson[]
+  links                   ResourceLink[]
+  roasters                ResourceRoaster[]
+  observations            ResourceObservation[]
+
+  @@index([resourceType])
+  @@index([platform])
+  @@index([publisherRoasterId])
+  @@map("resources")
+}
+
+model Person {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  email       String?
+  websiteUrl  String?
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  resources   ResourcePerson[]
+
+  @@map("people")
+}
+
+model ResourcePerson {
+  id         String   @id @default(cuid())
+  resourceId String
+  personId   String
+  role       String   @db.VarChar(24)
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  person     Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([resourceId, personId, role])
+  @@map("resource_people")
+}
+
+model ResourceLink {
+  id           String   @id @default(cuid())
+  resourceId   String
+  title        String
+  url          String
+  description  String?
+  linkType     String   @default("other") @db.VarChar(20)
+  displayOrder Int      @default(0)
+  resource     Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([resourceId, displayOrder])
+  @@map("resource_links")
+}
+
+model ResourceRoaster {
+  id           String   @id @default(cuid())
+  resourceId   String
+  roasterId    String
+  sourceUrl    String?
+  sourceTitle  String?
+  discoveredAt DateTime @default(now())
+  notes        String?
+  resource     Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  roaster      Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
+
+  @@unique([resourceId, roasterId])
+  @@index([roasterId])
+  @@map("resource_roasters")
+}
+
+model ResourceObservation {
+  id              String   @id @default(cuid())
+  resourceId      String
+  observationType String   @db.VarChar(24)
+  value           Int
+  observedAt      DateTime?
+  sourceUrl       String?
+  notes           String?
+  resource        Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([resourceId, observedAt])
+  @@map("resource_observations")
 }

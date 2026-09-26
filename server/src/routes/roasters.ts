@@ -789,6 +789,14 @@ router.get('/:id', [
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
+        resourceRoasters: {
+          include: {
+            resource: {
+              select: { id: true, name: true, slug: true, url: true }
+            }
+          },
+          orderBy: { discoveredAt: 'desc' }
+        },
         _count: {
           select: {
             reviews: true,
@@ -868,6 +876,11 @@ router.get('/:id', [
       imageUrl,
       specialties,
       isFavourited,
+      discoveredThrough: roaster.resourceRoasters.map((relationship: any) => ({
+        resource: relationship.resource,
+        sourceUrl: relationship.sourceUrl,
+        sourceTitle: relationship.sourceTitle
+      })),
     };
 
     // Only expose socialNetworks field

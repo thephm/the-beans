@@ -33,6 +33,7 @@ import specialtyRoutes from './routes/specialties';
 import contactRouter from './routes/contact'; // Import contact router
 import favouritesRoutes from './routes/favourites';
 import suggestionsRoutes from './routes/suggestions';
+import resourceRoutes from './routes/resources';
 import backupRoutes from './routes/backup';
 import oauthNewRoutes from './routes/oauthNew';
 import postsRoutes from './routes/posts';
@@ -173,6 +174,7 @@ app.use('/api/specialties', specialtyRoutes);
 app.use('/api/contact', contactRouter);
 app.use('/api/favourites', favouritesRoutes);
 app.use('/api/suggestions', suggestionsRoutes);
+app.use('/api/resources', resourceRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/auth/oauth', oauthNewRoutes); // OAuth 2.0 system
 app.use('/api/posts', postsRoutes);

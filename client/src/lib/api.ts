@@ -232,7 +232,12 @@ class ApiClient {
         const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
-      return response.json();
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      const responseText = await response.text();
+      return responseText ? JSON.parse(responseText) as T : undefined as T;
     };
 
     try {
@@ -337,6 +342,46 @@ class ApiClient {
 
   async getRoaster(id: string) {
     return this.request(`/roasters/${id}`);
+  }
+
+  async getResources(params?: Record<string, any>) {
+    const searchParams = params ? new URLSearchParams(params).toString() : '';
+    return this.request(searchParams ? `/resources?${searchParams}` : '/resources');
+  }
+
+  async getResource(slug: string) {
+    return this.request(`/resources/${encodeURIComponent(slug)}`);
+  }
+
+  async createResource(data: any) {
+    return this.request('/resources', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  async updateResource(id: string, data: any) {
+    return this.request(`/resources/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+  }
+
+  async archiveResource(id: string) {
+    return this.request(`/resources/${id}`, { method: 'DELETE' });
+  }
+
+  async deprecateResource(id: string) {
+    return this.archiveResource(id);
+  }
+
+  async undeprecateResource(id: string) {
+    return this.updateResource(id, { state: 'active' });
+  }
+
+  async linkResourceRoaster(resourceId: string, data: { roasterId: string; sourceUrl?: string; sourceTitle?: string }) {
+    return this.request(`/resources/${resourceId}/roasters`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async unlinkResourceRoaster(resourceId: string, roasterId: string) {
+    return this.request(`/resources/${resourceId}/roasters/${roasterId}`, { method: 'DELETE' });
   }
 
   async getRoasterImages(id: string) {

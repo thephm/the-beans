@@ -533,7 +533,105 @@ async function main() {
     });
   }
 
+  console.log('📚 Seeding coffee resources...');
+  const resourceSeeds = [
+    { name: 'Coffee Insurrection', slug: 'coffee-insurrection', url: 'https://www.coffeeinsurrection.com', resourceType: 'website', platform: 'Web', state: 'active', location: 'Italy', adminNotes: 'Supplied discovery source: Reddit. Verify social profiles before publication.' },
+    { name: 'r/pourover', slug: 'r-pourover', url: 'https://www.reddit.com/r/pourover/', resourceType: 'community', platform: 'Reddit', state: 'active' },
+    { name: 'r/espresso', slug: 'r-espresso', url: 'https://www.reddit.com/r/espresso/', resourceType: 'community', platform: 'Reddit', state: 'active' },
+    { name: 'r/coffee_roasters', slug: 'r-coffee-roasters', url: 'https://www.reddit.com/r/coffee_roasters/', resourceType: 'community', platform: 'Reddit', state: 'active' },
+    { name: 'Espresso Aficionado Discord', slug: 'espresso-aficionado-discord', url: 'https://discord.com/invite/mysterycoffeeleague', resourceType: 'community', platform: 'Discord', state: 'active' },
+    { name: 'Google Maps', slug: 'google-maps', url: 'https://maps.google.com/', resourceType: 'discovery_tool', platform: 'Web', state: 'active', adminNotes: 'Useful for geographic roaster discovery. Do not publish subjective comparisons.' },
+    { name: 'RoastGuide', slug: 'roastguide', url: 'https://apps.apple.com/gb/app/roastguide/id1454418262', resourceType: 'app', platform: 'Apple App Store', state: 'active' },
+    { name: 'r/coffeerotation', slug: 'r-coffeerotation', url: 'https://www.reddit.com/r/coffeerotation/', resourceType: 'community', platform: 'Reddit', state: 'active', adminNotes: 'Supplied community creation date: 2024-10-31.' },
+    { name: 'Roastful', slug: 'roastful', url: 'https://www.roastful.com/', resourceType: 'website', platform: 'Web', state: 'active', email: 'hello@roastful.com' },
+    { name: 'LoffeeLabs', slug: 'loffeelabs', url: 'https://www.loffeelabs.com/roasters-registry/', resourceType: 'directory', platform: 'Web', state: 'active', location: 'Oahu, Hawaii, USA', email: 'loffeelabs@gmail.com', adminNotes: 'Supplied site text says the organization is located on Oahu and holds meetups. Verify before publishing.' },
+    { name: 'CoffeeDrippd', slug: 'coffeedrippd', url: 'https://coffeedrippd.com/', resourceType: 'discovery_tool', platform: 'Web', state: 'active', location: 'Reykjavik, Iceland', email: 'support@coffeedrippd.com', adminNotes: 'User tested a 100 km search and observed 12 roasters in NY. Keep private until dated and contextualized.' },
+    { name: 'CoffeeRoast', slug: 'coffeeroast', url: 'https://coffeeroast.com/', resourceType: 'directory', platform: 'Web', state: 'active', adminNotes: 'Google authentication, advertising, and registration observations remain private research notes.' },
+    { name: 'Coffee Review', slug: 'coffee-review', url: 'https://www.coffeereview.com', resourceType: 'publication', platform: 'Web', state: 'active', location: 'Berkeley, CA, USA' },
+    { name: 'World Coffee Research', slug: 'world-coffee-research', url: 'https://worldcoffeeresearch.org', resourceType: 'research', platform: 'Web', state: 'active' },
+    { name: 'Sensory Lexicon', slug: 'world-coffee-research-sensory-lexicon', url: 'https://worldcoffeeresearch.org/resources/sensory-lexicon', resourceType: 'reference', platform: 'Web', state: 'active', parentSlug: 'world-coffee-research' },
+    { name: 'The Fair Trade Scandal', slug: 'the-fair-trade-scandal', url: 'https://www.ohioswallow.com/9780821420928/the-fair-trade-scandal/', resourceType: 'book', platform: 'Web', state: 'active' },
+    { name: 'Organic Coffee', slug: 'organic-coffee', url: 'https://www.ohioswallow.com/9780896802476/organic-coffee', resourceType: 'book', platform: 'Web', state: 'active' },
+    { name: 'Holy Grounds - The Surprising Connection between Coffee and Faith', slug: 'holy-grounds', url: 'https://www.amazon.com/Holy-Grounds-Surprising-Connection-between/dp/1506448232', resourceType: 'book', platform: 'Web', state: 'active' },
+    { name: 'Coffee Roaster - Local - Coffee Roastery Near You. Find Your Local Coffee Roaster', slug: 'coffee-roaster-local', url: 'https://www.thecoffeemaven.com/coffee-roaster-local', resourceType: 'article', platform: 'Web', state: 'active' },
+    { name: '10 Steps to Coffee', slug: '10-steps-to-coffee', url: 'https://www.colonialcoffee.ca/10steps', resourceType: 'article', platform: 'Web', state: 'active', description: 'A practical guide that walks coffee drinkers through the key steps from choosing and buying beans to brewing a better cup, with straightforward advice for understanding coffee and improving your results.' },
+    { name: 'What is Coffee?', slug: 'whatiscoffee', url: 'https://www.colonialcoffee.ca/whatiscoffee', resourceType: 'article', platform: 'Web', state: 'active' },
+    { name: 'Coffee around the world', slug: 'coffee-around-the-world', url: 'https://www.colonialcoffee.ca/coffee-around-the-world', resourceType: 'article', platform: 'Web', state: 'active' },
+    { name: 'INeedCoffee.com', slug: 'ineedcoffee', url: 'https://ineedcoffee.com/section/', resourceType: 'publication', platform: 'Web', state: 'archived' },
+    { name: 'Alma Coffee', slug: 'alma-coffee-youtube', url: 'https://www.youtube.com/@myalmacoffee', resourceType: 'website', platform: 'YouTube', state: 'active', description: 'Provides behind-the-scenes videos and educational content about coffee from farm to cup, including coffee farming, processing methods, roasting, brewing, and the people and practices involved in producing coffee.' },
+    { name: 'What Does Coffee Processing Look Like? | Video Walkthrough', slug: 'what-does-coffee-processing-look-like', url: 'https://www.youtube.com/watch?v=Ux98IXer_UE', resourceType: 'video', platform: 'YouTube', state: 'active', parentSlug: 'alma-coffee-youtube' },
+    { name: "Maple Creek Coffee's Roasting Blog", slug: 'maple-creek-coffee-roasting-blog', url: 'https://maplecreekcoffee.ca/blog', resourceType: 'blog', platform: 'Web', state: 'active', publisherOrganizationName: 'Maple Creek Coffee' },
+    { name: 'Commonly Coffee Blog', slug: 'commonly-coffee', url: 'https://commonlycoffee.com', resourceType: 'blog', platform: 'Web', state: 'active' },
+    { name: 'Economics of coffee', slug: 'wikipedia-economics-of-coffee', url: 'https://en.wikipedia.org/wiki/Economics_of_coffee', resourceType: 'reference', platform: 'Web', state: 'active' }
+  ] as const;
+
+  const resourceIds = new Map<string, string>();
+  await prisma.resource.deleteMany({ where: { slug: '69-top-coffee-producing-countries' } });
+  for (const seed of resourceSeeds) {
+    const { parentSlug, state: seedState, ...data } = seed as typeof seed & { parentSlug?: string; state?: string };
+    const parentResourceId = parentSlug ? resourceIds.get(parentSlug) : undefined;
+    const resourceData = { ...data, state: seedState || 'active', parentResourceId };
+    const resource = await prisma.resource.upsert({
+      where: { slug: seed.slug },
+      update: resourceData,
+      create: resourceData
+    });
+    resourceIds.set(seed.slug, resource.id);
+  }
+
+  const peopleSeeds = [
+    ['coffee-insurrection', 'Tanya Nanetti', 'tanya-nanetti', 'creator'],
+    ['coffee-insurrection', 'Endri Nonaj', 'endri-nonaj', 'creator'],
+    ['r-coffeerotation', 'DannyyDo', 'dannydo', 'contributor'],
+    ['coffeeroast', 'Theo C.', 'theo-c', 'creator'],
+    ['coffee-review', 'Kenneth Davids', 'kenneth-davids', 'founder'],
+    ['coffee-review', 'Ron Walters', 'ron-walters', 'founder'],
+    ['coffee-review', 'Kim Westerman', 'kim-westerman', 'contact'],
+    ['ineedcoffee', '@digitalcolony', 'digitalcolony', 'maintainer'],
+    ['the-fair-trade-scandal', 'Noonco Sylla', 'noonco-sylla', 'author'],
+    ['organic-coffee', 'Maria Elena Martinez-Torres', 'maria-elena-martinez-torres', 'author'],
+    ['holy-grounds', 'Tim Schenck', 'tim-schenck', 'author']
+  ] as const;
+  for (const [resourceSlug, name, personSlug, role] of peopleSeeds) {
+    const resourceId = resourceIds.get(resourceSlug);
+    if (!resourceId) continue;
+    const email = personSlug === 'kim-westerman' ? 'Kim@CoffeeReview.com' : undefined;
+    const person = await prisma.person.upsert({ where: { slug: personSlug }, update: { name, email }, create: { name, slug: personSlug, email } });
+    await prisma.resourcePerson.upsert({
+      where: { resourceId_personId_role: { resourceId, personId: person.id, role } },
+      update: {},
+      create: { resourceId, personId: person.id, role }
+    });
+  }
+
+  const linkSeeds = [
+    ['coffee-insurrection', 'Best Specialty Coffee Roasters in the World', 'https://www.coffeeinsurrection.com/best-specialty-coffee-roasters-in-the-world.html', 'discovery'],
+    ['roastful', 'Top Roasters', 'https://www.roastful.com/top-roasters', 'discovery'],
+    ['loffeelabs', 'Instagram', 'https://www.instagram.com/loffeelabs/', 'other'],
+    ['loffeelabs', 'YouTube', 'https://www.youtube.com/@LoffeeLabs', 'channel'],
+    ['coffeedrippd', 'LinkedIn', 'https://www.linkedin.com/company/coffeedrippd/about/', 'other'],
+    ['coffeeroast', 'Top by Country - Spain', 'https://coffeeroast.com/top-by-country/spain', 'country']
+  ] as const;
+  for (const [resourceSlug, title, url, linkType] of linkSeeds) {
+    const resourceId = resourceIds.get(resourceSlug);
+    if (!resourceId) continue;
+    const existing = await prisma.resourceLink.findFirst({ where: { resourceId, url } });
+    if (!existing) await prisma.resourceLink.create({ data: { resourceId, title, url, linkType } });
+  }
+
+  const observations = [
+    ['roastguide', 'roaster_count', 487, new Date('2024-01-01'), 'Reported/supplied as the number of roasters worldwide as of 2024.'],
+    ['r-coffeerotation', 'visitor_count', 1100, null, 'User supplied weekly visitor figure; verify date before publication.']
+  ] as const;
+  for (const [resourceSlug, observationType, value, observedAt, notes] of observations) {
+    const resourceId = resourceIds.get(resourceSlug);
+    if (!resourceId) continue;
+    const existing = await prisma.resourceObservation.findFirst({ where: { resourceId, observationType, value } });
+    if (!existing) await prisma.resourceObservation.create({ data: { resourceId, observationType, value, observedAt, notes } });
+  }
+
   console.log('✅ Seeded regions and countries successfully!');
+  console.log('✅ Seeded coffee resources successfully!');
   console.log('🎉 Database seeding completed successfully!');
 }
 
