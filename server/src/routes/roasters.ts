@@ -8,6 +8,7 @@ import { canEditRoaster } from '../middleware/roasterAuth';
 import { auditBefore, auditAfter, captureOldValues, storeEntityForAudit } from '../middleware/auditMiddleware';
 import { createAuditLog, getClientIP, getUserAgent, getEntityName } from '../lib/auditService';
 import { generateUniqueRoasterSlug } from '../lib/slug';
+import { SOCIAL_NETWORK_KEYS } from '../lib/socialNetworks';
 
 const router = Router();
 // Use shared Prisma client
@@ -1008,7 +1009,7 @@ router.post('/', [
     const isAdmin = currentUser?.role === 'admin';
 
     // Consolidate social network fields into socialNetworks object
-    const socialKeys = ['instagram','tiktok','facebook','linkedin','youtube','threads','pinterest','bluesky','x','reddit'];
+    const socialKeys = SOCIAL_NETWORK_KEYS;
     const socialNetworks: Record<string, string> = {};
     socialKeys.forEach(key => {
       if (req.body[key] && typeof req.body[key] === 'string' && req.body[key].trim() !== '') {
@@ -1286,7 +1287,7 @@ router.put('/:id', [
 
     const { id } = req.params;
   // Consolidate social network fields into socialNetworks object
-  const socialKeys = ['instagram','tiktok','facebook','linkedin','youtube','threads','pinterest','bluesky','x','reddit'];
+  const socialKeys = SOCIAL_NETWORK_KEYS;
   const socialNetworks: Record<string, string> = {};
   socialKeys.forEach(key => {
     if (req.body[key] && typeof req.body[key] === 'string' && req.body[key].trim() !== '') {

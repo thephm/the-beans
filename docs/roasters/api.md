@@ -66,10 +66,10 @@ Create a new roaster (requires authentication).
 		"linkedin": "https://linkedin.com/company/...",
 		"youtube": "https://youtube.com/@...",
 		"threads": "https://threads.net/@...",
-		"mastodon": "https://mstdn.ca/@...",
 		"pinterest": "https://pinterest.com/...",
 		"bluesky": "https://bsky.app/profile/...",
-		"x": "https://x.com/..."
+		"x": "https://x.com/...",
+		"reddit": "https://reddit.com/r/..."
 	}
 }
 ```

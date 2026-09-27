@@ -116,6 +116,7 @@
     "resourceType": "Type",
     "resourceTypeColumn": "Resource type",
     "description": "Description",
+    "socials": "Socials",
     "saving": "Saving...",
     "created": "Resource created.",
     "createFailed": "Could not create resource.",
@@ -145,6 +146,7 @@
     "roasterLinked": "Roaster linked.",
     "roasterLinkFailed": "Could not link roaster.",
     "providerRoaster": "Roaster providing this resource",
+    "clearProviderRoaster": "Remove roaster",
     "providerLookup": "Search roasters",
     "chooseProvider": "Choose a roaster",
     "undeprecate": "Undeprecate"

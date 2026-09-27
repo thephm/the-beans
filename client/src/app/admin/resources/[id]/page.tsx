@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { apiClient } from '@/lib/api'
+import SocialNetworksFields from '@/components/SocialNetworksFields'
+import { socialNetworksToForm, socialNetworksToPayload } from '@/lib/socials'
 
 const platforms = ['Web', 'Reddit', 'Discord', 'YouTube', 'Wikipedia', 'Apple App Store', 'Google Play Store']
 const resourceTypes = ['website', 'directory', 'community', 'app', 'article', 'book', 'video', 'blog', 'publication', 'research', 'reference', 'discovery_tool', 'other']
@@ -41,7 +43,8 @@ export default function AdminResourceEditPage() {
       description: resource.description || '',
       state: resource.state || 'active',
       people: resource.people || [],
-      publisherRoasterId: resource.publisherRoaster?.id || ''
+      publisherRoasterId: resource.publisherRoaster?.id || '',
+      socialNetworks: socialNetworksToForm(resource)
       })
     }).catch((error: any) => setMessage(error.message)).finally(() => setLoading(false))
   }, [params?.id, user?.role, t])
@@ -72,9 +75,11 @@ export default function AdminResourceEditPage() {
         platform: form.platform,
         description: form.description,
         state: form.state,
-        publisherRoasterId: form.publisherRoasterId || null
+        publisherRoasterId: form.publisherRoasterId || null,
+        socialNetworks: socialNetworksToPayload(form.socialNetworks)
       })
       router.push('/admin/resources')
+      router.refresh()
     } catch (error: any) {
       setMessage(error.message || t('adminResources.updateFailed', 'Could not update resource.'))
     } finally {
@@ -99,11 +104,23 @@ export default function AdminResourceEditPage() {
             <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
               <label htmlFor="resource-provider-search" className="mb-1 block">{t('adminResources.providerRoaster', 'Roaster providing this resource')}</label>
               <input id="resource-provider-search" value={providerSearch} onChange={(event) => setProviderSearch(event.target.value)} placeholder={t('adminResources.providerLookup', 'Search roasters')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
-              {providerRoasters.length > 0 && <div className="mt-2 space-y-2">{providerRoasters.map((roaster) => <button type="button" key={roaster.id} onClick={() => { setForm({ ...form, publisherRoasterId: roaster.id }); setProviderSearch(roaster.name) }} className={`block w-full rounded-lg px-3 py-2 text-left ${form.publisherRoasterId === roaster.id ? 'bg-green-100 font-semibold text-green-900 dark:bg-green-900/50 dark:text-green-100' : 'bg-white text-gray-800 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-600'}`}>{roaster.name}{roaster.city ? ` - ${roaster.city}` : ''}</button>)}</div>}
+              {providerRoasters.length > 0 && <div className="mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">{providerRoasters.map((roaster) => {
+                const isSelected = form.publisherRoasterId === roaster.id
+                return (
+                  <div key={roaster.id} className={`flex items-center gap-2 border-b border-gray-200 last:border-b-0 dark:border-gray-700 ${isSelected ? 'bg-green-100 dark:bg-green-900/50' : ''}`}>
+                    <button type="button" onClick={() => { setForm({ ...form, publisherRoasterId: roaster.id }); setProviderSearch(roaster.name) }} className={`flex-1 px-4 py-2 text-left ${isSelected ? 'font-semibold text-green-900 dark:text-green-100' : 'text-gray-800 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700'}`}>{roaster.name}{roaster.city ? ` - ${roaster.city}` : ''}</button>
+                    {isSelected && <button type="button" onClick={() => { setForm({ ...form, publisherRoasterId: '' }); setProviderSearch(''); setProviderRoasters([]) }} aria-label={t('adminResources.clearProviderRoaster', 'Remove roaster')} title={t('adminResources.clearProviderRoaster', 'Remove roaster')} className="px-3 py-2 text-lg font-bold leading-none text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">&times;</button>}
+                  </div>
+                )
+              })}</div>}
             </div>
             <label className="flex cursor-pointer items-start gap-3 pt-2 text-sm font-medium text-gray-700 dark:text-gray-200"><input type="checkbox" checked={form.state === 'archived'} onChange={(event) => setForm({ ...form, state: event.target.checked ? 'archived' : 'active' })} className="mt-0.5 h-4 w-4 shrink-0 accent-primary-600" /><span><span className="block">{t('adminResources.deprecateResource', 'Deprecate Resource')}</span><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-300">{t('adminResources.deprecateHelp', 'Deprecated resources are hidden from the public Resources list but remain available for historical attribution.')}</span></span></label>
           </div>
           <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.description', 'Description')}</span><textarea rows={5} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+          <section className="sm:col-span-2 rounded-lg border border-gray-200 p-4 dark:border-gray-700" aria-labelledby="resource-socials-heading">
+            <h2 id="resource-socials-heading" className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">{t('adminResources.socials', 'Socials')}</h2>
+            <SocialNetworksFields values={form.socialNetworks} onChange={(socialNetworks) => setForm({ ...form, socialNetworks })} idPrefix="resource-social" />
+          </section>
           {form.people.length > 0 && <section className="sm:col-span-2 rounded-lg bg-gray-100 p-5 dark:bg-gray-700" aria-labelledby="resource-people-heading"><h2 id="resource-people-heading" className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">{t('resources.people', 'People')}</h2><div className="space-y-2">{form.people.map((entry: any) => <div key={entry.id} className="rounded-lg bg-white px-3 py-2 dark:bg-gray-800"><p className="font-medium text-gray-800 dark:text-gray-100">{entry.person?.name}</p><p className="text-sm text-primary-700 dark:text-primary-300">{entry.role}</p></div>)}</div></section>}
           <div className="sm:col-span-2 flex justify-end"><button disabled={saving} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div>
           {message && <p className="self-center text-sm text-gray-600 dark:text-gray-300">{message}</p>}

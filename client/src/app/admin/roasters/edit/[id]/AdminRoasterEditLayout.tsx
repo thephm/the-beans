@@ -6,7 +6,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
 import SpecialtyPillSelector from "@/components/SpecialtyPillSelector";
 import SimpleImageUpload from "@/components/SimpleImageUpload";
+import SocialNetworksFields from "@/components/SocialNetworksFields";
 import { stripToRootUrl } from "@/lib/url";
+import { emptySocialNetworks, socialNetworksToForm, socialNetworksToPayload } from "@/lib/socials";
 import { Country, PersonRole, RoasterImage } from "@/types";
 
 type HoursDay = {
@@ -150,18 +152,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     latitude: "",
     longitude: "",
   });
-  const [socialInfo, setSocialInfo] = useState({
-    instagram: "",
-    tiktok: "",
-    facebook: "",
-    linkedin: "",
-    youtube: "",
-    threads: "",
-    pinterest: "",
-    bluesky: "",
-    x: "",
-    reddit: "",
-  });
+  const [socialInfo, setSocialInfo] = useState<Record<string, string>>(emptySocialNetworks());
   const [contactPeople, setContactPeople] = useState<ContactForm[]>([buildEmptyContact()]);
   const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<string[]>([]);
   const [availableCountries, setAvailableCountries] = useState<Country[]>([]);
@@ -174,7 +165,6 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const [newUrlImage, setNewUrlImage] = useState("");
   const [hours, setHours] = useState<Record<string, HoursDay>>(buildDefaultHours());
   const [showHours, setShowHours] = useState(isEditing);
-  const [showAllSocials, setShowAllSocials] = useState(false);
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [rating, setRating] = useState(0);
   const [verified, setVerified] = useState(false);
@@ -303,10 +293,6 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     setLocationInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSocialInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSocialInfo((prev) => ({ ...prev, [name]: value }));
-  };
   const handleContactInfoChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setContactPeople((prev) =>
@@ -509,7 +495,6 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
         if (!response.ok) return;
 
         const data = await response.json();
-        const socialNetworks = data.socialNetworks || {};
 
         setBasicInfo({
           name: data.name || "",
@@ -531,18 +516,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
           longitude: data.longitude ? String(data.longitude) : "",
         });
 
-        setSocialInfo({
-          instagram: socialNetworks.instagram || "",
-          tiktok: socialNetworks.tiktok || "",
-          facebook: socialNetworks.facebook || "",
-          linkedin: socialNetworks.linkedin || "",
-          youtube: socialNetworks.youtube || "",
-          threads: socialNetworks.threads || "",
-          pinterest: socialNetworks.pinterest || "",
-          bluesky: socialNetworks.bluesky || "",
-          x: socialNetworks.x || "",
-          reddit: socialNetworks.reddit || "",
-        });
+        setSocialInfo(socialNetworksToForm(data));
 
         setShowHours(typeof data.showHours === "boolean" ? data.showHours : true);
         setOnlineOnly(Boolean(data.onlineOnly));
@@ -766,13 +740,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       const effectiveShowHours = onlineOnly ? false : showHours;
       const normalizedHours = normalizeHours(hours);
 
-      const socialNetworks: Record<string, string> = {};
-      Object.entries(socialInfo).forEach(([key, value]) => {
-        const trimmedValue = value.trim();
-        if (trimmedValue.length > 0) {
-          socialNetworks[key] = trimmedValue;
-        }
-      });
+      const socialNetworks = socialNetworksToPayload(socialInfo);
 
       const payload = {
         name: trimmedName,
@@ -1192,69 +1160,9 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     }
 
     if (sectionKey === "socials") {
-      const primarySocialFields = [
-        { name: "instagram", label: t('adminForms.roasters.instagram', 'Instagram'), placeholder: "https://instagram.com/" },
-        { name: "facebook", label: t('adminForms.roasters.facebook', 'Facebook'), placeholder: "https://facebook.com/" },
-        { name: "tiktok", label: t('adminForms.roasters.tiktok', 'TikTok'), placeholder: "https://tiktok.com/@" },
-        { name: "linkedin", label: t('adminForms.roasters.linkedin', 'LinkedIn'), placeholder: "https://linkedin.com/" },
-        { name: "youtube", label: t('adminForms.roasters.youtube', 'YouTube'), placeholder: "https://youtube.com/" },
-      ];
-
-      const secondarySocialFields = [
-        { name: "x", label: t('adminForms.roasters.x', 'X'), placeholder: "https://x.com/" },
-        { name: "threads", label: t('adminForms.roasters.threads', 'Threads'), placeholder: "https://threads.net/" },
-        { name: "pinterest", label: t('adminForms.roasters.pinterest', 'Pinterest'), placeholder: "https://pinterest.com/" },
-        { name: "bluesky", label: t('adminForms.roasters.bluesky', 'Bluesky'), placeholder: "https://bsky.app/" },
-        { name: "reddit", label: t('adminForms.roasters.reddit', 'Reddit'), placeholder: "https://reddit.com/" },
-      ];
-
-      const renderSocialField = (field: { name: string; label: string; placeholder: string }) => (
-        <div key={field.name}>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {field.label}
-          </label>
-          <input
-            type="url"
-            name={field.name}
-            value={(socialInfo as Record<string, string>)[field.name] || ""}
-            onChange={handleSocialInfoChange}
-            onPaste={(event) => {
-              event.preventDefault();
-              const cleanUrl = stripToRootUrl(event.clipboardData.getData("text"));
-              setSocialInfo((prev) => ({ ...prev, [field.name]: cleanUrl }));
-            }}
-            placeholder={field.placeholder}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-          />
-        </div>
-      );
-
       return (
         <div className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {primarySocialFields.map(renderSocialField)}
-            {secondarySocialFields.map((field) => (
-              <div
-                key={field.name}
-                className={`${showAllSocials ? "block" : "hidden"} md:block`}
-              >
-                {renderSocialField(field)}
-              </div>
-            ))}
-            {secondarySocialFields.length > 0 && (
-              <div className="md:hidden">
-                <button
-                  type="button"
-                  onClick={() => setShowAllSocials((prev) => !prev)}
-                  className="text-sm font-semibold text-primary-600 dark:text-primary-300 hover:underline"
-                >
-                  {showAllSocials
-                    ? t('adminForms.roasters.showLessSocials', 'Show less')
-                    : t('adminForms.roasters.showMoreSocials', 'Show more')}
-                </button>
-              </div>
-            )}
-          </div>
+          <SocialNetworksFields values={socialInfo} onChange={setSocialInfo} idPrefix="roaster-social" />
         </div>
       );
     }

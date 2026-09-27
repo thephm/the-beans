@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
+import { isSocialNetworksObject, normalizeSocialNetworks } from '../lib/socialNetworks';
 
 const router = Router();
 
@@ -100,12 +101,18 @@ router.post('/', requireAuth, requireAdmin, [
   body('url').isURL({ protocols: ['http', 'https'], require_protocol: true }),
   body('resourceType').trim().notEmpty(),
   body('state').optional().isIn(['active', 'archived', 'inactive', 'closed', 'unknown']),
+  body('socialNetworks').optional({ nullable: true }).custom((value) => {
+    if (!isSocialNetworksObject(value)) throw new Error('socialNetworks must be an object');
+    return true;
+  }).withMessage('socialNetworks must be an object mapping network->url'),
 ], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
   if (!isSafeUrl(req.body.url)) return res.status(400).json({ error: 'URL must use HTTP or HTTPS' });
   try {
-    const resource = await prisma.resource.create({ data: req.body });
+    const data = { ...req.body };
+    if ('socialNetworks' in data) data.socialNetworks = normalizeSocialNetworks(data.socialNetworks);
+    const resource = await prisma.resource.create({ data });
     res.status(201).json(publicResource(resource));
   } catch (error: any) {
     if (error.code === 'P2002') return res.status(409).json({ error: 'A resource with that slug already exists' });
@@ -117,8 +124,13 @@ router.post('/', requireAuth, requireAdmin, [
 router.patch('/:id', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   const { url } = req.body;
   if (url && !isSafeUrl(url)) return res.status(400).json({ error: 'URL must use HTTP or HTTPS' });
+  if ('socialNetworks' in req.body && req.body.socialNetworks !== null && !isSocialNetworksObject(req.body.socialNetworks)) {
+    return res.status(400).json({ error: 'socialNetworks must be an object mapping network->url' });
+  }
   try {
-    const resource = await prisma.resource.update({ where: { id: req.params.id }, data: req.body });
+    const data = { ...req.body };
+    if ('socialNetworks' in data) data.socialNetworks = normalizeSocialNetworks(data.socialNetworks);
+    const resource = await prisma.resource.update({ where: { id: req.params.id }, data });
     res.json(publicResource(resource));
   } catch (error) {
     res.status(404).json({ error: 'Resource not found' });

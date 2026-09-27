@@ -835,6 +835,7 @@ publisher_organization_id
 parent_resource_id
 email
 phone
+social_networks
 created_at
 updated_at
 ```
@@ -898,6 +899,33 @@ Optional.
 This describes the resource organization/person/service where appropriate.
 
 It must not be confused with the locations of roasters listed by the resource.
+
+### social_networks
+
+Optional JSON object mapping a social network key to a profile URL, stored as `socialNetworks` (JSONB).
+
+This uses the exact same storage shape, allowed keys, form component and validation as roaster socials, so the two features stay in sync.
+
+Allowed keys:
+
+```text
+instagram
+tiktok
+facebook
+linkedin
+youtube
+threads
+pinterest
+bluesky
+x
+reddit
+```
+
+Rules:
+
+- Only the keys above are stored; unknown keys are dropped on save.
+- Values must be absolute `http`/`https` URLs; empty values are omitted rather than stored as blanks.
+- Admin add/edit resource forms render the shared Socials section (`SocialNetworksFields`).
 
 # 5. Resource People
 
@@ -1371,6 +1399,9 @@ Public API responses should expose only fields intended for public display.
 
 Do not expose private research notes.
 
+`POST /resources` and `PATCH /resources/:id` accept an optional `socialNetworks` object (same shape as the roaster endpoints). The server keeps only the allowed network keys with valid `http`/`https` URLs and rejects non-object values.
+
+
 # 16. Admin Workflow
 
 Adding a Resource should require as little work as possible.
@@ -1396,6 +1427,7 @@ Status
 Location
 Email
 Phone
+Social networks
 Publisher
 Parent resource
 ```
@@ -2343,6 +2375,7 @@ The purpose is **curation, discovery and attribution**.
 - Resources can optionally have a parent Resource.
 - Resources can have useful links.
 - Resources can have dated observations.
+- Resources can optionally have social network links, using the same fields, storage and validation as roasters.
 - Resources can be archived without deleting historical attribution.
 
 ### Discovery attribution

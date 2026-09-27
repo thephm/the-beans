@@ -149,6 +149,7 @@
     "resourceType": "Type",
     "resourceTypeColumn": "Type de ressource",
     "description": "Description",
+    "socials": "Reseaux sociaux",
     "saving": "Enregistrement...",
     "created": "Ressource creee.",
     "createFailed": "Impossible de creer la ressource.",
@@ -178,6 +179,7 @@
     "roasterLinked": "Torréfacteur lié.",
     "roasterLinkFailed": "Impossible de lier le torréfacteur.",
     "providerRoaster": "Torréfacteur fournissant cette ressource",
+    "clearProviderRoaster": "Retirer le torréfacteur",
     "providerLookup": "Rechercher des torréfacteurs",
     "chooseProvider": "Choisir un torréfacteur",
     "undeprecate": "Réactiver"
