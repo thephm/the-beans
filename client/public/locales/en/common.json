@@ -674,6 +674,7 @@
   "instagramUrl": "Instagram URL",
   "instagramUrlPlaceholder": "https://www.instagram.com/username",
   "roaster": "Roaster",
+  "roasterResource": "Roaster / Resource",
   "selectRoaster": "Select a roaster",
   "roasterRequired": "Please select a roaster",
   "firstNameRequired": "First name is required",

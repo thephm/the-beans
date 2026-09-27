@@ -194,11 +194,22 @@ export default function PeopleTable() {
                     <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                       <span className="mr-2">🏢</span>
                       <a
-                        href={`/admin/roasters/edit/${person.roaster.id}`}
+                        href={`/admin/roasters/edit/${person.roaster.id}?returnTo=people`}
                         className="text-primary-600 dark:text-primary-400 hover:underline"
                       >
                         {person.roaster.name}
                       </a>
+                      {person.roaster.resourceRoasters?.map(({ resource }) => (
+                        <React.Fragment key={resource.id}>
+                          <span className="mx-1">/</span>
+                          <a
+                            href={`/resources/${resource.slug}`}
+                            className="text-primary-600 dark:text-primary-400 hover:underline"
+                          >
+                            {resource.name}
+                          </a>
+                        </React.Fragment>
+                      ))}
                       {/* Show if person has same email in multiple roasters */}
                       {person.email && people.filter(p => p.email === person.email && p.id !== person.id).length > 0 && (
                         <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
@@ -247,7 +258,7 @@ export default function PeopleTable() {
                   {t('adminForms.roasters.name', 'Name')}{sortConfig?.key === 'firstName' && <SortArrow direction={sortConfig.direction} />}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roaster' ? { key: 'roaster', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roaster', direction: 'asc' })}>
-                  {t('adminSection.roasters', 'Roaster')}{sortConfig?.key === 'roaster' && <SortArrow direction={sortConfig.direction} />}
+                  {t('admin.people.roasterResource', 'Roaster / Resource')}{sortConfig?.key === 'roaster' && <SortArrow direction={sortConfig.direction} />}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roles' ? { key: 'roles', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roles', direction: 'asc' })}>
                   {t('adminSection.role', 'Role')}{sortConfig?.key === 'roles' && <SortArrow direction={sortConfig.direction} />}
@@ -289,11 +300,22 @@ export default function PeopleTable() {
                       {person.roaster ? (
                         <div>
                           <a
-                            href={`/admin/roasters/edit/${person.roaster.id}`}
+                            href={`/admin/roasters/edit/${person.roaster.id}?returnTo=people`}
                             className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                           >
                             {person.roaster.name}
                           </a>
+                          {person.roaster.resourceRoasters?.map(({ resource }) => (
+                            <React.Fragment key={resource.id}>
+                              <span className="mx-1">/</span>
+                              <a
+                                href={`/resources/${resource.slug}`}
+                                className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
+                              >
+                                {resource.name}
+                              </a>
+                            </React.Fragment>
+                          ))}
                           {/* Show if person has same email in multiple roasters */}
                           {person.email && people.filter(p => p.email === person.email && p.id !== person.id).length > 0 && (
                             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">

@@ -129,6 +129,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const returnToPeople = searchParams.get("returnTo") === "people";
   const [selected, setSelected] = useState("basic");
   const [mobileExpandedSections, setMobileExpandedSections] = useState<Record<string, boolean>>({
     basic: true,
@@ -373,7 +374,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       });
 
       if (response.ok) {
-        router.push("/admin/roasters");
+        router.push(returnToPeople ? "/admin/people" : "/admin/roasters");
         return;
       }
 
@@ -851,7 +852,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
 
       if (!roasterId) {
         const searchParam = encodeURIComponent(trimmedName);
-        router.push(`/admin/roasters?search=${searchParam}`);
+        router.push(returnToPeople ? "/admin/people" : `/admin/roasters?search=${searchParam}`);
       }
     } catch (error: any) {
       const message = error?.message || "Failed to save roaster";
@@ -1640,10 +1641,12 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
             <div className="md:w-64 md:-ml-8 md:pl-8 flex-shrink-0">
               <nav>
                 <Link
-                  href="/admin/roasters"
+                  href={returnToPeople ? "/admin/people" : "/admin/roasters"}
                   className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:underline transition-colors font-medium"
                 >
-                  {"<"} {t('admin.roasters.backToRoasters', 'Back to Roasters')}
+                  {"<"} {returnToPeople
+                    ? t('admin.people.backToPeople', 'Back to People')
+                    : t('admin.roasters.backToRoasters', 'Back to Roasters')}
                 </Link>
               </nav>
             </div>

@@ -697,6 +697,7 @@
   "instagramUrl": "URL Instagram",
   "instagramUrlPlaceholder": "https://www.instagram.com/nomutilisateur",
   "roaster": "Torréfacteur",
+  "roasterResource": "Torréfacteur / Ressource",
   "selectRoaster": "Sélectionner un torréfacteur",
   "roasterRequired": "Veuillez sélectionner un torréfacteur",
   "firstNameRequired": "Le prénom est requis",

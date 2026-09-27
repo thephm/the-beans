@@ -533,8 +533,13 @@ model Person {
   id          String           @id @default(cuid())
   name        String
   slug        String           @unique
+  title       String?
   email       String?
+  mobile      String?
   websiteUrl  String?
+  linkedinUrl String?
+  instagramUrl String?
+  bio         String?
   notes       String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
@@ -548,6 +553,7 @@ model ResourcePerson {
   resourceId String
   personId   String
   role       String   @db.VarChar(24)
+  isPrimary  Boolean  @default(false)
   resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
   person     Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
 

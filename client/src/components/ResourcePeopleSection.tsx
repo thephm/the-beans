@@ -7,22 +7,24 @@ import { PersonRole } from '@/types'
 const resourceRoleOptions = [
   PersonRole.OWNER,
   PersonRole.ADMIN,
+  PersonRole.ROASTER,
   PersonRole.EMPLOYEE,
   PersonRole.BILLING,
   PersonRole.MARKETING,
   PersonRole.SCOUT,
-  PersonRole.CUSTOMER,
   PersonRole.OTHER,
 ]
 
 interface ResourcePeopleSectionProps {
   people: any[]
   onChange: (people: any[]) => void
+  resourceId?: string
 }
 
 const toFormPerson = (entry: any) => {
   const person = entry.person || entry
   const nameParts = (person.name || '').trim().split(/\s+/)
+  const roles = entry.roles || person.roles || (entry.role ? [entry.role] : [])
   return {
     ...person,
     id: entry.personId || person.id,
@@ -34,28 +36,36 @@ const toFormPerson = (entry: any) => {
     linkedinUrl: person.linkedinUrl || '',
     instagramUrl: person.instagramUrl || '',
     bio: person.bio || person.notes || '',
-    roles: person.roles || (entry.role ? [entry.role] : []),
-    isPrimary: Boolean(person.isPrimary),
+    roles: roles.filter((role: PersonRole) => resourceRoleOptions.includes(role)),
+    isPrimary: Boolean(entry.isPrimary),
   }
 }
 
 const toResourcePerson = (person: any, existing: any = {}) => ({
   ...existing,
-  personId: existing.personId || person.id,
-  role: person.roles?.[0] || existing.role || 'other',
+  personId: existing.personId || existing.person?.id || person.id,
+  role: person.roles?.[person.roles.length - 1] || existing.role || 'other',
+  roles: person.roles?.length ? person.roles : [existing.role || 'other'],
+  isPrimary: Boolean(person.isPrimary),
   person: {
     ...(existing.person || {}),
     id: person.id,
     name: [person.firstName, person.lastName].filter(Boolean).join(' ').trim(),
     email: person.email || null,
-    websiteUrl: person.linkedinUrl || person.instagramUrl || null,
-    notes: [person.title, person.bio].filter(Boolean).join('\n\n') || null,
+    title: person.title || null,
+    mobile: person.mobile || null,
+    websiteUrl: existing.person?.websiteUrl || null,
+    linkedinUrl: person.linkedinUrl || null,
+    instagramUrl: person.instagramUrl || null,
+    bio: person.bio || null,
+    notes: existing.person?.notes || null,
   },
 })
 
-export default function ResourcePeopleSection({ people, onChange }: ResourcePeopleSectionProps) {
+export default function ResourcePeopleSection({ people, onChange, resourceId }: ResourcePeopleSectionProps) {
   const [expanded, setExpanded] = useState(false)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [saveError, setSaveError] = useState('')
   const [personSearch, setPersonSearch] = useState('')
   const [personResults, setPersonResults] = useState<any[]>([])
   const safePeople = Array.isArray(people) ? people : []
@@ -86,9 +96,26 @@ export default function ResourcePeopleSection({ people, onChange }: ResourcePeop
     setEditingIndex(null)
     onChange(safePeople.filter((_, entryIndex) => entryIndex !== index))
   }
-  const savePerson = (index: number, value: any) => {
-    updatePerson(index, value)
-    setEditingIndex(null)
+  const savePerson = async (index: number, value: any) => {
+    const updatedPerson = toResourcePerson(value, safePeople[index])
+    const existingEntry = safePeople[index]
+    const personId = updatedPerson.personId
+
+    setSaveError('')
+    try {
+      if (resourceId && existingEntry?.id && personId) {
+        await apiClient.updateResourcePerson(resourceId, personId, {
+          role: updatedPerson.role,
+          roles: updatedPerson.roles,
+          isPrimary: updatedPerson.isPrimary,
+          person: updatedPerson.person,
+        })
+      }
+      updatePerson(index, value)
+      setEditingIndex(null)
+    } catch (error: any) {
+      setSaveError(error?.message || 'Could not save person.')
+    }
   }
   const cancelPerson = (index: number) => {
     if (safePeople[index]?.person?.name?.trim()) {
@@ -111,6 +138,7 @@ export default function ResourcePeopleSection({ people, onChange }: ResourcePeop
         <ExpandMore aria-hidden="true" className={`ml-auto text-gray-600 transition-transform dark:text-gray-300 ${expanded ? 'rotate-180' : ''}`} />
       </button>
       <div id="resource-people-fields" hidden={!expanded} className="space-y-4 px-4 pb-4">
+        {saveError && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200">{saveError}</p>}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="relative w-full sm:max-w-xl sm:flex-1">
             <label htmlFor="resource-person-search" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Associate existing person</label>
@@ -141,7 +169,17 @@ export default function ResourcePeopleSection({ people, onChange }: ResourcePeop
                   {entry.role && <p className="text-sm text-gray-600 dark:text-gray-300">{entry.role}</p>}
                 </div>
                 <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => removePerson(index)} className="rounded-lg border border-red-300 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/20">Disassociate</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to disassociate this person from the resource?')) {
+                        removePerson(index)
+                      }
+                    }}
+                    className="rounded-lg border border-red-300 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/20"
+                  >
+                    Disassociate
+                  </button>
                   <button type="button" onClick={() => setEditingIndex(index)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">Edit</button>
                 </div>
               </div>

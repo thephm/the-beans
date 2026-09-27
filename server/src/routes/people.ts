@@ -170,7 +170,19 @@ router.get('/', [
         roaster: {
           select: {
             id: true,
-            name: true
+            name: true,
+            resourceRoasters: {
+              select: {
+                resource: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true
+                  }
+                }
+              },
+              orderBy: { resource: { name: 'asc' } }
+            }
           }
         },
         user: {

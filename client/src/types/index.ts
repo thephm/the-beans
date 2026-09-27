@@ -297,6 +297,13 @@ export interface RoasterPerson {
   roaster?: {
     id: string;
     name: string;
+    resourceRoasters?: Array<{
+      resource: {
+        id: string;
+        name: string;
+        slug: string;
+      };
+    }>;
   };
   firstName: string;
   lastName?: string;

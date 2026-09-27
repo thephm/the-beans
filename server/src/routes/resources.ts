@@ -212,11 +212,11 @@ router.delete('/:id/links/:linkId', requireAuth, requireAdmin, async (req: Reque
 });
 
 router.post('/:id/people', requireAuth, requireAdmin, [body('personId').optional().trim().notEmpty(), body('role').trim().notEmpty()], async (req: Request, res: Response) => {
-  const { personId, role, person } = req.body;
+  const { personId, role, isPrimary, person } = req.body;
   try {
     const resolvedPersonId = personId || (person ? (await prisma.person.create({ data: person })).id : null);
     if (!resolvedPersonId) return res.status(400).json({ error: 'personId or person is required' });
-    const relationship = await prisma.resourcePerson.create({ data: { resourceId: req.params.id, personId: resolvedPersonId, role }, include: { person: true } });
+    const relationship = await prisma.resourcePerson.create({ data: { resourceId: req.params.id, personId: resolvedPersonId, role, isPrimary: Boolean(isPrimary) }, include: { person: true } });
     res.status(201).json(relationship);
   } catch (error) {
     res.status(400).json({ error: 'Could not link person to resource' });
@@ -224,8 +224,11 @@ router.post('/:id/people', requireAuth, requireAdmin, [body('personId').optional
 });
 
 router.patch('/:id/people/:personId', requireAuth, requireAdmin, [body('role').trim().notEmpty()], async (req: Request, res: Response) => {
-  const { role, person } = req.body;
+  const { role, roles, isPrimary, person } = req.body;
   try {
+    const selectedRoles = Array.isArray(roles) && roles.length > 0
+      ? [...new Set(roles.filter((value: unknown): value is string => typeof value === 'string' && Boolean(value.trim())))]
+      : [role];
     const relationship = await prisma.resourcePerson.findFirst({
       where: { resourceId: req.params.id, personId: req.params.personId }
     });
@@ -237,16 +240,37 @@ router.patch('/:id/people/:personId', requireAuth, requireAdmin, [body('role').t
         data: {
           name: person.name,
           email: person.email,
+          title: person.title,
+          mobile: person.mobile,
           websiteUrl: person.websiteUrl,
+          linkedinUrl: person.linkedinUrl,
+          instagramUrl: person.instagramUrl,
+          bio: person.bio,
           notes: person.notes,
         }
       });
     }
     const updated = await prisma.resourcePerson.update({
       where: { id: relationship.id },
-      data: { role },
+      data: { role: selectedRoles[0], isPrimary: Boolean(isPrimary) },
       include: { person: true }
     });
+    await Promise.all(selectedRoles.slice(1).map((selectedRole) => prisma.resourcePerson.upsert({
+      where: {
+        resourceId_personId_role: {
+          resourceId: req.params.id,
+          personId: req.params.personId,
+          role: selectedRole,
+        }
+      },
+      update: { isPrimary: Boolean(isPrimary) },
+      create: {
+        resourceId: req.params.id,
+        personId: req.params.personId,
+        role: selectedRole,
+        isPrimary: Boolean(isPrimary),
+      },
+    })));
     res.json(updated);
   } catch (error) {
     res.status(400).json({ error: 'Could not update resource person' });
