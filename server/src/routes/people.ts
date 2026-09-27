@@ -162,12 +162,10 @@ router.get('/', [
     }
 
     // Get all people across all roasters
-    const people = await prisma.roasterPerson.findMany({
+    const allPeople = await prisma.roasterPerson.findMany({
       where: {
         isActive: true
       },
-      skip,
-      take: limit,
       include: {
         roaster: {
           select: {
@@ -186,11 +184,22 @@ router.get('/', [
       orderBy: orderBy
     });
 
-    const total = await prisma.roasterPerson.count({
-      where: {
-        isActive: true
-      }
-    });
+    // Legacy imports can contain the same person/roaster row more than once.
+    // Keep separate roaster associations, but collapse exact duplicate records.
+    const uniquePeople = Array.from(new Map(allPeople.map((person: any) => {
+      const duplicateKey = JSON.stringify({
+        roasterId: person.roasterId,
+        firstName: person.firstName?.trim().toLowerCase(),
+        lastName: person.lastName?.trim().toLowerCase() || '',
+        email: person.email?.trim().toLowerCase() || '',
+        mobile: person.mobile?.trim() || '',
+        title: person.title?.trim().toLowerCase() || '',
+        roles: [...(person.roles || [])].sort(),
+      });
+      return [duplicateKey, person];
+    })).values());
+    const people = uniquePeople.slice(skip, skip + limit);
+    const total = uniquePeople.length;
     const pages = Math.ceil(total / limit);
 
     // Add permissions to each person
