@@ -53,11 +53,11 @@ export default function SocialNetworksFields({ values, onChange, idPrefix = 'soc
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {PRIMARY_SOCIAL_NETWORKS.map(renderField)}
       {SECONDARY_SOCIAL_NETWORKS.map((key) => (
-        <div key={key} className={`${showAll ? 'block' : 'hidden'} md:block`}>
+        <div key={key} className={showAll ? 'block' : 'hidden'}>
           {renderField(key)}
         </div>
       ))}
-      <div className="md:hidden">
+      <div>
         <button
           type="button"
           onClick={() => setShowAll((prev) => !prev)}

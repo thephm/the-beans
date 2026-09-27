@@ -207,7 +207,7 @@ class ApiClient {
         headers,
       });
 
-      if (response.status === 401) {
+      if (response.status === 401 && !endpoint.startsWith('/auth/login')) {
         // Unauthorized: clear token and redirect to login
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token');
@@ -355,6 +355,11 @@ class ApiClient {
 
   async getAdminResource(id: string) {
     return this.request(`/resources/admin/${encodeURIComponent(id)}`);
+  }
+
+  async searchResourcePeople(search: string) {
+    const params = new URLSearchParams({ search }).toString();
+    return this.request(`/resources/people?${params}`);
   }
 
   async createResource(data: any) {

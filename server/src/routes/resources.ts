@@ -95,6 +95,26 @@ router.get('/admin/:id', requireAuth, requireAdmin, async (req: Request, res: Re
   }
 });
 
+router.get('/people', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+    const people = await prisma.person.findMany({
+      where: search ? {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+        ]
+      } : undefined,
+      orderBy: { name: 'asc' },
+      take: 20,
+    });
+    res.json({ people });
+  } catch (error) {
+    console.error('Error searching resource people:', error);
+    res.status(500).json({ error: 'Could not search people' });
+  }
+});
+
 router.get('/:slug', async (req: Request, res: Response) => {
   try {
     const resource = await prisma.resource.findUnique({ where: { slug: req.params.slug }, include: resourceInclude });

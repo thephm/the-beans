@@ -5,15 +5,16 @@ import { PersonRole } from '../types';
 interface PersonRoleButtonsProps {
   selectedRoles: PersonRole[];
   onRoleToggle: (role: PersonRole) => void;
+  roles?: PersonRole[];
   disabled?: boolean;
   size?: 'sm' | 'md';
   layout?: 'grid' | 'wrap' | 'column' | 'two-column';
 }
 
-export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disabled = false, size = 'md', layout = 'grid' }: PersonRoleButtonsProps) {
+export default function PersonRoleButtons({ selectedRoles, onRoleToggle, roles, disabled = false, size = 'md', layout = 'grid' }: PersonRoleButtonsProps) {
   const { t } = useTranslation();
   
-  const roles = [
+  const roleDefinitions = [
     { value: PersonRole.OWNER, label: t('admin.people.roleOwner', 'Owner') },
     { value: PersonRole.ADMIN, label: t('admin.people.roleAdmin', 'Admin') },
     { value: PersonRole.ROASTER, label: t('admin.people.roleRoaster', 'Roaster') },
@@ -21,8 +22,10 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
     { value: PersonRole.BILLING, label: t('admin.people.roleBilling', 'Billing') },
     { value: PersonRole.MARKETING, label: t('admin.people.roleMarketing', 'Marketing') },
     { value: PersonRole.SCOUT, label: t('admin.people.roleScout', 'Scout') },
-    { value: PersonRole.CUSTOMER, label: t('admin.people.roleCustomer', 'Customer') }
+    { value: PersonRole.CUSTOMER, label: t('admin.people.roleCustomer', 'Customer') },
+    { value: PersonRole.OTHER, label: t('admin.people.roleOther', 'Other') }
   ];
+  const visibleRoles = roles ? roleDefinitions.filter((role) => roles.includes(role.value)) : roleDefinitions;
 
   const sizeClasses = size === 'sm'
     ? 'px-3 py-1.5 text-sm min-w-[104px]'
@@ -42,7 +45,7 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, disable
 
   return (
     <div className={containerClasses}>
-      {roles.map(role => {
+      {visibleRoles.map(role => {
         const isSelected = selectedRoles.includes(role.value);
 
         return (

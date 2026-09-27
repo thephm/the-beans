@@ -17,9 +17,10 @@ interface AddPersonFormProps {
   mode?: 'add' | 'edit';
   initialPerson?: Partial<any>;
   error?: string;
+  roleOptions?: PersonRole[];
 }
 
-export default function AddPersonForm({ roasters, roasterId, roasterAssociations, onSave, onCancel, onDelete, mode = 'add', initialPerson, error }: AddPersonFormProps) {
+export default function AddPersonForm({ roasters, roasterId, roasterAssociations, onSave, onCancel, onDelete, mode = 'add', initialPerson, error, roleOptions }: AddPersonFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [form, setForm] = useState({
@@ -227,6 +228,7 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
                     <PersonRoleButtons 
                       selectedRoles={association.roles || []} 
                       onRoleToggle={(role) => handleAssociationRoleToggle(index, role)}
+                      roles={roleOptions}
                       size="sm"
                       layout="wrap"
                     />
@@ -260,6 +262,7 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
                 <PersonRoleButtons 
                   selectedRoles={form.roles} 
                   onRoleToggle={handleRoleToggle} 
+                  roles={roleOptions}
                   size="sm"
                   layout="wrap"
                 />

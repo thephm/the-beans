@@ -287,7 +287,8 @@ export enum PersonRole {
   BILLING = "billing",
   MARKETING = "marketing",
   SCOUT = "scout",
-  CUSTOMER = "customer"
+  CUSTOMER = "customer",
+  OTHER = "other"
 }
 
 export interface RoasterPerson {

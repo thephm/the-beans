@@ -91,9 +91,9 @@ export default function AdminResourceEditPage() {
         socialNetworks: socialNetworksToPayload(form.socialNetworks)
       })
       const currentPeople = form.people.filter((entry: any) => entry.person?.name)
-      await Promise.all(currentPeople.map((entry: any) => entry.personId
+      await Promise.all(currentPeople.map((entry: any) => entry.id
         ? apiClient.updateResourcePerson(form.id, entry.personId, { role: entry.role || 'other', person: entry.person })
-        : apiClient.linkResourcePerson(form.id, { role: entry.role || 'other', person: entry.person })))
+        : apiClient.linkResourcePerson(form.id, { personId: entry.personId, role: entry.role || 'other', person: entry.person })))
       await Promise.all(initialPeopleIds.filter((personId) => !currentPeople.some((entry: any) => entry.personId === personId)).map((personId) => apiClient.unlinkResourcePerson(form.id, personId)))
       router.push('/admin/resources')
       router.refresh()
