@@ -203,6 +203,36 @@ router.post('/:id/people', requireAuth, requireAdmin, [body('personId').optional
   }
 });
 
+router.patch('/:id/people/:personId', requireAuth, requireAdmin, [body('role').trim().notEmpty()], async (req: Request, res: Response) => {
+  const { role, person } = req.body;
+  try {
+    const relationship = await prisma.resourcePerson.findFirst({
+      where: { resourceId: req.params.id, personId: req.params.personId }
+    });
+    if (!relationship) return res.status(404).json({ error: 'Resource person not found' });
+
+    if (person) {
+      await prisma.person.update({
+        where: { id: req.params.personId },
+        data: {
+          name: person.name,
+          email: person.email,
+          websiteUrl: person.websiteUrl,
+          notes: person.notes,
+        }
+      });
+    }
+    const updated = await prisma.resourcePerson.update({
+      where: { id: relationship.id },
+      data: { role },
+      include: { person: true }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: 'Could not update resource person' });
+  }
+});
+
 router.delete('/:id/people/:personId', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
     await prisma.resourcePerson.deleteMany({ where: { resourceId: req.params.id, personId: req.params.personId } });

@@ -6,12 +6,13 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
 import SocialNetworksFields from '@/components/SocialNetworksFields'
+import ResourcePeopleSection from '@/components/ResourcePeopleSection'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import { countDefinedSocialNetworks, emptySocialNetworks, socialNetworksToPayload } from '@/lib/socials'
 
 const platforms = ['Web', 'Reddit', 'Discord', 'YouTube', 'Wikipedia', 'Apple App Store', 'Google Play Store']
 const resourceTypes = ['website', 'directory', 'community', 'app', 'article', 'book', 'video', 'blog', 'publication', 'research', 'reference', 'discovery_tool', 'other']
-const initialForm = { name: '', slug: '', url: '', resourceType: 'website', platform: 'Web', description: '', adminNotes: '', state: 'active', socialNetworks: emptySocialNetworks() }
+const initialForm = { name: '', slug: '', url: '', resourceType: 'website', platform: 'Web', description: '', adminNotes: '', state: 'active', socialNetworks: emptySocialNetworks(), people: [] as any[] }
 
 const slugify = (value: string) => value
   .toLowerCase()
@@ -70,7 +71,11 @@ export default function AdminResourceCreatePage() {
     try {
       const latest = await apiClient.getResources() as any
       const slug = uniqueSlug(form.name, latest.resources || resources)
-      await apiClient.createResource({ ...form, slug, socialNetworks: socialNetworksToPayload(form.socialNetworks) })
+      const createdResource: any = await apiClient.createResource({ ...form, slug, people: undefined, socialNetworks: socialNetworksToPayload(form.socialNetworks) })
+      await Promise.all(form.people.filter((entry: any) => entry.person?.name).map((entry: any) => apiClient.linkResourcePerson(createdResource.id, {
+        role: entry.role || 'other',
+        person: entry.person,
+      })))
       router.push('/admin/resources')
       router.refresh()
     } catch (error: any) {
@@ -101,6 +106,7 @@ export default function AdminResourceCreatePage() {
             </button>
             <div id="resource-socials-fields" hidden={!showSocials} className="px-4 pb-4"><SocialNetworksFields values={form.socialNetworks} onChange={(socialNetworks) => setForm({ ...form, socialNetworks })} idPrefix="resource-new-social" /></div>
           </section>
+          <ResourcePeopleSection people={form.people} onChange={(people) => setForm({ ...form, people })} />
           <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.observations', 'Observations')}</span><textarea rows={3} value={form.adminNotes} onChange={(event) => setForm({ ...form, adminNotes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-400" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.observationsPrivate', 'These observations are private and are not shown to end users.')}</span></label>
           <div className="sm:col-span-2 flex justify-end gap-3"><button type="button" onClick={() => router.push('/admin/resources')} className="rounded-lg border border-gray-300 px-5 py-2 font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">{t('common.cancel', 'Cancel')}</button><button disabled={saving} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div>
           {message && <p className="self-center text-sm text-gray-600 dark:text-gray-300">{message}</p>}

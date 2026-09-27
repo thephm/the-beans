@@ -388,6 +388,24 @@ class ApiClient {
     return this.request(`/resources/${resourceId}/roasters/${roasterId}`, { method: 'DELETE' });
   }
 
+  async linkResourcePerson(resourceId: string, data: any) {
+    return this.request(`/resources/${resourceId}/people`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateResourcePerson(resourceId: string, personId: string, data: any) {
+    return this.request(`/resources/${resourceId}/people/${personId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async unlinkResourcePerson(resourceId: string, personId: string) {
+    return this.request(`/resources/${resourceId}/people/${personId}`, { method: 'DELETE' });
+  }
+
   async getRoasterImages(id: string) {
     return this.request(`/roasters/${id}/images`);
   }

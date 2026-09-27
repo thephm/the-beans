@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { apiClient } from '@/lib/api'
 import SocialNetworksFields from '@/components/SocialNetworksFields'
+import ResourcePeopleSection from '@/components/ResourcePeopleSection'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import { countDefinedSocialNetworks, socialNetworksToForm, socialNetworksToPayload } from '@/lib/socials'
 
@@ -27,6 +28,7 @@ export default function AdminResourceEditPage() {
   const [providerRoasters, setProviderRoasters] = useState<any[]>([])
   const [selectedProviderRoaster, setSelectedProviderRoaster] = useState<any>(null)
   const [providerSearch, setProviderSearch] = useState('')
+  const [initialPeopleIds, setInitialPeopleIds] = useState<string[]>([])
 
   useEffect(() => {
     if (!user?.role || !params?.id) return
@@ -36,6 +38,7 @@ export default function AdminResourceEditPage() {
       return apiClient.getAdminResource(resource.id)
     }).then((resource: any) => {
       setSelectedProviderRoaster(resource.publisherRoaster || null)
+      setInitialPeopleIds((resource.people || []).map((entry: any) => entry.personId))
       setProviderRoasters([])
       setForm({
       id: resource.id,
@@ -87,6 +90,11 @@ export default function AdminResourceEditPage() {
         publisherRoasterId: form.publisherRoasterId || null,
         socialNetworks: socialNetworksToPayload(form.socialNetworks)
       })
+      const currentPeople = form.people.filter((entry: any) => entry.person?.name)
+      await Promise.all(currentPeople.map((entry: any) => entry.personId
+        ? apiClient.updateResourcePerson(form.id, entry.personId, { role: entry.role || 'other', person: entry.person })
+        : apiClient.linkResourcePerson(form.id, { role: entry.role || 'other', person: entry.person })))
+      await Promise.all(initialPeopleIds.filter((personId) => !currentPeople.some((entry: any) => entry.personId === personId)).map((personId) => apiClient.unlinkResourcePerson(form.id, personId)))
       router.push('/admin/resources')
       router.refresh()
     } catch (error: any) {
@@ -130,7 +138,7 @@ export default function AdminResourceEditPage() {
               </button>
               <div id="resource-socials-fields" hidden={!showSocials} className="px-4 pb-4"><SocialNetworksFields values={form.socialNetworks} onChange={(socialNetworks) => setForm({ ...form, socialNetworks })} idPrefix="resource-social" /></div>
             </section>
-          {form.people.length > 0 && <section className="sm:col-span-2 rounded-lg bg-gray-100 p-5 dark:bg-gray-700" aria-labelledby="resource-people-heading"><h2 id="resource-people-heading" className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-100">{t('resources.people', 'People')}</h2><div className="space-y-2">{form.people.map((entry: any) => <div key={entry.id} className="rounded-lg bg-white px-3 py-2 dark:bg-gray-800"><p className="font-medium text-gray-800 dark:text-gray-100">{entry.person?.name}</p><p className="text-sm text-primary-700 dark:text-primary-300">{entry.role}</p></div>)}</div></section>}
+          <ResourcePeopleSection people={Array.isArray(form.people) ? form.people : []} onChange={(people) => setForm({ ...form, people })} />
           <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.observations', 'Observations')}</span><textarea rows={3} value={form.adminNotes} onChange={(event) => setForm({ ...form, adminNotes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.observationsPrivate', 'These observations are private and are not shown to end users.')}</span></label>
           <div className="sm:col-span-2 flex justify-end gap-3"><button type="button" onClick={() => router.push('/admin/resources')} className="rounded-lg border border-gray-300 px-5 py-2 font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">{t('common.cancel', 'Cancel')}</button><button disabled={saving} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div>
           {message && <p className="self-center text-sm text-gray-600 dark:text-gray-300">{message}</p>}
