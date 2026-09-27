@@ -140,6 +140,7 @@
   "adminResources": {
     "title": "Ressources",
     "add": "Ajouter",
+    "addTitle": "Ajouter une ressource",
     "loading": "Chargement...",
     "accessRequired": "Acces administrateur requis.",
     "name": "Nom",
@@ -149,6 +150,8 @@
     "resourceType": "Type",
     "resourceTypeColumn": "Type de ressource",
     "description": "Description",
+    "observations": "Observations",
+    "observationsPrivate": "Ces observations sont privées et ne sont pas visibles par les utilisateurs.",
     "socials": "Reseaux sociaux",
     "saving": "Enregistrement...",
     "created": "Ressource creee.",

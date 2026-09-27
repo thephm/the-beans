@@ -107,6 +107,7 @@
   "adminResources": {
     "title": "Resources",
     "add": "Add",
+    "addTitle": "Add resource",
     "loading": "Loading...",
     "accessRequired": "Admin access required.",
     "name": "Name",
@@ -116,6 +117,8 @@
     "resourceType": "Type",
     "resourceTypeColumn": "Resource type",
     "description": "Description",
+    "observations": "Observations",
+    "observationsPrivate": "These observations are private and are not shown to end users.",
     "socials": "Socials",
     "saving": "Saving...",
     "created": "Resource created.",

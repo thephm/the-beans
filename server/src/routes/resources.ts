@@ -84,6 +84,17 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/admin/:id', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const resource = await prisma.resource.findUnique({ where: { id: req.params.id }, include: resourceInclude });
+    if (!resource) return res.status(404).json({ error: 'Resource not found' });
+    res.json(resource);
+  } catch (error) {
+    console.error('Error fetching admin resource:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get('/:slug', async (req: Request, res: Response) => {
   try {
     const resource = await prisma.resource.findUnique({ where: { slug: req.params.slug }, include: resourceInclude });

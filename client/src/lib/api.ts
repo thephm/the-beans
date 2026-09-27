@@ -353,6 +353,10 @@ class ApiClient {
     return this.request(`/resources/${encodeURIComponent(slug)}`);
   }
 
+  async getAdminResource(id: string) {
+    return this.request(`/resources/admin/${encodeURIComponent(id)}`);
+  }
+
   async createResource(data: any) {
     return this.request('/resources', { method: 'POST', body: JSON.stringify(data) });
   }

@@ -38,6 +38,10 @@ export function socialNetworksToPayload(values: Record<string, string>): Record<
   }, {} as Record<string, string>);
 }
 
+export function countDefinedSocialNetworks(values: Record<string, string>): number {
+  return SOCIAL_NETWORKS.filter((key) => (values[key] || '').trim().length > 0).length;
+}
+
 export function getSocial(roaster: any, network: string): string | null {
   if (!roaster) return null;
   // Prefer consolidated socialNetworks map
