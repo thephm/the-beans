@@ -27,6 +27,19 @@ const XIcon = (props: SvgIconProps) => (
   </SvgIcon>
 )
 
+const socialIconMap: Record<string, { Icon: ComponentType<SvgIconProps>; label: string }> = {
+  instagram: { Icon: Instagram, label: 'Instagram' },
+  facebook: { Icon: Facebook, label: 'Facebook' },
+  linkedin: { Icon: LinkedIn, label: 'LinkedIn' },
+  youtube: { Icon: YouTube, label: 'YouTube' },
+  threads: { Icon: ThreadsIcon, label: 'Threads' },
+  pinterest: { Icon: Pinterest, label: 'Pinterest' },
+  bluesky: { Icon: BlueskyIcon, label: 'Bluesky' },
+  x: { Icon: XIcon, label: 'X' },
+  twitter: { Icon: XIcon, label: 'X' },
+  reddit: { Icon: Reddit, label: 'Reddit' },
+}
+
 const typePillClass = (resourceType: string) => {
   switch (resourceType) {
     case 'website': return 'bg-green-600 text-white dark:bg-green-500 dark:text-white'
@@ -61,18 +74,6 @@ export default function ResourceDetailPage() {
   if (loading) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.loading', 'Loading resources')}</main>
   if (!resource) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.notFound', 'Resource not found')}</main>
 
-  const socialIconMap: Record<string, { Icon: ComponentType<SvgIconProps>; label: string }> = {
-    instagram: { Icon: Instagram, label: 'Instagram' },
-    facebook: { Icon: Facebook, label: 'Facebook' },
-    linkedin: { Icon: LinkedIn, label: 'LinkedIn' },
-    youtube: { Icon: YouTube, label: 'YouTube' },
-    threads: { Icon: ThreadsIcon, label: 'Threads' },
-    pinterest: { Icon: Pinterest, label: 'Pinterest' },
-    bluesky: { Icon: BlueskyIcon, label: 'Bluesky' },
-    x: { Icon: XIcon, label: 'X' },
-    twitter: { Icon: XIcon, label: 'X' },
-    reddit: { Icon: Reddit, label: 'Reddit' },
-  }
   const socialLinks = (Object.entries(resource.socialNetworks || {}) as Array<[string, string]>)
     .filter(([key, url]) => socialIconMap[key] && url.trim() && !(key === 'twitter' && resource.socialNetworks?.x))
     .map(([key, url]) => ({ key, url, ...socialIconMap[key] }))
