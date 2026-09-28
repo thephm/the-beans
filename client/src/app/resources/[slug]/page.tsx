@@ -40,6 +40,15 @@ const socialIconMap: Record<string, { Icon: ComponentType<SvgIconProps>; label: 
   reddit: { Icon: Reddit, label: 'Reddit' },
 }
 
+const isSafeSocialUrl = (value: string) => {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 const typePillClass = (resourceType: string) => {
   switch (resourceType) {
     case 'website': return 'bg-green-600 text-white dark:bg-green-500 dark:text-white'
@@ -85,7 +94,7 @@ export default function ResourceDetailPage() {
   const socialLinks = Object.entries(resourceSocials).flatMap(([key, url]) => {
     if (!socialIconMap[key] || typeof url !== 'string') return []
     const trimmedUrl = url.trim()
-    if (!trimmedUrl) return []
+    if (!trimmedUrl || !isSafeSocialUrl(trimmedUrl)) return []
     return [{ key, url: trimmedUrl, ...socialIconMap[key] }]
   })
 
