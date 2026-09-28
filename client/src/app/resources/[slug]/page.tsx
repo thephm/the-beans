@@ -74,10 +74,18 @@ export default function ResourceDetailPage() {
   if (loading) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.loading', 'Loading resources')}</main>
   if (!resource) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.notFound', 'Resource not found')}</main>
 
-  const socialLinks = Object.entries(resource.socialNetworks || {}).flatMap(([key, url]) => {
+  const resourceSocials = typeof resource.socialNetworks === 'object' && resource.socialNetworks !== null
+    ? { ...(resource.socialNetworks as Record<string, unknown>) }
+    : {}
+  if (typeof resourceSocials.x !== 'string' && typeof resourceSocials.twitter === 'string') {
+    resourceSocials.x = resourceSocials.twitter
+  }
+  delete resourceSocials.twitter
+
+  const socialLinks = Object.entries(resourceSocials).flatMap(([key, url]) => {
     if (!socialIconMap[key] || typeof url !== 'string') return []
     const trimmedUrl = url.trim()
-    if (!trimmedUrl || (key === 'twitter' && resource.socialNetworks?.x)) return []
+    if (!trimmedUrl) return []
     return [{ key, url: trimmedUrl, ...socialIconMap[key] }]
   })
 
