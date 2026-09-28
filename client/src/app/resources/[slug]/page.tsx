@@ -74,9 +74,12 @@ export default function ResourceDetailPage() {
   if (loading) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.loading', 'Loading resources')}</main>
   if (!resource) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.notFound', 'Resource not found')}</main>
 
-  const socialLinks = (Object.entries(resource.socialNetworks || {}) as Array<[string, string]>)
-    .filter(([key, url]) => socialIconMap[key] && url.trim() && !(key === 'twitter' && resource.socialNetworks?.x))
-    .map(([key, url]) => ({ key, url, ...socialIconMap[key] }))
+  const socialLinks = Object.entries(resource.socialNetworks || {}).flatMap(([key, url]) => {
+    if (!socialIconMap[key] || typeof url !== 'string') return []
+    const trimmedUrl = url.trim()
+    if (!trimmedUrl || (key === 'twitter' && resource.socialNetworks?.x)) return []
+    return [{ key, url: trimmedUrl, ...socialIconMap[key] }]
+  })
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
@@ -92,7 +95,7 @@ export default function ResourceDetailPage() {
           {resource.publisherRoaster && <p className="mb-6 text-gray-600 dark:text-gray-300">{t('resources.providedBy', 'Provided by')} <Link href={`/roasters/${resource.publisherRoaster.id}`} className="font-semibold text-primary-700 hover:underline dark:text-primary-300">{resource.publisherRoaster.name}</Link></p>}
           {socialLinks.length > 0 && (
             <div className="mb-6">
-              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{t('resources.socials', 'Socials')}</p>
+              <p className="mb-3 text-sm font-semibold text-gray-500 dark:text-gray-400">{t('resources.socials', 'Socials')}</p>
               <div className="flex flex-wrap items-center gap-2">
                 {socialLinks.map(({ key, url, Icon, label }) => (
                   <a
