@@ -49,6 +49,24 @@ const isSafeSocialUrl = (value: string) => {
   }
 }
 
+const getResourceSocialLinks = (socialNetworks: unknown) => {
+  const resourceSocials = typeof socialNetworks === 'object' && socialNetworks !== null
+    ? { ...(socialNetworks as Record<string, unknown>) }
+    : {}
+
+  if (typeof resourceSocials.x !== 'string' && typeof resourceSocials.twitter === 'string') {
+    resourceSocials.x = resourceSocials.twitter
+  }
+  delete resourceSocials.twitter
+
+  return Object.entries(resourceSocials).flatMap(([key, url]) => {
+    if (!socialIconMap[key] || typeof url !== 'string') return []
+    const trimmedUrl = url.trim()
+    if (!trimmedUrl || !isSafeSocialUrl(trimmedUrl)) return []
+    return [{ key, url: trimmedUrl, ...socialIconMap[key] }]
+  })
+}
+
 const typePillClass = (resourceType: string) => {
   switch (resourceType) {
     case 'website': return 'bg-green-600 text-white dark:bg-green-500 dark:text-white'
@@ -83,20 +101,7 @@ export default function ResourceDetailPage() {
   if (loading) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.loading', 'Loading resources')}</main>
   if (!resource) return <main className="min-h-screen bg-white px-4 pt-32 text-center dark:bg-gray-950 dark:text-white">{t('resources.notFound', 'Resource not found')}</main>
 
-  const resourceSocials = typeof resource.socialNetworks === 'object' && resource.socialNetworks !== null
-    ? { ...(resource.socialNetworks as Record<string, unknown>) }
-    : {}
-  if (typeof resourceSocials.x !== 'string' && typeof resourceSocials.twitter === 'string') {
-    resourceSocials.x = resourceSocials.twitter
-  }
-  delete resourceSocials.twitter
-
-  const socialLinks = Object.entries(resourceSocials).flatMap(([key, url]) => {
-    if (!socialIconMap[key] || typeof url !== 'string') return []
-    const trimmedUrl = url.trim()
-    if (!trimmedUrl || !isSafeSocialUrl(trimmedUrl)) return []
-    return [{ key, url: trimmedUrl, ...socialIconMap[key] }]
-  })
+  const socialLinks = getResourceSocialLinks(resource.socialNetworks)
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
