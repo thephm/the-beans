@@ -96,7 +96,7 @@ export default function ResourceDetailPage() {
               <div className="flex flex-wrap items-center gap-2">
                 {socialLinks.map(({ key, url, Icon, label }) => (
                   <a
-                    key={key}
+                    key={`${key}-${url}`}
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
