@@ -5,10 +5,11 @@ import { PersonRole } from '../types';
 import { Roaster } from '../types';
 import PersonRoleButtons from './PersonRoleButtons';
 import { stripToRootUrl } from '../lib/url';
+import { apiClient } from '../lib/api';
 
 
 interface AddPersonFormProps {
-  roasters?: Roaster[];
+  showRoasterSelector?: boolean;
   roasterId?: string; // If provided, roaster selector is hidden and this is used
   roasterAssociations?: any[]; // List of roaster associations for this person
   onSave: (person: any) => void;
@@ -20,7 +21,122 @@ interface AddPersonFormProps {
   roleOptions?: PersonRole[];
 }
 
-export default function AddPersonForm({ roasters, roasterId, roasterAssociations, onSave, onCancel, onDelete, mode = 'add', initialPerson, error, roleOptions }: AddPersonFormProps) {
+interface RoasterSearchFieldProps {
+  value: string
+  initialRoaster?: Roaster | null
+  label: string
+  onChange: (roaster: Roaster | null) => void
+}
+
+export function RoasterSearchField({ value, initialRoaster, label, onChange }: RoasterSearchFieldProps) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
+  const [selectedRoaster, setSelectedRoaster] = useState<Roaster | null>(initialRoaster || null);
+  const [results, setResults] = useState<Roaster[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (initialRoaster && initialRoaster.id === value) setSelectedRoaster(initialRoaster);
+  }, [initialRoaster, value]);
+
+  useEffect(() => {
+    const term = query.trim();
+    if (selectedRoaster || term.length < 2) {
+      setResults([]);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const data = await apiClient.getRoasters({ search: term, limit: 10 }) as any;
+        if (!cancelled) {
+          setResults(Array.isArray(data?.roasters) ? data.roasters : []);
+          setIsOpen(true);
+        }
+      } catch {
+        if (!cancelled) setResults([]);
+      } finally {
+        if (!cancelled) setIsSearching(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query, selectedRoaster]);
+
+  const selectRoaster = (roaster: Roaster) => {
+    setSelectedRoaster(roaster);
+    setQuery('');
+    setResults([]);
+    setIsOpen(false);
+    onChange(roaster);
+  };
+
+  const clearRoaster = () => {
+    setSelectedRoaster(null);
+    setQuery('');
+    setResults([]);
+    onChange(null);
+  };
+
+  return (
+    <div className="relative">
+      {selectedRoaster ? (
+        <div className="flex items-center gap-2 rounded-lg border border-green-300 bg-green-50 px-3 py-2 dark:border-green-800 dark:bg-green-900/30">
+          <span className="flex-1 text-gray-900 dark:text-gray-100">{selectedRoaster.name}</span>
+          <button type="button" onClick={clearRoaster} aria-label={t('adminResources.clearProviderRoaster', 'Remove roaster')} title={t('adminResources.clearProviderRoaster', 'Remove roaster')} className="text-lg font-bold leading-none text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">&times;</button>
+        </div>
+      ) : (
+        <>
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setIsOpen(true);
+            }}
+            onFocus={() => query.trim().length >= 2 && setIsOpen(true)}
+            onBlur={() => setIsOpen(false)}
+            placeholder={t('admin.posts.searchRoaster', 'Search for a roaster...')}
+            aria-label={label}
+            aria-autocomplete="list"
+            aria-expanded={isOpen && query.trim().length >= 2}
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+          />
+          {isOpen && query.trim().length >= 2 && (
+            <div role="listbox" className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
+              {isSearching ? (
+                <p className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t('common.loading', 'Loading...')}</p>
+              ) : results.length > 0 ? results.map((roaster) => (
+                <button
+                  key={roaster.id}
+                  type="button"
+                  role="option"
+                  aria-selected={false}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => selectRoaster(roaster)}
+                  className="block w-full border-b border-gray-200 px-4 py-2 text-left last:border-b-0 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700"
+                >
+                  <span className="block font-medium">{roaster.name}</span>
+                  {(roaster.city || roaster.state || roaster.country) && <span className="block text-sm text-gray-500 dark:text-gray-400">{[roaster.city, roaster.state || roaster.country].filter(Boolean).join(', ')}</span>}
+                </button>
+              )) : (
+                <p className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{t('admin.roasters.noSearchResults', 'No roasters found.')}</p>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function AddPersonForm({ showRoasterSelector = false, roasterId, roasterAssociations, onSave, onCancel, onDelete, mode = 'add', initialPerson, error, roleOptions }: AddPersonFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [form, setForm] = useState({
@@ -41,6 +157,7 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
   const [editableAssociations, setEditableAssociations] = useState<any[]>(
     roasterAssociations || []
   );
+  const [roasterValidationError, setRoasterValidationError] = useState('');
 
   useEffect(() => {
     if (roasterAssociations) {
@@ -65,7 +182,6 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
       });
     }
   }, [initialPerson]);
-  const safeRoasters = Array.isArray(roasters) ? roasters : [];
   const showPrimaryToggle = !(editableAssociations && editableAssociations.length > 0);
   const handleChange = (field: string, value: any) => {
     setForm(f => ({ ...f, [field]: value }));
@@ -88,6 +204,15 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
     });
   };
 
+  const handleAssociationRoasterChange = (index: number, roaster: Roaster | null) => {
+    setEditableAssociations(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], roasterId: roaster?.id || '', roaster: roaster || null };
+      return updated;
+    });
+    setRoasterValidationError('');
+  };
+
   const handleAssociationRoleToggle = (index: number, role: PersonRole) => {
     setEditableAssociations(prev => {
       const updated = [...prev];
@@ -104,6 +229,11 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if ((showRoasterSelector && !form.roasterId) || editableAssociations.some((association) => !association.roasterId)) {
+      setRoasterValidationError(t('admin.people.roasterRequired', 'Please select a roaster'));
+      return;
+    }
+    setRoasterValidationError('');
     // Include updated associations in the save
     onSave({ ...form, associations: editableAssociations });
   };
@@ -197,16 +327,12 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
                   <div className="flex flex-col sm:flex-row items-end gap-4">
                     <div className="flex-1 w-full">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
-                      <select 
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" 
-                        value={association.roasterId}
-                        onChange={e => handleAssociationChange(index, 'roasterId', e.target.value)}
-                      >
-                        <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
-                        {safeRoasters.map(roaster => (
-                          <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-                        ))}
-                      </select>
+                      <RoasterSearchField
+                        value={association.roasterId || ''}
+                        initialRoaster={association.roaster}
+                        label={t('admin.people.roaster', 'Roaster')}
+                        onChange={(roaster) => handleAssociationRoasterChange(index, roaster)}
+                      />
                     </div>
                     <div className="w-full sm:w-auto">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.primaryContact', 'Primary Contact')}</label>
@@ -227,7 +353,7 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
                     </label>
                     <PersonRoleButtons 
                       selectedRoles={association.roles || []} 
-                      onRoleToggle={(role) => handleAssociationRoleToggle(index, role)}
+                      onRoleToggle={(role) => handleAssociationRoleToggle(index, role as PersonRole)}
                       roles={roleOptions}
                       size="sm"
                       layout="wrap"
@@ -242,15 +368,18 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
           <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
             <div className="space-y-4">
               {/* Roaster */}
-              {!roasterId && roasters && (
+              {!roasterId && showRoasterSelector && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.people.roaster', 'Roaster')}</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value={form.roasterId} onChange={e => handleChange('roasterId', e.target.value)} required>
-                    <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
-                    {safeRoasters.map(roaster => (
-                      <option key={roaster.id} value={roaster.id}>{roaster.name}</option>
-                    ))}
-                  </select>
+                  <RoasterSearchField
+                    value={form.roasterId}
+                    initialRoaster={initialPerson?.roaster}
+                    label={t('admin.people.roaster', 'Roaster')}
+                    onChange={(roaster) => {
+                      handleChange('roasterId', roaster?.id || '');
+                      setRoasterValidationError('');
+                    }}
+                  />
                 </div>
               )}
 
@@ -279,9 +408,9 @@ export default function AddPersonForm({ roasters, roasterId, roasterAssociations
           <textarea rows={4} placeholder={t('admin.people.bio', 'Bio')} value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
         </div>
       </div>
-      {error && (
+      {(error || roasterValidationError) && (
         <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
+          <p className="text-red-800 dark:text-red-200 text-sm">{roasterValidationError || error}</p>
         </div>
       )}
       <div className="flex gap-4 mt-8 justify-between items-center">

@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { PersonRole } from '../types';
 
 interface PersonRoleButtonsProps {
-  selectedRoles: PersonRole[];
-  onRoleToggle: (role: PersonRole) => void;
-  roles?: PersonRole[];
+  selectedRoles: string[];
+  onRoleToggle: (role: string) => void;
+  roles?: string[];
   disabled?: boolean;
   size?: 'sm' | 'md';
   layout?: 'grid' | 'wrap' | 'column' | 'two-column';
@@ -25,7 +25,12 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, roles, 
     { value: PersonRole.CUSTOMER, label: t('admin.people.roleCustomer', 'Customer') },
     { value: PersonRole.OTHER, label: t('admin.people.roleOther', 'Other') }
   ];
-  const visibleRoles = roles ? roleDefinitions.filter((role) => roles.includes(role.value)) : roleDefinitions;
+  const visibleRoles = roles
+    ? [
+        ...roleDefinitions.filter((role) => roles.includes(role.value)),
+        ...roles.filter((role) => !roleDefinitions.some((definition) => definition.value === role)).map((value) => ({ value, label: value })),
+      ]
+    : roleDefinitions;
 
   const sizeClasses = size === 'sm'
     ? 'px-3 py-1.5 text-sm min-w-[104px]'

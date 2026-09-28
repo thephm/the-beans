@@ -129,7 +129,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const returnToPeople = searchParams.get("returnTo") === "people";
+  const returnToPeople = searchParams?.get("returnTo") === "people";
   const [selected, setSelected] = useState("basic");
   const [mobileExpandedSections, setMobileExpandedSections] = useState<Record<string, boolean>>({
     basic: true,
@@ -1214,7 +1214,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     </label>
                     <PersonRoleButtons
                       selectedRoles={contact.roles}
-                      onRoleToggle={(role) => handleContactRoleToggle(index, role)}
+                      onRoleToggle={(role) => handleContactRoleToggle(index, role as PersonRole)}
                       size="sm"
                       layout="wrap"
                     />

@@ -362,6 +362,17 @@ class ApiClient {
     return this.request(`/resources/people?${params}`);
   }
 
+  async getResourcePerson(personId: string) {
+    return this.request(`/resources/people/${encodeURIComponent(personId)}`);
+  }
+
+  async updateResourcePersonDetails(personId: string, data: any) {
+    return this.request(`/resources/people/${encodeURIComponent(personId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
   async createResource(data: any) {
     return this.request('/resources', { method: 'POST', body: JSON.stringify(data) });
   }

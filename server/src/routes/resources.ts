@@ -21,6 +21,16 @@ const isSafeUrl = (value: string) => {
   }
 };
 
+const createPersonSlug = async (name: string) => {
+  const baseSlug = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'person';
+  let slug = baseSlug;
+  let suffix = 2;
+  while (await prisma.person.findUnique({ where: { slug }, select: { id: true } })) {
+    slug = `${baseSlug}-${suffix++}`;
+  }
+  return slug;
+};
+
 const publicResource = (resource: any) => {
   const { adminNotes, ...safeResource } = resource;
   if (safeResource.people) {
@@ -112,6 +122,65 @@ router.get('/people', requireAuth, requireAdmin, async (req: Request, res: Respo
   } catch (error) {
     console.error('Error searching resource people:', error);
     res.status(500).json({ error: 'Could not search people' });
+  }
+});
+
+router.get('/people/:personId', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const person = await prisma.person.findUnique({
+      where: { id: req.params.personId },
+      include: {
+        resources: {
+          include: { resource: { select: { id: true, name: true, slug: true } } },
+          orderBy: { resource: { name: 'asc' } },
+        },
+      },
+    });
+    if (!person) return res.status(404).json({ error: 'Person not found' });
+    res.json({ person });
+  } catch (error) {
+    console.error('Error fetching resource person:', error);
+    res.status(500).json({ error: 'Could not fetch person' });
+  }
+});
+
+router.patch('/people/:personId', requireAuth, requireAdmin, [
+  body('name').trim().notEmpty().withMessage('Name is required'),
+  body('email').optional({ nullable: true, checkFalsy: true }).isEmail(),
+  body('title').optional({ nullable: true }).isString(),
+  body('mobile').optional({ nullable: true }).isString(),
+  body('websiteUrl').optional({ nullable: true, checkFalsy: true }).isURL({ protocols: ['http', 'https'], require_protocol: true }),
+  body('linkedinUrl').optional({ nullable: true, checkFalsy: true }).isURL({ protocols: ['http', 'https'], require_protocol: true }),
+  body('instagramUrl').optional({ nullable: true, checkFalsy: true }).isURL({ protocols: ['http', 'https'], require_protocol: true }),
+  body('bio').optional({ nullable: true }).isString(),
+], async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  try {
+    const person = await prisma.person.update({
+      where: { id: req.params.personId },
+      data: {
+        name: req.body.name,
+        email: req.body.email ?? null,
+        title: req.body.title ?? null,
+        mobile: req.body.mobile ?? null,
+        websiteUrl: req.body.websiteUrl ?? null,
+        linkedinUrl: req.body.linkedinUrl ?? null,
+        instagramUrl: req.body.instagramUrl ?? null,
+        bio: req.body.bio ?? null,
+      },
+      include: {
+        resources: {
+          include: { resource: { select: { id: true, name: true, slug: true } } },
+          orderBy: { resource: { name: 'asc' } },
+        },
+      },
+    });
+    res.json({ person });
+  } catch (error: any) {
+    if (error.code === 'P2025') return res.status(404).json({ error: 'Person not found' });
+    console.error('Error updating resource person:', error);
+    res.status(400).json({ error: 'Could not update person' });
   }
 });
 
@@ -214,7 +283,9 @@ router.delete('/:id/links/:linkId', requireAuth, requireAdmin, async (req: Reque
 router.post('/:id/people', requireAuth, requireAdmin, [body('personId').optional().trim().notEmpty(), body('role').trim().notEmpty()], async (req: Request, res: Response) => {
   const { personId, role, isPrimary, person } = req.body;
   try {
-    const resolvedPersonId = personId || (person ? (await prisma.person.create({ data: person })).id : null);
+    const resolvedPersonId = personId || (person ? (await prisma.person.create({
+      data: { ...person, slug: await createPersonSlug(person.name || '') },
+    })).id : null);
     if (!resolvedPersonId) return res.status(400).json({ error: 'personId or person is required' });
     const relationship = await prisma.resourcePerson.create({ data: { resourceId: req.params.id, personId: resolvedPersonId, role, isPrimary: Boolean(isPrimary) }, include: { person: true } });
     res.status(201).json(relationship);
@@ -226,9 +297,10 @@ router.post('/:id/people', requireAuth, requireAdmin, [body('personId').optional
 router.patch('/:id/people/:personId', requireAuth, requireAdmin, [body('role').trim().notEmpty()], async (req: Request, res: Response) => {
   const { role, roles, isPrimary, person } = req.body;
   try {
-    const selectedRoles = Array.isArray(roles) && roles.length > 0
-      ? [...new Set(roles.filter((value: unknown): value is string => typeof value === 'string' && Boolean(value.trim())))]
-      : [role];
+    const requestedRoles = Array.isArray(roles)
+      ? roles.filter((value: unknown): value is string => typeof value === 'string').map((value: string) => value.trim()).filter(Boolean)
+      : [];
+    const selectedRoles = [...new Set(requestedRoles.length > 0 ? requestedRoles : [String(role).trim()])];
     const relationship = await prisma.resourcePerson.findFirst({
       where: { resourceId: req.params.id, personId: req.params.personId }
     });
@@ -250,27 +322,33 @@ router.patch('/:id/people/:personId', requireAuth, requireAdmin, [body('role').t
         }
       });
     }
-    const updated = await prisma.resourcePerson.update({
-      where: { id: relationship.id },
-      data: { role: selectedRoles[0], isPrimary: Boolean(isPrimary) },
-      include: { person: true }
-    });
-    await Promise.all(selectedRoles.slice(1).map((selectedRole) => prisma.resourcePerson.upsert({
-      where: {
-        resourceId_personId_role: {
+    const updated = await prisma.$transaction(async (transaction) => {
+      await transaction.resourcePerson.deleteMany({
+        where: {
+          resourceId: req.params.id,
+          personId: req.params.personId,
+          role: { notIn: selectedRoles },
+        },
+      });
+      const updatedAssociations = await Promise.all(selectedRoles.map((selectedRole) => transaction.resourcePerson.upsert({
+        where: {
+          resourceId_personId_role: {
+            resourceId: req.params.id,
+            personId: req.params.personId,
+            role: selectedRole,
+          }
+        },
+        update: { isPrimary: Boolean(isPrimary) },
+        create: {
           resourceId: req.params.id,
           personId: req.params.personId,
           role: selectedRole,
-        }
-      },
-      update: { isPrimary: Boolean(isPrimary) },
-      create: {
-        resourceId: req.params.id,
-        personId: req.params.personId,
-        role: selectedRole,
-        isPrimary: Boolean(isPrimary),
-      },
-    })));
+          isPrimary: Boolean(isPrimary),
+        },
+        include: { person: true },
+      })));
+      return updatedAssociations[0];
+    });
     res.json(updated);
   } catch (error) {
     res.status(400).json({ error: 'Could not update resource person' });

@@ -38,7 +38,7 @@ export default function AdminResourceEditPage() {
       return apiClient.getAdminResource(resource.id)
     }).then((resource: any) => {
       setSelectedProviderRoaster(resource.publisherRoaster || null)
-      setInitialPeopleIds((resource.people || []).map((entry: any) => entry.personId))
+      setInitialPeopleIds(Array.from(new Set((resource.people || []).map((entry: any) => entry.personId).filter(Boolean))))
       setProviderRoasters([])
       setForm({
       id: resource.id,
@@ -91,9 +91,9 @@ export default function AdminResourceEditPage() {
         socialNetworks: socialNetworksToPayload(form.socialNetworks)
       })
       const currentPeople = form.people.filter((entry: any) => entry.person?.name)
-      await Promise.all(currentPeople.map((entry: any) => entry.id
-        ? apiClient.updateResourcePerson(form.id, entry.personId, { role: entry.role || 'other', roles: entry.roles || [entry.role || 'other'], isPrimary: Boolean(entry.isPrimary), person: entry.person })
-        : apiClient.linkResourcePerson(form.id, { personId: entry.personId, role: entry.role || 'other', isPrimary: Boolean(entry.isPrimary), person: entry.person })))
+      await Promise.all(currentPeople
+        .filter((entry: any) => !entry.id)
+        .map((entry: any) => apiClient.linkResourcePerson(form.id, { personId: entry.personId, role: entry.role || 'other', isPrimary: Boolean(entry.isPrimary), person: entry.person })))
       await Promise.all(initialPeopleIds.filter((personId) => !currentPeople.some((entry: any) => entry.personId === personId)).map((personId) => apiClient.unlinkResourcePerson(form.id, personId)))
       router.push('/admin/resources')
       router.refresh()

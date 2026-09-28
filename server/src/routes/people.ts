@@ -17,7 +17,8 @@ export enum PersonRole {
   BILLING = 'billing',
   MARKETING = 'marketing',
   SCOUT = 'scout',
-  CUSTOMER = 'customer'
+  CUSTOMER = 'customer',
+  OTHER = 'other'
 }
 
 // Permission helper functions
@@ -100,6 +101,7 @@ router.get('/', [
   query('limit').optional().isInt({ min: 1, max: 500 }),
   query('sortBy').optional().isString(),
   query('sortOrder').optional().isIn(['asc', 'desc']),
+  query('includeResources').optional().isBoolean(),
 ], requireAuth, async (req: Request, res: Response) => {
 
   try {
@@ -210,8 +212,90 @@ router.get('/', [
       });
       return [duplicateKey, person];
     })).values());
-    const people = uniquePeople.slice(skip, skip + limit);
-    const total = uniquePeople.length;
+    let peopleForListing: any[] = uniquePeople;
+    if (req.query.includeResources === 'true') {
+      const resourceAssociations = await prisma.resourcePerson.findMany({
+        include: {
+          person: { select: { id: true, name: true, title: true, email: true, mobile: true, createdAt: true } },
+          resource: { select: { id: true, name: true, slug: true } },
+        },
+      });
+      const groupedResourcePeople = new Map<string, any>();
+      resourceAssociations.forEach(({ person, resource, role, isPrimary }) => {
+        const key = `${resource.id}:${person.id}`;
+        let entry = groupedResourcePeople.get(key);
+        if (!entry) {
+          const [firstName, ...lastNameParts] = person.name.trim().split(/\s+/);
+          entry = {
+            id: key,
+            source: 'resource',
+            personId: person.id,
+            resourceId: resource.id,
+            firstName: firstName || person.name,
+            lastName: lastNameParts.join(' '),
+            title: person.title,
+            email: person.email,
+            mobile: person.mobile,
+            roles: [],
+            resource,
+            isPrimary: false,
+            createdAt: person.createdAt,
+          };
+          groupedResourcePeople.set(key, entry);
+        }
+        if (!entry.roles.includes(role)) entry.roles.push(role);
+        entry.isPrimary = entry.isPrimary || isPrimary;
+      });
+
+      const unassociatedResourcePeople = await prisma.person.findMany({
+        where: { resources: { none: {} } },
+        select: { id: true, name: true, title: true, email: true, mobile: true, createdAt: true },
+        orderBy: { name: 'asc' },
+      });
+      const unassociatedPeopleRows = unassociatedResourcePeople.map((person) => {
+        const [firstName, ...lastNameParts] = person.name.trim().split(/\s+/);
+        return {
+          id: person.id,
+          source: 'resource',
+          personId: person.id,
+          firstName: firstName || person.name,
+          lastName: lastNameParts.join(' '),
+          title: person.title,
+          email: person.email,
+          mobile: person.mobile,
+          roles: [],
+          resource: null,
+          isPrimary: false,
+          createdAt: person.createdAt,
+        };
+      });
+
+      peopleForListing = [
+        ...uniquePeople.map((person: any) => ({ ...person, source: 'roaster' })),
+        ...Array.from(groupedResourcePeople.values()),
+        ...unassociatedPeopleRows,
+      ];
+      const direction = sortOrder === 'desc' ? -1 : 1;
+      peopleForListing.sort((left, right) => {
+        const valueFor = (person: any) => {
+          switch (sortBy) {
+            case 'roaster': return person.roaster?.name || person.resource?.name || '';
+            case 'roles': return (person.roles || []).join(', ');
+            case 'email': return person.email || '';
+            case 'mobile': return person.mobile || '';
+            case 'title': return person.title || '';
+            case 'isPrimary': return person.isPrimary ? 1 : 0;
+            case 'createdAt': return person.createdAt || '';
+            case 'lastName': return person.lastName || '';
+            default: return `${person.firstName || ''} ${person.lastName || ''}`.trim();
+          }
+        };
+        return String(valueFor(left)).localeCompare(String(valueFor(right)), undefined, { sensitivity: 'base' }) * direction;
+      });
+    }
+
+    const people = peopleForListing.slice(skip, skip + limit);
+    const total = peopleForListing.length;
     const pages = Math.ceil(total / limit);
 
     // Add permissions to each person

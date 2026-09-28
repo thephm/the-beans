@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
+import Close from '@mui/icons-material/Close'
 import AddPersonForm from './AddPersonForm'
 import { apiClient } from '@/lib/api'
 import { PersonRole } from '@/types'
@@ -62,13 +63,44 @@ const toResourcePerson = (person: any, existing: any = {}) => ({
   },
 })
 
+const groupResourcePeople = (entries: any[]) => {
+  const grouped: any[] = []
+  const indicesByPersonId = new Map<string, number>()
+
+  entries.forEach((entry, index) => {
+    const personId = entry.personId || entry.person?.id
+    const roles = Array.from(new Set([
+      ...(Array.isArray(entry.roles) ? entry.roles : []),
+      ...(entry.role ? [entry.role] : []),
+    ].filter(Boolean)))
+
+    if (!personId) {
+      grouped.push({ ...entry, roles, _sourceIndex: index })
+      return
+    }
+
+    const groupedIndex = indicesByPersonId.get(personId)
+    if (groupedIndex === undefined) {
+      indicesByPersonId.set(personId, grouped.length)
+      grouped.push({ ...entry, roles, role: roles[0] || entry.role })
+      return
+    }
+
+    const existing = grouped[groupedIndex]
+    existing.roles = Array.from(new Set([...existing.roles, ...roles]))
+    existing.isPrimary = Boolean(existing.isPrimary || entry.isPrimary)
+  })
+
+  return grouped
+}
+
 export default function ResourcePeopleSection({ people, onChange, resourceId }: ResourcePeopleSectionProps) {
   const [expanded, setExpanded] = useState(false)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [saveError, setSaveError] = useState('')
   const [personSearch, setPersonSearch] = useState('')
   const [personResults, setPersonResults] = useState<any[]>([])
-  const safePeople = Array.isArray(people) ? people : []
+  const safePeople = groupResourcePeople(Array.isArray(people) ? people : [])
   const savedPeopleCount = safePeople.filter((entry) => entry.person?.name?.trim()).length
   const hasUnsavedPerson = safePeople.some((entry) => !entry.person?.name?.trim())
 
@@ -95,6 +127,14 @@ export default function ResourcePeopleSection({ people, onChange, resourceId }: 
   const removePerson = (index: number) => {
     setEditingIndex(null)
     onChange(safePeople.filter((_, entryIndex) => entryIndex !== index))
+  }
+  const disassociatePerson = (entry: any, index: number) => {
+    const personId = entry.personId || entry.person?.id
+    setEditingIndex(null)
+    onChange(safePeople.filter((entry, entryIndex) => {
+      if (!personId) return entryIndex !== index
+      return (entry.personId || entry.person?.id) !== personId
+    }))
   }
   const savePerson = async (index: number, value: any) => {
     const updatedPerson = toResourcePerson(value, safePeople[index])
@@ -147,9 +187,11 @@ export default function ResourcePeopleSection({ people, onChange, resourceId }: 
               {personResults.filter((person) => !safePeople.some((entry) => entry.personId === person.id)).map((person) => <button key={person.id} type="button" onClick={() => associatePerson(person)} className="block w-full border-b border-gray-200 px-4 py-2 text-left last:border-b-0 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700"><span className="font-medium">{person.name}</span>{person.email && <span className="ml-2 text-sm text-gray-500">{person.email}</span>}</button>)}
             </div>}
           </div>
-          {!hasUnsavedPerson && (
+          {!hasUnsavedPerson && (resourceId ? (
+            <a href={`/admin/people/add?source=resource&resourceId=${encodeURIComponent(resourceId)}`} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700 sm:w-auto">Add Person</a>
+          ) : (
             <button type="button" onClick={addPerson} className="w-full rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700 sm:w-auto">Add Person</button>
-          )}
+          ))}
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
         {safePeople.map((entry, index) => (
@@ -165,22 +207,40 @@ export default function ResourcePeopleSection({ people, onChange, resourceId }: 
             ) : (
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <button type="button" onClick={() => setEditingIndex(index)} className="text-left font-semibold text-blue-700 hover:underline dark:text-blue-300">{entry.person.name}</button>
-                  {entry.role && <p className="text-sm text-gray-600 dark:text-gray-300">{entry.role}</p>}
+                  {resourceId ? (
+                    <a href={`/admin/people/edit/${entry.personId || entry.person?.id}?source=resource&returnToResource=${encodeURIComponent(resourceId)}`} className="font-semibold text-blue-700 hover:underline dark:text-blue-300">{entry.person.name}</a>
+                  ) : (
+                    <button type="button" onClick={() => setEditingIndex(index)} className="text-left font-semibold text-blue-700 hover:underline dark:text-blue-300">{entry.person.name}</button>
+                  )}
+                  {(entry.roles?.length || entry.role) && (
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      {(entry.roles?.length ? entry.roles : [entry.role]).map((role: string) => (
+                        <span key={role} className="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
+                    aria-label={`Disassociate ${entry.person.name}`}
+                    title="Disassociate"
                     onClick={() => {
                       if (window.confirm('Are you sure you want to disassociate this person from the resource?')) {
-                        removePerson(index)
+                        disassociatePerson(entry, index)
                       }
                     }}
-                    className="rounded-lg border border-red-300 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/20"
+                    className="p-1 text-red-600 hover:text-red-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:text-red-400 dark:hover:text-red-300"
                   >
-                    Disassociate
+                    <Close fontSize="small" aria-hidden="true" />
                   </button>
-                  <button type="button" onClick={() => setEditingIndex(index)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">Edit</button>
+                  {resourceId ? (
+                    <a href={`/admin/people/edit/${entry.personId || entry.person?.id}?source=resource&returnToResource=${encodeURIComponent(resourceId)}`} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">Edit</a>
+                  ) : (
+                    <button type="button" onClick={() => setEditingIndex(index)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">Edit</button>
+                  )}
                 </div>
               </div>
             )}

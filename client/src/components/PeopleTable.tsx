@@ -6,15 +6,20 @@ import { apiClient } from '../lib/api';
 import { RoasterPerson, Roaster } from '../types';
 import { useTranslation } from 'react-i18next';
 
+type AdminPeopleRow = RoasterPerson & {
+  source?: 'roaster' | 'resource'
+  personId?: string
+  resource?: { id: string; name: string; slug: string }
+}
 
 export default function PeopleTable() {
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const { t } = useTranslation();
-  const [people, setPeople] = useState<RoasterPerson[]>([]);
+  const [people, setPeople] = useState<AdminPeopleRow[]>([]);
   const [roasters, setRoasters] = useState<Roaster[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filteredPeople, setFilteredPeople] = useState<RoasterPerson[]>([]);
+  const [filteredPeople, setFilteredPeople] = useState<AdminPeopleRow[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(100);
@@ -30,7 +35,7 @@ export default function PeopleTable() {
         setRoasters(roastersList);
 
         // Fetch all people with pagination and sorting
-        const params: any = { page: currentPage, limit };
+        const params: any = { page: currentPage, limit, includeResources: true };
         if (sortConfig) {
           params.sortBy = sortConfig.key;
           params.sortOrder = sortConfig.direction;
@@ -71,6 +76,7 @@ export default function PeopleTable() {
           person.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           person.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           person.roaster?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          person.resource?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           person.roles?.some(role => role.toLowerCase().includes(searchTerm.toLowerCase()))
         );
       });
@@ -155,8 +161,9 @@ export default function PeopleTable() {
               <div key={person.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                 {/* Person Header */}
                 <div className="mb-3">
+                  {(person.resource || person.roaster) && <div className="text-xs font-medium text-gray-500 dark:text-gray-400">{person.resource ? t('admin.people.resource', 'Resource') : t('admin.people.roaster', 'Roaster')}</div>}
                   <a
-                    href={`/admin/people/edit/${person.id}`}
+                    href={person.source === 'resource' ? `/admin/people/edit/${person.personId}?source=resource` : `/admin/people/edit/${person.id}`}
                     className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline"
                   >
                     {`${person.firstName} ${person.lastName || ''}`.trim()}
@@ -189,17 +196,22 @@ export default function PeopleTable() {
                 </div>
 
                 {/* Roaster */}
-                {person.roaster && (
+                {(person.roaster || person.resource) && (
                   <div className="mb-3">
-                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                      <span className="mr-2">🏢</span>
-                      <a
+                    <div className="flex flex-wrap items-center text-sm text-gray-600 dark:text-gray-400">
+                      {person.roaster && <a
                         href={`/admin/roasters/edit/${person.roaster.id}?returnTo=people`}
                         className="text-primary-600 dark:text-primary-400 hover:underline"
                       >
                         {person.roaster.name}
-                      </a>
-                      {person.roaster.resourceRoasters?.map(({ resource }) => (
+                      </a>}
+                      {person.resource && <a
+                        href={`/admin/resources/${person.resource.id}`}
+                        className="text-primary-600 dark:text-primary-400 hover:underline"
+                      >
+                        {person.resource.name}
+                      </a>}
+                      {person.roaster?.resourceRoasters?.map(({ resource }) => (
                         <React.Fragment key={resource.id}>
                           <span className="mx-1">/</span>
                           <a
@@ -254,19 +266,20 @@ export default function PeopleTable() {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'firstName' ? { key: 'firstName', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'firstName', direction: 'asc' })}>
+                <th className="w-[18%] min-w-[160px] px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'firstName' ? { key: 'firstName', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'firstName', direction: 'asc' })}>
                   {t('adminForms.roasters.name', 'Name')}{sortConfig?.key === 'firstName' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roaster' ? { key: 'roaster', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roaster', direction: 'asc' })}>
+                <th className="w-[24%] min-w-[180px] max-w-[300px] px-3 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roaster' ? { key: 'roaster', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roaster', direction: 'asc' })}>
                   {t('admin.people.roasterResource', 'Roaster / Resource')}{sortConfig?.key === 'roaster' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roles' ? { key: 'roles', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roles', direction: 'asc' })}>
+                <th className="w-[8%] min-w-[80px] px-3 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">{t('admin.people.type', 'Type')}</th>
+                <th className="w-[12%] min-w-[110px] px-3 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'roles' ? { key: 'roles', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'roles', direction: 'asc' })}>
                   {t('adminSection.role', 'Role')}{sortConfig?.key === 'roles' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
+                <th className="w-[22%] min-w-[190px] px-3 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'email' ? { key: 'email', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'email', direction: 'asc' })}>
                   {t('adminForms.roasters.email', 'Email')}{sortConfig?.key === 'email' && <SortArrow direction={sortConfig.direction} />}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'mobile' ? { key: 'mobile', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'mobile', direction: 'asc' })}>
+                <th className="w-[16%] min-w-[150px] px-3 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'mobile' ? { key: 'mobile', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'mobile', direction: 'asc' })}>
                   {t('adminForms.roasters.phone', 'Mobile')}{sortConfig?.key === 'mobile' && <SortArrow direction={sortConfig.direction} />}
                 </th>
               </tr>
@@ -274,18 +287,18 @@ export default function PeopleTable() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('loading', 'Loading...')}</td>
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('loading', 'Loading...')}</td>
                 </tr>
               ) : filteredPeople.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('admin.people.noPeopleFound', 'No people found.')}</td>
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('admin.people.noPeopleFound', 'No people found.')}</td>
                 </tr>
               ) : (
                 filteredPeople.map(person => (
                   <tr key={person.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4">
+                    <td className="w-[18%] px-4 py-4">
                       <a
-                        href={`/admin/people/edit/${person.id}`}
+                        href={person.source === 'resource' ? `/admin/people/edit/${person.personId}?source=resource` : `/admin/people/edit/${person.id}`}
                         className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                       >
                         {`${person.firstName} ${person.lastName || ''}`.trim()}
@@ -296,14 +309,21 @@ export default function PeopleTable() {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      {person.roaster ? (
+                    <td className="w-[24%] max-w-[300px] break-words px-3 py-4">
+                      {person.resource ? (
+                        <a
+                          href={`/admin/resources/${person.resource.id}`}
+                          className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
+                        >
+                          {person.resource.name}
+                        </a>
+                      ) : person.roaster ? (
                         <div>
                           <a
                             href={`/admin/roasters/edit/${person.roaster.id}?returnTo=people`}
                             className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                           >
-                            {person.roaster.name}
+                              {person.roaster.name}
                           </a>
                           {person.roaster.resourceRoasters?.map(({ resource }) => (
                             <React.Fragment key={resource.id}>
@@ -327,7 +347,10 @@ export default function PeopleTable() {
                         <span className="text-gray-400 dark:text-gray-500">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="w-[8%] px-3 py-4 text-sm text-gray-600 dark:text-gray-300">
+                      {person.resource ? t('admin.people.resource', 'Resource') : person.roaster ? t('admin.people.roaster', 'Roaster') : null}
+                    </td>
+                    <td className="w-[12%] px-3 py-4">
                       {person.roles && person.roles.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {person.roles.map((role, index) => (
@@ -351,11 +374,11 @@ export default function PeopleTable() {
                         <span className="text-gray-400 dark:text-gray-500">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="w-[22%] px-3 py-4">
                       {person.email ? (
                         <a
                           href={`mailto:${person.email}`}
-                          className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
+                          className="break-all text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                         >
                           {person.email}
                         </a>
@@ -363,7 +386,7 @@ export default function PeopleTable() {
                         <span className="text-gray-400 dark:text-gray-500">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-gray-900 dark:text-gray-100">{person.mobile}</td>
+                    <td className="w-[16%] px-3 py-4 break-words text-gray-900 dark:text-gray-100">{person.mobile}</td>
                   </tr>
                 ))
               )}
