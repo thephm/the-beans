@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { apiClient } from '@/lib/api'
@@ -20,6 +20,11 @@ export default function AdminResourceEditPage() {
   const { user, loading: authLoading } = useAuth()
   const params = useParams<{ id: string }>()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnToRoasterId = searchParams?.get('returnToRoasterId') || ''
+  const returnUrl = returnToRoasterId
+    ? `/admin/roasters/edit/${encodeURIComponent(returnToRoasterId)}?tab=resources`
+    : '/admin/resources'
   const [form, setForm] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -95,7 +100,7 @@ export default function AdminResourceEditPage() {
         .filter((entry: any) => !entry.id)
         .map((entry: any) => apiClient.linkResourcePerson(form.id, { personId: entry.personId, role: entry.role || 'other', isPrimary: Boolean(entry.isPrimary), person: entry.person })))
       await Promise.all(initialPeopleIds.filter((personId) => !currentPeople.some((entry: any) => entry.personId === personId)).map((personId) => apiClient.unlinkResourcePerson(form.id, personId)))
-      router.push('/admin/resources')
+      router.push(returnUrl)
       router.refresh()
     } catch (error: any) {
       setMessage(error.message || t('adminResources.updateFailed', 'Could not update resource.'))
@@ -140,7 +145,7 @@ export default function AdminResourceEditPage() {
             </section>
           <ResourcePeopleSection resourceId={form.id} people={Array.isArray(form.people) ? form.people : []} onChange={(people) => setForm((currentForm) => ({ ...currentForm, people }))} />
           <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.observations', 'Observations')}</span><textarea rows={3} value={form.adminNotes} onChange={(event) => setForm({ ...form, adminNotes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.observationsPrivate', 'These observations are private and are not shown to end users.')}</span></label>
-          <div className="sm:col-span-2 flex justify-end gap-3"><button type="button" onClick={() => router.push('/admin/resources')} className="rounded-lg border border-gray-300 px-5 py-2 font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">{t('common.cancel', 'Cancel')}</button><button disabled={saving} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div>
+          <div className="sm:col-span-2 flex justify-end gap-3"><button type="button" onClick={() => router.push(returnUrl)} className="rounded-lg border border-gray-300 px-5 py-2 font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">{t('common.cancel', 'Cancel')}</button><button disabled={saving} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div>
           {message && <p className="self-center text-sm text-gray-600 dark:text-gray-300">{message}</p>}
         </form>
       </div>

@@ -9,6 +9,7 @@ import SimpleImageUpload from "@/components/SimpleImageUpload";
 import SocialNetworksFields from "@/components/SocialNetworksFields";
 import { stripToRootUrl } from "@/lib/url";
 import { emptySocialNetworks, socialNetworksToForm, socialNetworksToPayload } from "@/lib/socials";
+import { apiClient } from "@/lib/api";
 import { Country, PersonRole, RoasterImage } from "@/types";
 
 type HoursDay = {
@@ -162,6 +163,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const [countriesFilter, setCountriesFilter] = useState("");
   const [images, setImages] = useState<RoasterImage[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [resources, setResources] = useState<any[]>([]);
   const [urlImages, setUrlImages] = useState<string[]>([]);
   const [newUrlImage, setNewUrlImage] = useState("");
   const [hours, setHours] = useState<Record<string, HoursDay>>(buildDefaultHours());
@@ -234,10 +236,14 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       baseSections.push({ key: "urlImages", label: t('adminForms.roasters.sections.urlImages', 'URL Images'), count: urlImages.length });
     }
 
+    if (isEditing) {
+      baseSections.push({ key: "resources", label: t('adminForms.roasters.sections.resources', 'Resources'), count: resources.length });
+    }
+
     baseSections.push({ key: "hours", label: t('adminForms.roasters.sections.hours', 'Hours'), count: hoursCount });
 
     return baseSections;
-  }, [contactCount, hoursCount, images.length, isEditing, selectedCountries.length, selectedSpecialtyIds.length, socialCount, t, urlImages.length]);
+  }, [contactCount, hoursCount, images.length, isEditing, resources.length, selectedCountries.length, selectedSpecialtyIds.length, socialCount, t, urlImages.length]);
 
   const sectionKeys = useMemo(() => new Set(sections.map((section) => section.key)), [sections]);
 
@@ -643,6 +649,24 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
 
     fetchImages();
     fetchUrlImages();
+  }, [roasterId]);
+
+  useEffect(() => {
+    if (!roasterId) {
+      setResources([]);
+      return;
+    }
+    let cancelled = false;
+    apiClient.getResources({ includeArchived: 'true' })
+      .then((data: any) => {
+        if (!cancelled) {
+          setResources((data.resources || []).filter((resource: any) => resource.publisherRoaster?.id === roasterId));
+        }
+      })
+      .catch((error) => console.error("Error fetching roaster resources:", error));
+    return () => {
+      cancelled = true;
+    };
   }, [roasterId]);
 
   const convertToImageUrl = (url: string): string => {
@@ -1525,6 +1549,37 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
             <p className="font-medium">{t('adminForms.roasters.aboutUrlImages', 'About URL Images:')}</p>
             <p>{t('adminForms.roasters.urlImagesFallback', 'Image URLs serve as fallback images when uploaded images are not accessible.')}</p>
           </div>
+        </div>
+      );
+    }
+
+    if (sectionKey === "resources") {
+      return (
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <Link
+              href={`/admin/resources/new?roasterId=${encodeURIComponent(roasterId!)}&returnToRoasterId=${encodeURIComponent(roasterId!)}`}
+              className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+            >
+              + {t('adminForms.roasters.addResource', 'Add resource')}
+            </Link>
+          </div>
+          {resources.length > 0 ? (
+            <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+              {resources.map((resource) => (
+                <li key={resource.id} className="px-4 py-3">
+                  <Link
+                    href={`/admin/resources/${encodeURIComponent(resource.id)}?returnToRoasterId=${encodeURIComponent(roasterId!)}`}
+                    className="font-medium text-primary-600 hover:underline dark:text-primary-400"
+                  >
+                    {resource.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('adminForms.roasters.noResources', 'No resources are provided by this roaster yet.')}</p>
+          )}
         </div>
       );
     }
