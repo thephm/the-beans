@@ -997,8 +997,11 @@
         "countries": "Pays",
         "images": "Images",
         "urlImages": "Images URL",
+        "resources": "Ressources",
         "hours": "Heures"
       },
+      "addResource": "Ajouter une ressource",
+      "noResources": "Aucune ressource n'est encore fournie par ce torréfacteur.",
   "add": "Ajouter",
   "cancel": "Annuler",
   "delete": "Supprimer",

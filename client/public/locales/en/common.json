@@ -923,8 +923,11 @@
         "countries": "Countries",
         "images": "Images",
         "urlImages": "URL Images",
+        "resources": "Resources",
         "hours": "Hours"
       },
+      "addResource": "Add resource",
+      "noResources": "No resources are provided by this roaster yet.",
       "add": "Add",
       "cancel": "Cancel",
       "save": "Save",
