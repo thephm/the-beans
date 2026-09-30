@@ -385,6 +385,10 @@ class ApiClient {
     return this.request(`/resources/${id}`, { method: 'DELETE' });
   }
 
+  async deleteResource(id: string) {
+    return this.request(`/resources/${id}/permanent`, { method: 'DELETE' });
+  }
+
   async deprecateResource(id: string) {
     return this.archiveResource(id);
   }

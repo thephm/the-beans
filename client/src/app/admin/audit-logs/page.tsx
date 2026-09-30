@@ -161,6 +161,8 @@ export default function AuditLogsPage() {
         return `/admin/users/${log.entityId}/edit`;
       case 'person':
         return `/admin/people/edit/${log.entityId}`;
+      case 'resource':
+        return `/admin/resources/${log.entityId}`;
       case 'roastersuggestion':
         return `/admin/suggestions/${log.entityId}`;
       default:
@@ -290,6 +292,7 @@ export default function AuditLogsPage() {
               <option value="bean">Bean</option>
               <option value="user">User</option>
               <option value="person">Person</option>
+              <option value="resource">Resource</option>
             </select>
           </div>
           <div>

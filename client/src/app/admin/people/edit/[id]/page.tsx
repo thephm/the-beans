@@ -477,7 +477,7 @@ const EditPersonPage: React.FC = () => {
             <section className="mb-4 space-y-3 sm:col-span-2" aria-labelledby="roaster-associations-heading">
               <h2 id="roaster-associations-heading" className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('admin.people.roasterAssociations', 'Roasters')}</h2>
               <div className="max-w-xl">
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.addRoasterAssociation', 'Associate roaster')}</label>
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.addRoasterAssociation', 'Associate a roaster')}</label>
                 <RoasterSearchField
                   key={roasterSearchKey}
                   value=""
@@ -527,7 +527,7 @@ const EditPersonPage: React.FC = () => {
             <section className="mb-4 space-y-3 sm:col-span-2" aria-labelledby="resource-associations-heading">
               <h2 id="resource-associations-heading" className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('admin.people.resourceAssociations', 'Resources')}</h2>
               <div className="relative max-w-xl">
-                <label htmlFor="person-resource-search" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.addResourceAssociation', 'Associate resource')}</label>
+                <label htmlFor="person-resource-search" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.addResourceAssociation', 'Associate a resource')}</label>
                 <input
                   id="person-resource-search"
                   type="search"

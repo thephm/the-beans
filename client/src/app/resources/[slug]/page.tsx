@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
+import { useAuth } from '@/contexts/AuthContext'
 import { YouTube, Language, LinkedIn, Instagram } from '@mui/icons-material'
 
 const typePillClass = (resourceType: string) => {
@@ -25,6 +26,7 @@ const typePillClass = (resourceType: string) => {
 
 export default function ResourceDetailPage() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const params = useParams<{ slug: string }>()
   const router = useRouter()
   const [resource, setResource] = useState<any>(null)
@@ -55,6 +57,7 @@ export default function ResourceDetailPage() {
           {resource.publisherRoaster && <p className="mb-6 text-gray-600 dark:text-gray-300">{t('resources.providedBy', 'Provided by')} <Link href={`/roasters/${resource.publisherRoaster.id}`} className="font-semibold text-primary-700 hover:underline dark:text-primary-300">{resource.publisherRoaster.name}</Link></p>}
           <div className="flex flex-wrap items-center gap-3">
             <button type="button" onClick={() => { if (window.history.length > 1) router.back(); else router.push('/resources') }} className="inline-flex min-h-11 items-center rounded-lg border border-primary-200 bg-white px-5 py-3 font-semibold text-primary-700 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-primary-800 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700">← {t('resources.backButton', 'Back')}</button>
+            {user?.role === 'admin' && <Link href={`/admin/resources/${resource.id}?returnTo=${encodeURIComponent(`/resources/${resource.slug}`)}`} className="inline-flex min-h-11 items-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-all transform hover:scale-105 hover:bg-blue-700">{t('resources.edit', 'Edit')}</Link>}
             <a href={resource.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-lg bg-primary-600 px-5 py-3 font-semibold text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500">{t('resources.visit', 'Visit')} <span className="ml-2" aria-hidden="true">↗</span></a>
           </div>
         </header>

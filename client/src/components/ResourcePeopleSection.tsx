@@ -179,20 +179,6 @@ export default function ResourcePeopleSection({ people, onChange, resourceId }: 
       </button>
       <div id="resource-people-fields" hidden={!expanded} className="space-y-4 px-4 pb-4">
         {saveError && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200">{saveError}</p>}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="relative w-full sm:max-w-xl sm:flex-1">
-            <label htmlFor="resource-person-search" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Associate existing person</label>
-            <input id="resource-person-search" value={personSearch} onChange={(event) => setPersonSearch(event.target.value)} placeholder="Search by name or email" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
-            {personResults.length > 0 && <div className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
-              {personResults.filter((person) => !safePeople.some((entry) => entry.personId === person.id)).map((person) => <button key={person.id} type="button" onClick={() => associatePerson(person)} className="block w-full border-b border-gray-200 px-4 py-2 text-left last:border-b-0 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700"><span className="font-medium">{person.name}</span>{person.email && <span className="ml-2 text-sm text-gray-500">{person.email}</span>}</button>)}
-            </div>}
-          </div>
-          {!hasUnsavedPerson && (resourceId ? (
-            <a href={`/admin/people/add?source=resource&resourceId=${encodeURIComponent(resourceId)}`} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700 sm:w-auto">Add Person</a>
-          ) : (
-            <button type="button" onClick={addPerson} className="w-full rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700 sm:w-auto">Add Person</button>
-          ))}
-        </div>
         <div className="grid gap-4 sm:grid-cols-2">
         {safePeople.map((entry, index) => (
           <div key={entry.id || entry.personId || `resource-person-${index}`} className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
@@ -246,6 +232,20 @@ export default function ResourcePeopleSection({ people, onChange, resourceId }: 
             )}
           </div>
         ))}
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="relative w-full sm:max-w-xl sm:flex-1">
+            <label htmlFor="resource-person-search" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Associate an existing person</label>
+            <input id="resource-person-search" value={personSearch} onChange={(event) => setPersonSearch(event.target.value)} placeholder="Search by name or email" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
+            {personResults.length > 0 && <div className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
+              {personResults.filter((person) => !safePeople.some((entry) => entry.personId === person.id)).map((person) => <button key={person.id} type="button" onClick={() => associatePerson(person)} className="block w-full border-b border-gray-200 px-4 py-2 text-left last:border-b-0 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700"><span className="font-medium">{person.name}</span>{person.email && <span className="ml-2 text-sm text-gray-500">{person.email}</span>}</button>)}
+            </div>}
+          </div>
+          {!hasUnsavedPerson && (resourceId ? (
+            <a href={`/admin/people/add?source=resource&resourceId=${encodeURIComponent(resourceId)}`} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700 sm:w-auto">Add Person</a>
+          ) : (
+            <button type="button" onClick={addPerson} className="w-full rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700 sm:w-auto">Add Person</button>
+          ))}
         </div>
       </div>
     </section>

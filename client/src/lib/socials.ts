@@ -1,5 +1,5 @@
-export const PRIMARY_SOCIAL_NETWORKS = ['instagram', 'facebook', 'tiktok', 'linkedin'] as const;
-export const SECONDARY_SOCIAL_NETWORKS = ['youtube', 'x', 'threads', 'pinterest', 'bluesky', 'reddit'] as const;
+export const PRIMARY_SOCIAL_NETWORKS = ['instagram', 'facebook', 'x', 'linkedin'] as const;
+export const SECONDARY_SOCIAL_NETWORKS = ['youtube', 'tiktok', 'threads', 'pinterest', 'bluesky', 'reddit'] as const;
 export const SOCIAL_NETWORKS = [...PRIMARY_SOCIAL_NETWORKS, ...SECONDARY_SOCIAL_NETWORKS];
 
 export type SocialNetworkKey = typeof SOCIAL_NETWORKS[number];

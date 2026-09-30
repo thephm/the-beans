@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
+import { auditBefore, auditAfter, captureOldValues } from '../middleware/auditMiddleware';
 import { isSocialNetworksObject, normalizeSocialNetworks } from '../lib/socialNetworks';
 
 const router = Router();
@@ -195,7 +196,7 @@ router.get('/:slug', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/', requireAuth, requireAdmin, [
+router.post('/', requireAuth, requireAdmin, auditBefore('resource', 'CREATE'), [
   body('name').trim().notEmpty(),
   body('slug').trim().matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   body('url').isURL({ protocols: ['http', 'https'], require_protocol: true }),
@@ -205,7 +206,7 @@ router.post('/', requireAuth, requireAdmin, [
     if (!isSocialNetworksObject(value)) throw new Error('socialNetworks must be an object');
     return true;
   }).withMessage('socialNetworks must be an object mapping network->url'),
-], async (req: Request, res: Response) => {
+], auditAfter(), async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
   if (!isSafeUrl(req.body.url)) return res.status(400).json({ error: 'URL must use HTTP or HTTPS' });
@@ -213,6 +214,7 @@ router.post('/', requireAuth, requireAdmin, [
     const data = { ...req.body };
     if ('socialNetworks' in data) data.socialNetworks = normalizeSocialNetworks(data.socialNetworks);
     const resource = await prisma.resource.create({ data });
+    res.locals.auditEntity = resource;
     res.status(201).json(publicResource(resource));
   } catch (error: any) {
     if (error.code === 'P2002') return res.status(409).json({ error: 'A resource with that slug already exists' });
@@ -221,7 +223,7 @@ router.post('/', requireAuth, requireAdmin, [
   }
 });
 
-router.patch('/:id', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+router.patch('/:id', requireAuth, requireAdmin, auditBefore('resource', 'UPDATE'), captureOldValues(prisma.resource), auditAfter(), async (req: Request, res: Response) => {
   const { url } = req.body;
   if (url && !isSafeUrl(url)) return res.status(400).json({ error: 'URL must use HTTP or HTTPS' });
   if ('socialNetworks' in req.body && req.body.socialNetworks !== null && !isSocialNetworksObject(req.body.socialNetworks)) {
@@ -231,15 +233,27 @@ router.patch('/:id', requireAuth, requireAdmin, async (req: Request, res: Respon
     const data = { ...req.body };
     if ('socialNetworks' in data) data.socialNetworks = normalizeSocialNetworks(data.socialNetworks);
     const resource = await prisma.resource.update({ where: { id: req.params.id }, data });
+    res.locals.auditEntity = resource;
     res.json(publicResource(resource));
   } catch (error) {
     res.status(404).json({ error: 'Resource not found' });
   }
 });
 
-router.delete('/:id', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+router.delete('/:id/permanent', requireAuth, requireAdmin, auditBefore('resource', 'DELETE'), captureOldValues(prisma.resource), auditAfter(), async (req: Request, res: Response) => {
   try {
-    await prisma.resource.update({ where: { id: req.params.id }, data: { state: 'archived' } });
+    res.locals.auditEntity = req.auditData?.oldValues;
+    await prisma.resource.delete({ where: { id: req.params.id } });
+    res.status(204).send();
+  } catch (error) {
+    res.status(404).json({ error: 'Resource not found' });
+  }
+});
+
+router.delete('/:id', requireAuth, requireAdmin, auditBefore('resource', 'DELETE'), captureOldValues(prisma.resource), auditAfter(), async (req: Request, res: Response) => {
+  try {
+    const resource = await prisma.resource.update({ where: { id: req.params.id }, data: { state: 'archived' } });
+    res.locals.auditEntity = resource;
     res.status(204).send();
   } catch (error) {
     res.status(404).json({ error: 'Resource not found' });

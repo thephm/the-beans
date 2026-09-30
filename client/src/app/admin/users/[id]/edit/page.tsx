@@ -222,7 +222,7 @@ const EditUserPage: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow dark:shadow-xl p-8">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow dark:shadow-xl p-8 pb-4">
   <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">{t('admin.users.editUser', 'Edit User')}</h1>
         {user?.isDeprecated && (
           <span className="inline-block mb-4 px-3 py-1 text-sm font-semibold rounded bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100">{t('admin.users.deprecated', 'Deprecated')}</span>
@@ -356,8 +356,9 @@ const EditUserPage: React.FC = () => {
           </div>
         </form>
         {(user.createdAt || user.updatedAt) && (
-          <div className="mt-6 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3">
-              {user.createdAt && <span>{t('admin.users.createdOn', 'Created on')} {formatDateTimeToYYYYMMDD(user.createdAt)}.</span>} {user.updatedAt && <span>{t('admin.users.updatedOn', 'Updated on')} {formatDateTimeToYYYYMMDD(user.updatedAt)}.</span>}
+              <div className="mt-6 flex items-center justify-between gap-4 px-3 pt-3 text-sm text-gray-500 dark:text-gray-400">
+                {user.createdAt && <span>{t('admin.users.createdOn', 'Created')} {formatDateTimeToYYYYMMDD(user.createdAt).replace(' ', ' at ')}</span>}
+                {user.updatedAt && <span className="text-right">{t('admin.users.lastUpdatedOn', 'Last updated')} {formatDateTimeToYYYYMMDD(user.updatedAt).replace(' ', ' at ')}</span>}
           </div>
         )}
       </div>

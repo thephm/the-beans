@@ -214,6 +214,8 @@ export function getEntityName(entityType: string, entity: any): string {
       return entity.title || `Review for ${entity.roaster?.name || 'Unknown Roaster'}`;
     case 'bean':
       return entity.name || entity.id;
+    case 'resource':
+      return entity.name || entity.id;
     case 'user':
       return entity.username || entity.email || entity.id;
     case 'favourite':
