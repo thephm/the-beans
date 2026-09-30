@@ -21,7 +21,7 @@ export default function AdminResourceEditPage() {
   const params = useParams<{ id: string }>()
   const searchParams = useSearchParams()
   const router = useRouter()
-  const requestedReturnTo = searchParams.get('returnTo')
+  const requestedReturnTo = searchParams?.get('returnTo')
   const returnTo = requestedReturnTo?.startsWith('/') && !requestedReturnTo.startsWith('//') ? requestedReturnTo : '/admin/resources'
   const returnToRoasterId = searchParams?.get('returnToRoasterId') || ''
   const returnUrl = returnToRoasterId
