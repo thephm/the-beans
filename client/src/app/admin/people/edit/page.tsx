@@ -96,7 +96,7 @@ export default function EditPersonPage() {
           {t('common.back', 'Back')} {t('admin.people.title', 'People')}
         </button>
       </div>
-      <div className="bg-white border border-gray-200 rounded-lg shadow p-8">
+      <div className="bg-white border border-black/90 rounded-lg shadow p-8 dark:border-purple-400/70">
   <h1 className="text-2xl font-bold mb-8">{personId === "new" ? t('people.addTitle', 'Add Person') : t('people.editTitle', 'Edit Person')}</h1>
         {error && <div className="text-red-600 mb-4">{error}</div>}
         <form onSubmit={e => { e.preventDefault(); saveEdit(); }}>

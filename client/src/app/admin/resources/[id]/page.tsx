@@ -134,7 +134,7 @@ export default function AdminResourceEditPage() {
         <div className="mb-8 flex items-center justify-between gap-4 px-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">{t('adminResources.editTitle', 'Edit resource')}</h1>
         </div>
-        <form onSubmit={submit} className="grid gap-4 rounded-2xl bg-white p-6 shadow dark:bg-gray-800 sm:grid-cols-2">
+        <form onSubmit={submit} className="grid gap-4 rounded-2xl border border-black/90 bg-white p-6 shadow dark:border-purple-400/70 dark:bg-gray-800 sm:grid-cols-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.name', 'Name')}</span><input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.slug', 'Slug')}</span><input readOnly value={form.slug} className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-600 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300" /></label>
           <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.url', 'URL')}</span><input required value={form.url} onChange={(event) => setForm({ ...form, url: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
