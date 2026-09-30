@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { isIP } from 'node:net';
+import rateLimit from 'express-rate-limit';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 import { normalizeSocialNetworks } from '../lib/socialNetworks';
@@ -96,7 +97,7 @@ router.get('/links', async (req: Request, res: Response) => {
       select: { url: true, category: true, service: true, entityId: true, checkedAt: true, isBroken: true, statusCode: true, error: true },
     });
     const checked = new Map(checks.map((check) => [`${check.url}|${check.category}|${check.service}|${check.entityId}`, check]));
-    const filtered = links.filter((link) => {
+    const filtered = links.map((link, linkIndex) => ({ ...link, linkIndex })).filter((link) => {
       if (category && link.category !== category) return false;
       if (service && link.service !== service) return false;
       return !(skipRecentlyChecked && checked.has(`${link.url}|${link.category}|${link.service}|${link.entityId}`));
@@ -108,12 +109,17 @@ router.get('/links', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/check', async (req: Request, res: Response) => {
-  const { url, category, service, entityId, entityName, editPath } = req.body || {};
-  if (typeof url !== 'string' || !categories.includes(category) || !services.includes(service) || typeof entityId !== 'string' || typeof entityName !== 'string' || typeof editPath !== 'string') {
+router.post('/check', rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false }), async (req: Request, res: Response) => {
+  const { linkIndex } = req.body || {};
+  if (!Number.isInteger(linkIndex) || linkIndex < 0) {
     return res.status(400).json({ error: 'Invalid link check request' });
   }
+  let selectedLink: LinkItem | undefined;
   try {
+    const links = await collectLinks();
+    selectedLink = links[linkIndex];
+    if (!selectedLink) return res.status(404).json({ error: 'Link not found' });
+    const { url, category, service, entityId, entityName, editPath } = selectedLink;
     const parsed = new URL(url);
     if (!['http:', 'https:'].includes(parsed.protocol)) return res.status(400).json({ error: 'Only HTTP and HTTPS links can be checked' });
     if (!isPublicUrl(parsed)) return res.status(400).json({ error: 'Private network links cannot be checked' });
@@ -136,6 +142,8 @@ router.post('/check', async (req: Request, res: Response) => {
     });
     res.json({ ...check, editPath });
   } catch (error: any) {
+    if (!selectedLink) return res.status(500).json({ error: 'Could not load link' });
+    const { url, category, service, entityId, entityName, editPath } = selectedLink;
     const message = error?.name === 'AbortError' ? 'Request timed out' : (error?.message || 'Request failed');
     const check = await prisma.linkCheck.upsert({
       where: { url_category_service_entityId: { url, category, service, entityId } },

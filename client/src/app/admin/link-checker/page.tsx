@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
-type LinkItem = { url: string; category: string; service: string; entityId: string; entityName: string; editPath: string; lastCheck?: any };
+type LinkItem = { url: string; category: string; service: string; entityId: string; entityName: string; editPath: string; linkIndex?: number; lastCheck?: any };
 type Result = LinkItem & { statusCode?: number; isBroken: boolean; error?: string };
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -51,7 +51,7 @@ export default function LinkCheckerPage() {
     try {
       for (let index = 0; index < links.length; index += 1) {
         while (pausedRef.current) await wait(250);
-        const result = await apiClient.checkLink(links[index]) as Result;
+        const result = await apiClient.checkLink({ linkIndex: links[index].linkIndex }) as Result;
         setResults((current) => [...current, result]);
         setProgress(index + 1);
         if (index < links.length - 1) await wait(Math.max(0, Math.min(5000, delay)));
