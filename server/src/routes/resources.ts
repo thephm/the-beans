@@ -88,6 +88,36 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/admin', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+    const includeArchived = req.query.includeArchived === 'true';
+    const resources = await prisma.resource.findMany({
+      where: {
+        state: includeArchived ? { not: 'inactive' } : { notIn: ['inactive', 'archived'] },
+        ...(search ? { OR: [
+          { name: { contains: search, mode: 'insensitive' as const } },
+          { description: { contains: search, mode: 'insensitive' as const } },
+          { notes: { contains: search, mode: 'insensitive' as const } },
+          { publisherRoaster: { is: { name: { contains: search, mode: 'insensitive' as const } } } },
+          { roasters: { some: { roaster: { name: { contains: search, mode: 'insensitive' as const } } } } },
+          { people: { some: { person: { name: { contains: search, mode: 'insensitive' as const } } } } },
+        ] } : {}),
+      },
+      orderBy: { name: 'asc' },
+      select: {
+        id: true, name: true, slug: true, url: true, description: true, notes: true,
+        resourceType: true, platform: true, state: true,
+        publisherRoaster: { select: { id: true, name: true, slug: true, city: true, state: true, country: true } },
+      },
+    });
+    res.json({ resources });
+  } catch (error) {
+    console.error('Error fetching admin resources:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get('/admin/:id', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
     const resource = await prisma.resource.findUnique({ where: { id: req.params.id }, include: resourceInclude });
@@ -142,6 +172,8 @@ router.patch('/people/:personId', requireAuth, requireAdmin, [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email').optional({ nullable: true, checkFalsy: true }).isEmail(),
   body('title').optional({ nullable: true }).isString(),
+  body('city').optional({ nullable: true }).isString(),
+  body('country').optional({ nullable: true }).isString(),
   body('mobile').optional({ nullable: true }).isString(),
   body('websiteUrl').optional({ nullable: true, checkFalsy: true }).isURL({ protocols: ['http', 'https'], require_protocol: true }),
   body('linkedinUrl').optional({ nullable: true, checkFalsy: true }).isURL({ protocols: ['http', 'https'], require_protocol: true }),
@@ -158,6 +190,8 @@ router.patch('/people/:personId', requireAuth, requireAdmin, [
         name: req.body.name,
         email: req.body.email ?? null,
         title: req.body.title ?? null,
+        ...(req.body.city !== undefined && { city: req.body.city || null }),
+        ...(req.body.country !== undefined && { country: req.body.country || null }),
         mobile: req.body.mobile ?? null,
         websiteUrl: req.body.websiteUrl ?? null,
         linkedinUrl: req.body.linkedinUrl ?? null,

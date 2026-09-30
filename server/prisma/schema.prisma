@@ -175,6 +175,8 @@ model RoasterPerson {
   createdById  String?
   updatedById  String?
   title        String?
+  city         String?
+  country      String?
   createdBy    User?    @relation("PersonCreatedBy", fields: [createdById], references: [id])
   roaster      Roaster  @relation(fields: [roasterId], references: [id], onDelete: Cascade)
   updatedBy    User?    @relation("PersonUpdatedBy", fields: [updatedById], references: [id])
@@ -534,6 +536,8 @@ model Person {
   name        String
   slug        String           @unique
   title       String?
+  city        String?
+  country     String?
   email       String?
   mobile      String?
   websiteUrl  String?

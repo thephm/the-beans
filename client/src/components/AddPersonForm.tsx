@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { PersonRole } from '../types';
 import { Roaster } from '../types';
 import PersonRoleButtons from './PersonRoleButtons';
+import PersonLocationFields from './PersonLocationFields';
 import { stripToRootUrl } from '../lib/url';
 import { apiClient } from '../lib/api';
 
@@ -143,6 +144,8 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
     firstName: initialPerson?.firstName || '',
     lastName: initialPerson?.lastName || '',
     title: initialPerson?.title || '',
+    city: initialPerson?.city || '',
+    country: initialPerson?.country || '',
     websiteUrl: initialPerson?.websiteUrl || '',
     email: initialPerson?.email || '',
     mobile: initialPerson?.mobile || '',
@@ -172,6 +175,8 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
         firstName: initialPerson.firstName || '',
         lastName: initialPerson.lastName || '',
         title: initialPerson.title || '',
+        city: initialPerson.city || '',
+        country: initialPerson.country || '',
         websiteUrl: initialPerson.websiteUrl || '',
         email: initialPerson.email || '',
         mobile: initialPerson.mobile || '',
@@ -303,6 +308,14 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
             </div>
           )}
         </div>
+
+        {mode === 'edit' && (
+          <PersonLocationFields
+            city={form.city}
+            country={form.country}
+            onChange={(city, country) => setForm((current) => ({ ...current, city, country }))}
+          />
+        )}
 
         {/* Instagram and LinkedIn - match Email/Mobile column widths */}
         <div className={`grid grid-cols-1 ${showPrimaryToggle ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>

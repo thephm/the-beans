@@ -511,6 +511,8 @@ router.post('/', [
   body('firstName').isString().isLength({ min: 1, max: 50 }).withMessage('First name is required and must be 1-50 characters'),
   body('lastName').optional().isString().isLength({ max: 50 }).withMessage('Last name must be 50 characters or less'),
   body('title').optional({ nullable: true }).isString().isLength({ max: 100 }).withMessage('Title must be 100 characters or less').custom((value: any) => value === null || typeof value === 'string' || value === '').withMessage('Title must be a string or null'),
+  body('city').optional({ nullable: true }).isString(),
+  body('country').optional({ nullable: true }).isString(),
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
   body('linkedinUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid LinkedIn URL'),
@@ -530,6 +532,8 @@ router.post('/', [
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const title = req.body.title;
+  const city = req.body.city;
+  const country = req.body.country;
   const email = req.body.email;
   const mobile = req.body.mobile;
   const linkedinUrl = req.body.linkedinUrl;
@@ -590,6 +594,8 @@ router.post('/', [
         firstName,
         lastName,
         title,
+        city: city || null,
+        country: country || null,
         email: normalizedEmail,
         mobile,
         linkedinUrl,
@@ -658,6 +664,8 @@ router.put('/:id', [
   body('firstName').optional().isString().isLength({ min: 1, max: 50 }).withMessage('First name must be 1-50 characters'),
   body('lastName').optional().isString().isLength({ max: 50 }).withMessage('Last name must be 50 characters or less'),
   body('title').optional({ nullable: true }).isString().isLength({ max: 100 }).withMessage('Title must be 100 characters or less').custom((value: any) => value === null || typeof value === 'string' || value === '').withMessage('Title must be a string or null'),
+  body('city').optional({ nullable: true }).isString(),
+  body('country').optional({ nullable: true }).isString(),
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
   body('linkedinUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid LinkedIn URL'),
@@ -680,6 +688,8 @@ router.put('/:id', [
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const title = req.body.title;
+  const city = req.body.city;
+  const country = req.body.country;
   const email = req.body.email;
   const mobile = req.body.mobile;
   const linkedinUrl = req.body.linkedinUrl;
@@ -785,6 +795,8 @@ router.put('/:id', [
         ...(firstName !== undefined && { firstName }),
         ...(lastName !== undefined && { lastName }),
         ...(title !== undefined && { title }),
+        ...(city !== undefined && { city: city || null }),
+        ...(country !== undefined && { country: country || null }),
         ...(email !== undefined && { email: normalizedEmail }),
         ...(mobile !== undefined && { mobile }),
         ...(linkedinUrl !== undefined && { linkedinUrl }),

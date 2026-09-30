@@ -31,4 +31,4 @@ EXPOSE 5000
 
 # Build TypeScript at startup to always use fresh code
 # This ensures changes are compiled even if Docker cache is used
-CMD ["sh", "-c", "sleep 10 && npx prisma generate && npx prisma migrate deploy && npm run build && npm start"]
+CMD ["sh", "-c", "sleep 10 && npx prisma generate && npx prisma migrate deploy && npx prisma db seed && npm run build && npm start"]

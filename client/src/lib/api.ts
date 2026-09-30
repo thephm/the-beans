@@ -330,6 +330,11 @@ class ApiClient {
     return this.request(endpoint);
   }
 
+  async searchCities(search: string, country?: string) {
+    const params = new URLSearchParams({ search, ...(country ? { country } : {}) }).toString();
+    return this.request(`/locations/cities?${params}`);
+  }
+
   async checkRoasterDomain(domain: string): Promise<RoasterExistsResponse> {
     const params = new URLSearchParams({ domain }).toString();
     return this.request(`/roasters/domain-exists?${params}`) as Promise<RoasterExistsResponse>;
@@ -347,6 +352,11 @@ class ApiClient {
   async getResources(params?: Record<string, any>) {
     const searchParams = params ? new URLSearchParams(params).toString() : '';
     return this.request(searchParams ? `/resources?${searchParams}` : '/resources');
+  }
+
+  async getAdminResources(params?: Record<string, any>) {
+    const searchParams = params ? new URLSearchParams(params).toString() : '';
+    return this.request(searchParams ? `/resources/admin?${searchParams}` : '/resources/admin');
   }
 
   async getResource(slug: string) {

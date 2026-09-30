@@ -29,6 +29,7 @@ import auditLogRoutes from './routes/auditLogs';
 import adminUsersRoutes from './routes/adminUsers';
 import regionRoutes from './routes/regions';
 import countryRoutes from './routes/countries';
+import locationRoutes from './routes/locations';
 import specialtyRoutes from './routes/specialties';
 import contactRouter from './routes/contact'; // Import contact router
 import favouritesRoutes from './routes/favourites';
@@ -170,6 +171,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/regions', regionRoutes);
 app.use('/api/countries', countryRoutes);
+app.use('/api/locations', locationRoutes);
 app.use('/api/specialties', specialtyRoutes);
 app.use('/api/contact', contactRouter);
 app.use('/api/favourites', favouritesRoutes);

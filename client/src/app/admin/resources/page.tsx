@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
-import { YouTube } from '@mui/icons-material'
+import { Search, YouTube } from '@mui/icons-material'
 
 const typePillClass = (resourceType: string) => {
   switch (resourceType) {
@@ -27,9 +27,19 @@ export default function AdminResourcesPage() {
   const { t } = useTranslation()
   const { user, loading: authLoading } = useAuth()
   const [resources, setResources] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
 
-  const loadResources = () => apiClient.getResources({ search: '', includeArchived: 'true' }).then((data: any) => setResources(data.resources || []))
-  useEffect(() => { if (user?.role === 'admin') loadResources() }, [user])
+  const loadResources = (search = searchTerm) => apiClient.getAdminResources({ search: search.trim(), includeArchived: 'true' }).then((data: any) => setResources(data.resources || []))
+  useEffect(() => {
+    if (user?.role !== 'admin') return
+    let active = true
+    const timer = setTimeout(() => {
+      apiClient.getAdminResources({ search: searchTerm.trim(), includeArchived: 'true' })
+        .then((data: any) => { if (active) setResources(data.resources || []) })
+        .catch(() => { if (active) setResources([]) })
+    }, 250)
+    return () => { active = false; clearTimeout(timer) }
+  }, [user?.role, searchTerm])
 
   if (authLoading) return <main className="p-8 pt-28">{t('adminResources.loading', 'Loading...')}</main>
   if (!user || user.role !== 'admin') return <main className="p-8 pt-28">{t('adminResources.accessRequired', 'Admin access required.')}</main>
@@ -39,7 +49,23 @@ export default function AdminResourcesPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">{t('adminResources.title', 'Resources')}</h1>
-          <Link href="/admin/resources/new" className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700">+ {t('adminResources.add', 'Add')}</Link>
+        </div>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <span className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+            {resources.length} {t('adminResources.title', 'Resources')}
+          </span>
+          <div className="relative w-full sm:ml-auto sm:max-w-sm">
+            <Search aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fontSize="small" />
+            <input
+              type="search"
+              aria-label={t('adminResources.search', 'Search by name, description, notes, roaster, or person...')}
+              placeholder={t('adminResources.search', 'Search by name, description, notes, roaster, or person...')}
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
+            />
+          </div>
+          <Link href="/admin/resources/new" className="self-end rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 sm:self-auto">{t('adminResources.add', 'Add')}</Link>
         </div>
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

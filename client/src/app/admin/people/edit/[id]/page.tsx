@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import AddPersonForm from "@/components/AddPersonForm";
+import PersonLocationFields from "@/components/PersonLocationFields";
 import { RoasterSearchField } from "@/components/AddPersonForm";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
 import { apiClient } from "@/lib/api";
@@ -84,6 +85,8 @@ const EditPersonPage: React.FC = () => {
             firstName: nameParts.shift() || '',
             lastName: nameParts.join(' '),
             title: resourcePersonObject.title || '',
+            city: resourcePersonObject.city || '',
+            country: resourcePersonObject.country || '',
             email: resourcePersonObject.email || '',
             mobile: resourcePersonObject.mobile || '',
             websiteUrl: resourcePersonObject.websiteUrl || '',
@@ -179,6 +182,8 @@ const EditPersonPage: React.FC = () => {
           firstName: personObj.firstName || '',
           lastName: personObj.lastName || '',
           title: matchingResourcePerson?.title || personObj.title || '',
+          city: matchingResourcePerson?.city || personObj.city || '',
+          country: matchingResourcePerson?.country || personObj.country || '',
           email: matchingResourcePerson?.email || personObj.email || '',
           mobile: matchingResourcePerson?.mobile || personObj.mobile || '',
           websiteUrl: matchingResourcePerson?.websiteUrl || '',
@@ -297,6 +302,8 @@ const EditPersonPage: React.FC = () => {
         ...resourcePersonForm,
         name,
         title: resourcePersonForm.title.trim() || null,
+        city: resourcePersonForm.city.trim() || null,
+        country: resourcePersonForm.country.trim() || null,
         email: resourcePersonForm.email.trim() || null,
         mobile: resourcePersonForm.mobile.trim() || null,
         websiteUrl: resourcePersonForm.websiteUrl.trim() || null,
@@ -313,6 +320,8 @@ const EditPersonPage: React.FC = () => {
           firstName,
           lastName,
           title: resourcePersonForm.title.trim(),
+          city: resourcePersonForm.city.trim() || null,
+          country: resourcePersonForm.country.trim() || null,
           email: resourcePersonForm.email.trim() || null,
           mobile: resourcePersonForm.mobile.trim(),
           linkedinUrl: resourcePersonForm.linkedinUrl.trim() || null,
@@ -405,6 +414,8 @@ const EditPersonPage: React.FC = () => {
               firstName: updatedPerson.firstName,
               lastName: updatedPerson.lastName,
               title: updatedPerson.title,
+              city: updatedPerson.city || null,
+              country: updatedPerson.country || null,
               email: updatedPerson.email,
               mobile: updatedPerson.mobile,
               linkedinUrl: updatedPerson.linkedinUrl,
@@ -474,6 +485,11 @@ const EditPersonPage: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.email', 'Email')}<input type="email" value={resourcePersonForm.email || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, email: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.mobile', 'Mobile')}<input value={resourcePersonForm.mobile || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, mobile: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
               </div>
+              <PersonLocationFields
+                city={resourcePersonForm.city || ''}
+                country={resourcePersonForm.country || ''}
+                onChange={(city, country) => setResourcePersonForm((current: any) => ({ ...current, city, country }))}
+              />
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.linkedinUrl', 'LinkedIn URL')}<input type="url" value={resourcePersonForm.linkedinUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, linkedinUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.instagramUrl', 'Instagram URL')}<input type="url" value={resourcePersonForm.instagramUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, instagramUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
