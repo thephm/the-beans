@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
 import SpecialtyPillSelector from "@/components/SpecialtyPillSelector";
 import SimpleImageUpload from "@/components/SimpleImageUpload";
+import LocationFields from "@/components/LocationFields";
 import SocialNetworksFields from "@/components/SocialNetworksFields";
 import { stripToRootUrl } from "@/lib/url";
 import { emptySocialNetworks, socialNetworksToForm, socialNetworksToPayload } from "@/lib/socials";
@@ -1109,41 +1110,19 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.city', 'City')}
-              </label>
-              <input
-                type="text"
-                name="city"
-                value={locationInfo.city}
-                onChange={handleLocationInfoChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('adminForms.roasters.state', 'State')}
-              </label>
-              <input
-                type="text"
-                name="state"
-                value={locationInfo.state}
-                onChange={handleLocationInfoChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.roasters.country', 'Country')} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="country"
-                value={locationInfo.country}
-                onChange={handleLocationInfoChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            <div className="md:col-span-2">
+              <LocationFields
+                city={locationInfo.city}
+                province={locationInfo.state}
+                country={locationInfo.country}
+                showProvince
+                requiredCountry
+                onChange={(city, country, state) => setLocationInfo((current) => ({
+                  ...current,
+                  city,
+                  country,
+                  state: state || "",
+                }))}
               />
             </div>
           </div>

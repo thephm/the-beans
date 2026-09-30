@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Select from 'react-select'
 import AsyncSelect from 'react-select/async'
@@ -14,10 +13,13 @@ const countryOptions = Object.entries(isoCountries.getNames('en'))
   .map(([code, name]) => ({ code, value: name, label: name }))
   .sort((first, second) => first.label.localeCompare(second.label))
 
-interface PersonLocationFieldsProps {
+interface LocationFieldsProps {
   city: string
   country: string
-  onChange: (city: string, country: string) => void
+  province?: string
+  showProvince?: boolean
+  requiredCountry?: boolean
+  onChange: (city: string, country: string, province?: string) => void
 }
 
 interface CityOption {
@@ -28,7 +30,14 @@ interface CityOption {
   label: string
 }
 
-export default function PersonLocationFields({ city, country, onChange }: PersonLocationFieldsProps) {
+export default function LocationFields({
+  city,
+  country,
+  province = '',
+  showProvince = false,
+  requiredCountry = false,
+  onChange,
+}: LocationFieldsProps) {
   const { t } = useTranslation()
   const selectedCountry = countryOptions.find((option) => option.value === country || option.code === country)
     || (country ? { code: '', value: country, label: country } : null)
@@ -36,6 +45,7 @@ export default function PersonLocationFields({ city, country, onChange }: Person
   const cityValue: CityOption | null = city
     ? { city, province: '', country, value: `${city}|${country}`, label: getDisplayCity(city) }
     : null
+  const provinceValue = province ? { value: province, label: province } : null
 
   const loadCityOptions = async (input: string): Promise<CityOption[]> => {
     const search = input.trim()
@@ -59,16 +69,31 @@ export default function PersonLocationFields({ city, country, onChange }: Person
 
   const selectCity = (option: CityOption | null) => {
     if (!option) {
-      onChange('', country)
+      onChange('', citySearchCountry, province)
       return
     }
     const countryCode = isoCountries.getAlpha2Code(option.country, 'en')
     const canonicalCountry = countryCode ? isoCountries.getName(countryCode, 'en') : undefined
-    onChange(option.city, canonicalCountry || option.country)
+    onChange(option.city, canonicalCountry || option.country, option.province)
+  }
+
+  const loadProvinceOptions = async (input: string) => {
+    const search = input.trim()
+    if (!country || search.length < 2) return []
+
+    try {
+      const data = await apiClient.searchProvinces(search, citySearchCountry) as any
+      return (Array.isArray(data?.provinces) ? data.provinces : []).map((name: string) => ({
+        value: name,
+        label: name,
+      }))
+    } catch {
+      return []
+    }
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className={`grid grid-cols-1 gap-6 ${showProvince ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         {t('admin.people.city', 'City')}
         <AsyncSelect
@@ -107,15 +132,58 @@ export default function PersonLocationFields({ city, country, onChange }: Person
           }}
         />
       </label>
+      {showProvince && (
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {t('adminForms.roasters.state', 'State / Province')}
+          <AsyncSelect
+            key={`province-${citySearchCountry || 'no-country'}`}
+            inputId="location-province-search"
+            instanceId="location-province-search"
+            aria-label={t('adminForms.roasters.state', 'State / Province')}
+            value={provinceValue}
+            loadOptions={loadProvinceOptions}
+            onChange={(option) => onChange(city, citySearchCountry, option?.value || '')}
+            getOptionValue={(option) => option.value}
+            getOptionLabel={(option) => option.label}
+            isClearable
+            defaultOptions={false}
+            cacheOptions
+            loadingMessage={() => t('common.loading', 'Loading...')}
+            noOptionsMessage={({ inputValue }) => !citySearchCountry
+              ? t('admin.people.selectCountryForProvinces', 'Select a country to search provinces')
+              : inputValue.trim().length < 2
+                ? t('admin.people.typeToSearchProvinces', 'Type at least 2 characters')
+                : t('admin.people.noProvincesFound', 'No provinces found')}
+            placeholder={citySearchCountry
+              ? t('admin.people.searchProvinceInCountry', 'Search provinces/states in {{country}}...', { country: citySearchCountry })
+              : t('admin.people.selectCountryForProvinces', 'Select a country to search provinces')}
+            isDisabled={!citySearchCountry}
+            unstyled
+            className="mt-1"
+            classNames={{
+              control: (state) => `min-h-[42px] w-full rounded-lg border !bg-white px-3 py-2 dark:!bg-gray-800 ${state.isFocused ? 'border-transparent ring-2 ring-blue-500' : 'border-gray-300 dark:border-gray-600'}`,
+              valueContainer: () => 'gap-1 p-0',
+              input: () => 'text-gray-900 dark:text-gray-100',
+              singleValue: () => 'text-gray-900 dark:text-gray-100',
+              placeholder: () => 'text-gray-400 dark:text-gray-500',
+              indicatorsContainer: () => 'gap-1 pr-2 text-gray-400',
+              menu: () => 'z-30 mt-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800',
+              menuList: () => 'max-h-60 overflow-y-auto',
+              option: (state) => `cursor-pointer px-3 py-2 text-sm text-gray-900 dark:text-gray-100 ${state.isFocused ? 'bg-blue-50 dark:bg-gray-700' : ''}`,
+              noOptionsMessage: () => 'px-3 py-2 text-sm text-gray-500 dark:text-gray-400',
+            }}
+          />
+        </label>
+      )}
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        {t('admin.people.country', 'Country')}
+        {t('admin.people.country', 'Country')} {requiredCountry && <span className="text-red-500">*</span>}
         <Select
           inputId="person-country-search"
           instanceId="person-country-search"
           aria-label={t('admin.people.country', 'Country')}
           options={countryOptions}
           value={selectedCountry}
-          onChange={(option) => onChange('', option?.value || '')}
+          onChange={(option) => onChange('', option?.value || '', '')}
           isClearable
           placeholder={t('admin.people.searchCountry', 'Search countries...')}
           noOptionsMessage={() => t('admin.people.noCountriesFound', 'No countries found')}

@@ -335,6 +335,11 @@ class ApiClient {
     return this.request(`/locations/cities?${params}`);
   }
 
+  async searchProvinces(search: string, country: string) {
+    const params = new URLSearchParams({ search, country }).toString();
+    return this.request(`/locations/provinces?${params}`);
+  }
+
   async checkRoasterDomain(domain: string): Promise<RoasterExistsResponse> {
     const params = new URLSearchParams({ domain }).toString();
     return this.request(`/roasters/domain-exists?${params}`) as Promise<RoasterExistsResponse>;

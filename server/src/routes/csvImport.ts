@@ -4,6 +4,7 @@ import { parse } from 'csv-parse/sync';
 import { prisma } from '../lib/prisma';
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 import { generateUniqueRoasterSlug } from '../lib/slug';
+import { normalizeCountryName } from '../lib/countryNames';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -254,33 +255,6 @@ const findExistingSpecialty = async (name: string, language: string = 'en'): Pro
   });
 
   return existingTranslation ? existingTranslation.specialtyId : null;
-};
-
-// Normalize common country name variants to canonical names.
-const normalizeCountryName = (name: string): string => {
-  const trimmed = name.trim();
-  const normalized = trimmed.toLowerCase();
-  const aliases: Record<string, string> = {
-    'u.s.a.': 'United States of America',
-    'u.s.a': 'United States of America',
-    'usa': 'United States of America',
-    'u.s.': 'United States of America',
-    'u.s': 'United States of America',
-    'united states': 'United States of America',
-    'united states of america': 'United States of America',
-    'uk': 'United Kingdom',
-    'u.k.': 'United Kingdom',
-    'united kingdom': 'United Kingdom',
-    'south korea': 'Korea, South',
-    'north korea': 'Korea, North',
-    'dr congo': 'Democratic Republic of Congo',
-    'drc': 'Democratic Republic of Congo',
-    'democratic republic of the congo': 'Democratic Republic of Congo',
-    'republic of the congo': 'Congo',
-    'czech republic': 'Czechia'
-  };
-
-  return aliases[normalized] || trimmed;
 };
 
 // Helper function to resolve origin country by name (no auto-create)
