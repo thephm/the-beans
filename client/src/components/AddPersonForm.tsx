@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { PersonRole } from '../types';
 import { Roaster } from '../types';
 import PersonRoleButtons from './PersonRoleButtons';
-import PersonLocationFields from './PersonLocationFields';
+import LocationFields from './LocationFields';
 import { stripToRootUrl } from '../lib/url';
 import { apiClient } from '../lib/api';
 
@@ -310,7 +310,7 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
         </div>
 
         {mode === 'edit' && (
-          <PersonLocationFields
+          <LocationFields
             city={form.city}
             country={form.country}
             onChange={(city, country) => setForm((current) => ({ ...current, city, country }))}

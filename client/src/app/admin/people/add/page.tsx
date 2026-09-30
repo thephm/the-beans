@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "next/navigation";
 
 import AddPersonForm from "@/components/AddPersonForm";
-import PersonLocationFields from "@/components/PersonLocationFields";
+import LocationFields from "@/components/LocationFields";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
 import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api";
@@ -95,7 +95,7 @@ const ResourcePersonAddPage: React.FC<{ resourceId: string }> = ({ resourceId })
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.jobTitle', 'Title')}<input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.email', 'Email')}<input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
           <div className="sm:col-span-2">
-            <PersonLocationFields
+            <LocationFields
               city={form.city}
               country={form.country}
               onChange={(city, country) => setForm((current) => ({ ...current, city, country }))}
