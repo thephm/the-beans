@@ -102,6 +102,7 @@ router.get('/', [
   query('limit').optional().isInt({ min: 1, max: 500 }),
   query('sortBy').optional().isString(),
   query('sortOrder').optional().isIn(['asc', 'desc']),
+  query('search').optional().isString(),
   query('includeResources').optional().isBoolean(),
 ], requireAuth, async (req: Request, res: Response) => {
 
@@ -124,7 +125,7 @@ router.get('/', [
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 100;
     const skip = (page - 1) * limit;
-    const { sortBy, sortOrder } = req.query;
+    const { sortBy, sortOrder, search } = req.query;
 
     // Build orderBy clause
     let orderBy: any = [
@@ -292,6 +293,27 @@ router.get('/', [
           }
         };
         return String(valueFor(left)).localeCompare(String(valueFor(right)), undefined, { sensitivity: 'base' }) * direction;
+      });
+    }
+
+    const searchValue = typeof search === 'string' ? search.trim().toLowerCase() : '';
+    if (searchValue) {
+      peopleForListing = peopleForListing.filter((person: any) => {
+        const searchableValues = [
+          `${person.firstName || ''} ${person.lastName || ''}`.trim(),
+          person.firstName,
+          person.lastName,
+          person.email,
+          person.mobile,
+          person.title,
+          ...(person.roles || []),
+          person.roaster?.name,
+          person.resource?.name,
+          ...(person.roaster?.resourceRoasters || []).map(({ resource }: any) => resource.name),
+        ];
+        return searchableValues.some(value =>
+          value && String(value).toLowerCase().includes(searchValue)
+        );
       });
     }
 

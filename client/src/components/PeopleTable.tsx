@@ -22,6 +22,7 @@ export default function PeopleTable() {
   const [filteredPeople, setFilteredPeople] = useState<AdminPeopleRow[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalPeople, setTotalPeople] = useState<number>(0);
   const [limit, setLimit] = useState<number>(100);
 
   useEffect(() => {
@@ -36,6 +37,9 @@ export default function PeopleTable() {
 
         // Fetch all people with pagination and sorting
         const params: any = { page: currentPage, limit, includeResources: true };
+        if (searchTerm.trim()) {
+          params.search = searchTerm.trim();
+        }
         if (sortConfig) {
           params.sortBy = sortConfig.key;
           params.sortOrder = sortConfig.direction;
@@ -51,6 +55,9 @@ export default function PeopleTable() {
         // Update pagination info
         if (peopleData && (peopleData as any).pagination) {
           setTotalPages((peopleData as any).pagination.pages || 1);
+          setTotalPeople((peopleData as any).pagination.total || 0);
+        } else {
+          setTotalPeople(allPeople.length);
         }
       } catch (err) {
         console.error('Error fetching roasters and people:', err);
@@ -60,29 +67,7 @@ export default function PeopleTable() {
       }
     }
     fetchRoastersAndPeople();
-  }, [currentPage, limit, sortConfig]);
-
-  // Filter people based on search term (client-side filtering for now)
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredPeople(people);
-    } else {
-      const filtered = people.filter(person => {
-        const fullName = `${person.firstName} ${person.lastName || ''}`.trim();
-        return (
-          fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          person.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          person.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          person.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          person.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          person.roaster?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          person.resource?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          person.roles?.some(role => role.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-      });
-      setFilteredPeople(filtered);
-    }
-  }, [searchTerm, people]);
+  }, [currentPage, limit, searchTerm, sortConfig]);
 
   // Sorting is now handled by the backend
 
@@ -117,10 +102,7 @@ export default function PeopleTable() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
         {/* Person count */}
         <span className="text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
-          {filteredPeople.length === people.length 
-            ? `${filteredPeople.length} ${t('admin.people.title', 'People')}`
-            : `${filteredPeople.length} ${t('admin.people.of', 'of')} ${people.length} ${t('admin.people.title', 'People')}`
-          }
+          {totalPeople} {t('admin.people.title', 'People')}
         </span>
 
         {/* Search Bar */}
@@ -129,7 +111,10 @@ export default function PeopleTable() {
             type="text"
             placeholder={t('admin.people.search', 'Search by name, email, roaster, title, or role...')}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -480,6 +465,4 @@ export function EditableCell({ value, onChange, type = 'text', options, ...props
     />
   );
 }
-
-
 
