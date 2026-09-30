@@ -81,9 +81,9 @@ async function collectLinks(): Promise<LinkItem[]> {
   return items;
 }
 
-router.use(requireAuth, requireAdmin);
+router.use(linkCheckRateLimit, requireAuth, requireAdmin);
 
-router.get('/links', linkCheckRateLimit, async (req: Request, res: Response) => {
+router.get('/links', async (req: Request, res: Response) => {
   try {
     const category = categories.includes(req.query.category as Category) ? req.query.category as Category : undefined;
     const service = services.includes(req.query.service as Service) ? req.query.service as Service : undefined;
@@ -110,7 +110,7 @@ router.get('/links', linkCheckRateLimit, async (req: Request, res: Response) => 
   }
 });
 
-router.post('/check', linkCheckRateLimit, async (req: Request, res: Response) => {
+router.post('/check', async (req: Request, res: Response) => {
   const { linkIndex } = req.body || {};
   if (!Number.isInteger(linkIndex) || linkIndex < 0) {
     return res.status(400).json({ error: 'Invalid link check request' });
