@@ -469,7 +469,7 @@ const EditPersonPage: React.FC = () => {
         <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">{t('admin.people.editTitle', 'Edit Person')}</h1>
         {errors.general && <p role="alert" className="mb-4 text-sm text-red-600 dark:text-red-400">{errors.general}</p>}
         {personLoaded ? (
-          <form onSubmit={handleResourceSave} className="w-full rounded-lg border border-gray-200 bg-white p-8 shadow dark:border-gray-700 dark:bg-gray-950">
+          <form onSubmit={handleResourceSave} className="w-full rounded-lg border border-black/90 bg-white p-8 shadow dark:border-purple-400/70 dark:bg-gray-950">
             <div className="mb-8 space-y-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.firstName', 'First Name')}<input required value={resourcePersonForm.firstName || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, firstName: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
