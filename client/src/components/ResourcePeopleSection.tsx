@@ -26,9 +26,9 @@ const toFormPerson = (entry: any) => {
     linkedinUrl: person.linkedinUrl || '',
     instagramUrl: person.instagramUrl || '',
     bio: person.bio || person.notes || '',
-    roles: roles
+    roles: Array.from(new Set(roles
       .map((role: string) => role === 'contact' ? PersonRole.OTHER : role as PersonRole)
-      .filter((role: PersonRole) => RESOURCE_PERSON_ROLES.includes(role)),
+      .filter((role: PersonRole) => RESOURCE_PERSON_ROLES.includes(role)))),
     isPrimary: Boolean(entry.isPrimary),
   }
 }
