@@ -149,16 +149,16 @@ export default function PeopleTable() {
         {/* Mobile Card View */}
         <div className="md:hidden space-y-4">
           {loading ? (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm text-center text-gray-500 dark:text-gray-400">
+            <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm text-center text-gray-500 dark:text-gray-400">
               {t('loading', 'Loading...')}
             </div>
           ) : filteredPeople.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm text-center text-gray-500 dark:text-gray-400">
+            <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm text-center text-gray-500 dark:text-gray-400">
               {t('admin.people.noPeopleFound', 'No people found.')}
             </div>
           ) : (
             filteredPeople.map(person => (
-              <div key={person.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
+              <div key={person.id} className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
                 {/* Person Header */}
                 <div className="mb-3">
                   {(person.resource || person.roaster) && <div className="text-xs font-medium text-gray-500 dark:text-gray-400">{person.resource ? t('admin.people.resource', 'Resource') : t('admin.people.roaster', 'Roaster')}</div>}
@@ -262,9 +262,9 @@ export default function PeopleTable() {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-gray-200 dark:border-gray-700">
+        <div className="hidden md:block bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-x-auto border border-gray-200 dark:border-gray-700">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+            <thead className="bg-gray-50 dark:bg-gray-950">
               <tr>
                 <th className="w-[18%] min-w-[160px] px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'firstName' ? { key: 'firstName', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'firstName', direction: 'asc' })}>
                   {t('adminForms.roasters.name', 'Name')}{sortConfig?.key === 'firstName' && <SortArrow direction={sortConfig.direction} />}
@@ -396,7 +396,7 @@ export default function PeopleTable() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6 rounded-lg shadow">
+          <div className="bg-white dark:bg-gray-950 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-6 rounded-lg shadow">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}

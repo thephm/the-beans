@@ -143,6 +143,7 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
     firstName: initialPerson?.firstName || '',
     lastName: initialPerson?.lastName || '',
     title: initialPerson?.title || '',
+    websiteUrl: initialPerson?.websiteUrl || '',
     email: initialPerson?.email || '',
     mobile: initialPerson?.mobile || '',
     linkedinUrl: initialPerson?.linkedinUrl || '',
@@ -171,6 +172,7 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
         firstName: initialPerson.firstName || '',
         lastName: initialPerson.lastName || '',
         title: initialPerson.title || '',
+        websiteUrl: initialPerson.websiteUrl || '',
         email: initialPerson.email || '',
         mobile: initialPerson.mobile || '',
         linkedinUrl: initialPerson.linkedinUrl || '',
@@ -256,12 +258,20 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
           </div>
         </div>
 
-        {/* Title - full width */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('admin.people.jobTitle', 'Title')}
-          </label>
-          <input type="text" placeholder={t('admin.people.jobTitle', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+        {/* Title and Website - side by side on medium+ screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('admin.people.jobTitle', 'Title')}
+            </label>
+            <input type="text" placeholder={t('admin.people.jobTitle', 'Title')} value={form.title} onChange={e => handleChange('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('admin.people.websiteUrl', 'Website')}
+            </label>
+            <input type="url" placeholder={t('admin.people.websiteUrl', 'Website')} value={form.websiteUrl} onChange={e => handleChange('websiteUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+          </div>
         </div>
 
         {/* Email, Mobile, Primary - side by side on medium+ screens */}
@@ -285,7 +295,7 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
               </label>
               <button
                 type="button"
-                className={`w-full px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+                className={`px-6 py-2 rounded-lg border text-sm font-semibold transition-colors duration-150 focus:outline-none ${form.isPrimary ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
                 onClick={() => handleChange('isPrimary', !form.isPrimary)}
               >
                 {form.isPrimary ? t('common.yes', 'Yes') : t('common.no', 'No')}

@@ -223,7 +223,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       { key: "basic", label: t('adminForms.roasters.sections.basic', 'Basic') },
       { key: "location", label: t('adminForms.roasters.sections.location', 'Location') },
       { key: "socials", label: t('adminForms.roasters.sections.socials', 'Socials'), count: socialCount },
-      { key: "contacts", label: t('adminForms.roasters.sections.contacts', 'Contacts'), count: contactCount },
+      { key: "contacts", label: t('adminForms.roasters.sections.contacts', 'People'), count: contactCount },
       { key: "specialties", label: t('adminForms.roasters.sections.specialties', 'Specialties'), count: selectedSpecialtyIds.length },
       { key: "countries", label: t('adminForms.roasters.sections.countries', 'Countries'), count: selectedCountries.length },
     ];
@@ -290,8 +290,8 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
   const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setBasicInfo((prev) => ({ ...prev, [name]: value }));
-    if (name === "closedYear" && value.trim() !== "") {
-      setDeprecated(true);
+    if (name === "closedYear") {
+      setDeprecated(value.trim() !== "");
     }
   };
 
@@ -340,6 +340,15 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
 
   const handleDeleteContact = async (index: number) => {
     const contactToDelete = contactPeople[index];
+    if (contactToDelete?.id) {
+      const confirmed = window.confirm(
+        t(
+          'adminForms.roasters.disassociatePersonConfirm',
+          'Disassociate this person from the roaster? This does not delete the person.'
+        )
+      );
+      if (!confirmed) return;
+    }
     const nextContacts = contactPeople.filter((_, contactIndex) => contactIndex !== index);
     setContactPeople(nextContacts.length > 0 ? nextContacts : [buildEmptyContact()]);
 
@@ -348,16 +357,16 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/api/people/${contactToDelete.id}`, {
-        method: "DELETE",
+      const response = await fetch(`${apiUrl}/api/people/${contactToDelete.id}/disassociate`, {
+        method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
       if (!response.ok) {
-        showToast(t('adminForms.roasters.deleteFailed', 'Failed to delete contact.'), "error");
+        showToast(t('adminForms.roasters.disassociatePersonFailed', 'Failed to disassociate person.'), "error");
       }
     } catch (error) {
-      showToast(t('adminForms.roasters.deleteFailed', 'Failed to delete contact.'), "error");
+      showToast(t('adminForms.roasters.disassociatePersonFailed', 'Failed to disassociate person.'), "error");
     }
   };
 
@@ -827,7 +836,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
       }
 
       const savedRoaster = await response.json();
-      const savedRoasterId = roasterId || savedRoaster?.id;
+      const savedRoasterId = roasterId || savedRoaster?.roaster?.id || savedRoaster?.id;
 
       if (savedRoasterId) {
         const sourceCountriesRes = await fetch(`${apiUrl}/api/roasters/${savedRoasterId}/source-countries`, {
@@ -1358,7 +1367,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                         className="text-red-600 hover:text-red-700 text-sm font-semibold"
                         onClick={() => handleDeleteContact(index)}
                       >
-                        {t('common.delete', 'Delete')} {t('adminForms.roasters.contact', 'Contact')}
+                        {t('adminForms.roasters.disassociatePerson', 'Disassociate Person')}
                       </button>
                     )}
                   </div>

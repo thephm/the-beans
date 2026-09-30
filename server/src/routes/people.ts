@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
+import { generateUniquePersonSlug } from '../lib/slug';
 
 const router = Router();
 // Use shared Prisma client
@@ -849,6 +850,97 @@ router.put('/:id', [
       });
     }
     
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/people/:id/disassociate - Remove a person from a roaster without deleting the person
+router.post('/:id/disassociate', [
+  param('id').isString().notEmpty().withMessage('person ID is required')
+], requireAuth, async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const id = req.params.id;
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const association = await prisma.roasterPerson.findUnique({ where: { id } });
+    if (!association) {
+      return res.status(404).json({ error: 'person not found' });
+    }
+
+    const canManage = await canManagePeople(userId, association.roasterId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Permission denied. Only owners and admins can manage people.' });
+    }
+
+    const roaster = await prisma.roaster.findUnique({ where: { id: association.roasterId }, select: { name: true } });
+    const note = `${new Date().toISOString().slice(0, 10)}: disassociated from ${roaster?.name || 'roaster'}`;
+    const appendNote = (bio: string | null) => (bio?.trim() ? `${bio.trim()}\n\n${note}` : note);
+
+    const email = association.email?.trim() || null;
+    const otherRoasterLinks = email
+      ? await prisma.roasterPerson.findMany({
+          where: { id: { not: id }, email: { equals: email, mode: 'insensitive' } },
+          select: { id: true, bio: true }
+        })
+      : [];
+
+    // Roaster contacts only exist as roaster_people rows, so keep a standalone Person when this was the last link.
+    let keptPersonId: string | null = null;
+    await prisma.$transaction(async (tx) => {
+      for (const link of otherRoasterLinks) {
+        await tx.roasterPerson.update({ where: { id: link.id }, data: { bio: appendNote(link.bio) } });
+      }
+
+      if (otherRoasterLinks.length === 0) {
+        const existingPerson = email
+          ? await tx.person.findFirst({ where: { email: { equals: email, mode: 'insensitive' } }, select: { id: true, bio: true } })
+          : null;
+        if (existingPerson) {
+          await tx.person.update({ where: { id: existingPerson.id }, data: { bio: appendNote(existingPerson.bio) } });
+          keptPersonId = existingPerson.id;
+        } else {
+          const name = `${association.firstName} ${association.lastName || ''}`.trim();
+          const person = await tx.person.create({
+            data: {
+              name,
+              slug: await generateUniquePersonSlug(prisma, name),
+              title: association.title,
+              email,
+              mobile: association.mobile,
+              linkedinUrl: association.linkedinUrl,
+              instagramUrl: association.instagramUrl,
+              bio: appendNote(association.bio),
+            }
+          });
+          keptPersonId = person.id;
+        }
+      }
+
+      await tx.roasterPerson.delete({ where: { id } });
+    });
+
+    await createAuditLog({
+      action: 'DELETE',
+      entityType: 'person',
+      entityId: association.id,
+      entityName: `${association.firstName} ${association.lastName || ''}`.trim(),
+      userId,
+      ipAddress: getClientIP(req),
+      userAgent: getUserAgent(req),
+      oldValues: association,
+    });
+
+    res.json({ message: 'person disassociated from roaster', personId: keptPersonId });
+  } catch (error) {
+    console.error('Disassociate person error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

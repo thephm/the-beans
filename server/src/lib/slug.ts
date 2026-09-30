@@ -8,6 +8,19 @@ export const slugify = (value: string): string => {
     .replace(/^-+|-+$/g, '');
 };
 
+export const generateUniquePersonSlug = async (
+  prisma: PrismaClient,
+  name: string
+): Promise<string> => {
+  const baseSlug = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'person';
+  let slug = baseSlug;
+  let suffix = 2;
+  while (await prisma.person.findUnique({ where: { slug }, select: { id: true } })) {
+    slug = `${baseSlug}-${suffix++}`;
+  }
+  return slug;
+};
+
 export const generateUniqueRoasterSlug = async (
   prisma: PrismaClient,
   roasterName: string

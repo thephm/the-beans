@@ -3,7 +3,7 @@
   html.dark body > *,
   html.dark section,
   html.dark main,
-  html.dark .bg-white,
+  html.dark .bg-white:not(input):not(select):not(textarea),
   html.dark .bg-lavender-50,
   html.dark .bg-gradient-lavender {
     background-image: none !important;

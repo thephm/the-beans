@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 import { auditBefore, auditAfter, captureOldValues } from '../middleware/auditMiddleware';
 import { isSocialNetworksObject, normalizeSocialNetworks } from '../lib/socialNetworks';
+import { generateUniquePersonSlug } from '../lib/slug';
 
 const router = Router();
 
@@ -22,18 +23,10 @@ const isSafeUrl = (value: string) => {
   }
 };
 
-const createPersonSlug = async (name: string) => {
-  const baseSlug = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'person';
-  let slug = baseSlug;
-  let suffix = 2;
-  while (await prisma.person.findUnique({ where: { slug }, select: { id: true } })) {
-    slug = `${baseSlug}-${suffix++}`;
-  }
-  return slug;
-};
+const createPersonSlug = (name: string) => generateUniquePersonSlug(prisma, name);
 
 const publicResource = (resource: any) => {
-  const { adminNotes, ...safeResource } = resource;
+  const { notes, ...safeResource } = resource;
   if (safeResource.people) {
     safeResource.people = safeResource.people.map((entry: any) => ({
       ...entry,
@@ -154,6 +147,7 @@ router.patch('/people/:personId', requireAuth, requireAdmin, [
   body('linkedinUrl').optional({ nullable: true, checkFalsy: true }).isURL({ protocols: ['http', 'https'], require_protocol: true }),
   body('instagramUrl').optional({ nullable: true, checkFalsy: true }).isURL({ protocols: ['http', 'https'], require_protocol: true }),
   body('bio').optional({ nullable: true }).isString(),
+  body('notes').optional({ nullable: true }).isString(),
 ], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -169,6 +163,7 @@ router.patch('/people/:personId', requireAuth, requireAdmin, [
         linkedinUrl: req.body.linkedinUrl ?? null,
         instagramUrl: req.body.instagramUrl ?? null,
         bio: req.body.bio ?? null,
+        notes: req.body.notes === undefined ? undefined : req.body.notes || null,
       },
       include: {
         resources: {

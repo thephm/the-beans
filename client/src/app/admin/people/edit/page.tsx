@@ -102,15 +102,15 @@ export default function EditPersonPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.name', 'Name')}</label>
-              <input className="w-full border rounded px-3 py-2" value={editData.name || ""} onChange={e => handleEditChange("name", e.target.value)} />
+              <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" value={editData.name || ""} onChange={e => handleEditChange("name", e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.email', 'Email')}</label>
-              <input className="w-full border rounded px-3 py-2" value={editData.email || ""} onChange={e => handleEditChange("email", e.target.value)} />
+              <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" value={editData.email || ""} onChange={e => handleEditChange("email", e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.mobile', 'Mobile')}</label>
-              <input className="w-full border rounded px-3 py-2" value={editData.mobile || ""} onChange={e => handleEditChange("mobile", e.target.value)} />
+              <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" value={editData.mobile || ""} onChange={e => handleEditChange("mobile", e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.role', 'Roles')}</label>
@@ -139,7 +139,7 @@ export default function EditPersonPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.roaster', 'Roaster')}</label>
-              <select className="w-full border rounded px-3 py-2" value={editData.roasterId || ""} onChange={e => handleEditChange("roasterId", e.target.value)}>
+              <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" value={editData.roasterId || ""} onChange={e => handleEditChange("roasterId", e.target.value)}>
                 <option value="">{t('admin.people.selectRoaster', 'Select a roaster')}</option>
                 {[...roasters].sort((a, b) => a.name.trim().toLowerCase().localeCompare(b.name.trim().toLowerCase())).map(r => (
                   <option key={r.id} value={r.id}>{r.name}</option>

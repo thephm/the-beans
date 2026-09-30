@@ -90,6 +90,7 @@ const EditPersonPage: React.FC = () => {
             linkedinUrl: resourcePersonObject.linkedinUrl || '',
             instagramUrl: resourcePersonObject.instagramUrl || '',
             bio: resourcePersonObject.bio || '',
+            notes: resourcePersonObject.notes || '',
           });
           let matchingRoasterPeople: any[] = [];
           if (resourcePersonObject.email) {
@@ -184,6 +185,7 @@ const EditPersonPage: React.FC = () => {
           linkedinUrl: matchingResourcePerson?.linkedinUrl || personObj.linkedinUrl || '',
           instagramUrl: matchingResourcePerson?.instagramUrl || personObj.instagramUrl || '',
           bio: matchingResourcePerson?.bio || personObj.bio || '',
+          notes: matchingResourcePerson?.notes || '',
         });
       } catch (err) {
         console.error('Error fetching person data:', err);
@@ -301,6 +303,7 @@ const EditPersonPage: React.FC = () => {
         linkedinUrl: resourcePersonForm.linkedinUrl.trim() || null,
         instagramUrl: resourcePersonForm.instagramUrl.trim() || null,
         bio: resourcePersonForm.bio.trim() || null,
+        notes: resourcePersonForm.notes.trim() || null,
       };
       if (resourcePerson?.id) {
         await apiClient.updateResourcePersonDetails(resourcePerson.id, resourcePersonData);
@@ -454,25 +457,27 @@ const EditPersonPage: React.FC = () => {
         <div className="mb-8">
           <a href={resourceReturnUrl} className="inline-flex items-center font-medium text-primary-600 hover:underline dark:text-primary-400">{'<'} {returnToResourceId ? t('admin.people.backToResource', 'Back to resource') : t('admin.people.title', 'Back to People')}</a>
         </div>
-        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100">{t('admin.people.editTitle', 'Edit Person')}</h1>
+        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">{t('admin.people.editTitle', 'Edit Person')}</h1>
         {errors.general && <p role="alert" className="mb-4 text-sm text-red-600 dark:text-red-400">{errors.general}</p>}
         {personLoaded ? (
-          <form onSubmit={handleResourceSave} className="w-full rounded-lg border border-gray-200 bg-white p-8 shadow dark:border-gray-700 dark:bg-gray-900">
+          <form onSubmit={handleResourceSave} className="w-full rounded-lg border border-gray-200 bg-white p-8 shadow dark:border-gray-700 dark:bg-gray-950">
             <div className="mb-8 space-y-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.firstName', 'First Name')}<input required value={resourcePersonForm.firstName || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, firstName: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.lastName', 'Last Name')}<input value={resourcePersonForm.lastName || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, lastName: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-              </div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.jobTitle', 'Title')}<input value={resourcePersonForm.title || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, title: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.email', 'Email')}<input type="email" value={resourcePersonForm.email || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, email: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.mobile', 'Mobile')}<input value={resourcePersonForm.mobile || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, mobile: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.firstName', 'First Name')}<input required value={resourcePersonForm.firstName || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, firstName: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.lastName', 'Last Name')}<input value={resourcePersonForm.lastName || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, lastName: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
               </div>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.websiteUrl', 'Website')}<input type="url" value={resourcePersonForm.websiteUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, websiteUrl: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.instagramUrl', 'Instagram URL')}<input type="url" value={resourcePersonForm.instagramUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, instagramUrl: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.jobTitle', 'Title')}<input value={resourcePersonForm.title || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, title: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.websiteUrl', 'Website')}<input type="url" value={resourcePersonForm.websiteUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, websiteUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
               </div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.linkedinUrl', 'LinkedIn URL')}<input type="url" value={resourcePersonForm.linkedinUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, linkedinUrl: event.target.value })} className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.email', 'Email')}<input type="email" value={resourcePersonForm.email || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, email: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.mobile', 'Mobile')}<input value={resourcePersonForm.mobile || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, mobile: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+              </div>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.linkedinUrl', 'LinkedIn URL')}<input type="url" value={resourcePersonForm.linkedinUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, linkedinUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.instagramUrl', 'Instagram URL')}<input type="url" value={resourcePersonForm.instagramUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, instagramUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+              </div>
             </div>
             <section className="mb-4 space-y-3 sm:col-span-2" aria-labelledby="roaster-associations-heading">
               <h2 id="roaster-associations-heading" className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('admin.people.roasterAssociations', 'Roasters')}</h2>
@@ -599,7 +604,12 @@ const EditPersonPage: React.FC = () => {
                 </div>
               ))}
             </section>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200 sm:col-span-2">{t('admin.people.bio', 'Bio')}<textarea rows={4} value={resourcePersonForm.bio || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, bio: event.target.value })} className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200 sm:col-span-2">{t('admin.people.bio', 'Bio')}<textarea rows={4} value={resourcePersonForm.bio || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, bio: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <div className="sm:col-span-2">
+              <label htmlFor="person-private-notes" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.notes', 'Notes')}</label>
+              <textarea id="person-private-notes" aria-describedby="person-private-notes-help" rows={5} value={resourcePersonForm.notes || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, notes: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" />
+              <p id="person-private-notes-help" className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('admin.people.notesPrivateHelp', 'These are private notes, not displayed to users')}</p>
+            </div>
             <div className="flex justify-end gap-3 sm:col-span-2">
               <button type="button" onClick={() => { window.location.href = resourceReturnUrl; }} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200">{t('common.cancel', 'Cancel')}</button>
               <button type="submit" disabled={resourceSaving} className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50">{resourceSaving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button>
