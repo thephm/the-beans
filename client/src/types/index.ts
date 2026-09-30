@@ -282,14 +282,32 @@ export interface AuditLogFilters {
 export enum PersonRole {
   OWNER = "owner",
   ADMIN = "admin",
-  ROASTER = "roaster",
-  EMPLOYEE = "employee",
-  BILLING = "billing",
+  FOUNDER = "founder",
   MARKETING = "marketing",
   SCOUT = "scout",
-  CUSTOMER = "customer",
-  OTHER = "other"
+  EMPLOYEE = "employee",
+  OTHER = "other",
+  CREATOR = "creator",
+  AUTHOR = "author",
+  CONTRIBUTOR = "contributor"
 }
+
+export const COMMON_PERSON_ROLES: PersonRole[] = [
+  PersonRole.OWNER,
+  PersonRole.ADMIN,
+  PersonRole.FOUNDER,
+  PersonRole.MARKETING,
+  PersonRole.SCOUT,
+  PersonRole.EMPLOYEE,
+  PersonRole.OTHER,
+];
+
+export const RESOURCE_PERSON_ROLES: PersonRole[] = [
+  ...COMMON_PERSON_ROLES,
+  PersonRole.CREATOR,
+  PersonRole.AUTHOR,
+  PersonRole.CONTRIBUTOR,
+];
 
 export interface RoasterPerson {
   id: string;

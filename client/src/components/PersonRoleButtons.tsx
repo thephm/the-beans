@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { PersonRole } from '../types';
+import { COMMON_PERSON_ROLES, PersonRole } from '../types';
 
 interface PersonRoleButtonsProps {
   selectedRoles: string[];
@@ -17,20 +17,17 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, roles, 
   const roleDefinitions = [
     { value: PersonRole.OWNER, label: t('admin.people.roleOwner', 'Owner') },
     { value: PersonRole.ADMIN, label: t('admin.people.roleAdmin', 'Admin') },
-    { value: PersonRole.ROASTER, label: t('admin.people.roleRoaster', 'Roaster') },
-    { value: PersonRole.EMPLOYEE, label: t('admin.people.roleEmployee', 'Employee') },
-    { value: PersonRole.BILLING, label: t('admin.people.roleBilling', 'Billing') },
+    { value: PersonRole.FOUNDER, label: t('admin.people.roleFounder', 'Founder') },
     { value: PersonRole.MARKETING, label: t('admin.people.roleMarketing', 'Marketing') },
     { value: PersonRole.SCOUT, label: t('admin.people.roleScout', 'Scout') },
-    { value: PersonRole.CUSTOMER, label: t('admin.people.roleCustomer', 'Customer') },
-    { value: PersonRole.OTHER, label: t('admin.people.roleOther', 'Other') }
+    { value: PersonRole.EMPLOYEE, label: t('admin.people.roleEmployee', 'Employee') },
+    { value: PersonRole.OTHER, label: t('admin.people.roleOther', 'Other') },
+    { value: PersonRole.CREATOR, label: t('admin.people.roleCreator', 'Creator') },
+    { value: PersonRole.AUTHOR, label: t('admin.people.roleAuthor', 'Author') },
+    { value: PersonRole.CONTRIBUTOR, label: t('admin.people.roleContributor', 'Contributor') },
   ];
-  const visibleRoles = roles
-    ? [
-        ...roleDefinitions.filter((role) => roles.includes(role.value)),
-        ...roles.filter((role) => !roleDefinitions.some((definition) => definition.value === role)).map((value) => ({ value, label: value })),
-      ]
-    : roleDefinitions;
+  const allowedRoles = roles || COMMON_PERSON_ROLES;
+  const visibleRoles = roleDefinitions.filter((role) => allowedRoles.includes(role.value));
 
   const sizeClasses = size === 'sm'
     ? 'px-3 py-1.5 text-sm min-w-[104px]'

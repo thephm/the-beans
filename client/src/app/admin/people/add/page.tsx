@@ -5,8 +5,10 @@ import { useSearchParams } from "next/navigation";
 
 import AddPersonForm from "@/components/AddPersonForm";
 import PersonLocationFields from "@/components/PersonLocationFields";
+import PersonRoleButtons from "@/components/PersonRoleButtons";
 import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api";
+import { RESOURCE_PERSON_ROLES } from "@/types";
 
 const ResourcePersonAddPage: React.FC<{ resourceId: string }> = ({ resourceId }) => {
   const { t } = useTranslation();
@@ -104,7 +106,16 @@ const ResourcePersonAddPage: React.FC<{ resourceId: string }> = ({ resourceId })
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.linkedinUrl', 'LinkedIn URL')}<input type="url" value={form.linkedinUrl} onChange={(event) => setForm({ ...form, linkedinUrl: event.target.value })} className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.instagramUrl', 'Instagram URL')}<input type="url" value={form.instagramUrl} onChange={(event) => setForm({ ...form, instagramUrl: event.target.value })} className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200 sm:col-span-2">{t('admin.people.bio', 'Bio')}<textarea rows={4} value={form.bio} onChange={(event) => setForm({ ...form, bio: event.target.value })} className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.role', 'Role')}<input required value={role} onChange={(event) => setRole(event.target.value)} maxLength={24} className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+          <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
+            <label className="mb-1 block">{t('admin.people.role', 'Role')}</label>
+            <PersonRoleButtons
+              selectedRoles={[role]}
+              onRoleToggle={setRole}
+              roles={RESOURCE_PERSON_ROLES}
+              size="sm"
+              layout="wrap"
+            />
+          </div>
           <label className="inline-flex items-center gap-2 self-end pb-3 text-sm text-gray-700 dark:text-gray-200"><input type="checkbox" checked={isPrimary} onChange={(event) => setIsPrimary(event.target.checked)} className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800" />{t('admin.people.primaryContact', 'Primary contact')}</label>
           <div className="flex justify-end gap-3 sm:col-span-2">
             <button type="button" onClick={() => { window.location.href = `/admin/resources/${resourceId}`; }} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200">{t('common.cancel', 'Cancel')}</button>

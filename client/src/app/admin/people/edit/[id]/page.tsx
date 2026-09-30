@@ -7,12 +7,9 @@ import PersonLocationFields from "@/components/PersonLocationFields";
 import { RoasterSearchField } from "@/components/AddPersonForm";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
 import { apiClient } from "@/lib/api";
-import { PersonRole, RoasterPerson } from "@/types";
+import { PersonRole, RESOURCE_PERSON_ROLES, RoasterPerson } from "@/types";
 
-const RESOURCE_PERSON_ROLE_OPTIONS = [
-  'author', 'contact', 'contributor', 'creator', 'founder', 'maintainer',
-  'owner', 'admin', 'roaster', 'employee', 'billing', 'marketing', 'scout', 'other',
-];
+const normalizeResourceRole = (role: string) => role === 'contact' ? PersonRole.OTHER : role;
 
 
 const EditPersonPage: React.FC = () => {
@@ -72,7 +69,8 @@ const EditPersonPage: React.FC = () => {
               };
               resourceAssociationMap.set(resource.id, entry);
             }
-            if (association.role && !entry.roles.includes(association.role)) entry.roles.push(association.role);
+            const role = association.role && normalizeResourceRole(association.role);
+            if (role && RESOURCE_PERSON_ROLES.includes(role as PersonRole) && !entry.roles.includes(role)) entry.roles.push(role);
             entry.isPrimary = entry.isPrimary || Boolean(association.isPrimary);
           });
           setResourcePerson(resourcePersonObject);
@@ -170,7 +168,8 @@ const EditPersonPage: React.FC = () => {
             grouped = { resourceId: resource.id, resource, roles: [], isPrimary: false };
             resourcesById.set(resource.id, grouped);
           }
-          if (association.role && !grouped.roles.includes(association.role)) grouped.roles.push(association.role);
+          const role = association.role && normalizeResourceRole(association.role);
+          if (role && RESOURCE_PERSON_ROLES.includes(role as PersonRole) && !grouped.roles.includes(role)) grouped.roles.push(role);
           grouped.isPrimary = grouped.isPrimary || Boolean(association.isPrimary);
         });
         const loadedResourceAssociations = Array.from(resourcesById.values());
@@ -288,7 +287,9 @@ const EditPersonPage: React.FC = () => {
 
     const normalizedResourceAssociations = resourceAssociations.map((association) => ({
       ...association,
-      roles: association.roles.map((role: string) => role.trim()).filter(Boolean),
+      roles: association.roles
+        .map((role: string) => normalizeResourceRole(role.trim()))
+        .filter((role: string) => RESOURCE_PERSON_ROLES.includes(role as PersonRole)),
     }));
     if (normalizedResourceAssociations.some((association) => association.roles.length === 0)) {
       setErrors({ general: t('admin.people.resourceRoleRequired', 'Each resource association needs at least one role.') });
@@ -392,10 +393,7 @@ const EditPersonPage: React.FC = () => {
       : association));
   };
 
-  const resourceRoleOptions = Array.from(new Set([
-    ...RESOURCE_PERSON_ROLE_OPTIONS,
-    ...resourceAssociations.flatMap((association) => association.roles || []),
-  ]));
+  const resourceRoleOptions = RESOURCE_PERSON_ROLES;
   const handleSave = async (updatedPerson: any) => {
     setErrors({});
     

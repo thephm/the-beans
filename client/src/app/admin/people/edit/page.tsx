@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiClient } from "@/lib/api";
-import { RoasterPerson, PersonRole, Roaster } from "@/types";
+import PersonRoleButtons from "@/components/PersonRoleButtons";
+import { COMMON_PERSON_ROLES, RoasterPerson, Roaster } from "@/types";
 
 function formatDateTime(dt?: string) {
   if (!dt) return "";
@@ -114,28 +115,15 @@ export default function EditPersonPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.role', 'Roles')}</label>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {[
-                  { value: "owner", labelKey: "admin.people.roleOwner", label: "Owner" },
-                  { value: "admin", labelKey: "admin.people.roleAdmin", label: "Admin" },
-                  { value: "billing", labelKey: "admin.people.roleBilling", label: "Billing" },
-                ].map(opt => {
-                  const selected = (editData.roles || []).includes(opt.value);
-                  return (
-                    <button
-                      type="button"
-                      key={opt.value}
-                      className={`px-4 py-1 rounded-full border text-sm font-semibold transition-colors duration-150 focus:outline-none ${selected ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50'}`}
-                      onClick={() => {
-                        const roles = editData.roles || [];
-                        handleEditChange("roles", selected ? roles.filter(r => r !== opt.value) : [...roles, opt.value]);
-                      }}
-                    >
-                      {t(opt.labelKey, opt.label)}
-                    </button>
-                  );
-                })}
-              </div>
+              <PersonRoleButtons
+                selectedRoles={editData.roles || []}
+                onRoleToggle={(role) => {
+                  const roles = editData.roles || [];
+                  handleEditChange("roles", roles.includes(role) ? roles.filter((value) => value !== role) : [...roles, role]);
+                }}
+                roles={COMMON_PERSON_ROLES}
+                layout="wrap"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.roaster', 'Roaster')}</label>
