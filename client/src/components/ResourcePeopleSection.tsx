@@ -3,18 +3,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import Close from '@mui/icons-material/Close'
 import AddPersonForm from './AddPersonForm'
 import { apiClient } from '@/lib/api'
-import { PersonRole } from '@/types'
-
-const resourceRoleOptions = [
-  PersonRole.OWNER,
-  PersonRole.ADMIN,
-  PersonRole.ROASTER,
-  PersonRole.EMPLOYEE,
-  PersonRole.BILLING,
-  PersonRole.MARKETING,
-  PersonRole.SCOUT,
-  PersonRole.OTHER,
-]
+import { PersonRole, RESOURCE_PERSON_ROLES } from '@/types'
 
 interface ResourcePeopleSectionProps {
   people: any[]
@@ -37,7 +26,9 @@ const toFormPerson = (entry: any) => {
     linkedinUrl: person.linkedinUrl || '',
     instagramUrl: person.instagramUrl || '',
     bio: person.bio || person.notes || '',
-    roles: roles.filter((role: PersonRole) => resourceRoleOptions.includes(role)),
+    roles: roles
+      .map((role: string) => role === 'contact' ? PersonRole.OTHER : role as PersonRole)
+      .filter((role: PersonRole) => RESOURCE_PERSON_ROLES.includes(role)),
     isPrimary: Boolean(entry.isPrimary),
   }
 }
@@ -186,7 +177,7 @@ export default function ResourcePeopleSection({ people, onChange, resourceId }: 
               <AddPersonForm
                 mode={entry.id ? 'edit' : 'add'}
                 initialPerson={toFormPerson(entry)}
-                roleOptions={resourceRoleOptions}
+                roleOptions={RESOURCE_PERSON_ROLES}
                 onSave={(person) => savePerson(index, person)}
                 onCancel={() => cancelPerson(index)}
               />
