@@ -6,6 +6,7 @@ import { requireAuth } from '../middleware/requireAuth';
 import { normalizeSocialNetworks } from '../lib/socialNetworks';
 
 const router = Router();
+const linkCheckRateLimit = rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false });
 const categories = ['people', 'roasters', 'resources'] as const;
 const services = ['web', 'socials'] as const;
 type Category = typeof categories[number];
@@ -82,7 +83,7 @@ async function collectLinks(): Promise<LinkItem[]> {
 
 router.use(requireAuth, requireAdmin);
 
-router.get('/links', async (req: Request, res: Response) => {
+router.get('/links', linkCheckRateLimit, async (req: Request, res: Response) => {
   try {
     const category = categories.includes(req.query.category as Category) ? req.query.category as Category : undefined;
     const service = services.includes(req.query.service as Service) ? req.query.service as Service : undefined;
@@ -109,7 +110,7 @@ router.get('/links', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/check', rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false }), async (req: Request, res: Response) => {
+router.post('/check', linkCheckRateLimit, async (req: Request, res: Response) => {
   const { linkIndex } = req.body || {};
   if (!Number.isInteger(linkIndex) || linkIndex < 0) {
     return res.status(400).json({ error: 'Invalid link check request' });
