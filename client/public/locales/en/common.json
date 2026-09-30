@@ -1110,7 +1110,35 @@
       "workflowStep6": "Click \"Set\" to save",
       "workflowTip": "Tip: You can also use \"Calculate\" for a quick estimate, or type coordinates manually."
     },
-    "unverified": "Unverified"
+    "unverified": "Unverified",
+    "linkChecker": {
+      "title": "Link checker",
+      "description": "Check database links and find broken ones.",
+      "adminRequired": "Admin access required.",
+      "type": "Type",
+      "all": "All",
+      "people": "People",
+      "roasters": "Roasters",
+      "resources": "Resources",
+      "services": "Services",
+      "web": "Web",
+      "socials": "Socials",
+      "skipRecent": "Skip checked in last 30 days",
+      "delay": "Delay (ms)",
+      "load": "Load links",
+      "start": "Start",
+      "running": "Checking...",
+      "pause": "Pause",
+      "continue": "Continue",
+      "progress": "Progress",
+      "broken": "Broken",
+      "entity": "Entity",
+      "url": "URL",
+      "error": "Error",
+      "edit": "Edit",
+      "loadFailed": "Could not load links.",
+      "checkFailed": "A link check failed unexpectedly."
+    }
   },
   "adminSection": {
   "users": "Users",

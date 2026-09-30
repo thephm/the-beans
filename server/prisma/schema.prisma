@@ -608,3 +608,21 @@ model ResourceObservation {
   @@index([resourceId, observedAt])
   @@map("resource_observations")
 }
+
+model LinkCheck {
+  id          String   @id @default(cuid())
+  url         String
+  category    String   @db.VarChar(16)
+  service     String   @db.VarChar(16)
+  entityId    String
+  entityName  String
+  statusCode  Int?
+  isBroken    Boolean
+  error       String?
+  checkedAt   DateTime @default(now())
+
+  @@unique([url, category, service, entityId])
+  @@index([checkedAt])
+  @@index([category, service])
+  @@map("link_checks")
+}

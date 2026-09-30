@@ -968,7 +968,35 @@
       "workflowStep6": "Cliquez sur \"Définir\" pour enregistrer",
       "workflowTip": "Astuce : Vous pouvez également utiliser \"Calculer\" pour une estimation rapide, ou saisir les coordonnées manuellement."
     },
-    "unverified": "Non vérifié"
+    "unverified": "Non vérifié",
+    "linkChecker": {
+      "title": "Vérificateur de liens",
+      "description": "Vérifiez les liens de la base de données et trouvez ceux qui sont brisés.",
+      "adminRequired": "Accès administrateur requis.",
+      "type": "Type",
+      "all": "Tous",
+      "people": "Personnes",
+      "roasters": "Torréfacteurs",
+      "resources": "Ressources",
+      "services": "Services",
+      "web": "Web",
+      "socials": "Réseaux sociaux",
+      "skipRecent": "Ignorer les liens vérifiés depuis 30 jours",
+      "delay": "Délai (ms)",
+      "load": "Charger les liens",
+      "start": "Démarrer",
+      "running": "Vérification...",
+      "pause": "Pause",
+      "continue": "Continuer",
+      "progress": "Progression",
+      "broken": "Brisés",
+      "entity": "Entité",
+      "url": "URL",
+      "error": "Erreur",
+      "edit": "Modifier",
+      "loadFailed": "Impossible de charger les liens.",
+      "checkFailed": "Une vérification de lien a échoué de manière inattendue."
+    }
   },
   "adminForms": {
     "roasters": {

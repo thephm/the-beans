@@ -543,6 +543,18 @@ class ApiClient {
     return this.request(`/admin/analytics/stats${searchParams}`);
   }
 
+  async getLinkCheckerLinks(params?: Record<string, any>) {
+    const searchParams = params ? new URLSearchParams(params).toString() : '';
+    return this.request(`/admin/link-checker/links${searchParams ? `?${searchParams}` : ''}`);
+  }
+
+  async checkLink(data: Record<string, any>) {
+    return this.request('/admin/link-checker/check', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Favourites methods
   async getFavourites() {
     return this.request('/favourites');

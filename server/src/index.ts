@@ -40,6 +40,7 @@ import oauthNewRoutes from './routes/oauthNew';
 import postsRoutes from './routes/posts';
 import csvImportRoutes from './routes/csvImport';
 import instagramImportRoutes from './routes/instagramImport';
+import linkCheckerRoutes from './routes/linkChecker';
 
 import forgotPasswordRoutes from './routes/forgotPassword';
 import { prisma } from './lib/prisma';
@@ -184,6 +185,7 @@ app.use('/api/roasters', csvImportRoutes); // CSV import endpoint
 app.use('/api', forgotPasswordRoutes);
 app.use('/api/admin', auditLogRoutes); // Admin audit log routes
 app.use('/api/admin', instagramImportRoutes);
+app.use('/api/admin/link-checker', linkCheckerRoutes);
 // Analytics event capture route
 app.use('/api/analytics', analyticsRouter);
 // Analytics admin stats route
@@ -210,4 +212,3 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
   console.log(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
 });
-

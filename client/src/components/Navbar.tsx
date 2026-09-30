@@ -116,6 +116,13 @@ export function Navbar() {
                     >
                       {t('adminSection.auditLogs', 'Audit Logs')}
                     </Link>
+                    <Link
+                      href="/admin/link-checker"
+                      className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
+                      onClick={() => setIsAdminMenuOpen(false)}
+                    >
+                      {t('admin.linkChecker.title', 'Link checker')}
+                    </Link>
                     <Link 
                       href="/admin/backup" 
                       className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-600 transition-colors"
@@ -404,4 +411,3 @@ export function Navbar() {
     </nav>
   )
 }
-
