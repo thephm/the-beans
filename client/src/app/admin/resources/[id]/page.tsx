@@ -21,8 +21,16 @@ export default function AdminResourceEditPage() {
   const params = useParams<{ id: string }>()
   const searchParams = useSearchParams()
   const router = useRouter()
+<<<<<<< HEAD
   const requestedReturnTo = searchParams.get('returnTo')
   const returnTo = requestedReturnTo?.startsWith('/') && !requestedReturnTo.startsWith('//') ? requestedReturnTo : '/admin/resources'
+=======
+  const searchParams = useSearchParams()
+  const returnToRoasterId = searchParams?.get('returnToRoasterId') || ''
+  const returnUrl = returnToRoasterId
+    ? `/admin/roasters/edit/${encodeURIComponent(returnToRoasterId)}?tab=resources`
+    : '/admin/resources'
+>>>>>>> 24e20ae6354bda6defd8904898578dcf88c6a7e1
   const [form, setForm] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -99,7 +107,12 @@ export default function AdminResourceEditPage() {
         .filter((entry: any) => !entry.id)
         .map((entry: any) => apiClient.linkResourcePerson(form.id, { personId: entry.personId, role: entry.role || 'other', isPrimary: Boolean(entry.isPrimary), person: entry.person })))
       await Promise.all(initialPeopleIds.filter((personId) => !currentPeople.some((entry: any) => entry.personId === personId)).map((personId) => apiClient.unlinkResourcePerson(form.id, personId)))
+<<<<<<< HEAD
       router.push(returnTo)
+=======
+      router.push(returnUrl)
+      router.refresh()
+>>>>>>> 24e20ae6354bda6defd8904898578dcf88c6a7e1
     } catch (error: any) {
       setMessage(error.message || t('adminResources.updateFailed', 'Could not update resource.'))
     } finally {
@@ -159,7 +172,11 @@ export default function AdminResourceEditPage() {
             </section>
           <ResourcePeopleSection resourceId={form.id} people={Array.isArray(form.people) ? form.people : []} onChange={(people) => setForm((currentForm) => ({ ...currentForm, people }))} />
           <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.observations', 'Observations')}</span><textarea rows={3} value={form.adminNotes} onChange={(event) => setForm({ ...form, adminNotes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.observationsPrivate', 'These observations are private and are not shown to end users.')}</span></label>
+<<<<<<< HEAD
           <div className="sm:col-span-2 flex items-center justify-between gap-3"><button type="button" onClick={deleteResource} className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed" disabled={saving || deleting}>{t('common.delete', 'Delete')}</button><div className="flex justify-end gap-3"><button type="button" onClick={() => router.push(returnTo)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600" disabled={saving || deleting}>{t('common.cancel', 'Cancel')}</button><button disabled={saving || deleting} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div></div>
+=======
+          <div className="sm:col-span-2 flex justify-end gap-3"><button type="button" onClick={() => router.push(returnUrl)} className="rounded-lg border border-gray-300 px-5 py-2 font-semibold text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">{t('common.cancel', 'Cancel')}</button><button disabled={saving} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div>
+>>>>>>> 24e20ae6354bda6defd8904898578dcf88c6a7e1
           {message && <p className="self-center text-sm text-gray-600 dark:text-gray-300">{message}</p>}
         </form>
       </div>

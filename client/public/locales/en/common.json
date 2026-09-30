@@ -87,6 +87,7 @@
     "discoveredRoasters": "Roasters discovered through this resource",
     "discoveredThrough": "Discovered through",
     "providedBy": "Provided by",
+    "socials": "Socials",
     "viewSource": "View source page",
     "discoveries": "discovered roasters",
     "types": {
@@ -926,8 +927,11 @@
         "countries": "Countries",
         "images": "Images",
         "urlImages": "URL Images",
+        "resources": "Resources",
         "hours": "Hours"
       },
+      "addResource": "Add resource",
+      "noResources": "No resources are provided by this roaster yet.",
       "add": "Add",
       "cancel": "Cancel",
       "save": "Save",

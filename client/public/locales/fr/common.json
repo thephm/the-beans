@@ -120,6 +120,7 @@
     "discoveredRoasters": "Torrefacteurs decouverts grace a cette ressource",
     "discoveredThrough": "Decouvert grace a",
     "providedBy": "Fourni par",
+    "socials": "Reseaux sociaux",
     "viewSource": "Voir la page source",
     "discoveries": "torrefacteurs decouverts",
     "types": {
@@ -1000,8 +1001,11 @@
         "countries": "Pays",
         "images": "Images",
         "urlImages": "Images URL",
+        "resources": "Ressources",
         "hours": "Heures"
       },
+      "addResource": "Ajouter une ressource",
+      "noResources": "Aucune ressource n'est encore fournie par ce torréfacteur.",
   "add": "Ajouter",
   "cancel": "Annuler",
   "delete": "Supprimer",
