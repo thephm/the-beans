@@ -298,6 +298,13 @@ export function Navbar() {
                       >
                         {t('adminSection.auditLogs', 'Audit Logs')}
                       </Link>
+                      <Link
+                        href="/admin/link-checker"
+                        className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {t('admin.linkChecker.title', 'Link checker')}
+                      </Link>
                       <Link 
                         href="/admin/backup" 
                         className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 py-1" 
