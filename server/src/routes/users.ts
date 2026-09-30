@@ -250,7 +250,7 @@ router.delete('/:id', requireAuth, auditDelete('user', prisma.user), async (req:
 // ...existing code...
 
 // Update current user's language preference
-router.put('/language', requireAuth, async (req: Request, res: Response) => {
+router.put('/language', requireAuth, auditBefore('user', 'UPDATE'), auditAfter(), async (req: Request, res: Response) => {
   const authReq = req as import('../types').AuthenticatedRequest;
   try {
     const userId = authReq.user?.id;
@@ -263,12 +263,15 @@ router.put('/language', requireAuth, async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid language value' });
     }
 
+    const oldUser = await prisma.user.findUnique({ where: { id: userId } });
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { language, updatedById: userId },
       select: { id: true, email: true, username: true, language: true }
     });
 
+    req.auditData.oldValues = oldUser;
+    res.locals.auditEntity = updatedUser;
     res.json({ message: 'Language updated successfully', user: updatedUser });
   } catch (error) {
     console.error('Error updating user language:', error);
@@ -277,7 +280,7 @@ router.put('/language', requireAuth, async (req: Request, res: Response) => {
 });
 
 // Admin: Update user by ID
-router.put('/:id', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+router.put('/:id', requireAuth, auditBefore('user', 'UPDATE'), captureOldValues(prisma.user), auditAfter(), async (req: Request, res: Response, next: NextFunction) => {
   const authReq = req as import('../types').AuthenticatedRequest;
   // If a literal path segment like 'language' is passed, skip this dynamic handler
   // so a more specific route (e.g. /language) can handle it.
@@ -314,6 +317,7 @@ router.put('/:id', requireAuth, async (req: Request, res: Response, next: NextFu
         updatedById: true,
       }
     });
+    res.locals.auditEntity = updatedUser;
     res.json(updatedUser);
   } catch (error) {
     console.error('Error updating user by ID:', error);

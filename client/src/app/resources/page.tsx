@@ -52,7 +52,7 @@ export default function ResourcesPage() {
             {resources.map((resource) => (
               <Link key={resource.id} href={`/resources/${resource.slug}`} className="group rounded-2xl border border-white/70 bg-white/85 p-6 shadow-lg transition-transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800">
                 <div className="mb-6 flex items-start justify-between gap-4">
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${typePillClass(resource.resourceType)}`}>{resource.resourceType.replace('_', ' ')}</span>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${typePillClass(resource.resourceType)}`}>{t(`resources.types.${resource.resourceType === 'discovery_tool' ? 'discoveryTool' : resource.resourceType}`, resource.resourceType.replace('_', ' '))}</span>
                   {resource.platform && !(resource.resourceType === 'website' && resource.platform === 'Web') && <span className="text-sm text-gray-500 dark:text-gray-400">{resource.platform === 'YouTube' ? <YouTube fontSize="small" aria-label="YouTube" titleAccess="YouTube" /> : resource.platform}</span>}
                 </div>
                 <h2 className="mb-2 text-2xl font-semibold text-gray-900 group-hover:text-primary-700 dark:text-white dark:group-hover:text-primary-300">{resource.name}</h2>

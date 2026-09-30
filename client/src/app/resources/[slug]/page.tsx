@@ -6,10 +6,7 @@ import type { ComponentType } from 'react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
-<<<<<<< HEAD
 import { useAuth } from '@/contexts/AuthContext'
-import { YouTube, Language, LinkedIn, Instagram } from '@mui/icons-material'
-=======
 import { YouTube, Language, LinkedIn, Instagram, Facebook, Pinterest, Reddit } from '@mui/icons-material'
 import { SvgIcon, type SvgIconProps } from '@mui/material'
 
@@ -70,7 +67,6 @@ const getResourceSocialLinks = (socialNetworks: unknown) => {
     return [{ key, url: trimmedUrl, ...socialIconMap[key] }]
   })
 }
->>>>>>> 24e20ae6354bda6defd8904898578dcf88c6a7e1
 
 const typePillClass = (resourceType: string) => {
   switch (resourceType) {
@@ -114,7 +110,7 @@ export default function ResourceDetailPage() {
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
         <header className="mb-12 max-w-4xl">
           <div className="mb-4 flex flex-wrap items-center gap-3">
-            <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${typePillClass(resource.resourceType)}`}>{resource.resourceType.replace('_', ' ')}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${typePillClass(resource.resourceType)}`}>{t(`resources.types.${resource.resourceType === 'discovery_tool' ? 'discoveryTool' : resource.resourceType}`, resource.resourceType.replace('_', ' '))}</span>
             {resource.platform && !(resource.resourceType === 'website' && resource.platform === 'Web') && <span className="text-sm text-gray-500 dark:text-gray-400">{resource.platform === 'YouTube' ? <YouTube fontSize="small" aria-label="YouTube" titleAccess="YouTube" /> : resource.platform}</span>}
             {resource.state !== 'active' && <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{resource.state}</span>}
           </div>

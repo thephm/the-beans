@@ -117,18 +117,6 @@ function calculateChanges(oldValues: Record<string, any>, newValues: Record<stri
     }
   }
 
-  // Check for deleted fields (present in old but not in new)
-  for (const [key, oldValue] of Object.entries(oldValues)) {
-    if (skipFields.includes(key)) continue;
-    
-    const normalizedOld = normalizeValue(oldValue);
-    
-    // Only track deletion if old value was not null
-    if (!(key in newValues) && normalizedOld !== null) {
-      changes[key] = { old: normalizedOld, new: null };
-    }
-  }
-
   return changes;
 }
 

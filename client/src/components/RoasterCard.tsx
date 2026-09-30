@@ -362,7 +362,7 @@ export function RoasterCard({ roaster, userLocation, onSpecialtyClick, returnTo 
             <div className="flex gap-2 items-center">
               {user?.role === 'admin' && (
                 <Link
-                  href={`/admin/roasters?edit=${roaster.id}&returnTo=${returnTo}`}
+                  href={`/admin/roasters/edit/${roaster.id}?returnTo=${encodeURIComponent(returnTo)}`}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
                 >
                   Edit
