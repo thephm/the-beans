@@ -982,6 +982,7 @@
       "web": "Web",
       "socials": "Réseaux sociaux",
       "skipRecent": "Ignorer les liens vérifiés depuis 30 jours",
+      "showResolved": "Afficher les liens résolus",
       "delay": "Délai (ms)",
       "load": "Charger les liens",
       "start": "Démarrer",
