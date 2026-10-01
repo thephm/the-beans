@@ -1132,6 +1132,8 @@
       "continue": "Continue",
       "progress": "Progress",
       "broken": "Broken",
+      "previousBroken": "Previously failed links",
+      "currentBroken": "Failed links in this check",
       "entity": "Entity",
       "url": "URL",
       "error": "Error",

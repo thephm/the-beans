@@ -20,6 +20,7 @@ export default function LinkCheckerPage() {
   const [delay, setDelay] = useState(750);
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [results, setResults] = useState<Result[]>([]);
+  const [previousBroken, setPreviousBroken] = useState<Result[]>([]);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
@@ -35,6 +36,7 @@ export default function LinkCheckerPage() {
         skipRecentlyChecked: String(skipRecent),
       });
       setLinks(data.links || []);
+      setPreviousBroken(data.brokenLinks || []);
       setResults([]);
       setProgress(0);
     } catch {
@@ -73,6 +75,7 @@ export default function LinkCheckerPage() {
   if (!user || user.role !== 'admin') return <main className="p-8 pt-28">{t('admin.linkChecker.adminRequired', 'Admin access required.')}</main>;
 
   const broken = results.filter((result) => result.isBroken);
+  const renderBrokenLinks = (items: Result[]) => <div className="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800"><table className="min-w-full text-left text-sm text-gray-900 dark:text-gray-100"><thead><tr className="border-b dark:border-gray-600"><th className="p-3">{t('admin.linkChecker.entity', 'Entity')}</th><th className="p-3">{t('admin.linkChecker.url', 'URL')}</th><th className="p-3">{t('admin.linkChecker.error', 'Error')}</th><th className="p-3">{t('admin.linkChecker.edit', 'Edit')}</th></tr></thead><tbody>{items.map((item) => <tr key={`${item.entityId}-${item.url}`} className="border-b dark:border-gray-600"><td className="p-3"><Link className="text-primary-600 underline dark:text-primary-400" href={item.editPath}>{item.entityName}</Link></td><td className="max-w-xs truncate p-3">{item.url}</td><td className="p-3">{item.error || item.statusCode}</td><td className="p-3"><Link className="text-primary-600 underline dark:text-primary-400" href={item.editPath}>{t('admin.linkChecker.edit', 'Edit')}</Link></td></tr>)}</tbody></table></div>;
   return (
     <main className="min-h-screen bg-gray-50 px-4 pb-16 pt-28 dark:bg-gray-950">
       <div className="mx-auto max-w-6xl">
@@ -97,7 +100,8 @@ export default function LinkCheckerPage() {
         </div>
         {error && <p className="mb-4 text-red-600 dark:text-red-400">{error}</p>}
         {(running || results.length > 0) && <p className="mb-4 text-gray-700 dark:text-gray-200">{t('admin.linkChecker.progress', 'Progress')}: {progress}/{links.length} · {t('admin.linkChecker.broken', 'Broken')}: {broken.length}</p>}
-        {broken.length > 0 && <div className="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800"><table className="min-w-full text-left text-sm text-gray-900 dark:text-gray-100"><thead><tr className="border-b dark:border-gray-600"><th className="p-3">{t('admin.linkChecker.entity', 'Entity')}</th><th className="p-3">{t('admin.linkChecker.url', 'URL')}</th><th className="p-3">{t('admin.linkChecker.error', 'Error')}</th><th className="p-3">{t('admin.linkChecker.edit', 'Edit')}</th></tr></thead><tbody>{broken.map((item) => <tr key={`${item.entityId}-${item.url}`} className="border-b dark:border-gray-600"><td className="p-3"><Link className="text-primary-600 underline dark:text-primary-400" href={item.editPath}>{item.entityName}</Link></td><td className="max-w-xs truncate p-3">{item.url}</td><td className="p-3">{item.error || item.statusCode}</td><td className="p-3"><Link className="text-primary-600 underline dark:text-primary-400" href={item.editPath}>{t('admin.linkChecker.edit', 'Edit')}</Link></td></tr>)}</tbody></table></div>}
+        {previousBroken.length > 0 && <section className="mb-6"><h2 className="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{t('admin.linkChecker.previousBroken', 'Previously failed links')} ({previousBroken.length})</h2>{renderBrokenLinks(previousBroken)}</section>}
+        {broken.length > 0 && <section><h2 className="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{t('admin.linkChecker.currentBroken', 'Failed links in this check')} ({broken.length})</h2>{renderBrokenLinks(broken)}</section>}
       </div>
     </main>
   );

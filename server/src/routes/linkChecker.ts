@@ -93,17 +93,18 @@ router.get('/links', async (req: Request, res: Response) => {
       where: {
         ...(category ? { category } : {}),
         ...(service ? { service } : {}),
-        ...(skipRecentlyChecked ? { checkedAt: { gt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } : {}),
       },
       select: { url: true, category: true, service: true, entityId: true, checkedAt: true, isBroken: true, statusCode: true, error: true },
     });
     const checked = new Map(checks.map((check) => [`${check.url}|${check.category}|${check.service}|${check.entityId}`, check]));
-    const filtered = links.map((link, linkIndex) => ({ ...link, linkIndex })).filter((link) => {
+    const matching = links.map((link, linkIndex) => ({ ...link, linkIndex })).filter((link) => {
       if (category && link.category !== category) return false;
       if (service && link.service !== service) return false;
-      return !(skipRecentlyChecked && checked.has(`${link.url}|${link.category}|${link.service}|${link.entityId}`));
     }).map((link) => ({ ...link, lastCheck: checked.get(`${link.url}|${link.category}|${link.service}|${link.entityId}`) || null }));
-    res.json({ links: filtered });
+    const recentCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const filtered = matching.filter((link) => !(skipRecentlyChecked && link.lastCheck && link.lastCheck.checkedAt > recentCutoff));
+    const brokenLinks = matching.flatMap((link) => link.lastCheck?.isBroken ? [{ ...link, ...link.lastCheck }] : []);
+    res.json({ links: filtered, brokenLinks });
   } catch (error) {
     console.error('Error collecting links:', error);
     res.status(500).json({ error: 'Could not collect links' });

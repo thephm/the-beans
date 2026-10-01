@@ -990,6 +990,8 @@
       "continue": "Continuer",
       "progress": "Progression",
       "broken": "Brisés",
+      "previousBroken": "Liens précédemment échoués",
+      "currentBroken": "Liens échoués lors de cette vérification",
       "entity": "Entité",
       "url": "URL",
       "error": "Erreur",
