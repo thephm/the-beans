@@ -1,11 +1,8 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
 import { ConditionalFooter } from '@/components/ConditionalFooter'
 import { AnalyticsTracker } from '@/components/AnalyticsTracker'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://thebeans.onrender.com'),
@@ -81,7 +78,7 @@ export default function RootLayout({
           })();
         `}} />
       </head>
-      <body className={`${inter.className} min-h-screen`} suppressHydrationWarning>
+      <body className="font-sans min-h-screen" suppressHydrationWarning>
         <Providers>
           <DarkModeScript />
           <div className="flex flex-col min-h-screen">

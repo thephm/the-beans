@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
-type LinkItem = { url: string; category: string; service: string; entityId: string; entityName: string; editPath: string; linkIndex?: number; lastCheck?: any };
+type LinkItem = { url: string; category: string; service: string; entityId: string; entityName: string; editPath: string; linkIndex?: number };
 type Result = LinkItem & { statusCode?: number; isBroken: boolean; error?: string };
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,11 +30,11 @@ export default function LinkCheckerPage() {
   const loadLinks = async () => {
     setError('');
     try {
-      const data: any = await apiClient.getLinkCheckerLinks({
+      const data = await apiClient.getLinkCheckerLinks({
         ...(category !== 'all' ? { category } : {}),
         ...(service !== 'all' ? { service } : {}),
         skipRecentlyChecked: String(skipRecent),
-      });
+      }) as { links?: LinkItem[]; brokenLinks?: Result[] };
       setLinks(data.links || []);
       setPreviousBroken(data.brokenLinks || []);
       setResults([]);
@@ -53,7 +53,16 @@ export default function LinkCheckerPage() {
     try {
       for (let index = 0; index < links.length; index += 1) {
         while (pausedRef.current) await wait(250);
-        const result = await apiClient.checkLink({ linkIndex: links[index].linkIndex }) as Result;
+        let result: Result;
+        try {
+          result = await apiClient.checkLink({ linkIndex: links[index].linkIndex }) as Result;
+        } catch (checkError) {
+          result = {
+            ...links[index],
+            isBroken: true,
+            error: checkError instanceof Error ? checkError.message : String(checkError || 'Unknown error'),
+          };
+        }
         setResults((current) => [...current, result]);
         setProgress(index + 1);
         if (index < links.length - 1) await wait(Math.max(0, Math.min(5000, delay)));
@@ -75,7 +84,7 @@ export default function LinkCheckerPage() {
   if (!user || user.role !== 'admin') return <main className="p-8 pt-28">{t('admin.linkChecker.adminRequired', 'Admin access required.')}</main>;
 
   const broken = results.filter((result) => result.isBroken);
-  const renderBrokenLinks = (items: Result[]) => <div className="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800"><table className="min-w-full text-left text-sm text-gray-900 dark:text-gray-100"><thead><tr className="border-b dark:border-gray-600"><th className="p-3">{t('admin.linkChecker.entity', 'Entity')}</th><th className="p-3">{t('admin.linkChecker.url', 'URL')}</th><th className="p-3">{t('admin.linkChecker.error', 'Error')}</th><th className="p-3">{t('admin.linkChecker.edit', 'Edit')}</th></tr></thead><tbody>{items.map((item) => <tr key={`${item.entityId}-${item.url}`} className="border-b dark:border-gray-600"><td className="p-3"><Link className="text-primary-600 underline dark:text-primary-400" href={item.editPath}>{item.entityName}</Link></td><td className="max-w-xs truncate p-3">{item.url}</td><td className="p-3">{item.error || item.statusCode}</td><td className="p-3"><Link className="text-primary-600 underline dark:text-primary-400" href={item.editPath}>{t('admin.linkChecker.edit', 'Edit')}</Link></td></tr>)}</tbody></table></div>;
+  const renderBrokenLinks = (items: Result[]) => <div className="overflow-x-auto rounded-lg bg-white shadow dark:bg-gray-800"><table className="min-w-full text-left text-sm text-gray-900 dark:text-gray-100"><thead><tr className="border-b dark:border-gray-600"><th className="p-3">{t('admin.linkChecker.entity', 'Entity')}</th><th className="p-3">{t('admin.linkChecker.url', 'URL')}</th><th className="p-3">{t('admin.linkChecker.error', 'Error')}</th></tr></thead><tbody>{items.map((item) => <tr key={`${item.entityId}-${item.url}`} className="border-b dark:border-gray-600"><td className="p-3"><Link className="text-primary-600 underline dark:text-primary-400" href={item.editPath}>{item.entityName}</Link></td><td className="max-w-xs truncate p-3">{item.url}</td><td className="p-3">{item.error || item.statusCode}</td></tr>)}</tbody></table></div>;
   return (
     <main className="min-h-screen bg-gray-50 px-4 pb-16 pt-28 dark:bg-gray-950">
       <div className="mx-auto max-w-6xl">
