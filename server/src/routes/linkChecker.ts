@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/requireAuth';
 import { normalizeSocialNetworks } from '../lib/socialNetworks';
+import { isBrokenHttpStatus } from '../lib/linkChecker';
 
 const router = Router();
 const linkCheckRateLimit = rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false });
@@ -137,7 +138,7 @@ router.post('/check', async (req: Request, res: Response) => {
     } finally {
       clearTimeout(timeout);
     }
-    const result = { statusCode: response.status, isBroken: response.status >= 400, error: response.status >= 400 ? `HTTP ${response.status}` : null };
+    const result = { statusCode: response.status, isBroken: isBrokenHttpStatus(response.status), error: response.status >= 400 ? `HTTP ${response.status}` : null };
     const check = await prisma.linkCheck.upsert({
       where: { url_category_service_entityId: { url, category, service, entityId } },
       create: { url, category, service, entityId, entityName, statusCode: result.statusCode, isBroken: result.isBroken, error: result.error },

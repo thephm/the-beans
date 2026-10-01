@@ -17,7 +17,8 @@
     "test:analytics": "ts-node --transpile-only test/testAnalytics.ts",
     "test:dateutils": "ts-node --transpile-only test/testDateUtils.ts",
     "test:audit-date": "ts-node --transpile-only test/testAuditDateFilter.ts",
-    "test:country-names": "ts-node --transpile-only test/testCountryNames.ts"
+    "test:country-names": "ts-node --transpile-only test/testCountryNames.ts",
+    "test:link-checker": "ts-node --transpile-only test/testLinkChecker.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"
