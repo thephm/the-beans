@@ -100,6 +100,7 @@ router.get('/links', async (req: Request, res: Response) => {
     const matching = links.map((link, linkIndex) => ({ ...link, linkIndex })).filter((link) => {
       if (category && link.category !== category) return false;
       if (service && link.service !== service) return false;
+      return true;
     }).map((link) => ({ ...link, lastCheck: checked.get(`${link.url}|${link.category}|${link.service}|${link.entityId}`) || null }));
     const recentCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const filtered = matching.filter((link) => !(skipRecentlyChecked && link.lastCheck && link.lastCheck.checkedAt > recentCutoff));
