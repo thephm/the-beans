@@ -1124,6 +1124,7 @@
       "web": "Web",
       "socials": "Socials",
       "skipRecent": "Skip checked in last 30 days",
+      "showResolved": "Show resolved",
       "delay": "Delay (ms)",
       "load": "Load links",
       "start": "Start",
