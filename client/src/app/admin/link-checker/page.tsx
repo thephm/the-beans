@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
-type LinkItem = { url: string; category: string; service: string; entityId: string; entityName: string; editPath: string; linkIndex?: number; lastCheck?: any };
+type LinkItem = { url: string; category: string; service: string; entityId: string; entityName: string; editPath: string; linkIndex?: number };
 type Result = LinkItem & { statusCode?: number; isBroken: boolean; error?: string };
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,11 +30,11 @@ export default function LinkCheckerPage() {
   const loadLinks = async () => {
     setError('');
     try {
-      const data: any = await apiClient.getLinkCheckerLinks({
+      const data = await apiClient.getLinkCheckerLinks({
         ...(category !== 'all' ? { category } : {}),
         ...(service !== 'all' ? { service } : {}),
         skipRecentlyChecked: String(skipRecent),
-      });
+      }) as { links?: LinkItem[]; brokenLinks?: Result[] };
       setLinks(data.links || []);
       setPreviousBroken(data.brokenLinks || []);
       setResults([]);
