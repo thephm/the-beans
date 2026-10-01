@@ -619,6 +619,7 @@ model LinkCheck {
   statusCode  Int?
   isBroken    Boolean
   error       String?
+  disposition String?
   checkedAt   DateTime @default(now())
 
   @@unique([url, category, service, entityId])

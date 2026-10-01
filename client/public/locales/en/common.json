@@ -1137,9 +1137,12 @@
       "entity": "Entity",
       "url": "URL",
       "error": "Error",
+      "disposition": "Disposition",
+      "recheck": "re-check",
       "edit": "Edit",
       "loadFailed": "Could not load links.",
-      "checkFailed": "A link check failed unexpectedly."
+      "checkFailed": "A link check failed unexpectedly.",
+      "recheckFailed": "Could not re-check failed links."
     }
   },
   "adminSection": {

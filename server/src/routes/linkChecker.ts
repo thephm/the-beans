@@ -47,6 +47,26 @@ const addSocials = (items: LinkItem[], socials: unknown, category: Category, ent
   Object.entries(normalizeSocialNetworks(socials)).forEach(([, url]) => add(items, url, category, 'socials', entityId, entityName, editPath));
 };
 
+type UrlCheckResult = { statusCode: number; isBroken: boolean; error: string | null };
+
+const checkUrl = async (url: string): Promise<UrlCheckResult> => {
+  const parsed = new URL(url);
+  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Only HTTP and HTTPS links can be checked');
+  if (!isPublicUrl(parsed)) throw new Error('Private network links cannot be checked');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  let response: globalThis.Response;
+  try {
+    response = await fetch(parsed, { method: 'HEAD', redirect: 'manual', signal: controller.signal, headers: { 'User-Agent': 'The Beans link checker' } });
+    if (response.status === 405 || response.status === 403) {
+      response = await fetch(parsed, { method: 'GET', redirect: 'manual', signal: controller.signal, headers: { 'User-Agent': 'The Beans link checker' } });
+    }
+  } finally {
+    clearTimeout(timeout);
+  }
+  return { statusCode: response.status, isBroken: isBrokenHttpStatus(response.status), error: response.status >= 400 ? `HTTP ${response.status}` : null };
+};
+
 async function collectLinks(): Promise<LinkItem[]> {
   const items: LinkItem[] = [];
   const [roasters, roasterPeople, people, resources] = await Promise.all([
@@ -95,7 +115,7 @@ router.get('/links', async (req: Request, res: Response) => {
         ...(category ? { category } : {}),
         ...(service ? { service } : {}),
       },
-      select: { url: true, category: true, service: true, entityId: true, checkedAt: true, isBroken: true, statusCode: true, error: true },
+      select: { id: true, url: true, category: true, service: true, entityId: true, entityName: true, checkedAt: true, isBroken: true, statusCode: true, error: true, disposition: true },
     });
     const checked = new Map(checks.map((check) => [`${check.url}|${check.category}|${check.service}|${check.entityId}`, check]));
     const matching = links.map((link, linkIndex) => ({ ...link, linkIndex })).filter((link) => {
@@ -105,11 +125,45 @@ router.get('/links', async (req: Request, res: Response) => {
     }).map((link) => ({ ...link, lastCheck: checked.get(`${link.url}|${link.category}|${link.service}|${link.entityId}`) || null }));
     const recentCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const filtered = matching.filter((link) => !(skipRecentlyChecked && link.lastCheck && link.lastCheck.checkedAt > recentCutoff));
-    const brokenLinks = matching.flatMap((link) => link.lastCheck?.isBroken ? [{ ...link, ...link.lastCheck }] : []);
+    const currentByIdentity = new Map(links.map((link) => [`${link.category}|${link.service}|${link.entityId}`, link]));
+    const brokenLinks = checks.filter((check) => check.isBroken || check.disposition).flatMap((check) => {
+      const current = currentByIdentity.get(`${check.category}|${check.service}|${check.entityId}`);
+      return [{
+        ...check,
+        ...(current || {}),
+        entityName: current?.entityName || check.entityName,
+        currentUrl: current?.url || null,
+        editPath: current?.editPath || `/admin/${check.category}/${check.entityId}`,
+      }];
+    });
     res.json({ links: filtered, brokenLinks });
   } catch (error) {
     console.error('Error collecting links:', error);
     res.status(500).json({ error: 'Could not collect links' });
+  }
+});
+
+router.post('/recheck', async (req: Request, res: Response) => {
+  const { id } = req.body || {};
+  if (typeof id !== 'string' || !id) return res.status(400).json({ error: 'Invalid link check request' });
+  const failed = await prisma.linkCheck.findUnique({ where: { id } });
+  if (!failed) return res.status(404).json({ error: 'Link check not found' });
+
+  const current = (await collectLinks()).find((link) => link.category === failed.category && link.service === failed.service && link.entityId === failed.entityId);
+  if (!current) {
+    const check = await prisma.linkCheck.update({ where: { id }, data: { isBroken: false, statusCode: null, error: null, disposition: 'URL removed', checkedAt: new Date() } });
+    return res.json(check);
+  }
+
+  try {
+    const result = await checkUrl(current.url);
+    const disposition = result.isBroken ? null : (current.url === failed.url ? 'URL valid' : 'URL updated');
+    const check = await prisma.linkCheck.update({ where: { id }, data: { isBroken: result.isBroken, statusCode: result.statusCode, error: result.error, disposition, checkedAt: new Date(), entityName: current.entityName } });
+    return res.json({ ...check, currentUrl: current.url, editPath: current.editPath });
+  } catch (error: any) {
+    const message = error?.name === 'AbortError' ? 'Request timed out' : (error?.message || 'Request failed');
+    const check = await prisma.linkCheck.update({ where: { id }, data: { isBroken: true, statusCode: null, error: message, disposition: null, checkedAt: new Date(), entityName: current.entityName } });
+    return res.json({ ...check, currentUrl: current.url, editPath: current.editPath });
   }
 });
 
@@ -124,25 +178,11 @@ router.post('/check', async (req: Request, res: Response) => {
     selectedLink = links[linkIndex];
     if (!selectedLink) return res.status(404).json({ error: 'Link not found' });
     const { url, category, service, entityId, entityName, editPath } = selectedLink;
-    const parsed = new URL(url);
-    if (!['http:', 'https:'].includes(parsed.protocol)) return res.status(400).json({ error: 'Only HTTP and HTTPS links can be checked' });
-    if (!isPublicUrl(parsed)) return res.status(400).json({ error: 'Private network links cannot be checked' });
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    let response: globalThis.Response;
-    try {
-      response = await fetch(parsed, { method: 'HEAD', redirect: 'manual', signal: controller.signal, headers: { 'User-Agent': 'The Beans link checker' } });
-      if (response.status === 405 || response.status === 403) {
-        response = await fetch(parsed, { method: 'GET', redirect: 'manual', signal: controller.signal, headers: { 'User-Agent': 'The Beans link checker' } });
-      }
-    } finally {
-      clearTimeout(timeout);
-    }
-    const result = { statusCode: response.status, isBroken: isBrokenHttpStatus(response.status), error: response.status >= 400 ? `HTTP ${response.status}` : null };
+    const result = await checkUrl(url);
     const check = await prisma.linkCheck.upsert({
       where: { url_category_service_entityId: { url, category, service, entityId } },
-      create: { url, category, service, entityId, entityName, statusCode: result.statusCode, isBroken: result.isBroken, error: result.error },
-      update: { entityName, statusCode: result.statusCode, isBroken: result.isBroken, error: result.error, checkedAt: new Date() },
+      create: { url, category, service, entityId, entityName, statusCode: result.statusCode, isBroken: result.isBroken, error: result.error, disposition: null },
+      update: { entityName, statusCode: result.statusCode, isBroken: result.isBroken, error: result.error, disposition: null, checkedAt: new Date() },
     });
     res.json({ ...check, editPath });
   } catch (error: any) {

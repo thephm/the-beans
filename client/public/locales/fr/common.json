@@ -995,9 +995,12 @@
       "entity": "Entité",
       "url": "URL",
       "error": "Erreur",
+      "disposition": "Résolution",
+      "recheck": "re-vérifier",
       "edit": "Modifier",
       "loadFailed": "Impossible de charger les liens.",
-      "checkFailed": "Une vérification de lien a échoué de manière inattendue."
+      "checkFailed": "Une vérification de lien a échoué de manière inattendue.",
+      "recheckFailed": "Impossible de revérifier les liens échoués."
     }
   },
   "adminForms": {

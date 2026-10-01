@@ -545,11 +545,18 @@ class ApiClient {
 
   async getLinkCheckerLinks(params?: Record<string, any>) {
     const searchParams = params ? new URLSearchParams(params).toString() : '';
-    return this.request(`/admin/link-checker/links${searchParams ? `?${searchParams}` : ''}`);
+    return this.request(`/admin/link-checker/links${searchParams ? `?${searchParams}` : ''}`, { cache: 'no-store' });
   }
 
   async checkLink(data: Record<string, any>) {
     return this.request('/admin/link-checker/check', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async recheckLink(data: Record<string, any>) {
+    return this.request('/admin/link-checker/recheck', {
       method: 'POST',
       body: JSON.stringify(data),
     });
