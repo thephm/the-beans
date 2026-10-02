@@ -521,7 +521,6 @@ model Resource {
   childResources          Resource[]            @relation("ResourceHierarchy")
   publisherRoaster        Roaster?              @relation("ResourcePublisherRoaster", fields: [publisherRoasterId], references: [id], onDelete: SetNull)
   people                  ResourcePerson[]
-  links                   ResourceLink[]
   roasters                ResourceRoaster[]
   observations            ResourceObservation[]
 
@@ -563,20 +562,6 @@ model ResourcePerson {
 
   @@unique([resourceId, personId, role])
   @@map("resource_people")
-}
-
-model ResourceLink {
-  id           String   @id @default(cuid())
-  resourceId   String
-  title        String
-  url          String
-  description  String?
-  linkType     String   @default("other") @db.VarChar(20)
-  displayOrder Int      @default(0)
-  resource     Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
-
-  @@index([resourceId, displayOrder])
-  @@map("resource_links")
 }
 
 model ResourceRoaster {

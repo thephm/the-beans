@@ -131,8 +131,9 @@ export default function AdminResourceEditPage() {
   return (
     <main className="min-h-screen bg-gray-50 px-4 pb-16 pt-28 dark:bg-gray-950">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center justify-between gap-4 px-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">{t('adminResources.editTitle', 'Edit resource')}</h1>
+        <div className="mb-8">
+          <a href="/admin/resources" className="inline-flex items-center font-medium text-primary-600 hover:underline dark:text-primary-400">{'<'} {t('adminResources.backToResources', 'Back to Resources')}</a>
+          <h1 className="mt-4 text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">{t('adminResources.editTitle', 'Edit resource')}</h1>
         </div>
         <form onSubmit={submit} className="grid gap-4 rounded-2xl border border-black/90 bg-white p-6 shadow dark:border-purple-400/70 dark:bg-gray-800 sm:grid-cols-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.name', 'Name')}</span><input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>

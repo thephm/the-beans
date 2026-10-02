@@ -47,7 +47,6 @@ const resourceInclude = {
   parentResource: { select: { id: true, name: true, slug: true } },
   childResources: { select: { id: true, name: true, slug: true, resourceType: true } },
   people: { include: { person: true } },
-  links: { orderBy: { displayOrder: 'asc' as const } },
   observations: { orderBy: { observedAt: 'desc' as const } },
   roasters: {
     include: {
@@ -78,7 +77,7 @@ router.get('/', async (req: Request, res: Response) => {
         id: true, name: true, slug: true, url: true, description: true, resourceType: true,
         platform: true, state: true, location: true, publisherOrganizationName: true,
         publisherRoaster: { select: { id: true, name: true, slug: true, city: true, state: true, country: true } },
-        _count: { select: { roasters: true, people: true, links: true } }
+        _count: { select: { roasters: true, people: true } }
       }
     });
     res.json({ resources });
@@ -286,40 +285,6 @@ router.delete('/:id', requireAuth, requireAdmin, auditBefore('resource', 'DELETE
     res.status(204).send();
   } catch (error) {
     res.status(404).json({ error: 'Resource not found' });
-  }
-});
-
-router.post('/:id/links', requireAuth, requireAdmin, [
-  body('title').trim().notEmpty(),
-  body('url').isURL({ protocols: ['http', 'https'], require_protocol: true }),
-], async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-  if (!isSafeUrl(req.body.url)) return res.status(400).json({ error: 'URL must use HTTP or HTTPS' });
-  try {
-    const link = await prisma.resourceLink.create({ data: { ...req.body, resourceId: req.params.id } });
-    res.status(201).json(link);
-  } catch (error) {
-    res.status(400).json({ error: 'Could not create resource link' });
-  }
-});
-
-router.patch('/:id/links/:linkId', requireAuth, requireAdmin, async (req: Request, res: Response) => {
-  if (req.body.url && !isSafeUrl(req.body.url)) return res.status(400).json({ error: 'URL must use HTTP or HTTPS' });
-  try {
-    const link = await prisma.resourceLink.update({ where: { id: req.params.linkId }, data: req.body });
-    res.json(link);
-  } catch (error) {
-    res.status(404).json({ error: 'Resource link not found' });
-  }
-});
-
-router.delete('/:id/links/:linkId', requireAuth, requireAdmin, async (req: Request, res: Response) => {
-  try {
-    await prisma.resourceLink.delete({ where: { id: req.params.linkId } });
-    res.status(204).send();
-  } catch (error) {
-    res.status(404).json({ error: 'Resource link not found' });
   }
 });
 

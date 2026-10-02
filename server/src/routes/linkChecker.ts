@@ -73,7 +73,7 @@ async function collectLinks(): Promise<LinkItem[]> {
     prisma.roaster.findMany({ select: { id: true, name: true, slug: true, website: true, socialNetworks: true } }),
     prisma.roasterPerson.findMany({ select: { id: true, firstName: true, lastName: true, linkedinUrl: true, instagramUrl: true, roasterId: true } }),
     prisma.person.findMany({ select: { id: true, name: true, websiteUrl: true, linkedinUrl: true, instagramUrl: true } }),
-    prisma.resource.findMany({ select: { id: true, name: true, slug: true, url: true, socialNetworks: true, links: { select: { id: true, title: true, url: true } } } }),
+    prisma.resource.findMany({ select: { id: true, name: true, slug: true, url: true, socialNetworks: true } }),
   ]);
 
   roasters.forEach((roaster) => {
@@ -97,7 +97,6 @@ async function collectLinks(): Promise<LinkItem[]> {
     const path = `/admin/resources/${resource.id}`;
     add(items, resource.url, 'resources', 'web', resource.id, resource.name, path);
     addSocials(items, resource.socialNetworks, 'resources', resource.id, resource.name, path);
-    resource.links.forEach((link) => add(items, link.url, 'resources', 'web', resource.id, `${resource.name}: ${link.title}`, path));
   });
   return items;
 }

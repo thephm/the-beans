@@ -544,8 +544,8 @@ async function main() {
     { name: 'RoastGuide', slug: 'roastguide', url: 'https://apps.apple.com/gb/app/roastguide/id1454418262', resourceType: 'app', platform: 'Apple App Store', state: 'active' },
     { name: 'r/coffeerotation', slug: 'r-coffeerotation', url: 'https://www.reddit.com/r/coffeerotation/', resourceType: 'community', platform: 'Reddit', state: 'active', notes: 'Supplied community creation date: 2024-10-31.' },
     { name: 'Roastful', slug: 'roastful', url: 'https://www.roastful.com/', resourceType: 'website', platform: 'Web', state: 'active', email: 'hello@roastful.com' },
-    { name: 'LoffeeLabs', slug: 'loffeelabs', url: 'https://www.loffeelabs.com/roasters-registry/', resourceType: 'directory', platform: 'Web', state: 'active', location: 'Oahu, Hawaii, USA', email: 'loffeelabs@gmail.com', notes: 'Supplied site text says the organization is located on Oahu and holds meetups. Verify before publishing.' },
-    { name: 'CoffeeDrippd', slug: 'coffeedrippd', url: 'https://coffeedrippd.com/', resourceType: 'discovery_tool', platform: 'Web', state: 'active', location: 'Reykjavik, Iceland', email: 'support@coffeedrippd.com', notes: 'User tested a 100 km search and observed 12 roasters in NY. Keep private until dated and contextualized.' },
+    { name: 'LoffeeLabs', slug: 'loffeelabs', url: 'https://www.loffeelabs.com/roasters-registry/', resourceType: 'directory', platform: 'Web', state: 'active', location: 'Oahu, Hawaii, USA', email: 'loffeelabs@gmail.com', socialNetworks: { instagram: 'https://www.instagram.com/loffeelabs/', youtube: 'https://www.youtube.com/@LoffeeLabs' }, notes: 'Supplied site text says the organization is located on Oahu and holds meetups. Verify before publishing.' },
+    { name: 'CoffeeDrippd', slug: 'coffeedrippd', url: 'https://coffeedrippd.com/', resourceType: 'discovery_tool', platform: 'Web', state: 'active', location: 'Reykjavik, Iceland', email: 'support@coffeedrippd.com', socialNetworks: { linkedin: 'https://www.linkedin.com/company/coffeedrippd/about/' }, notes: 'User tested a 100 km search and observed 12 roasters in NY. Keep private until dated and contextualized.' },
     { name: 'CoffeeRoast', slug: 'coffeeroast', url: 'https://coffeeroast.com/', resourceType: 'directory', platform: 'Web', state: 'active', notes: 'Google authentication, advertising, and registration observations remain private research notes.' },
     { name: 'Coffee Review', slug: 'coffee-review', url: 'https://www.coffeereview.com', resourceType: 'publication', platform: 'Web', state: 'active', location: 'Berkeley, CA, USA' },
     { name: 'World Coffee Research', slug: 'world-coffee-research', url: 'https://worldcoffeeresearch.org', resourceType: 'research', platform: 'Web', state: 'active' },
@@ -602,21 +602,6 @@ async function main() {
       update: {},
       create: { resourceId, personId: person.id, role }
     });
-  }
-
-  const linkSeeds = [
-    ['coffee-insurrection', 'Best Specialty Coffee Roasters in the World', 'https://www.coffeeinsurrection.com/best-specialty-coffee-roasters-in-the-world.html', 'discovery'],
-    ['roastful', 'Top Roasters', 'https://www.roastful.com/top-roasters', 'discovery'],
-    ['loffeelabs', 'Instagram', 'https://www.instagram.com/loffeelabs/', 'other'],
-    ['loffeelabs', 'YouTube', 'https://www.youtube.com/@LoffeeLabs', 'channel'],
-    ['coffeedrippd', 'LinkedIn', 'https://www.linkedin.com/company/coffeedrippd/about/', 'other'],
-    ['coffeeroast', 'Top by Country - Spain', 'https://coffeeroast.com/top-by-country/spain', 'country']
-  ] as const;
-  for (const [resourceSlug, title, url, linkType] of linkSeeds) {
-    const resourceId = resourceIds.get(resourceSlug);
-    if (!resourceId) continue;
-    const existing = await prisma.resourceLink.findFirst({ where: { resourceId, url } });
-    if (!existing) await prisma.resourceLink.create({ data: { resourceId, title, url, linkType } });
   }
 
   const observations = [

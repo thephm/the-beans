@@ -1052,55 +1052,9 @@ Do not create a top-level resource solely because a URL happens to be nested und
 
 Use the relationship when it improves navigation or attribution.
 
-# 8. Resource Links
+# 8. Resource URL and Social Networks
 
-Some resources have specific pages that are useful without being independent Resources.
-
-Examples:
-
-```text
-Coffee Insurrection
-    Best Specialty Coffee Roasters in the World
-
-Roastful
-    Top Roasters
-
-CoffeeRoast
-    Top by Country / Spain
-
-LoffeeLabs
-    Roasters Registry
-```
-
-Create:
-
-```text
-ResourceLink
-------------
-id
-resource_id
-title
-url
-description
-link_type
-display_order
-```
-
-Suggested `link_type` values:
-
-```text
-discovery
-directory
-country
-city
-article
-registry
-channel
-reference
-other
-```
-
-This avoids turning every useful URL into another database record.
+Each Resource has one primary URL for its main destination. Social profile URLs belong in the Resource's `socialNetworks` field. Do not store additional URLs in a separate resource-link collection.
 
 # 9. Resource → Roaster Relationship
 
@@ -1232,10 +1186,6 @@ Founder
 Ron Walters
 Founder
 ```
-
-### Useful links
-
-Display specific ResourceLinks.
 
 ### Coverage
 
@@ -1451,18 +1401,7 @@ Owner
 Contributor
 ```
 
-### Step 3 — Add useful links
-
-Optional.
-
-Example:
-
-```text
-Best Specialty Coffee Roasters in the World
-https://...
-```
-
-### Step 4 — Record approximate coverage
+### Step 3 — Record approximate coverage
 
 Optional.
 
@@ -1474,7 +1413,7 @@ Roaster count
 2024
 ```
 
-### Step 5 — Link discovered roasters
+### Step 4 — Link discovered roasters
 
 Only add roasters actually discovered through the resource.
 
@@ -1504,7 +1443,6 @@ Suitable for visitors:
 - location
 - resource type
 - platform
-- useful links
 - status
 - appropriately qualified coverage observations
 - discovered-through relationships
@@ -1587,22 +1525,6 @@ People:
 
 - name: Endri Nonaj
   role: creator
-```
-
-Useful links:
-
-```yaml
-- title: Best Specialty Coffee Roasters in the World
-  url: https://www.coffeeinsurrection.com/best-specialty-coffee-roasters-in-the-world.html
-  link_type: discovery
-
-- title: Pages by Country
-  url: ""
-  link_type: country
-
-- title: Pages by City
-  url: ""
-  link_type: city
 ```
 
 Social URLs supplied:
@@ -1755,14 +1677,6 @@ email: hello@roastful.com
 description: ""
 ```
 
-Useful link:
-
-```yaml
-- title: Top Roasters
-  url: https://www.roastful.com/top-roasters
-  link_type: discovery
-```
-
 ## 19.10 LoffeeLabs
 
 ```yaml
@@ -1777,16 +1691,11 @@ email: loffeelabs@gmail.com
 description: ""
 ```
 
-Useful links:
+Social networks:
 
 ```yaml
-- title: Instagram
-  url: https://www.instagram.com/loffeelabs/
-  link_type: other
-
-- title: YouTube
-  url: https://www.youtube.com/@LoffeeLabs
-  link_type: channel
+instagram: https://www.instagram.com/loffeelabs/
+youtube: https://www.youtube.com/@LoffeeLabs
 ```
 
 Notes for verification:
@@ -1809,12 +1718,10 @@ email: support@coffeedrippd.com
 description: ""
 ```
 
-Useful link:
+Social networks:
 
 ```yaml
-- title: LinkedIn
-  url: https://www.linkedin.com/company/coffeedrippd/about/
-  link_type: other
+linkedin: https://www.linkedin.com/company/coffeedrippd/about/
 ```
 
 Private research observation:
@@ -1840,14 +1747,6 @@ Person:
 ```yaml
 name: Theo C.
 role: creator
-```
-
-Useful link:
-
-```yaml
-- title: Top by Country — Spain
-  url: https://coffeeroast.com/top-by-country/spain
-  link_type: country
 ```
 
 Private research notes:
@@ -2274,7 +2173,6 @@ Resources
 Explore the coffee world
 Visit resource
 People
-Useful links
 Roasters discovered through this resource
 Related resources
 Discovered through
@@ -2311,7 +2209,6 @@ Resource detail:
 ```text
 load resource
 load people
-load useful links
 load discovered roasters
 ```
 
@@ -2373,7 +2270,6 @@ The purpose is **curation, discovery and attribution**.
 - Resources can optionally have people.
 - Resources can optionally have a publisher/organization.
 - Resources can optionally have a parent Resource.
-- Resources can have useful links.
 - Resources can have dated observations.
 - Resources can optionally have social network links, using the same fields, storage and validation as roasters.
 - Resources can be archived without deleting historical attribution.
@@ -2416,19 +2312,18 @@ Implement in this order:
 1. Database migration
 2. Resource model
 3. Resource/person relationships
-4. Resource links
-5. Resource/roaster relationships
-6. Resource observations
-7. API endpoints
-8. Admin UI
-9. /resources index
-10. /resources/[slug] detail page
-11. Roaster "Discovered through" section
-12. Seed development data
-13. Responsive/mobile refinement
-14. Localization
-15. Accessibility testing
-16. Production verification/import
+4. Resource/roaster relationships
+5. Resource observations
+6. API endpoints
+7. Admin UI
+8. /resources index
+9. /resources/[slug] detail page
+10. Roaster "Discovered through" section
+11. Seed development data
+12. Responsive/mobile refinement
+13. Localization
+14. Accessibility testing
+15. Production verification/import
 ```
 
 The initial production version should deliberately remain small. The most important capability is:
@@ -2455,8 +2350,8 @@ The Resources feature is implemented as a first production slice.
 
 - `Discover -> Resources` is available in the desktop and mobile navigation.
 - `/resources` displays resource cards with type, platform, location, description, and discovered-roaster counts where available.
-- `/resources/[slug]` displays resource details, people, useful links, coverage observations, and roasters discovered through the resource. Parent and child resource data is available in the API response for future public navigation.
-- Resource detail pages include a `Back` button beside `Visit`. Back uses browser history to return to the previous Resources index position and falls back to `/resources` for direct visits.
+- `/resources/[slug]` displays resource details, social profiles, people, coverage observations, and roasters discovered through the resource. Parent and child resource data is available in the API response for future public navigation.
+- Resource detail pages show the primary URL beside social profiles. Back and Edit actions appear below the resource details; Back uses browser history and falls back to `/resources` for direct visits.
 - External links use a new tab and safe opener settings.
 - Existing `RoasterCard` components are reused for discovered roasters.
 - Roaster detail pages display `Discovered through` links and exact source-page links when recorded.
@@ -2468,7 +2363,6 @@ The Prisma schema and migration include:
 - `Resource`
 - `Person`
 - `ResourcePerson`
-- `ResourceLink`
 - `ResourceRoaster`
 - `ResourceObservation`
 
@@ -2479,7 +2373,7 @@ GET /api/resources
 GET /api/resources/:slug
 ```
 
-Administrator-only endpoints support resource creation, updates, archival, people, useful links, discovered-roaster relationships, and observations. Archived resources are retained so historical attribution is not deleted. Private resource notes, relationship notes, and person notes are removed from public responses.
+Administrator-only endpoints support resource creation, updates, archival, people, discovered-roaster relationships, and observations. Archived resources are retained so historical attribution is not deleted. Private resource notes, relationship notes, and person notes are removed from public responses.
 
 Resource and source URLs are restricted to HTTP and HTTPS. Empty successful responses such as archive operations are handled by the shared client API without attempting to parse an empty JSON body.
 
@@ -2503,11 +2397,11 @@ The admin Resources page supports:
 - Reversible resource deprecation. Deprecation sets the lifecycle state to `archived` and retains attribution; administrators can undeprecate a resource to restore its `active` state and public visibility.
 - Resource lifecycle is stored as `state` (`active`, `archived`, `inactive`, `closed`, or `unknown`).
 
-The relationship and observation API is available for administrative tooling. Dedicated admin controls for adding people, useful links, observations, and discovered roasters remain follow-up work.
+The relationship and observation API is available for administrative tooling. Dedicated admin controls for adding people, observations, and discovered roasters remain follow-up work.
 
 ## Seed data
 
-The supplied research seed records are included in `server/prisma/seed.ts`, including resources, people, useful links, observations, parent relationships, lifecycle states, and private research notes. Missing values remain null. The seed does not create third-party roaster records or imply independent verification.
+The supplied research seed records are included in `server/prisma/seed.ts`, including resources, social profiles, people, observations, parent relationships, lifecycle states, and private research notes. Missing values remain null. The seed does not create third-party roaster records or imply independent verification.
 
 ## Localization and current UX scope
 

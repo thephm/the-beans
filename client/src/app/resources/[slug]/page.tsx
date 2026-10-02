@@ -117,34 +117,47 @@ export default function ResourceDetailPage() {
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">{resource.name}</h1>
           <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">{resource.description}</p>
           {resource.publisherRoaster && <p className="mb-6 text-gray-600 dark:text-gray-300">{t('resources.providedBy', 'Provided by')} <Link href={`/roasters/${resource.publisherRoaster.id}`} className="font-semibold text-primary-700 hover:underline dark:text-primary-300">{resource.publisherRoaster.name}</Link></p>}
-          {socialLinks.length > 0 && (
-            <div className="mb-6">
-              <p className="mb-3 text-sm font-semibold text-gray-500 dark:text-gray-400">{t('resources.socials', 'Socials')}</p>
-              <div className="flex flex-wrap items-center gap-2">
-                {socialLinks.map(({ key, url, Icon, label }) => (
+          <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-center">
+            {socialLinks.length > 0 && (
+              <div className="w-full rounded-lg border border-primary-400 p-4 sm:w-2/5">
+                <p className="mb-3 text-base font-bold text-gray-900 dark:text-white">{t('resources.socials', 'Socials')}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {socialLinks.map(({ key, url, Icon, label }) => (
+                    <a
+                      key={`${key}-${url}`}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${resource.name} ${label}`}
+                      title={label}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-100 bg-gray-50 text-gray-600 shadow transition-colors hover:bg-gray-100 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                    >
+                      <Icon fontSize="small" aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+            {resource.url && (
+              <div className="flex min-w-0 items-center">
+                <Language sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900 dark:text-white">{t('resources.website', 'Website')}</p>
                   <a
-                    key={`${key}-${url}`}
-                    href={url}
+                    href={resource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`${resource.name} ${label}`}
-                    title={label}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-600 shadow transition-colors hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                    className="break-all text-primary-600 hover:underline dark:text-primary-400"
                   >
-                    <Icon fontSize="small" aria-hidden="true" />
+                    {resource.url.replace(/^https?:\/\//, '')}
                   </a>
-                ))}
+                </div>
               </div>
-            </div>
-          )}
-          <div className="flex flex-wrap items-center gap-3">
-            <button type="button" onClick={() => { if (window.history.length > 1) router.back(); else router.push('/resources') }} className="inline-flex min-h-11 items-center rounded-lg border border-primary-200 bg-white px-5 py-3 font-semibold text-primary-700 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-primary-800 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700">← {t('resources.backButton', 'Back')}</button>
-            {user?.role === 'admin' && <Link href={`/admin/resources/${resource.id}?returnTo=${encodeURIComponent(`/resources/${resource.slug}`)}`} className="inline-flex min-h-11 items-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-all transform hover:scale-105 hover:bg-blue-700">{t('resources.edit', 'Edit')}</Link>}
-            <a href={resource.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-lg bg-primary-600 px-5 py-3 font-semibold text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500">{t('resources.visit', 'Visit')} <span className="ml-2" aria-hidden="true">↗</span></a>
+            )}
           </div>
         </header>
 
-        {(resource.people?.length > 0 || resource.links?.length > 0 || resource.observations?.length > 0) && (
+        {(resource.people?.length > 0 || resource.observations?.length > 0) && (
           <div className="mb-14 grid gap-8 lg:grid-cols-3">
             {resource.people?.length > 0 && <section><h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">{t('resources.people', 'People')}</h2><div className="space-y-3">{resource.people.map((entry: any) => {
               const socialLinks = [
@@ -177,10 +190,14 @@ export default function ResourceDetailPage() {
                 </div>
               );
             })}</div></section>}
-            {resource.links?.length > 0 && <section><h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">{t('resources.links', 'Useful links')}</h2><div className="space-y-3">{resource.links.map((link: any) => <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="block rounded-xl bg-white/80 p-4 shadow hover:ring-2 hover:ring-primary-400 dark:bg-gray-800"><p className="font-semibold text-gray-900 dark:text-white">{link.title} <span aria-hidden="true">↗</span></p>{link.description && <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{link.description}</p>}</a>)}</div></section>}
             {resource.observations?.length > 0 && <section><h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">{t('resources.coverage', 'Coverage')}</h2><div className="space-y-3">{resource.observations.map((observation: any) => <div key={observation.id} className="rounded-xl bg-white/80 p-4 shadow dark:bg-gray-800"><p className="text-2xl font-semibold text-gray-900 dark:text-white">{observation.value.toLocaleString()}</p><p className="text-sm text-gray-600 dark:text-gray-300">{observation.observationType.replace('_', ' ')}{observation.observedAt ? ` · ${new Date(observation.observedAt).getFullYear()}` : ''}</p></div>)}</div></section>}
           </div>
         )}
+
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <button type="button" onClick={() => { if (window.history.length > 1) router.back(); else router.push('/resources') }} className="inline-flex min-h-11 items-center rounded-lg border border-primary-200 bg-white px-5 py-3 font-semibold text-primary-700 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-primary-800 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700">← {t('resources.backButton', 'Back')}</button>
+          {user?.role === 'admin' && <Link href={`/admin/resources/${resource.id}?returnTo=${encodeURIComponent(`/resources/${resource.slug}`)}`} className="inline-flex min-h-11 items-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-all transform hover:scale-105 hover:bg-blue-700">{t('resources.edit', 'Edit')}</Link>}
+        </div>
 
       </div>
     </main>
