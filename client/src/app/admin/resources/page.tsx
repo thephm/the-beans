@@ -68,14 +68,14 @@ export default function AdminResourcesPage() {
           <Link href="/admin/resources/new" className="self-end rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 sm:self-auto">{t('adminResources.add', 'Add')}</Link>
         </div>
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <table className="w-full table-fixed divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.name', 'Name')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.resourceTypeColumn', 'Resource type')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.platform', 'Platform')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.state', 'State')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.actions', 'Actions')}</th>
+                <th className="w-[35%] px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.name', 'Name')}</th>
+                <th className="w-[20%] px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.resourceTypeColumn', 'Resource type')}</th>
+                <th className="w-[15%] px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.platform', 'Platform')}</th>
+                <th className="w-[12%] px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.state', 'State')}</th>
+                <th className="w-[18%] px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">{t('adminResources.actions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
@@ -83,9 +83,9 @@ export default function AdminResourcesPage() {
                 const isDeprecated = resource.state === 'archived'
                 return (
                   <tr key={resource.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="whitespace-nowrap px-6 py-4">
+                    <td className="break-words px-6 py-4">
                       <Link href={`/admin/resources/${resource.id}`} className="font-medium text-primary-600 hover:underline dark:text-primary-400">{resource.name}</Link>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">/{resource.slug}</p>
+                      <p className="mt-1 break-all text-xs text-gray-500 dark:text-gray-400">/{resource.slug}</p>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4"><span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold uppercase tracking-wide ${typePillClass(resource.resourceType)}`}>{String(t(`resources.types.${resource.resourceType === 'discovery_tool' ? 'discoveryTool' : resource.resourceType}`, resource.resourceType))}</span></td>
                     <td className="whitespace-nowrap px-6 py-4 text-gray-900 dark:text-gray-100">{resource.platform === 'YouTube' ? <YouTube fontSize="small" aria-label="YouTube" titleAccess="YouTube" /> : resource.platform || 'Web'}</td>

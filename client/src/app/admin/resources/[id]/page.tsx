@@ -56,7 +56,7 @@ export default function AdminResourceEditPage() {
       resourceType: resource.resourceType || 'website',
       platform: resource.platform || 'Web',
       description: resource.description || '',
-      adminNotes: resource.adminNotes || '',
+      notes: resource.notes || '',
       state: resource.state || 'active',
       people: resource.people || [],
       publisherRoasterId: resource.publisherRoaster?.id || '',
@@ -93,7 +93,7 @@ export default function AdminResourceEditPage() {
         resourceType: form.resourceType,
         platform: form.platform,
         description: form.description,
-        adminNotes: form.adminNotes,
+        notes: form.notes,
         state: form.state,
         publisherRoasterId: form.publisherRoasterId || null,
         socialNetworks: socialNetworksToPayload(form.socialNetworks)
@@ -163,7 +163,7 @@ export default function AdminResourceEditPage() {
               <div id="resource-socials-fields" hidden={!showSocials} className="px-4 pb-4"><SocialNetworksFields values={form.socialNetworks} onChange={(socialNetworks) => setForm({ ...form, socialNetworks })} idPrefix="resource-social" /></div>
             </section>
           <ResourcePeopleSection resourceId={form.id} people={Array.isArray(form.people) ? form.people : []} onChange={(people) => setForm((currentForm) => ({ ...currentForm, people }))} />
-          <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.observations', 'Observations')}</span><textarea rows={3} value={form.adminNotes} onChange={(event) => setForm({ ...form, adminNotes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.observationsPrivate', 'These observations are private and are not shown to end users.')}</span></label>
+          <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.observations', 'Observations')}</span><textarea rows={3} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.observationsPrivate', 'These observations are private and are not shown to end users.')}</span></label>
           <div className="sm:col-span-2 flex items-center justify-between gap-3"><button type="button" onClick={deleteResource} className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed" disabled={saving || deleting}>{t('common.delete', 'Delete')}</button><div className="flex justify-end gap-3"><button type="button" onClick={() => router.push(returnUrl)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600" disabled={saving || deleting}>{t('common.cancel', 'Cancel')}</button><button disabled={saving || deleting} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div></div>
           {message && <p className="self-center text-sm text-gray-600 dark:text-gray-300">{message}</p>}
         </form>

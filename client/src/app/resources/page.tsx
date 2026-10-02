@@ -37,7 +37,7 @@ export default function ResourcesPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-orchid-50 dark:bg-gray-950 dark:bg-none">
-      <div className="mx-auto max-w-7xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:px-8">
         <header className="mx-auto mb-10 max-w-3xl text-center">
           <h1 className="mb-6 bg-gradient-to-r from-primary-700 to-orchid-600 bg-clip-text text-4xl font-bold text-transparent sm:text-5xl">{t('resources.title', 'Explore the coffee world')}</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">{t('resources.subtitle', 'Discover the people, communities, publications, tools and other resources that help us learn about coffee and find roasters.')}</p>
