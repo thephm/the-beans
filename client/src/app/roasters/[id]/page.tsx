@@ -1,5 +1,24 @@
 import RoasterDetail from '@/components/RoasterDetail';
+import { apiClient } from '@/lib/api';
+import type { Roaster } from '@/types';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  try {
+    const roaster = await apiClient.getRoaster(params.id) as Roaster;
+    if (roaster?.name) {
+      return {
+        title: { absolute: roaster.name },
+        description: roaster.description || undefined,
+      };
+    }
+  } catch {
+    // Fall back to the generic roaster title when metadata cannot be loaded.
+  }
+
+  return { title: 'Roaster' };
+}
 
 const isTruthySearchParam = (value: string | string[] | undefined) => {
   const paramValue = Array.isArray(value) ? value[0] : value;
