@@ -535,7 +535,7 @@ async function main() {
 
   console.log('📚 Seeding coffee resources...');
   const resourceSeeds = [
-    { name: 'Coffee Insurrection', slug: 'coffee-insurrection', url: 'https://www.coffeeinsurrection.com', resourceType: 'website', platform: 'Web', state: 'active', location: 'Italy', notes: 'Supplied discovery source: Reddit. Verify social profiles before publication.' },
+    { name: 'Coffee Insurrection', slug: 'coffee-insurrection', url: 'https://www.coffeeinsurrection.com', resourceType: 'website', platform: 'Web', state: 'active', country: 'Italy', notes: 'Supplied discovery source: Reddit. Verify social profiles before publication.' },
     { name: 'r/pourover', slug: 'r-pourover', url: 'https://www.reddit.com/r/pourover/', resourceType: 'community', platform: 'Reddit', state: 'active' },
     { name: 'r/espresso', slug: 'r-espresso', url: 'https://www.reddit.com/r/espresso/', resourceType: 'community', platform: 'Reddit', state: 'active' },
     { name: 'r/coffee_roasters', slug: 'r-coffee-roasters', url: 'https://www.reddit.com/r/coffee_roasters/', resourceType: 'community', platform: 'Reddit', state: 'active' },
@@ -544,12 +544,12 @@ async function main() {
     { name: 'RoastGuide', slug: 'roastguide', url: 'https://apps.apple.com/gb/app/roastguide/id1454418262', resourceType: 'app', platform: 'Apple App Store', state: 'active' },
     { name: 'r/coffeerotation', slug: 'r-coffeerotation', url: 'https://www.reddit.com/r/coffeerotation/', resourceType: 'community', platform: 'Reddit', state: 'active', notes: 'Supplied community creation date: 2024-10-31.' },
     { name: 'Roastful', slug: 'roastful', url: 'https://www.roastful.com/', resourceType: 'website', platform: 'Web', state: 'active', email: 'hello@roastful.com' },
-    { name: 'LoffeeLabs', slug: 'loffeelabs', url: 'https://www.loffeelabs.com/roasters-registry/', resourceType: 'directory', platform: 'Web', state: 'active', location: 'Oahu, Hawaii, USA', email: 'loffeelabs@gmail.com', socialNetworks: { instagram: 'https://www.instagram.com/loffeelabs/', youtube: 'https://www.youtube.com/@LoffeeLabs' }, notes: 'Supplied site text says the organization is located on Oahu and holds meetups. Verify before publishing.' },
-    { name: 'CoffeeDrippd', slug: 'coffeedrippd', url: 'https://coffeedrippd.com/', resourceType: 'discovery_tool', platform: 'Web', state: 'active', location: 'Reykjavik, Iceland', email: 'support@coffeedrippd.com', socialNetworks: { linkedin: 'https://www.linkedin.com/company/coffeedrippd/about/' }, notes: 'User tested a 100 km search and observed 12 roasters in NY. Keep private until dated and contextualized.' },
+    { name: 'LoffeeLabs', slug: 'loffeelabs', url: 'https://www.loffeelabs.com/roasters-registry/', resourceType: 'directory', platform: 'Web', state: 'active', city: 'Oahu', province: 'Hawaii', country: 'United States of America', email: 'loffeelabs@gmail.com', socialNetworks: { instagram: 'https://www.instagram.com/loffeelabs/', youtube: 'https://www.youtube.com/@LoffeeLabs' }, notes: 'Supplied site text says the organization is located on Oahu and holds meetups. Verify before publishing.' },
+    { name: 'CoffeeDrippd', slug: 'coffeedrippd', url: 'https://coffeedrippd.com/', resourceType: 'discovery_tool', platform: 'Web', state: 'active', city: 'Reykjavik', country: 'Iceland', email: 'support@coffeedrippd.com', socialNetworks: { linkedin: 'https://www.linkedin.com/company/coffeedrippd/about/' }, notes: 'User tested a 100 km search and observed 12 roasters in NY. Keep private until dated and contextualized.' },
     { name: 'CoffeeRoast', slug: 'coffeeroast', url: 'https://coffeeroast.com/', resourceType: 'directory', platform: 'Web', state: 'active', notes: 'Google authentication, advertising, and registration observations remain private research notes.' },
-    { name: 'Coffee Review', slug: 'coffee-review', url: 'https://www.coffeereview.com', resourceType: 'publication', platform: 'Web', state: 'active', location: 'Berkeley, CA, USA' },
+    { name: 'Coffee Review', slug: 'coffee-review', url: 'https://www.coffeereview.com', resourceType: 'publication', platform: 'Web', state: 'active', city: 'Berkeley', province: 'California', country: 'United States of America' },
     { name: 'World Coffee Research', slug: 'world-coffee-research', url: 'https://worldcoffeeresearch.org', resourceType: 'research', platform: 'Web', state: 'active' },
-    { name: 'Sensory Lexicon', slug: 'world-coffee-research-sensory-lexicon', url: 'https://worldcoffeeresearch.org/resources/sensory-lexicon', resourceType: 'reference', platform: 'Web', state: 'active', parentSlug: 'world-coffee-research' },
+    { name: 'Sensory Lexicon', slug: 'world-coffee-research-sensory-lexicon', url: 'https://worldcoffeeresearch.org/resources/sensory-lexicon', resourceType: 'reference', platform: 'Web', state: 'active' },
     { name: 'The Fair Trade Scandal', slug: 'the-fair-trade-scandal', url: 'https://www.ohioswallow.com/9780821420928/the-fair-trade-scandal/', resourceType: 'book', platform: 'Web', state: 'active' },
     { name: 'Organic Coffee', slug: 'organic-coffee', url: 'https://www.ohioswallow.com/9780896802476/organic-coffee', resourceType: 'book', platform: 'Web', state: 'active' },
     { name: 'Holy Grounds - The Surprising Connection between Coffee and Faith', slug: 'holy-grounds', url: 'https://www.amazon.com/Holy-Grounds-Surprising-Connection-between/dp/1506448232', resourceType: 'book', platform: 'Web', state: 'active' },
@@ -559,8 +559,8 @@ async function main() {
     { name: 'Coffee around the world', slug: 'coffee-around-the-world', url: 'https://www.colonialcoffee.ca/coffee-around-the-world', resourceType: 'article', platform: 'Web', state: 'active' },
     { name: 'INeedCoffee.com', slug: 'ineedcoffee', url: 'https://ineedcoffee.com/section/', resourceType: 'publication', platform: 'Web', state: 'archived' },
     { name: 'Alma Coffee', slug: 'alma-coffee-youtube', url: 'https://www.youtube.com/@myalmacoffee', resourceType: 'website', platform: 'YouTube', state: 'active', description: 'Provides behind-the-scenes videos and educational content about coffee from farm to cup, including coffee farming, processing methods, roasting, brewing, and the people and practices involved in producing coffee.' },
-    { name: 'What Does Coffee Processing Look Like? | Video Walkthrough', slug: 'what-does-coffee-processing-look-like', url: 'https://www.youtube.com/watch?v=Ux98IXer_UE', resourceType: 'video', platform: 'YouTube', state: 'active', parentSlug: 'alma-coffee-youtube' },
-    { name: "Maple Creek Coffee's Roasting Blog", slug: 'maple-creek-coffee-roasting-blog', url: 'https://maplecreekcoffee.ca/blog', resourceType: 'blog', platform: 'Web', state: 'active', publisherOrganizationName: 'Maple Creek Coffee' },
+    { name: 'What Does Coffee Processing Look Like? | Video Walkthrough', slug: 'what-does-coffee-processing-look-like', url: 'https://www.youtube.com/watch?v=Ux98IXer_UE', resourceType: 'video', platform: 'YouTube', state: 'active' },
+    { name: "Maple Creek Coffee's Roasting Blog", slug: 'maple-creek-coffee-roasting-blog', url: 'https://maplecreekcoffee.ca/blog', resourceType: 'blog', platform: 'Web', state: 'active' },
     { name: 'Commonly Coffee Blog', slug: 'commonly-coffee', url: 'https://commonlycoffee.com', resourceType: 'blog', platform: 'Web', state: 'active' },
     { name: 'Economics of coffee', slug: 'wikipedia-economics-of-coffee', url: 'https://en.wikipedia.org/wiki/Economics_of_coffee', resourceType: 'reference', platform: 'Web', state: 'active' }
   ] as const;
@@ -568,9 +568,8 @@ async function main() {
   const resourceIds = new Map<string, string>();
   await prisma.resource.deleteMany({ where: { slug: '69-top-coffee-producing-countries' } });
   for (const seed of resourceSeeds) {
-    const { parentSlug, state: seedState, ...data } = seed as typeof seed & { parentSlug?: string; state?: string };
-    const parentResourceId = parentSlug ? resourceIds.get(parentSlug) : undefined;
-    const resourceData = { ...data, state: seedState || 'active', parentResourceId };
+    const { state: seedState, ...data } = seed as typeof seed & { state?: string };
+    const resourceData = { ...data, state: seedState || 'active' };
     const resource = await prisma.resource.upsert({
       where: { slug: seed.slug },
       update: resourceData,

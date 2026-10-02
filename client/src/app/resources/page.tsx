@@ -56,7 +56,7 @@ export default function ResourcesPage() {
                   {resource.platform && !(resource.resourceType === 'website' && resource.platform === 'Web') && <span className="text-sm text-gray-500 dark:text-gray-400">{resource.platform === 'YouTube' ? <YouTube fontSize="small" aria-label="YouTube" titleAccess="YouTube" /> : resource.platform}</span>}
                 </div>
                 <h2 className="mb-2 text-2xl font-semibold text-gray-900 group-hover:text-primary-700 dark:text-white dark:group-hover:text-primary-300">{resource.name}</h2>
-                {resource.location && <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{resource.location}</p>}
+                {(resource.city || resource.province || resource.country) && <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{[resource.city, resource.province, resource.country].filter(Boolean).join(', ')}</p>}
                 {resource.description && <p className="line-clamp-3 text-gray-600 dark:text-gray-300">{resource.description}</p>}
                 {resource._count && resource._count.roasters > 0 && <p className="mt-5 text-sm font-medium text-primary-700 dark:text-primary-300">{resource._count.roasters} {t('resources.discoveries', 'discovered roasters')}</p>}
               </Link>

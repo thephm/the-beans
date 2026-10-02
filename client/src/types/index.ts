@@ -115,8 +115,9 @@ export interface ResourceSummary {
   resourceType: string;
   platform?: string;
   state: string;
-  location?: string;
-  publisherOrganizationName?: string;
+  city?: string;
+  province?: string;
+  country?: string;
   socialNetworks?: Record<string, string>;
   _count?: { roasters: number; people: number };
 }

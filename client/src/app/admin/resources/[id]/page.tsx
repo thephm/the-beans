@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { apiClient } from '@/lib/api'
 import SocialNetworksFields from '@/components/SocialNetworksFields'
 import ResourcePeopleSection from '@/components/ResourcePeopleSection'
+import LocationFields from '@/components/LocationFields'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import { countDefinedSocialNetworks, socialNetworksToForm, socialNetworksToPayload } from '@/lib/socials'
 
@@ -53,6 +54,11 @@ export default function AdminResourceEditPage() {
       name: resource.name || '',
       slug: resource.slug || '',
       url: resource.url || '',
+      city: resource.city || '',
+      province: resource.province || '',
+      country: resource.country || '',
+      email: resource.email || '',
+      phone: resource.phone || '',
       resourceType: resource.resourceType || 'website',
       platform: resource.platform || 'Web',
       description: resource.description || '',
@@ -90,6 +96,11 @@ export default function AdminResourceEditPage() {
       await apiClient.updateResource(form.id, {
         name: form.name,
         url: form.url,
+        city: form.city || null,
+        province: form.province || null,
+        country: form.country || null,
+        email: form.email || null,
+        phone: form.phone || null,
         resourceType: form.resourceType,
         platform: form.platform,
         description: form.description,
@@ -136,23 +147,40 @@ export default function AdminResourceEditPage() {
           <h1 className="mt-4 text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">{t('adminResources.editTitle', 'Edit resource')}</h1>
         </div>
         <form onSubmit={submit} className="grid gap-4 rounded-2xl border border-black/90 bg-white p-6 shadow dark:border-purple-400/70 dark:bg-gray-800 sm:grid-cols-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.name', 'Name')}</span><input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.slug', 'Slug')}</span><input readOnly value={form.slug} className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-600 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300" /></label>
-          <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.url', 'URL')}</span><input required value={form.url} onChange={(event) => setForm({ ...form, url: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+          <div className="sm:col-span-2 grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-1">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.name', 'Name')}</span><input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+              <p className="break-all text-sm text-gray-500 dark:text-gray-400">{form.slug}</p>
+            </div>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.url', 'URL')}</span><input required value={form.url} onChange={(event) => setForm({ ...form, url: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+          </div>
+          <div className="sm:col-span-2 grid gap-4 sm:grid-cols-3">
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              <label htmlFor="resource-provider-search" className="mb-1 block">{t('adminResources.providerRoaster', 'Roaster providing this resource')}</label>
+              {selectedProviderRoaster && form.publisherRoasterId === selectedProviderRoaster.id ? <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-green-100 dark:border-gray-700 dark:bg-green-900/50">
+                <span className="flex-1 px-4 py-2 font-semibold text-green-900 dark:text-green-100">{selectedProviderRoaster.name}{selectedProviderRoaster.city ? ` - ${selectedProviderRoaster.city}` : ''}</span>
+                <button type="button" onClick={() => { setForm({ ...form, publisherRoasterId: '' }); setSelectedProviderRoaster(null); setProviderSearch(''); setProviderRoasters([]) }} aria-label={t('adminResources.clearProviderRoaster', 'Remove roaster')} title={t('adminResources.clearProviderRoaster', 'Remove roaster')} className="px-3 py-2 text-lg font-bold leading-none text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">&times;</button>
+              </div> : <>
+                <input id="resource-provider-search" value={providerSearch} onChange={(event) => setProviderSearch(event.target.value)} placeholder={t('adminResources.providerLookup', 'Search roasters')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
+                {providerSearch.trim() && providerRoasters.length > 0 && <div className="mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">{providerRoasters.map((roaster) => <button key={roaster.id} type="button" onClick={() => { setForm({ ...form, publisherRoasterId: roaster.id }); setSelectedProviderRoaster(roaster); setProviderSearch(''); setProviderRoasters([]) }} className="block w-full border-b border-gray-200 px-4 py-2 text-left text-gray-800 last:border-b-0 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700">{roaster.name}{roaster.city ? ` - ${roaster.city}` : ''}</button>)}</div>}
+              </>}
+            </div>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.email', 'Email')}</span><input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.phone', 'Phone')}</span><input type="tel" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+          </div>
+          <div className="sm:col-span-2">
+            <LocationFields
+              city={form.city}
+              province={form.province}
+              country={form.country}
+              showProvince
+              onChange={(city, country, province) => setForm((currentForm: any) => ({ ...currentForm, city, province: province || '', country }))}
+            />
+          </div>
           <div className="sm:col-span-2 grid gap-4 sm:grid-cols-3">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.platform', 'Platform')}</span><select value={form.platform} onChange={(event) => setForm({ ...form, platform: event.target.value, resourceType: typeForPlatform(event.target.value, form.resourceType) })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">{platforms.map((platform) => <option key={platform}>{platform}</option>)}</select></label>
             <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.resourceType', 'Resource type')}</span><select value={form.resourceType} onChange={(event) => setForm({ ...form, resourceType: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">{resourceTypes.map((type) => <option key={type} value={type}>{t(`resources.types.${type === 'discovery_tool' ? 'discoveryTool' : type}`, type)}</option>)}</select></label>
             <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.state', 'State')}</span><select value={form.state} onChange={(event) => setForm({ ...form, state: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"><option value="active">{t('adminResources.active', 'Active')}</option><option value="archived">{t('adminResources.deprecated', 'Deprecated')}</option><option value="inactive">{t('adminResources.inactive', 'Inactive')}</option><option value="closed">{t('adminResources.closed', 'Closed')}</option><option value="unknown">{t('adminResources.unknown', 'Unknown')}</option></select></label>
-            <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              <label htmlFor="resource-provider-search" className="mb-1 block">{t('adminResources.providerRoaster', 'Roaster providing this resource')}</label>
-              <input id="resource-provider-search" value={providerSearch} onChange={(event) => setProviderSearch(event.target.value)} placeholder={t('adminResources.providerLookup', 'Search roasters')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
-              {selectedProviderRoaster && form.publisherRoasterId === selectedProviderRoaster.id && <div className="mt-1 flex items-center gap-2 rounded-lg border border-gray-200 bg-green-100 dark:border-gray-700 dark:bg-green-900/50">
-                <span className="flex-1 px-4 py-2 font-semibold text-green-900 dark:text-green-100">{selectedProviderRoaster.name}{selectedProviderRoaster.city ? ` - ${selectedProviderRoaster.city}` : ''}</span>
-                <button type="button" onClick={() => { setForm({ ...form, publisherRoasterId: '' }); setSelectedProviderRoaster(null); setProviderSearch(''); setProviderRoasters([]) }} aria-label={t('adminResources.clearProviderRoaster', 'Remove roaster')} title={t('adminResources.clearProviderRoaster', 'Remove roaster')} className="px-3 py-2 text-lg font-bold leading-none text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">&times;</button>
-              </div>}
-              {providerSearch.trim() && providerRoasters.length > 0 && <div className="mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">{providerRoasters.map((roaster) => <button key={roaster.id} type="button" onClick={() => { setForm({ ...form, publisherRoasterId: roaster.id }); setSelectedProviderRoaster(roaster); setProviderSearch(''); setProviderRoasters([]) }} className="block w-full border-b border-gray-200 px-4 py-2 text-left text-gray-800 last:border-b-0 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700">{roaster.name}{roaster.city ? ` - ${roaster.city}` : ''}</button>)}</div>}
-            </div>
-            <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 pt-2 text-sm font-medium text-gray-700 dark:text-gray-200"><input type="checkbox" checked={form.state === 'archived'} onChange={(event) => setForm({ ...form, state: event.target.checked ? 'archived' : 'active' })} className="mt-0.5 h-4 w-4 shrink-0 accent-primary-600" /><span><span className="block">{t('adminResources.deprecateResource', 'Deprecate Resource')}</span><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-300">{t('adminResources.deprecateHelp', 'Deprecated resources are hidden from the public Resources list but remain available for historical attribution.')}</span></span></label>
           </div>
           <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.description', 'Description')}</span><textarea rows={5} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
           <section className="sm:col-span-2 rounded-lg border border-gray-200 dark:border-gray-700" aria-labelledby="resource-socials-heading">
@@ -164,7 +192,7 @@ export default function AdminResourceEditPage() {
               <div id="resource-socials-fields" hidden={!showSocials} className="px-4 pb-4"><SocialNetworksFields values={form.socialNetworks} onChange={(socialNetworks) => setForm({ ...form, socialNetworks })} idPrefix="resource-social" /></div>
             </section>
           <ResourcePeopleSection resourceId={form.id} people={Array.isArray(form.people) ? form.people : []} onChange={(people) => setForm((currentForm) => ({ ...currentForm, people }))} />
-          <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.observations', 'Observations')}</span><textarea rows={3} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.observationsPrivate', 'These observations are private and are not shown to end users.')}</span></label>
+          <label className="sm:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.notes', 'Notes')}</span><textarea rows={3} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /><span className="mt-1 block text-xs font-normal text-gray-500 dark:text-gray-400">{t('adminResources.notesPrivate', 'These notes are private and are not shown to end users.')}</span></label>
           <div className="sm:col-span-2 flex items-center justify-between gap-3"><button type="button" onClick={deleteResource} className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed" disabled={saving || deleting}>{t('common.delete', 'Delete')}</button><div className="flex justify-end gap-3"><button type="button" onClick={() => router.push(returnUrl)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-70 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600" disabled={saving || deleting}>{t('common.cancel', 'Cancel')}</button><button disabled={saving || deleting} className="rounded-lg bg-green-600 px-5 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50">{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button></div></div>
           {message && <p className="self-center text-sm text-gray-600 dark:text-gray-300">{message}</p>}
         </form>

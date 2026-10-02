@@ -44,8 +44,6 @@ const publicResource = (resource: any) => {
 
 const resourceInclude = {
   publisherRoaster: { select: { id: true, name: true, slug: true, city: true, state: true, country: true } },
-  parentResource: { select: { id: true, name: true, slug: true } },
-  childResources: { select: { id: true, name: true, slug: true, resourceType: true } },
   people: { include: { person: true } },
   observations: { orderBy: { observedAt: 'desc' as const } },
   roasters: {
@@ -75,7 +73,7 @@ router.get('/', async (req: Request, res: Response) => {
       orderBy: { name: 'asc' },
       select: {
         id: true, name: true, slug: true, url: true, description: true, resourceType: true,
-        platform: true, state: true, location: true, publisherOrganizationName: true,
+        platform: true, state: true, city: true, province: true, country: true,
         publisherRoaster: { select: { id: true, name: true, slug: true, city: true, state: true, country: true } },
         _count: { select: { roasters: true, people: true } }
       }

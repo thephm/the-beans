@@ -113,9 +113,7 @@ export default function LocationFields({
           noOptionsMessage={({ inputValue }) => inputValue.trim().length < 2
             ? t('admin.people.typeToSearchCities', 'Type at least 2 characters')
             : t('admin.people.noCitiesFound', 'No cities found')}
-          placeholder={citySearchCountry
-            ? t('admin.people.searchCityInCountry', 'Search for cities in {{country}}...', { country: citySearchCountry })
-            : t('admin.people.searchCity', 'Search for cities worldwide...')}
+          placeholder={t('admin.people.searchCity', 'Search cities...')}
           unstyled
           className="mt-1"
           classNames={{
@@ -150,13 +148,13 @@ export default function LocationFields({
             cacheOptions
             loadingMessage={() => t('common.loading', 'Loading...')}
             noOptionsMessage={({ inputValue }) => !citySearchCountry
-              ? t('admin.people.selectCountryForProvinces', 'Select a country to search provinces')
+              ? t('admin.people.selectCountryForProvinces', 'Select a country first')
               : inputValue.trim().length < 2
                 ? t('admin.people.typeToSearchProvinces', 'Type at least 2 characters')
                 : t('admin.people.noProvincesFound', 'No provinces found')}
             placeholder={citySearchCountry
-              ? t('admin.people.searchProvinceInCountry', 'Search provinces/states in {{country}}...', { country: citySearchCountry })
-              : t('admin.people.selectCountryForProvinces', 'Select a country to search provinces')}
+              ? t('admin.people.searchProvince', 'Search provinces/states...')
+              : t('admin.people.selectCountryForProvinces', 'Select a country first')}
             isDisabled={!citySearchCountry}
             unstyled
             className="mt-1"

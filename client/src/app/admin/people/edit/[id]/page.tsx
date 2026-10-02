@@ -281,7 +281,7 @@ const EditPersonPage: React.FC = () => {
     const lastName = (resourcePersonForm.lastName || '').trim();
     const name = [firstName, lastName].filter(Boolean).join(' ');
     if (!firstName) {
-      setErrors({ general: t('admin.people.firstNameRequired', 'First name is required') });
+      setErrors({ firstName: t('admin.people.firstNameRequired', 'First name is required') });
       return;
     }
 
@@ -291,8 +291,9 @@ const EditPersonPage: React.FC = () => {
         .map((role: string) => normalizeResourceRole(role.trim()))
         .filter((role: string) => RESOURCE_PERSON_ROLES.includes(role as PersonRole)),
     }));
-    if (normalizedResourceAssociations.some((association) => association.roles.length === 0)) {
-      setErrors({ general: t('admin.people.resourceRoleRequired', 'Each resource association needs at least one role.') });
+    const associationMissingRole = normalizedResourceAssociations.find((association) => association.roles.length === 0);
+    if (associationMissingRole) {
+      setErrors({ resourceRoleAssociationId: associationMissingRole.resourceId });
       return;
     }
 
@@ -374,9 +375,11 @@ const EditPersonPage: React.FC = () => {
 
   const toggleResourceRole = (associationIndex: number, role: string) => {
     const roles: string[] = resourceAssociations[associationIndex].roles || [];
-    updateResourceAssociation(associationIndex, {
-      roles: roles.includes(role) ? roles.filter((selectedRole) => selectedRole !== role) : [...roles, role],
-    });
+    const updatedRoles = roles.includes(role) ? roles.filter((selectedRole) => selectedRole !== role) : [...roles, role];
+    updateResourceAssociation(associationIndex, { roles: updatedRoles });
+    if (updatedRoles.length > 0 && errors.resourceRoleAssociationId === resourceAssociations[associationIndex].resourceId) {
+      setErrors({});
+    }
   };
 
   const toggleRoasterRole = (associationIndex: number, role: PersonRole) => {
@@ -472,7 +475,17 @@ const EditPersonPage: React.FC = () => {
           <form onSubmit={handleResourceSave} className="w-full rounded-lg border border-black/90 bg-white p-8 shadow dark:border-purple-400/70 dark:bg-gray-950">
             <div className="mb-8 space-y-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.firstName', 'First Name')}<input required value={resourcePersonForm.firstName || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, firstName: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.firstName', 'First Name')}<input required aria-invalid={Boolean(errors.firstName)} aria-describedby={errors.firstName ? 'resource-person-first-name-error' : undefined} value={resourcePersonForm.firstName || ''} onChange={(event) => {
+                  const firstNameValue = event.target.value;
+                  setResourcePersonForm({ ...resourcePersonForm, firstName: firstNameValue });
+                  if (firstNameValue.trim()) {
+                    setErrors((currentErrors) => {
+                      const nextErrors = { ...currentErrors };
+                      delete nextErrors.firstName;
+                      return nextErrors;
+                    });
+                  }
+                }} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" />{errors.firstName && <span id="resource-person-first-name-error" role="alert" className="mt-1 block text-sm text-red-600 dark:text-red-400">{errors.firstName}</span>}</label>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.lastName', 'Last Name')}<input value={resourcePersonForm.lastName || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, lastName: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
               </div>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -614,6 +627,7 @@ const EditPersonPage: React.FC = () => {
                       size="sm"
                       layout="wrap"
                     />
+                    {errors.resourceRoleAssociationId === association.resourceId && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{t('admin.people.resourceRoleRequired', 'Each resource association needs at least one role.')}</p>}
                   </div>
                 </div>
               ))}

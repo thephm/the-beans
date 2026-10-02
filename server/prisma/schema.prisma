@@ -507,18 +507,16 @@ model Resource {
   resourceType            String                @db.VarChar(32)
   platform                String?
   state                   String                @default("active") @db.VarChar(16)
-  location                String?
-  publisherOrganizationName String?
+  city                    String?
+  province                String?
+  country                 String?
   publisherRoasterId       String?
-  parentResourceId        String?
   email                   String?
   phone                   String?
   socialNetworks          Json?
   notes                   String?
   createdAt               DateTime              @default(now())
   updatedAt               DateTime              @updatedAt
-  parentResource          Resource?             @relation("ResourceHierarchy", fields: [parentResourceId], references: [id], onDelete: SetNull)
-  childResources          Resource[]            @relation("ResourceHierarchy")
   publisherRoaster        Roaster?              @relation("ResourcePublisherRoaster", fields: [publisherRoasterId], references: [id], onDelete: SetNull)
   people                  ResourcePerson[]
   roasters                ResourceRoaster[]
