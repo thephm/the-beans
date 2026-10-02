@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import CountryFlag from '@/components/CountryFlag'
 import { useParams, useRouter } from 'next/navigation'
 import type { ComponentType } from 'react'
 import { useEffect, useState } from 'react'
@@ -217,7 +218,14 @@ export default function ResourceDetailPage() {
 
               return (
                 <div key={entry.id} className="flex h-full min-h-56 flex-col rounded-2xl bg-white/85 p-6 shadow-lg dark:bg-gray-800">
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">{entry.person.name}</p>
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="min-w-0 break-words text-2xl font-semibold text-gray-900 dark:text-white">
+                      {user?.role === 'admin' ? (
+                        <Link href={`/admin/people/edit/${encodeURIComponent(entry.person.id)}?source=resource`} className="hover:underline focus-visible:underline">{entry.person.name}</Link>
+                      ) : entry.person.name}
+                    </p>
+                    <CountryFlag country={entry.person.country} className="mt-1" />
+                  </div>
                   {entry.roles.length > 0 && <p className="text-base text-primary-700 dark:text-primary-300">{entry.roles.map((role: string) => formatPersonRole(role, t)).join(', ')}</p>}
                   {entry.person.bio && <p title={entry.person.bio} className="mt-3 line-clamp-4 text-gray-600 dark:text-gray-300">{entry.person.bio}</p>}
                   {socialLinks.length > 0 && (

@@ -1,4 +1,5 @@
 import './globals.css'
+import 'flag-icons/css/flag-icons.min.css'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
 import { ConditionalFooter } from '@/components/ConditionalFooter'

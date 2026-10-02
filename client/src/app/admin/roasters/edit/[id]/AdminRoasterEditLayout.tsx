@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
+import CountryFlag from "@/components/CountryFlag";
 import SpecialtyPillSelector from "@/components/SpecialtyPillSelector";
 import SimpleImageUpload from "@/components/SimpleImageUpload";
 import LocationFields from "@/components/LocationFields";
@@ -1398,16 +1399,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     className="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:bg-gray-700 focus:ring-blue-500 flex-shrink-0"
                   />
                   <div className="flex items-center space-x-2 min-w-0 overflow-hidden">
-                    {country.flagSvg && (
-                      <img
-                        src={country.flagSvg}
-                        alt={`${country.name} flag`}
-                        className="w-4 h-3 flex-shrink-0 object-cover rounded-sm"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    )}
+                    <CountryFlag country={country.code || country.name} />
                     <span className="text-sm text-gray-700 dark:text-gray-300 truncate block">
                       {country.name}
                     </span>

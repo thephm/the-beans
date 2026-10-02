@@ -283,6 +283,7 @@ export interface AuditLogFilters {
 export enum PersonRole {
   OWNER = "owner",
   ADMIN = "admin",
+  ROASTER = "roaster",
   FOUNDER = "founder",
   MARKETING = "marketing",
   SCOUT = "scout",
@@ -296,6 +297,7 @@ export enum PersonRole {
 export const COMMON_PERSON_ROLES: PersonRole[] = [
   PersonRole.OWNER,
   PersonRole.ADMIN,
+  PersonRole.ROASTER,
   PersonRole.FOUNDER,
   PersonRole.MARKETING,
   PersonRole.SCOUT,
