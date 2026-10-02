@@ -74,7 +74,7 @@ export default function LocationFields({
     }
     const countryCode = isoCountries.getAlpha2Code(option.country, 'en')
     const canonicalCountry = countryCode ? isoCountries.getName(countryCode, 'en') : undefined
-    onChange(option.city, canonicalCountry || option.country, option.province)
+    onChange(getDisplayCity(option.city), canonicalCountry || option.country, option.province)
   }
 
   const loadProvinceOptions = async (input: string) => {
