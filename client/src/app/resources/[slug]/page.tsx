@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
-import { YouTube, Language, LinkedIn, Instagram, Facebook, Pinterest, Reddit } from '@mui/icons-material'
+import { YouTube, Language, LinkedIn, Instagram, Facebook, Pinterest, Reddit, Coffee } from '@mui/icons-material'
 import { SvgIcon, type SvgIconProps } from '@mui/material'
 
 const ThreadsIcon = (props: SvgIconProps) => (
@@ -68,6 +68,43 @@ const getResourceSocialLinks = (socialNetworks: unknown) => {
   })
 }
 
+const groupResourcePeople = (entries: any[]) => {
+  const grouped: any[] = []
+  const entriesByPersonId = new Map<string, any>()
+
+  entries.forEach((entry) => {
+    const personId = entry.personId || entry.person?.id
+    const roles = Array.from(new Set([
+      ...(Array.isArray(entry.roles) ? entry.roles : []),
+      ...(entry.role ? [entry.role] : []),
+    ].filter(Boolean)))
+
+    if (!personId) {
+      grouped.push({ ...entry, roles })
+      return
+    }
+
+    const existing = entriesByPersonId.get(personId)
+    if (existing) {
+      existing.roles = Array.from(new Set([...existing.roles, ...roles]))
+      return
+    }
+
+    const groupedEntry = { ...entry, roles }
+    entriesByPersonId.set(personId, groupedEntry)
+    grouped.push(groupedEntry)
+  })
+
+  return grouped
+}
+
+const formatPersonRole = (role: string, translate: (key: string, fallback: string) => string) => {
+  const words = role.split(/[_\s-]+/).filter(Boolean)
+  const fallback = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+  const roleKey = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('')
+  return translate(`admin.people.role${roleKey}`, fallback || role)
+}
+
 const typePillClass = (resourceType: string) => {
   switch (resourceType) {
     case 'website': return 'bg-green-600 text-white dark:bg-green-500 dark:text-white'
@@ -116,8 +153,36 @@ export default function ResourceDetailPage() {
           </div>
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">{resource.name}</h1>
           <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">{resource.description}</p>
-          {resource.publisherRoaster && <p className="mb-6 text-gray-600 dark:text-gray-300">{t('resources.providedBy', 'Provided by')} <Link href={`/roasters/${resource.publisherRoaster.id}`} className="font-semibold text-primary-700 hover:underline dark:text-primary-300">{resource.publisherRoaster.name}</Link></p>}
           <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-center">
+            {(resource.publisherRoaster || resource.url) && (
+              <div className="flex min-w-0 flex-1 flex-col gap-5">
+                {resource.publisherRoaster && (
+                  <div className="flex min-w-0 items-center">
+                    <Coffee sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} aria-hidden="true" />
+                    <div className="min-w-0">
+                      <p className="font-medium text-gray-900 dark:text-white">{t('admin.people.roaster', 'Roaster')}</p>
+                      <Link href={`/roasters/${resource.publisherRoaster.id}`} className="break-all font-semibold text-primary-700 hover:underline dark:text-primary-300">{resource.publisherRoaster.name}</Link>
+                    </div>
+                  </div>
+                )}
+                {resource.url && (
+                  <div className="flex min-w-0 items-center">
+                    <Language sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
+                    <div className="min-w-0">
+                      <p className="font-medium text-gray-900 dark:text-white">{t('resources.website', 'Website')}</p>
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="break-all text-primary-600 hover:underline dark:text-primary-400"
+                      >
+                        {resource.url.replace(/^https?:\/\//, '')}
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             {socialLinks.length > 0 && (
               <div className="w-full rounded-lg border border-primary-400 p-4 sm:w-2/5">
                 <p className="mb-3 text-base font-bold text-gray-900 dark:text-white">{t('resources.socials', 'Socials')}</p>
@@ -138,28 +203,12 @@ export default function ResourceDetailPage() {
                 </div>
               </div>
             )}
-            {resource.url && (
-              <div className="flex min-w-0 items-center">
-                <Language sx={{ fontSize: 20, color: '#6b7280', marginRight: 1 }} />
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-900 dark:text-white">{t('resources.website', 'Website')}</p>
-                  <a
-                    href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="break-all text-primary-600 hover:underline dark:text-primary-400"
-                  >
-                    {resource.url.replace(/^https?:\/\//, '')}
-                  </a>
-                </div>
-              </div>
-            )}
           </div>
         </header>
 
         {resource.people?.length > 0 && (
-          <div className="mb-14 grid gap-8 lg:grid-cols-3">
-            <section><h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">{t('resources.people', 'People')}</h2><div className="space-y-3">{resource.people.map((entry: any) => {
+          <div className="mb-14">
+            <section><h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">{t('resources.people', 'People')}</h2><div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{groupResourcePeople(resource.people).map((entry: any) => {
               const socialLinks = [
                 { key: 'website', url: entry.person.websiteUrl, Icon: Language, label: t('admin.people.websiteUrl', 'Website') },
                 { key: 'linkedin', url: entry.person.linkedinUrl, Icon: LinkedIn, label: 'LinkedIn' },
@@ -167,11 +216,12 @@ export default function ResourceDetailPage() {
               ].filter((social) => Boolean(social.url));
 
               return (
-                <div key={entry.id} className="rounded-xl bg-white/80 p-4 shadow dark:bg-gray-800">
-                  <p className="font-semibold text-gray-900 dark:text-white">{entry.person.name}</p>
-                  <p className="text-sm text-primary-700 dark:text-primary-300">{entry.role}</p>
+                <div key={entry.id} className="flex h-full min-h-56 flex-col rounded-2xl bg-white/85 p-6 shadow-lg dark:bg-gray-800">
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">{entry.person.name}</p>
+                  {entry.roles.length > 0 && <p className="text-base text-primary-700 dark:text-primary-300">{entry.roles.map((role: string) => formatPersonRole(role, t)).join(', ')}</p>}
+                  {entry.person.bio && <p title={entry.person.bio} className="mt-3 line-clamp-4 text-gray-600 dark:text-gray-300">{entry.person.bio}</p>}
                   {socialLinks.length > 0 && (
-                    <div className="mt-3 flex items-center gap-2">
+                    <div className="mt-auto flex justify-end gap-2 pt-4">
                       {socialLinks.map(({ key, url, Icon, label }) => (
                         <a
                           key={key}
@@ -180,7 +230,7 @@ export default function ResourceDetailPage() {
                           rel="noopener noreferrer"
                           aria-label={`${entry.person.name} ${label}`}
                           title={label}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 shadow transition-colors hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                         >
                           <Icon fontSize="small" aria-hidden="true" />
                         </a>
