@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/requireAuth';
 
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 import { generateUniquePersonSlug } from '../lib/slug';
+import { normalizePersonRole } from '../lib/personRoles';
 
 const router = Router();
 // Use shared Prisma client
@@ -695,7 +696,7 @@ router.put('/:id', [
   body('instagramUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid Instagram URL'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
-  body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
+  body('roles.*').optional().customSanitizer(normalizePersonRole).isIn(Object.values(PersonRole)).withMessage('Invalid role'),
   body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean'),
   body('isActive').optional().isBoolean().withMessage('isActive must be a boolean')
 ], requireAuth, async (req: Request, res: Response) => {

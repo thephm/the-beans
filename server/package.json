@@ -18,6 +18,7 @@
     "test:dateutils": "ts-node --transpile-only test/testDateUtils.ts",
     "test:audit-date": "ts-node --transpile-only test/testAuditDateFilter.ts",
     "test:country-names": "ts-node --transpile-only test/testCountryNames.ts",
+    "test:person-roles": "ts-node --transpile-only test/testPersonRoles.ts",
     "test:link-checker": "ts-node --transpile-only test/testLinkChecker.ts"
   },
   "prisma": {
