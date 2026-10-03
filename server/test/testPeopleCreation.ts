@@ -91,17 +91,18 @@ async function run() {
       });
       return { status: response.status, data: await response.json() };
     };
-    const roasterOnly = await create({ roasterId: 'roaster-test', roles: ['owner'], isPrimary: true });
+    const roasterOnly = await create({ roasterId: 'roaster-test', roles: ['Owner', ' owner ', 'OWNER'], isPrimary: true });
     assert.equal(roasterOnly.status, 201, JSON.stringify(roasterOnly.data));
     assert.equal(roasterOnly.data.person.firstName, 'Ada');
     assert.equal(roasterOnly.data.person.email, null);
     assert.equal(roasterOnly.data.person.permissions.canEditRoaster, true);
+    assert.deepEqual(roasterOnly.data.person.roles, ['owner']);
     assert.equal(roasterOnly.data.resourcePerson, undefined);
     assert.equal(roasterWrites, 1);
     assert.equal(resourceWrites, 0);
 
     const resourceOnly = await create({
-      resourceId: 'resource-test', resourceRoles: ['author', 'creator', 'author'],
+      resourceId: 'resource-test', resourceRoles: ['Author', 'creator', ' author '],
       websiteUrl: 'https://example.test', resourceIsPrimary: true,
     });
     assert.equal(resourceOnly.status, 201, JSON.stringify(resourceOnly.data));

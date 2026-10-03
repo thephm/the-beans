@@ -5,7 +5,7 @@ import { requireAuth } from '../middleware/requireAuth';
 
 import { createAuditLog, getClientIP, getUserAgent } from '../lib/auditService';
 import { generateUniquePersonSlug } from '../lib/slug';
-import { normalizePersonRole } from '../lib/personRoles';
+import { normalizePersonRole, normalizePersonRoles } from '../lib/personRoles';
 
 const router = Router();
 // Use shared Prisma client
@@ -204,7 +204,8 @@ router.get('/', [
 
     // Legacy imports can contain the same person/roaster row more than once.
     // Keep separate roaster associations, but collapse exact duplicate records.
-    const uniquePeople = Array.from(new Map(allPeople.map((person: any) => {
+    const uniquePeople = Array.from(new Map(allPeople.map((person) => {
+      const roles = normalizePersonRoles(person.roles);
       const duplicateKey = JSON.stringify({
         roasterId: person.roasterId,
         firstName: person.firstName?.trim().toLowerCase(),
@@ -212,9 +213,9 @@ router.get('/', [
         email: person.email?.trim().toLowerCase() || '',
         mobile: person.mobile?.trim() || '',
         title: person.title?.trim().toLowerCase() || '',
-        roles: [...(person.roles || [])].sort(),
+        roles: [...roles].sort(),
       });
-      return [duplicateKey, person];
+      return [duplicateKey, { ...person, roles }];
     })).values());
     let peopleForListing: any[] = uniquePeople;
     if (req.query.includeResources === 'true') {
@@ -247,7 +248,8 @@ router.get('/', [
           };
           groupedResourcePeople.set(key, entry);
         }
-        if (!entry.roles.includes(role)) entry.roles.push(role);
+        const normalizedRole = normalizePersonRole(role);
+        if (!entry.roles.includes(normalizedRole)) entry.roles.push(normalizedRole);
         entry.isPrimary = entry.isPrimary || isPrimary;
       });
 
@@ -398,6 +400,7 @@ router.get('/:id', [
     // Attach permissions
     const personWithPermissions = {
       ...person,
+      roles: normalizePersonRoles(person.roles),
       permissions: getPersonPermissions(person.roles)
     };
     res.json({ person: personWithPermissions });
@@ -459,6 +462,7 @@ router.get('/roaster/:roasterId', [
     // Add permissions to each person
     const peopleWithPermissions = people.map((person: any) => ({
       ...person,
+      roles: normalizePersonRoles(person.roles),
       permissions: getPersonPermissions(person.roles)
     }));
 
@@ -515,6 +519,7 @@ router.get('/email/:email', requireAuth, async (req: Request, res: Response) => 
 
     const peopleWithPermissions = people.map(person => ({
       ...person,
+      roles: normalizePersonRoles(person.roles),
       permissions: getPersonPermissions(person.roles)
     }));
 
@@ -546,10 +551,10 @@ router.post('/', [
   body('instagramUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid Instagram URL'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
-  body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
+  body('roles.*').optional().customSanitizer(normalizePersonRole).isIn(Object.values(PersonRole)).withMessage('Invalid role'),
   body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean'),
   body('resourceRoles').optional().isArray({ min: 1 }).withMessage('Each resource association needs at least one role'),
-  body('resourceRoles.*').isIn([...Object.values(PersonRole), 'creator', 'author', 'contributor']).withMessage('Invalid resource role'),
+  body('resourceRoles.*').customSanitizer(normalizePersonRole).isIn([...Object.values(PersonRole), 'creator', 'author', 'contributor']).withMessage('Invalid resource role'),
   body('resourceIsPrimary').optional().isBoolean().withMessage('resourceIsPrimary must be a boolean')
 ], requireAuth, async (req: Request, res: Response) => {
 
@@ -571,9 +576,9 @@ router.post('/', [
   const linkedinUrl = req.body.linkedinUrl;
   const instagramUrl = req.body.instagramUrl;
   const bio = req.body.bio;
-  const roles: string[] = req.body.roles || [];
+  const roles = normalizePersonRoles(req.body.roles || []);
   const isPrimary = req.body.isPrimary;
-  const resourceRoles: string[] = [...new Set<string>(req.body.resourceRoles || ['other'])];
+  const resourceRoles = normalizePersonRoles(req.body.resourceRoles || ['other']);
   const resourceIsPrimary = req.body.resourceIsPrimary ?? isPrimary ?? false;
     const userId = req.user?.id;
 
@@ -755,7 +760,7 @@ router.put('/:id', [
   const linkedinUrl = req.body.linkedinUrl;
   const instagramUrl = req.body.instagramUrl;
   const bio = req.body.bio;
-  const roles = req.body.roles;
+  const roles = req.body.roles === undefined ? undefined : normalizePersonRoles(req.body.roles);
   const isPrimary = req.body.isPrimary;
   const isActive = req.body.isActive;
     const userId = req.user?.id;

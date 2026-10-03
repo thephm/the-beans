@@ -19,6 +19,7 @@
     "test:audit-date": "ts-node --transpile-only test/testAuditDateFilter.ts",
     "test:country-names": "ts-node --transpile-only test/testCountryNames.ts",
     "test:person-roles": "ts-node --transpile-only test/testPersonRoles.ts",
+    "test:people-listing": "ts-node --transpile-only test/testPeopleListing.ts",
     "test:link-checker": "ts-node --transpile-only test/testLinkChecker.ts",
     "test:people-updates": "ts-node --transpile-only test/testPeopleUpdates.ts",
     "test:people-creation": "ts-node --transpile-only test/testPeopleCreation.ts"

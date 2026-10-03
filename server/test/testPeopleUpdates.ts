@@ -94,7 +94,7 @@ async function run() {
     assert.equal(updateCount, 1);
     assert.equal(auditCount, 1);
 
-    const omitted = await update({ roles: ['employee'] });
+    const omitted = await update({ roles: ['Employee', ' employee ', 'EMPLOYEE'] });
     assert.equal(omitted.status, 200);
     assert.equal(person.bio, importedBio);
     assert.deepEqual(person.roles, ['employee']);

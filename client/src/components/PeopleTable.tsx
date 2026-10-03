@@ -6,7 +6,8 @@ import { apiClient } from '../lib/api';
 import { RoasterPerson, Roaster } from '../types';
 import { useTranslation } from 'react-i18next';
 
-type AdminPeopleRow = RoasterPerson & {
+type AdminPeopleRow = Omit<RoasterPerson, 'roles'> & {
+  roles: string[]
   source?: 'roaster' | 'resource'
   personId?: string
   resource?: { id: string; name: string; slug: string }
@@ -58,11 +59,15 @@ export default function PeopleTable() {
         }
 
         const peopleData = await apiClient.getPeople(params);
-        const allPeople = (peopleData && Array.isArray((peopleData as any).data)) ? (peopleData as any).data : [];
+        const allPeople: AdminPeopleRow[] = (peopleData && Array.isArray((peopleData as any).data)) ? (peopleData as any).data : [];
+        const normalizedPeople = allPeople.map(person => ({
+          ...person,
+          roles: Array.from(new Set((person.roles || []).map(role => role.trim().toLowerCase()))),
+        }));
         
         console.log('Total people fetched:', allPeople.length);
-        setPeople(allPeople);
-        setFilteredPeople(allPeople);
+        setPeople(normalizedPeople);
+        setFilteredPeople(normalizedPeople);
 
         // Update pagination info
         if (peopleData && (peopleData as any).pagination) {
