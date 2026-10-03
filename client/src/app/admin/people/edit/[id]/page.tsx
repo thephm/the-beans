@@ -328,7 +328,7 @@ const EditPersonPage: React.FC = () => {
           mobile: resourcePersonForm.mobile.trim(),
           linkedinUrl: resourcePersonForm.linkedinUrl.trim() || null,
           instagramUrl: resourcePersonForm.instagramUrl.trim() || null,
-          bio: resourcePersonForm.bio.trim(),
+          bio: resourcePersonForm.bio === association.bio ? association.bio : resourcePersonForm.bio.trim(),
           roasterId: association.roasterId,
           roles: association.roles || ['other'],
           isPrimary: Boolean(association.isPrimary),

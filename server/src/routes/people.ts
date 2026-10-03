@@ -692,7 +692,7 @@ router.put('/:id', [
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
   body('linkedinUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid LinkedIn URL'),
   body('instagramUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid Instagram URL'),
-  body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
+  body('bio').optional().isString().withMessage('Bio must be a string'),
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
   body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean'),
@@ -739,6 +739,17 @@ router.put('/:id', [
     const canManage = await canManagePeople(userId, existingperson.roasterId);
     if (!canManage) {
       return res.status(403).json({ error: 'Permission denied. Only owners and admins can manage people.' });
+    }
+
+    // Imported biographies may exceed the limit; only validate length when changed.
+    await body('bio').optional()
+      .if((value) => value !== existingperson.bio)
+      .isLength({ max: 1000 })
+      .withMessage('Bio must be 1000 characters or less. Shorten the biography or leave the existing biography unchanged.')
+      .run(req);
+    const bioErrors = validationResult(req);
+    if (!bioErrors.isEmpty()) {
+      return res.status(400).json({ errors: bioErrors.array() });
     }
 
     // If roasterId is being changed, validate and check permissions

@@ -16,6 +16,12 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 - Manage roaster ownership
 - Update roaster owner contact information (name, email, bio, mobile)
 
+### Person Management
+- Edit person details and roles at `/admin/people`
+- New or changed roaster-person biographies are limited to 1,000 characters
+- Existing imported biographies above that limit can be saved unchanged when editing roles or other details
+- Failed saves display the API's validation messages, including the reason a biography was rejected
+
 ### Audit Logging
 - Comprehensive activity tracking and monitoring
 - View detailed audit logs with filtering capabilities

@@ -12,6 +12,7 @@ export async function resetPassword(token: string, password: string) {
   return res.json();
 }
 import { CreateRoasterFromSuggestionResponse, RoasterExistsResponse } from '../types';
+import { getApiErrorMessage } from './apiError';
 
 export interface InstagramImportCandidate {
   title: string;
@@ -229,7 +230,7 @@ class ApiClient {
       // Handle other error status codes
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'An error occurred' }));
-        const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        const errorMessage = getApiErrorMessage(errorData, `HTTP ${response.status}: ${response.statusText}`);
         throw new Error(errorMessage);
       }
       if (response.status === 204) {
