@@ -28,6 +28,8 @@ const descriptionLineClamp = (resourceName: string) => {
   return Math.max(2, 6 - estimatedTitleLines)
 }
 
+const getDisplayCity = (city: string) => city.split('|', 1)[0].replace(/^,\s*/, '').trim()
+
 export default function ResourcesPage() {
   const { t } = useTranslation()
   const [resources, setResources] = useState<ResourceSummary[]>([])
@@ -61,7 +63,7 @@ export default function ResourcesPage() {
                   {resource.platform && !(resource.resourceType === 'website' && resource.platform === 'Web') && <span className="text-sm text-gray-500 dark:text-gray-400">{resource.platform === 'YouTube' ? <YouTube fontSize="small" aria-label="YouTube" titleAccess="YouTube" /> : resource.platform}</span>}
                 </div>
                 <h2 className="mb-2 text-2xl font-semibold text-gray-900 group-hover:text-primary-700 dark:text-white dark:group-hover:text-primary-300">{resource.name}</h2>
-                {(resource.city || resource.province || resource.country) && <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{[resource.city, resource.province, resource.country].filter(Boolean).join(', ')}</p>}
+                {(resource.city || resource.province || resource.country) && <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{[resource.city && getDisplayCity(resource.city), resource.province, resource.country].filter(Boolean).join(', ')}</p>}
                 {resource.description && (
                   <p
                     className="overflow-hidden text-gray-600 dark:text-gray-300"
