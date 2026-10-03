@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { PersonRole } from '../types';
+import { PersonRole, RESOURCE_PERSON_ROLES } from '../types';
 import { Roaster } from '../types';
 import PersonRoleButtons from './PersonRoleButtons';
 import LocationFields from './LocationFields';
 import { stripToRootUrl } from '../lib/url';
 import { apiClient } from '../lib/api';
+import ResourceSearchField, { ResourceSelection } from './ResourceSearchField';
 
 
 interface AddPersonFormProps {
   showRoasterSelector?: boolean;
+  showResourceSelector?: boolean;
+  initialResource?: ResourceSelection | null;
+  saving?: boolean;
   roasterId?: string; // If provided, roaster selector is hidden and this is used
   roasterAssociations?: any[]; // List of roaster associations for this person
   onSave: (person: any) => void;
@@ -137,7 +141,7 @@ export function RoasterSearchField({ value, initialRoaster, label, onChange }: R
   );
 }
 
-export default function AddPersonForm({ showRoasterSelector = false, roasterId, roasterAssociations, onSave, onCancel, onDelete, mode = 'add', initialPerson, error, roleOptions }: AddPersonFormProps) {
+export default function AddPersonForm({ showRoasterSelector = false, showResourceSelector = false, initialResource, saving = false, roasterId, roasterAssociations, onSave, onCancel, onDelete, mode = 'add', initialPerson, error, roleOptions }: AddPersonFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [form, setForm] = useState({
@@ -162,6 +166,8 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
     roasterAssociations || []
   );
   const [roasterValidationError, setRoasterValidationError] = useState('');
+  const [resource, setResource] = useState<ResourceSelection | null>(initialResource || null);
+  const [resourceRoles, setResourceRoles] = useState<string[]>([PersonRole.OTHER]);
 
   useEffect(() => {
     if (roasterAssociations) {
@@ -236,13 +242,35 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((showRoasterSelector && !form.roasterId) || editableAssociations.some((association) => !association.roasterId)) {
+    if (saving) return;
+    if (!form.firstName.trim()) {
+      setRoasterValidationError(t('admin.people.firstNameRequired', 'First name is required'));
+      return;
+    }
+    if (showResourceSelector && !form.roasterId && !resource) {
+      setRoasterValidationError(t('admin.people.associationRequired', 'Please select a roaster or a resource'));
+      return;
+    }
+    if ((!showResourceSelector && showRoasterSelector && !form.roasterId) || editableAssociations.some((association) => !association.roasterId)) {
       setRoasterValidationError(t('admin.people.roasterRequired', 'Please select a roaster'));
+      return;
+    }
+    if (resource && resourceRoles.length === 0) {
+      setRoasterValidationError(t('admin.people.resourceRoleRequired', 'Each resource association needs at least one role.'));
       return;
     }
     setRoasterValidationError('');
     // Include updated associations in the save
-    onSave({ ...form, associations: editableAssociations });
+    onSave({
+      ...form,
+      roasterId: form.roasterId || undefined,
+      associations: editableAssociations,
+      ...(showResourceSelector && {
+        resourceId: resource?.id,
+        resourceRoles,
+        resourceIsPrimary: form.isPrimary,
+      }),
+    });
   };
   return (
     <div>
@@ -309,7 +337,7 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
           )}
         </div>
 
-        {mode === 'edit' && (
+        {(mode === 'edit' || showResourceSelector) && (
           <LocationFields
             city={form.city}
             country={form.country}
@@ -423,7 +451,27 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
           </div>
         )}
 
-        {/* Bio - full width, moved below roaster section */}
+        {showResourceSelector && (
+          <section className="space-y-4 rounded-lg border border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-800" aria-labelledby="add-person-resource-heading">
+            <h2 id="add-person-resource-heading" className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.resource', 'Resource')}</h2>
+            <ResourceSearchField resource={resource} onChange={(selected) => { setResource(selected); setRoasterValidationError(''); }} />
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.role', 'Role')}</label>
+              <PersonRoleButtons
+                selectedRoles={resourceRoles}
+                onRoleToggle={(role) => {
+                  setResourceRoles((current) => current.includes(role) ? current.filter((selected) => selected !== role) : [...current, role]);
+                  setRoasterValidationError('');
+                }}
+                roles={RESOURCE_PERSON_ROLES}
+                size="sm"
+                layout="wrap"
+              />
+            </div>
+          </section>
+        )}
+
+        {/* Bio - full width, moved below association sections */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('admin.people.bio', 'Bio')}
@@ -433,7 +481,7 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
       </div>
       {(error || roasterValidationError) && (
         <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-800 dark:text-red-200 text-sm">{roasterValidationError || error}</p>
+          <p role="alert" className="text-red-800 dark:text-red-200 text-sm">{roasterValidationError || error}</p>
         </div>
       )}
       <div className="flex gap-4 mt-8 justify-between items-center">
@@ -450,7 +498,7 @@ export default function AddPersonForm({ showRoasterSelector = false, roasterId, 
         </div>
         <div className="flex gap-4">
           <button type="button" className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onClick={onCancel}>{t('common.cancel', 'Cancel')}</button>
-          <button type="button" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" onClick={handleSubmit}>{t('common.save', 'Save')}</button>
+          <button type="button" disabled={saving} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50" onClick={handleSubmit}>{saving ? t('adminResources.saving', 'Saving...') : t('common.save', 'Save')}</button>
         </div>
       </div>
     </div>

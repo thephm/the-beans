@@ -12,6 +12,18 @@ type AdminPeopleRow = RoasterPerson & {
   resource?: { id: string; name: string; slug: string }
 }
 
+const getRoleLabel = (role: string, translate: (key: string, options: { defaultValue: string }) => string) => {
+  const words = role
+    .trim()
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+  const key = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('')
+  const fallback = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
+
+  return translate(`admin.people.role${key}`, { defaultValue: fallback || role })
+}
+
 export default function PeopleTable() {
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const { t } = useTranslation();
@@ -173,7 +185,7 @@ export default function PeopleTable() {
                             'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                           }`}
                         >
-                          {t(`admin.people.role${role.charAt(0).toUpperCase() + role.slice(1)}`, role)}
+                          {getRoleLabel(role, t)}
                         </span>
                       ))}
                     </div>
@@ -351,7 +363,7 @@ export default function PeopleTable() {
                                 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                               }`}
                             >
-                              {t(`admin.people.role${role.charAt(0).toUpperCase() + role.slice(1)}`, role)}
+                              {getRoleLabel(role, t)}
                             </span>
                           ))}
                         </div>
@@ -465,4 +477,3 @@ export function EditableCell({ value, onChange, type = 'text', options, ...props
     />
   );
 }
-

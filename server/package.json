@@ -20,7 +20,8 @@
     "test:country-names": "ts-node --transpile-only test/testCountryNames.ts",
     "test:person-roles": "ts-node --transpile-only test/testPersonRoles.ts",
     "test:link-checker": "ts-node --transpile-only test/testLinkChecker.ts",
-    "test:people-updates": "ts-node --transpile-only test/testPeopleUpdates.ts"
+    "test:people-updates": "ts-node --transpile-only test/testPeopleUpdates.ts",
+    "test:people-creation": "ts-node --transpile-only test/testPeopleCreation.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"

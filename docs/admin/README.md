@@ -18,6 +18,10 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 
 ### Person Management
 - Edit person details and roles at `/admin/people`
+- Add a person associated with a roaster, a resource, or both; at least one association is required
+- The Resource section below Roaster supports resource search and independent resource roles (including Creator, Author, and Contributor)
+- Adding from a resource preselects that resource and still allows an optional roaster association
+- Selected associations are created together in a database transaction, so a failed save does not partially create a person
 - New or changed roaster-person biographies are limited to 1,000 characters
 - Existing imported biographies above that limit can be saved unchanged when editing roles or other details
 - Failed saves display the API's validation messages, including the reason a biography was rejected
@@ -66,6 +70,11 @@ The Admin Dashboard is accessible via the main navigation bar (visible only to a
 - `GET /api/admin/audit-logs` — List audit logs with pagination and filtering (admin only)
 - `GET /api/admin/audit-logs/stats` — Get audit statistics (admin only)
 - `GET /api/admin/audit-logs/:id` — Get specific audit log entry (admin only)
+
+### Person Management
+- `POST /api/people` — Create a person with `roasterId`, `resourceId`, or both
+- `roles` and `isPrimary` apply to the roaster association; `resourceRoles` and `resourceIsPrimary` apply to the resource association
+- Resource associations require admin access; roaster-only creation retains existing owner/admin permissions
 
 ### Database Backup
 - `POST /api/backup/database` — Create database backup and upload to WebDAV (admin only)

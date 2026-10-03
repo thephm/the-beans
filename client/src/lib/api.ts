@@ -11,7 +11,7 @@ export async function resetPassword(token: string, password: string) {
   }
   return res.json();
 }
-import { CreateRoasterFromSuggestionResponse, RoasterExistsResponse } from '../types';
+import { CreatePersonInput, CreateRoasterFromSuggestionResponse, RoasterExistsResponse } from '../types';
 import { getApiErrorMessage } from './apiError';
 
 export interface InstagramImportCandidate {
@@ -146,7 +146,7 @@ class ApiClient {
     return this.request(`/people/email/${encodeURIComponent(email)}`);
   }
 
-  async createPerson(personData: any) {
+  async createPerson(personData: CreatePersonInput) {
     return this.request('/people', {
       method: 'POST',
       body: JSON.stringify(personData),

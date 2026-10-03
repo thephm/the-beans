@@ -9,7 +9,7 @@ export const slugify = (value: string): string => {
 };
 
 export const generateUniquePersonSlug = async (
-  prisma: PrismaClient,
+  prisma: Pick<PrismaClient, 'person'>,
   name: string
 ): Promise<string> => {
   const baseSlug = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'person';

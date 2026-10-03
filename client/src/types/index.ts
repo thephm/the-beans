@@ -312,6 +312,26 @@ export const RESOURCE_PERSON_ROLES: PersonRole[] = [
   PersonRole.CONTRIBUTOR,
 ];
 
+export interface CreatePersonInput {
+  firstName: string;
+  lastName?: string;
+  title?: string | null;
+  city?: string | null;
+  country?: string | null;
+  email?: string | null;
+  mobile?: string;
+  websiteUrl?: string | null;
+  linkedinUrl?: string | null;
+  instagramUrl?: string | null;
+  bio?: string;
+  roasterId?: string;
+  roles?: string[];
+  isPrimary?: boolean;
+  resourceId?: string;
+  resourceRoles?: string[];
+  resourceIsPrimary?: boolean;
+}
+
 export interface RoasterPerson {
   id: string;
   roasterId: string;

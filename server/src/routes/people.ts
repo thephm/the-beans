@@ -531,8 +531,10 @@ router.get('/email/:email', requireAuth, async (req: Request, res: Response) => 
 
 // POST /api/people - Create a new person
 router.post('/', [
-  body('roasterId').isString().notEmpty().withMessage('Roaster ID is required'),
-  body('firstName').isString().isLength({ min: 1, max: 50 }).withMessage('First name is required and must be 1-50 characters'),
+  body('roasterId').optional().isString().trim().notEmpty().withMessage('Roaster ID must be a valid string'),
+  body('resourceId').optional().isString().trim().notEmpty().withMessage('Resource ID must be a valid string'),
+  body().custom((_value, { req }) => Boolean(req.body.roasterId || req.body.resourceId)).withMessage('Please select a roaster or a resource'),
+  body('firstName').isString().trim().isLength({ min: 1, max: 50 }).withMessage('First name is required and must be 1-50 characters'),
   body('lastName').optional().isString().isLength({ max: 50 }).withMessage('Last name must be 50 characters or less'),
   body('title').optional({ nullable: true }).isString().isLength({ max: 100 }).withMessage('Title must be 100 characters or less').custom((value: any) => value === null || typeof value === 'string' || value === '').withMessage('Title must be a string or null'),
   body('city').optional({ nullable: true }).isString(),
@@ -540,10 +542,15 @@ router.post('/', [
   body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please enter a valid email address'),
   body('mobile').optional().isString().isLength({ max: 20 }).withMessage('Mobile must be 20 characters or less'),
   body('linkedinUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid LinkedIn URL'),
+  body('websiteUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid website URL'),
+  body('instagramUrl').optional({ checkFalsy: true }).isURL().withMessage('Please enter a valid Instagram URL'),
   body('bio').optional().isString().isLength({ max: 1000 }).withMessage('Bio must be 1000 characters or less'),
   body('roles').optional().isArray().withMessage('Roles must be an array if provided'),
   body('roles.*').optional().isIn(Object.values(PersonRole)).withMessage('Invalid role'),
-  body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean')
+  body('isPrimary').optional().isBoolean().withMessage('isPrimary must be a boolean'),
+  body('resourceRoles').optional().isArray({ min: 1 }).withMessage('Each resource association needs at least one role'),
+  body('resourceRoles.*').isIn([...Object.values(PersonRole), 'creator', 'author', 'contributor']).withMessage('Invalid resource role'),
+  body('resourceIsPrimary').optional().isBoolean().withMessage('resourceIsPrimary must be a boolean')
 ], requireAuth, async (req: Request, res: Response) => {
 
   try {
@@ -552,7 +559,8 @@ router.post('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-  const roasterId = req.body.roasterId as string;
+  const roasterId = req.body.roasterId as string | undefined;
+  const resourceId = req.body.resourceId as string | undefined;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const title = req.body.title;
@@ -563,117 +571,145 @@ router.post('/', [
   const linkedinUrl = req.body.linkedinUrl;
   const instagramUrl = req.body.instagramUrl;
   const bio = req.body.bio;
-  const roles = req.body.roles;
+  const roles: string[] = req.body.roles || [];
   const isPrimary = req.body.isPrimary;
+  const resourceRoles: string[] = [...new Set<string>(req.body.resourceRoles || ['other'])];
+  const resourceIsPrimary = req.body.resourceIsPrimary ?? isPrimary ?? false;
     const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Check if roaster exists
-    const roaster = await prisma.roaster.findUnique({
-      where: { id: roasterId }
-    });
-
-    if (!roaster) {
-      return res.status(404).json({ error: 'Roaster not found' });
-    }
-
-    // Check if user can manage people for this roaster
-    const canManage = await canManagePeople(userId, roasterId);
-    if (!canManage) {
-      return res.status(403).json({ error: 'Permission denied. Only owners and admins can manage people.' });
-    }
-
-    // If setting as primary, remove primary status from other people
-    if (isPrimary) {
-      await prisma.roasterPerson.updateMany({
-        where: {
-          roasterId,
-          isPrimary: true
-        },
-        data: {
-          isPrimary: false
-        }
-      });
-    }
-
-    // If email is provided, check if user exists
-    // Normalize empty string to null to avoid unique constraint issues
-    const normalizedEmail = email && email.trim() !== '' ? email : null;
-    let linkedUserId = null;
-    if (normalizedEmail) {
-      const existingUser = await prisma.user.findUnique({
-        where: { email: normalizedEmail }
-      });
-      linkedUserId = existingUser?.id || null;
-    }
-
-    // Create the person
-    const person = await prisma.roasterPerson.create({
-      data: {
-        roasterId,
-        userId: linkedUserId,
-        firstName,
-        lastName,
-        title,
-        city: city || null,
-        country: country || null,
-        email: normalizedEmail,
-        mobile,
-        linkedinUrl,
-        instagramUrl,
-        bio,
-        roles,
-        isPrimary: isPrimary || false,
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            username: true
-          }
-        }
+    if (resourceId) {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+      if (user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required to associate a person with a resource' });
       }
+      const resource = await prisma.resource.findUnique({ where: { id: resourceId }, select: { id: true } });
+      if (!resource) {
+        return res.status(404).json({ error: 'Resource not found' });
+      }
+    }
+
+    if (roasterId) {
+      const roaster = await prisma.roaster.findUnique({ where: { id: roasterId } });
+      if (!roaster) {
+        return res.status(404).json({ error: 'Roaster not found' });
+      }
+      const canManage = await canManagePeople(userId, roasterId);
+      if (!canManage) {
+        return res.status(403).json({ error: 'Permission denied. Only owners and admins can manage people.' });
+      }
+    }
+
+    const normalizedEmail = email && email.trim() !== '' ? email.trim() : null;
+    const name = `${firstName} ${lastName || ''}`.trim();
+    const { person, resourcePerson } = await prisma.$transaction(async (transaction) => {
+      let person = null;
+      if (roasterId) {
+        if (isPrimary) {
+          await transaction.roasterPerson.updateMany({
+            where: { roasterId, isPrimary: true },
+            data: { isPrimary: false },
+          });
+        }
+        const linkedUser = normalizedEmail
+          ? await transaction.user.findUnique({ where: { email: normalizedEmail }, select: { id: true } })
+          : null;
+        person = await transaction.roasterPerson.create({
+          data: {
+            roasterId,
+            userId: linkedUser?.id || null,
+            firstName,
+            lastName,
+            title,
+            city: city || null,
+            country: country || null,
+            email: normalizedEmail,
+            mobile,
+            linkedinUrl,
+            instagramUrl,
+            bio,
+            roles,
+            isPrimary: isPrimary || false,
+            isActive: true,
+          },
+          include: { user: { select: { id: true, email: true, username: true } } },
+        });
+      }
+
+      let resourcePerson = null;
+      if (resourceId) {
+        if (resourceIsPrimary) {
+          await transaction.resourcePerson.updateMany({
+            where: { resourceId, isPrimary: true },
+            data: { isPrimary: false },
+          });
+        }
+        resourcePerson = await transaction.person.create({
+          data: {
+            name,
+            slug: await generateUniquePersonSlug(transaction, name),
+            title,
+            city: city || null,
+            country: country || null,
+            email: normalizedEmail,
+            mobile,
+            websiteUrl: req.body.websiteUrl || null,
+            linkedinUrl: linkedinUrl || null,
+            instagramUrl: instagramUrl || null,
+            bio,
+            resources: {
+              create: resourceRoles.map((role) => ({ resourceId, role, isPrimary: resourceIsPrimary })),
+            },
+          },
+          include: { resources: true },
+        });
+      }
+      return { person, resourcePerson };
     });
 
-    const personWithPermissions = {
-      ...person,
-      permissions: getPersonPermissions(person.roles)
-    };
-
-    // Audit log: CREATE person
-    // Extract only the actual database fields (no relations) for audit
-    const { user: _user, ...valuesForAudit } = person as any;
-    
-    await createAuditLog({
-      action: 'CREATE',
-      entityType: 'person',
-      entityId: person.id,
-      entityName: `${person.firstName} ${person.lastName || ''}`.trim(),
-      userId,
-      ipAddress: getClientIP(req),
-      userAgent: getUserAgent(req),
-      newValues: valuesForAudit,
-    });
+    if (person) {
+      const { user: _user, ...valuesForAudit } = person;
+      await createAuditLog({
+        action: 'CREATE',
+        entityType: 'person',
+        entityId: person.id,
+        entityName: name,
+        userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        newValues: valuesForAudit,
+      });
+    }
+    if (resourcePerson) {
+      await createAuditLog({
+        action: 'CREATE',
+        entityType: 'person',
+        entityId: resourcePerson.id,
+        entityName: name,
+        userId,
+        ipAddress: getClientIP(req),
+        userAgent: getUserAgent(req),
+        newValues: resourcePerson,
+      });
+    }
 
     res.status(201).json({
       message: 'person created successfully',
-      person: personWithPermissions
+      person: person ? { ...person, permissions: getPersonPermissions(person.roles) } : resourcePerson,
+      ...(resourcePerson && { resourcePerson }),
     });
 
   } catch (error: any) {
     console.error('Create person error:', error);
     
-    // Handle unique constraint violation
     if (error.code === 'P2002') {
       return res.status(400).json({ 
-        error: 'A person with this email already exists for this roaster' 
+        error: req.body.roasterId
+          ? 'A person with this email already exists for this roaster'
+          : 'A person with this name already exists. Please try saving again.'
       });
     }
     
