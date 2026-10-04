@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 
+import { getInternalRequestHeaders } from '@/server/requestDiagnostics';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thebeans.ca';
   
@@ -71,8 +73,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let roasterRoutes: MetadataRoute.Sitemap = [];
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    const response = await fetch(`${apiUrl}/api/roasters`, {
+    const roastersUrl = `${apiUrl}/api/roasters`;
+    const response = await fetch(roastersUrl, {
       next: { revalidate: 3600 }, // Cache for 1 hour
+      headers: getInternalRequestHeaders(roastersUrl, {
+        REQUEST_DIAGNOSTIC_SECRET: process.env.REQUEST_DIAGNOSTIC_SECRET,
+        NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+        RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL,
+      }),
     });
     if (response.ok) {
       const data = await response.json();

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { createHash, webcrypto } from 'node:crypto'
 import { test } from 'node:test'
-import { logRequestDiagnostic } from '../src/server/requestDiagnostics'
+import { getInternalRequestHeaders, logRequestDiagnostic } from '../src/server/requestDiagnostics'
 
 // Next's Edge runtime provides Web Crypto; Node 18 needs it installed for these tests.
 if (!globalThis.crypto) Object.defineProperty(globalThis, 'crypto', { value: webcrypto })
@@ -98,6 +98,92 @@ test('missing secret or client IP is unavailable, never a raw-IP fallback', asyn
   assert.equal(JSON.parse(lines[0]).ipHash, 'unavailable')
 })
 
+test('marks only server-side calls back to the configured frontend origin as internal', () => {
+  assert.deepEqual(
+    getInternalRequestHeaders('https://thebeans.ca/api/resources/3rd-wave', {
+      REQUEST_DIAGNOSTIC_SECRET: secret,
+      NEXT_PUBLIC_SITE_URL: 'https://thebeans.ca/',
+    }),
+    { 'x-beans-internal-request': secret },
+  )
+  assert.deepEqual(
+    getInternalRequestHeaders('https://the-beans-api.onrender.com/api/resources/3rd-wave', {
+      REQUEST_DIAGNOSTIC_SECRET: secret,
+      NEXT_PUBLIC_SITE_URL: 'https://thebeans.ca',
+      RENDER_EXTERNAL_URL: 'https://the-beans-frontend.onrender.com',
+    }),
+    {},
+  )
+  assert.deepEqual(
+    getInternalRequestHeaders('https://the-beans-frontend.onrender.com/api/resources/3rd-wave', {
+      REQUEST_DIAGNOSTIC_SECRET: secret,
+      RENDER_EXTERNAL_URL: 'https://the-beans-frontend.onrender.com',
+    }),
+    { 'x-beans-internal-request': secret },
+  )
+  assert.deepEqual(
+    getInternalRequestHeaders('https://thebeans.ca/api/resources/3rd-wave', {
+      NEXT_PUBLIC_SITE_URL: 'https://thebeans.ca',
+    }),
+    {},
+  )
+})
+
+test('excludes marked same-origin app requests but still records external node clients', async () => {
+  const internal = request('/api/resources/3rd-wave', {
+    'x-beans-internal-request': secret,
+    'user-agent': 'node',
+  })
+  assert.deepEqual(await capture(internal), [])
+
+  const external = request('/api/resources/3rd-wave', { 'user-agent': 'node' })
+  const lines = await capture(external)
+  assert.equal(lines.length, 1)
+  assert.equal(JSON.parse(lines[0]).userAgent, 'node')
+  assert.equal(JSON.parse(lines[0]).userAgentCategory, 'unknown')
+
+  const incorrectMarker = request('/api/resources/3rd-wave', {
+    'x-beans-internal-request': 'not-the-secret',
+    'user-agent': 'node',
+  })
+  assert.equal((await capture(incorrectMarker)).length, 1)
+})
+
+test('excludes health checks and Render requests without filtering external page traffic', async () => {
+  assert.deepEqual(await capture(request('/health')), [])
+  assert.deepEqual(await capture(request('/health', {}, 'HEAD')), [])
+  for (const input of [
+    request('/', { 'user-agent': 'Render/1.0' }),
+    request('/discover', { 'user-agent': 'Render/1.0' }),
+    request('/api/resources/3rd-wave', { 'user-agent': 'Render/1.0' }, 'POST'),
+  ]) {
+    assert.deepEqual(await capture(input), [])
+  }
+  assert.equal((await capture(request('/'))).length, 1)
+  assert.equal((await capture(request('/health-check'))).length, 1)
+  assert.equal((await capture(request('/discover', { 'user-agent': 'node' }))).length, 1)
+})
+
+test('excludes Next.js data plumbing and prefetches, but includes real page and API requests', async () => {
+  for (const path of [
+    '/_next/data/build-id/discover.json',
+    '/_next/webpack-hmr',
+  ]) {
+    assert.deepEqual(await capture(request(path)), [], path)
+  }
+  const prefetchHeaders: Record<string, string>[] = [
+    { 'next-router-prefetch': '1' },
+    { purpose: 'prefetch' },
+    { 'sec-purpose': 'prefetch;prerender' },
+  ]
+  for (const headers of prefetchHeaders) {
+    assert.deepEqual(await capture(request('/discover', headers)), [])
+  }
+
+  assert.equal((await capture(request('/discover'))).length, 1)
+  assert.equal((await capture(request('/api/resources/3rd-wave'))).length, 1)
+})
+
 test('IPv6 is hashed without logging the address', async () => {
   const ipv6 = '2001:db8::1234'
   const lines = await capture(request('/discover', { 'cf-connecting-ip': ipv6 }))
@@ -116,6 +202,7 @@ test('uses the request hostname, not Next internal localhost, and removes the po
 
 test('excludes Next.js and common browser/static assets including source maps', async () => {
   for (const path of ['/_next/static/chunks/app.js', '/_next/static/anything',
+    '/_next/data/build-id/page.json', '/_next/webpack-hmr',
     '/_next/image?url=private&width=100', '/_next/image/example',
     '/favicon.ico', '/favicon-32x32.png', '/apple-touch-icon.png',
     '/images/default-cafe.svg', '/locales/en/common.json', '/locales/en/common.json.map', '/app.js.map',

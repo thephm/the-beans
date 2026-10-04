@@ -2,6 +2,7 @@ import RoasterDetail from '@/components/RoasterDetail';
 import type { Roaster } from '@/types';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getInternalRequestHeaders } from '@/server/requestDiagnostics';
 
 const isValidRoasterId = (id: string | undefined) =>
   Boolean(id && id !== 'null' && id !== 'undefined');
@@ -12,8 +13,14 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     return { title: 'Roaster' };
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/roasters/${encodeURIComponent(id)}`, {
+  const apiUrl = `${getApiBaseUrl()}/api/roasters/${encodeURIComponent(id)}`;
+  const response = await fetch(apiUrl, {
     cache: 'no-store',
+    headers: getInternalRequestHeaders(apiUrl, {
+      REQUEST_DIAGNOSTIC_SECRET: process.env.REQUEST_DIAGNOSTIC_SECRET,
+      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+      RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL,
+    }),
   });
 
   if (response.status === 404) {
@@ -68,8 +75,14 @@ export default async function RoasterDetailPage({
   }
 
   const apiBaseUrl = getApiBaseUrl();
-  const response = await fetch(`${apiBaseUrl}/api/roasters/${encodeURIComponent(id)}`, {
+  const apiUrl = `${apiBaseUrl}/api/roasters/${encodeURIComponent(id)}`;
+  const response = await fetch(apiUrl, {
     cache: 'no-store',
+    headers: getInternalRequestHeaders(apiUrl, {
+      REQUEST_DIAGNOSTIC_SECRET: process.env.REQUEST_DIAGNOSTIC_SECRET,
+      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+      RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL,
+    }),
   });
 
   if (response.status === 404) {

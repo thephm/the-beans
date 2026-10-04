@@ -13,7 +13,7 @@ This is **request diagnostic logging, not user analytics**. Requests are not vis
 1. A request reaching the Next.js frontend passes through
    [Edge middleware](../client/src/middleware.ts), before response generation.
 2. Only the exact environment value `REQUEST_DIAGNOSTICS=true` enables logging. Otherwise no diagnostic headers are read, hashes calculated, or entries emitted.
-3. The helper excludes static asset noise, then builds an explicit field allowlist.
+3. The helper excludes marked same-origin server-side application requests, the configured Render health-check signature, and static asset noise, then builds an explicit field allowlist.
 4. If a nonempty secret is configured, it reads the client IP from the trimmed `CF-Connecting-IP` header first. Otherwise it takes the trimmed **first** comma-separated entry in `X-Forwarded-For`. It does not use a socket IP fallback.
 5. Built-in Web Crypto calculates:
 
@@ -74,14 +74,53 @@ emails, usernames, secrets, or search text in path segments; a malicious caller 
 
 ### Included and excluded requests
 
-- Pages, missing paths/scanner probes, `/api` and `/api/...` requests are included.  API routes remain included even with file-like extensions such as `.json` or `.csv`.
-  Non-API JSON paths are not excluded just because they end in `.json`.
-- `robots.txt` and `sitemap.xml` are included.
-- `/_next/static/...`, `/_next/image` and its subpaths, `/manifest.json`, `/site.webmanifest`, and `/locales/...` paths ending in `.json` are excluded.
-- Non-API paths ending in these common asset extensions are excluded,
-  case-insensitively: `avif`, `bmp`, `css`, `csv`, `eot`, `gif`, `ico`, `jpg`, `jpeg`, `js`, `mjs`, `map`, `mp3`, `mp4`, `ogg`, `otf`, `pdf`, `png`, `svg`, `ttf`, `wav`, `webm`, `webp`, `woff`, `woff2`.
+- **Included:** externally initiated page/document requests, `/api` and `/api/...` data requests (including API file-like paths), `robots.txt`, `sitemap.xml`, and other paths such as missing pages or scanner probes. These less-common paths are retained because they can reveal automated traffic responsible for a spike.
+- **Health checks:** every request whose pathname is exactly `/health` is excluded, regardless of User-Agent or method.
+- **Render requests:** any request whose trimmed User-Agent is exactly `Render/1.0` is excluded, regardless of path or method. The frontend root health check is therefore omitted while ordinary external requests to `/` are retained.
+- **Application server-to-server calls:** a same-origin server-side fetch is excluded only when it has the exact `x-beans-internal-request` marker described below. Calls to the separate Express API do not pass through Next.js middleware in the first place. No IP-address heuristic is used.
+- **Next.js/browser plumbing:** `/_next/static/...`, `/_next/data/...`, `/_next/webpack-hmr`, `/_next/image` and its subpaths are excluded. Requests carrying `Next-Router-Prefetch`, `Purpose: prefetch`, or a `Sec-Purpose` value containing `prefetch` are also excluded to avoid logging speculative page loads.
+- **Standard assets:** `/manifest.json`, `/site.webmanifest`, `/locales/...` paths ending in `.json`, and non-API paths ending in common asset extensions are excluded. The extension filter is case-insensitive and includes `avif`, `bmp`, `css`, `csv`, `eot`, `gif`, `ico`, `jpg`, `jpeg`, `js`, `mjs`, `map`, `mp3`, `mp4`, `ogg`, `otf`, `pdf`, `png`, `svg`, `ttf`, `wav`, `webm`, `webp`, `woff`, and `woff2`. This covers favicons, browser icons, stylesheets, scripts, fonts, and media.
 
-Filtering is path-based, not response-content-type-based. A non-API application route ending in one of those asset extensions will also be excluded.
+Filtering uses the request pathname/headers, not response content type. API paths are deliberately exempt from the extension filter so meaningful API/data requests are not lost; non-API application paths ending in an asset extension are excluded. This is a focused diagnostic, not a complete HTTP access log.
+
+### Distinguishing external requests from application requests
+
+The diagnostic runs only in the Next.js frontend middleware. A normal server-side
+fetch from a Next.js page to the separate Express API service does **not** pass
+through that middleware and therefore cannot create a frontend diagnostic entry.
+For example, resource metadata generation in
+[the resource layout](../client/src/app/resources/%5Bslug%5D/layout.tsx) calls
+`apiClient.getResource()`. With the API URL correctly set to the separate API
+service, that request is not observed by this diagnostic.
+
+If `NEXT_PUBLIC_API_URL` instead points to the frontend's own origin, the
+server-side fetch can re-enter Next.js at `/api/resources/<slug>`. Node's fetch
+commonly sends `User-Agent: node`, but that User-Agent is not used to decide
+whether a request is internal: an external Node client without the internal
+marker remains included.
+
+To identify the self-call, server-side API fetches add
+`x-beans-internal-request` with the private `REQUEST_DIAGNOSTIC_SECRET` value
+only when the target origin exactly matches `NEXT_PUBLIC_SITE_URL` or
+Render's `RENDER_EXTERNAL_URL`. Middleware suppresses a request only when that
+header exactly matches the configured secret. Browser-side requests do not add
+it; server-side calls to the separate API origin do not add it; and an absent
+secret/site origin or invalid URL means no marker is added. Set the diagnostic
+secret when enabling diagnostics and configure `NEXT_PUBLIC_SITE_URL` to the
+actual frontend origin so a custom-domain self-call can be recognized. The
+marker is not returned to the browser or included in log records.
+
+This is an origin marker for this application's own server-side fetch code, not
+a general way to infer origin from IP address or User-Agent. A request with
+`User-Agent: node` is **not** automatically classified as internal: the
+application's same-origin calls are filtered by their marker, while an
+unmarked external Node client remains eligible for logging. The marker covers
+server-side API calls through [the shared API client](../client/src/lib/api.ts),
+the server-rendered roaster route, and sitemap API fetches. It does not cover
+unmarked server-side HTTP clients or requests handled by the separate API
+service, whose logs are outside this frontend diagnostic. Keep the marker
+secret private; a request that supplies the exact secret-valued header is also
+suppressed.
 
 ## 5. How to use it on Render
 
@@ -149,7 +188,7 @@ Forwarded IP and Cloudflare headers are trustworthy only if your ingress overwri
 | Missing IP hash | `"unavailable"` means missing/empty secret or missing/empty client-IP headers. Check ingress configuration without dumping headers or logging raw IPs. |
 | Hash changes unexpectedly | Check UTC midnight, secret changes, instance configuration, changing client IPs, and forwarded-header behavior. |
 | Unexpected User-Agent/category | Agents are caller-controlled. `null` means absent. `unknown` is normal for curl/Python and unlisted agents; inspect patterns without assuming identity. |
-| Excessive volume | Static filtering does not remove API traffic, health checks, prefetches, repeated pages, or probes. Shorten the investigation and disable the flag; no sampling/rate cap is implemented. |
+| Excessive volume | This is not an access log: health checks, Render requests, marked same-origin server fetches, Next.js data/assets, browser prefetches, and standard assets are excluded. External API traffic, repeated page requests, and scanner probes remain eligible. Shorten the investigation and disable the flag; no sampling/rate cap is implemented. |
 | Logs difficult to search | Select the frontend service and a narrow time window; search `request_diagnostic` or the exact type field, then a hash/path/agent. Use a securely stored export with a local JSON-aware tool if necessary; do not upload logs to another service. |
 | Diagnostic error entry | Check the safe `request_diagnostic_error` message and runtime/build configuration; run focused tests. Do not dump requests or exception details into logs. Requests continue normally. |
 | Status always null | Expected middleware limitation, not a configuration error. |
@@ -175,5 +214,5 @@ Forwarded IP and Cloudflare headers are trustworthy only if your ingress overwri
 - Relevant code/config/test files are linked above. The focused command is `npm run test:request-diagnostics` from the client directory.
 - Render configuration assumes a Node frontend service rooted at `client`, built with `npm install && npm run build` and started with `npm run start` (`next start`). This is not a static-site deployment. The separate Express API is not covered.
 - Middleware sees requests before the final response, so errors, redirects, and successful responses all have `status: null`. It does not modify authentication, SEO, cache policy, or response content.
-- Counts include health checks and App Router prefetch/data requests. Upstream caching/blocking can hide requests. Country and CF-Ray may be absent.
+- Counts exclude App Router prefetch/data requests and `/health`; other upstream caching/blocking can hide requests. Country and CF-Ray may be absent.
 - Host uses the validated request header because Next.js can normalize its internal URL hostname to `localhost`; neither host nor Cloudflare headers establish a verified source identity.

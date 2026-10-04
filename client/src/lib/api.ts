@@ -13,6 +13,7 @@ export async function resetPassword(token: string, password: string) {
 }
 import { CreatePersonInput, CreateRoasterFromSuggestionResponse, RoasterExistsResponse } from '../types';
 import { getApiErrorMessage } from './apiError';
+import { getInternalRequestHeaders } from '../server/requestDiagnostics';
 
 export interface InstagramImportCandidate {
   title: string;
@@ -205,7 +206,14 @@ class ApiClient {
     const executeRequest = async (targetUrl: string): Promise<T> => {
       const response = await fetch(targetUrl, {
         ...options,
-        headers,
+        headers: {
+          ...headers,
+          ...(typeof window === 'undefined' ? getInternalRequestHeaders(targetUrl, {
+            REQUEST_DIAGNOSTIC_SECRET: process.env.REQUEST_DIAGNOSTIC_SECRET,
+            NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+            RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL,
+          }) : {}),
+        },
       });
 
       if (response.status === 401 && !endpoint.startsWith('/auth/login')) {

@@ -83,6 +83,8 @@ services:
         value: production
       - key: NEXT_PUBLIC_API_URL
         sync: false # IMPORTANT: Set to "https://the-beans-api.onrender.com" in Render dashboard
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false # Set to the public frontend origin; used to identify same-origin server fetches
       - key: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
         sync: false # Set manually in Render dashboard
       - key: REQUEST_DIAGNOSTICS
