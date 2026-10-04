@@ -566,13 +566,13 @@ async function main() {
   ] as const;
 
   const resourceIds = new Map<string, string>();
-  await prisma.resource.deleteMany({ where: { slug: '69-top-coffee-producing-countries' } });
   for (const seed of resourceSeeds) {
     const { state: seedState, ...data } = seed as typeof seed & { state?: string };
     const resourceData = { ...data, state: seedState || 'active' };
+    // Seed runs on every server start; never overwrite admin edits to existing rows.
     const resource = await prisma.resource.upsert({
       where: { slug: seed.slug },
-      update: resourceData,
+      update: {},
       create: resourceData
     });
     resourceIds.set(seed.slug, resource.id);
@@ -595,7 +595,7 @@ async function main() {
     const resourceId = resourceIds.get(resourceSlug);
     if (!resourceId) continue;
     const email = personSlug === 'kim-westerman' ? 'Kim@CoffeeReview.com' : undefined;
-    const person = await prisma.person.upsert({ where: { slug: personSlug }, update: { name, email }, create: { name, slug: personSlug, email } });
+    const person = await prisma.person.upsert({ where: { slug: personSlug }, update: {}, create: { name, slug: personSlug, email } });
     await prisma.resourcePerson.upsert({
       where: { resourceId_personId_role: { resourceId, personId: person.id, role } },
       update: {},

@@ -289,11 +289,11 @@ export default function PeopleTable() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('loading', 'Loading...')}</td>
+                  <td colSpan={6} className="px-4 py-4 text-left text-gray-500 dark:text-gray-400">{t('loading', 'Loading...')}</td>
                 </tr>
               ) : filteredPeople.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">{t('admin.people.noPeopleFound', 'No people found.')}</td>
+                  <td colSpan={6} className="px-4 py-4 text-left text-gray-500 dark:text-gray-400">{t('admin.people.noPeopleFound', 'No people found.')}</td>
                 </tr>
               ) : (
                 filteredPeople.map(person => (
