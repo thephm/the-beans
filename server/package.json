@@ -22,10 +22,11 @@
     "test:people-listing": "ts-node --transpile-only test/testPeopleListing.ts",
     "test:link-checker": "ts-node --transpile-only test/testLinkChecker.ts",
     "test:people-updates": "ts-node --transpile-only test/testPeopleUpdates.ts",
-    "test:people-creation": "ts-node --transpile-only test/testPeopleCreation.ts"
+    "test:people-creation": "ts-node --transpile-only test/testPeopleCreation.ts",
+    "test:seed-guard": "ts-node --transpile-only test/testSeedGuard.ts"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts && ts-node prisma/cleanup-specialties.ts"
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

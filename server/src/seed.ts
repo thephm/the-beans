@@ -1,6 +1,14 @@
 import { PrismaClient } from '@prisma/client';
+import { hasExistingApplicationData } from './lib/seedGuard';
+
 async function main() {
   const prisma = new PrismaClient();
+
+  if (await hasExistingApplicationData(prisma)) {
+    console.log('Database already contains application data; skipping seed.');
+    await prisma.$disconnect();
+    return;
+  }
 
   // Load admin credentials from environment variables
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@thebeans.ca';

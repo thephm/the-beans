@@ -1,9 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { hasExistingApplicationData } from '../src/lib/seedGuard';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  if (await hasExistingApplicationData(prisma)) {
+    console.log('Database already contains application data; skipping seed.');
+    return;
+  }
+
   console.log('🌱 Starting database seeding...');
 
   // Create a test user for roaster ownership
