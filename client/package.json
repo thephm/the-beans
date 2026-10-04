@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:request-diagnostics": "node scripts/testRequestDiagnostics.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

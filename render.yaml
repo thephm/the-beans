@@ -85,6 +85,8 @@ services:
         sync: false # IMPORTANT: Set to "https://the-beans-api.onrender.com" in Render dashboard
       - key: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
         sync: false # Set manually in Render dashboard
+      - key: REQUEST_DIAGNOSTICS
+        value: "false" # Enable temporarily in the frontend service environment
       - key: PORT
         value: 3000
     autoDeploy: true

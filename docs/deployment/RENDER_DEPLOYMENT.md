@@ -137,6 +137,66 @@ The backend includes a health check endpoint at `/health` that Render uses for m
 ### Logs
 View logs for each service in the Render dashboard under the service's "Logs" tab.
 
+#### Temporary request diagnostics
+
+See the [permanent request diagnostics reference](../request-diagnostics.md) for
+the complete field specification, investigation guidance, troubleshooting, and removal.
+
+`REQUEST_DIAGNOSTICS` is disabled by default. This is a temporary diagnostic for
+unusual traffic and crawler investigation, **not visitor measurement**. It does
+not change the existing analytics, authentication, cookies, or browser storage.
+
+1. In Render, open **the-beans-frontend > Environment** (not the API service).
+2. Configure `REQUEST_DIAGNOSTIC_SECRET` as a strong, private server-side secret.
+   Keep the same value across frontend instances during the investigation.
+   Never commit it, prefix it with `NEXT_PUBLIC_`, or add it to `next.config.js`.
+3. Set `REQUEST_DIAGNOSTICS=true` and save with Render's rebuild/redeploy option.
+   Next.js 14 Edge middleware environment changes should be applied with a rebuild;
+   do not assume a running process will pick them up.
+4. In the frontend **Logs** tab, filter for `request_diagnostic`.
+5. After investigating, set `REQUEST_DIAGNOSTICS=false` and rebuild/redeploy again.
+   Restrict access to captured logs and delete exports when no longer needed;
+   disabling diagnostics does not delete existing Render logs.
+
+Each relevant request writes one JSON line to application stdout, for example
+(illustrative hash and headers):
+
+```json
+{"type":"request_diagnostic","timestamp":"2026-10-04T14:24:00.000Z","method":"GET","path":"/discover","status":null,"ipHash":"a1b2c3d4e5f6","userAgent":"GPTBot/1.0","userAgentCategory":"bot-like","cfRay":"example-ray","country":"CA","host":"thebeans.ca"}
+```
+
+The server reads `CF-Connecting-IP` first, otherwise the first comma-separated
+`X-Forwarded-For` entry. It logs only the first 12 hex characters of
+`SHA-256(secret + ":" + UTC YYYY-MM-DD + ":" + clientIP)`. The daily rotating
+hash correlates a source within one UTC day, not across days; it is pseudonymous,
+not a count of people. If the secret or IP is absent, `ipHash` is `"unavailable"`.
+No raw IP, query-string values, referrers, bodies, cookies, authorization headers,
+or account fields are included. Neither the hash nor the secret is sent to the browser.
+Only the pathname and hostname are recorded, not the full URL.
+
+This uses Next.js **14.2.35 Edge middleware** before response generation, so
+`status` is always `null`, including for errors and redirects. Static assets,
+source maps, image optimization requests, and the browser manifest are excluded;
+API routes (including JSON/file-like endpoints), pages, `robots.txt`, and
+`sitemap.xml` are included. User-Agent is recorded as provided; the small category
+rule only recognizes the listed crawler names and obvious browser signatures.
+It is **not proof of bot or human identity**: browsers and crawlers can spoof it.
+
+Limitations: forwarded/Cloudflare headers are only trustworthy when your ingress
+overwrites them; this logger cannot authenticate a crawler or verify the proxy chain.
+Shared IPs can merge sources, changing IPs can split them, and truncated hashes
+can collide. Requests served or blocked upstream never reach this logger.
+Render health checks, prefetches, and App Router data requests may be included:
+request totals are not visits. The separate Express API service is not covered.
+Paths and User-Agents are untrusted text; avoid putting personal data in URL path
+segments and keep log access limited. This diagnostic does not change any existing
+Render/proxy logging or its retention policy.
+
+Run the focused checks locally with `cd client` then
+`npm run test:request-diagnostics`. For Docker development, configure the variables
+in `client/.env.local` and recreate the client container to load changed environment
+values; restart it after code changes.
+
 ### Auto-Deploy
 Services are configured to auto-deploy on pushes to the `main` branch.
 

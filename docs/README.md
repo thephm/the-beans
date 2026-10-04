@@ -36,6 +36,8 @@ The Beans is a full-stack web application for discovering, reviewing, and managi
 
 ## Development Notes
 
+- [**Temporary Request Diagnostics**](./request-diagnostics.md) - Configuration, traffic investigation, privacy, troubleshooting, and removal
+
 This project uses a **Docker-first development approach**. Key points:
 
 - **Container restarts required** for code changes to take effect

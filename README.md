@@ -131,6 +131,7 @@ Comprehensive documentation is maintained in the [`docs/`](./docs/) directory fo
 - [Glossary](./docs/glossary.md)
 - [Setup Guide](./docs/SETUP.md)
 - [Docker Documentation](./docs/DOCKER.md)
+- [Temporary Request Diagnostics](./docs/request-diagnostics.md) - Privacy-conscious traffic-spike investigation
 - [Project Summary](./docs/PROJECT_SUMMARY.md)
 
 ### Feature Documentation
