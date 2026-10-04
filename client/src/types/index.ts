@@ -288,6 +288,7 @@ export enum PersonRole {
   MARKETING = "marketing",
   SCOUT = "scout",
   EMPLOYEE = "employee",
+  ALUMNI = "alumni",
   OTHER = "other",
   CREATOR = "creator",
   AUTHOR = "author",
@@ -302,6 +303,7 @@ export const COMMON_PERSON_ROLES: PersonRole[] = [
   PersonRole.MARKETING,
   PersonRole.SCOUT,
   PersonRole.EMPLOYEE,
+  PersonRole.ALUMNI,
   PersonRole.OTHER,
 ];
 

@@ -99,6 +99,10 @@ async function run() {
     assert.equal(person.bio, importedBio);
     assert.deepEqual(person.roles, ['employee']);
 
+    const alumni = await update({ roles: ['Alumni', ' alumni '] });
+    assert.equal(alumni.status, 200, JSON.stringify(alumni.data));
+    assert.deepEqual(person.roles, ['alumni']);
+
     const writesBeforeRejection = updateCount;
     const changed = await update({ bio: 'b'.repeat(1001), roles: ['owner'] });
     assert.equal(changed.status, 400);
@@ -107,7 +111,7 @@ async function run() {
     assert.equal(updateCount, writesBeforeRejection);
     assert.equal(auditCount, writesBeforeRejection);
     assert.equal(person.bio, importedBio);
-    assert.deepEqual(person.roles, ['employee']);
+    assert.deepEqual(person.roles, ['alumni']);
 
     const invalidType = await update({ bio: 42 });
     assert.equal(invalidType.status, 400);

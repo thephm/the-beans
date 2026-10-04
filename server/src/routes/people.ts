@@ -17,6 +17,7 @@ export enum PersonRole {
   ROASTER = 'roaster',
   FOUNDER = 'founder',
   EMPLOYEE = 'employee',
+  ALUMNI = 'alumni',
   BILLING = 'billing',
   MARKETING = 'marketing',
   SCOUT = 'scout',
