@@ -1,23 +1,34 @@
 import RoasterDetail from '@/components/RoasterDetail';
-import { apiClient } from '@/lib/api';
 import type { Roaster } from '@/types';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+const isValidRoasterId = (id: string | undefined) =>
+  Boolean(id && id !== 'null' && id !== 'undefined');
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  try {
-    const roaster = await apiClient.getRoaster(params.id) as Roaster;
-    if (roaster?.name) {
-      return {
-        title: { absolute: roaster.name },
-        description: roaster.description || undefined,
-      };
-    }
-  } catch {
-    // Fall back to the generic roaster title when metadata cannot be loaded.
+  const id = params?.id;
+  if (!isValidRoasterId(id)) {
+    return { title: 'Roaster' };
   }
 
-  return { title: 'Roaster' };
+  const response = await fetch(`${getApiBaseUrl()}/api/roasters/${encodeURIComponent(id)}`, {
+    cache: 'no-store',
+  });
+
+  if (response.status === 404) {
+    return { title: 'Roaster' };
+  }
+
+  if (!response.ok) {
+    throw new Error(`Failed to load roaster metadata ${id}`);
+  }
+
+  const roaster = await response.json() as Roaster;
+  return {
+    title: roaster?.name ? { absolute: roaster.name } : 'Roaster',
+    description: roaster?.description || undefined,
+  };
 }
 
 const isTruthySearchParam = (value: string | string[] | undefined) => {
@@ -52,7 +63,7 @@ export default async function RoasterDetailPage({
   searchParams?: { hideShareHeart?: string | string[]; hideActions?: string | string[] };
 }) {
   const id = params?.id || '';
-  if (!id) {
+  if (!isValidRoasterId(id)) {
     notFound();
   }
 

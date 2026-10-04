@@ -45,6 +45,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/resources" className="text-gray-400 hover:text-primary-400 transition-colors">
+                  {t('nav.resources', 'Resources')}
+                </Link>
+              </li>
+              <li>
                 <Link href="/favourites" className="text-gray-400 hover:text-primary-400 transition-colors">
                   {t('nav.favourites')}
                 </Link>
