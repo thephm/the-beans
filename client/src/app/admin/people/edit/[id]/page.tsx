@@ -633,7 +633,7 @@ const EditPersonPage: React.FC = () => {
                 </div>
               ))}
             </section>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200 sm:col-span-2">{t('admin.people.bio', 'Bio')}<textarea rows={4} value={resourcePersonForm.bio || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, bio: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200 sm:col-span-2">{t('admin.people.bio', 'Bio')}<textarea rows={6} value={resourcePersonForm.bio || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, bio: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
             <div className="sm:col-span-2">
               <label htmlFor="person-private-notes" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">{t('admin.people.notes', 'Notes')}</label>
               <textarea id="person-private-notes" aria-describedby="person-private-notes-help" rows={5} value={resourcePersonForm.notes || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, notes: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" />

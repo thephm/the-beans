@@ -228,13 +228,10 @@ const AdminUsersPage: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider w-1/6 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'role' ? { key: 'role', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'role', direction: 'asc' })}>
                 {t('admin.users.role', 'Role')}{sortConfig?.key === 'role' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="px-6 py-3 text-center text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider w-1/12 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'language' ? { key: 'language', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'language', direction: 'asc' })}>
-                {t('admin.users.language', 'Language')}{sortConfig?.key === 'language' && <SortArrow direction={sortConfig.direction} />}
-              </th>
-              <th className="px-6 py-3 text-center text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'lastLogin' ? { key: 'lastLogin', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'lastLogin', direction: 'asc' })}>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider w-1/5 min-w-[10rem] whitespace-nowrap cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'lastLogin' ? { key: 'lastLogin', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'lastLogin', direction: 'asc' })}>
                 {t('admin.users.lastLogin', 'Last Login')}{sortConfig?.key === 'lastLogin' && <SortArrow direction={sortConfig.direction} />}
               </th>
-              <th className="px-6 py-3 text-center font-medium text-gray-900 dark:text-gray-100 w-1/5 cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'createdAt' ? { key: 'createdAt', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'createdAt', direction: 'asc' })}>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider w-1/5 min-w-[10rem] whitespace-nowrap cursor-pointer select-none" onClick={() => setSortConfig(sortConfig?.key === 'createdAt' ? { key: 'createdAt', direction: sortConfig?.direction === 'asc' ? 'desc' : 'asc' } : { key: 'createdAt', direction: 'asc' })}>
                 {t('admin.users.created', 'Created')}{sortConfig?.key === 'createdAt' && <SortArrow direction={sortConfig.direction} />}
               </th>
             </tr>
@@ -268,17 +265,10 @@ const AdminUsersPage: React.FC = () => {
                     {user.role}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-center">
-                  {user.language && (
-                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                      {user.language.toUpperCase()}
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                <td className="px-6 py-4 text-left text-sm text-gray-600 dark:text-gray-400 min-w-[10rem] whitespace-nowrap">
                     {user.lastLogin ? formatDateToYYYYMMDD(user.lastLogin) : '-'}
                 </td>
-                  <td className="px-6 py-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                  <td className="px-6 py-4 text-left text-sm text-gray-600 dark:text-gray-400 min-w-[10rem] whitespace-nowrap">
                     {user.createdAt ? formatDateToYYYYMMDD(user.createdAt) : '-'}
                 </td>
               </tr>

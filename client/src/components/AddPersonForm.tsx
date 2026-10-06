@@ -477,7 +477,7 @@ export default function AddPersonForm({ showRoasterSelector = false, showResourc
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('admin.people.bio', 'Bio')}
           </label>
-          <textarea rows={4} placeholder={t('admin.people.bio', 'Bio')} value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+          <textarea rows={mode === 'edit' ? 6 : 4} placeholder={t('admin.people.bio', 'Bio')} value={form.bio} onChange={e => handleChange('bio', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
         </div>
       </div>
       {(error || roasterValidationError) && (

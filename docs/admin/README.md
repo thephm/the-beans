@@ -7,6 +7,7 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 ### User Management
 - View all registered users
 - View user last login timestamps
+- The desktop Users list hides the language column and keeps Last Login and Created dates on one line in `YYYY-MM-DD` format.
 - Edit user roles (admin/user) and language preferences
 - Delete users
 
@@ -18,6 +19,7 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 
 ### Person Management
 - Edit person details and roles at `/admin/people`
+- Edit Person biography fields show six lines by default; the Add Person form retains four lines.
 - Add a person associated with a roaster, a resource, or both; at least one association is required
 - The Resource section below Roaster supports resource search and independent resource roles (including Creator, Author, and Contributor)
 - Adding from a resource preselects that resource and still allows an optional roaster association
