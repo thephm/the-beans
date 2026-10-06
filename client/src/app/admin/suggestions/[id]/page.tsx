@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import LinkInput from '@/components/LinkInput';
 
 interface Suggestion {
   id: string;
@@ -377,7 +378,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('admin.suggestions.website', 'Website')}
             </label>
-            <input
+            <LinkInput
               ref={websiteRef}
               type="url"
               value={website}
@@ -452,7 +453,7 @@ const AdminSuggestionDetailPage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('admin.suggestions.email', 'Email')}
               </label>
-              <input
+              <LinkInput
                 type="email"
                 value={submitterEmail}
                 onChange={(e) => setSubmitterEmail(e.target.value)}

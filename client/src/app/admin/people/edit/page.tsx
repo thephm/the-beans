@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiClient } from "@/lib/api";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
+import LinkInput from "@/components/LinkInput";
 import { COMMON_PERSON_ROLES, RoasterPerson, Roaster } from "@/types";
 
 function formatDateTime(dt?: string) {
@@ -107,7 +108,7 @@ export default function EditPersonPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.email', 'Email')}</label>
-              <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" value={editData.email || ""} onChange={e => handleEditChange("email", e.target.value)} />
+              <LinkInput linkKind="email" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" value={editData.email || ""} onChange={e => handleEditChange("email", e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('admin.people.mobile', 'Mobile')}</label>

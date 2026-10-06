@@ -8,6 +8,7 @@ import LocationFields from './LocationFields';
 import { stripToRootUrl } from '../lib/url';
 import { apiClient } from '../lib/api';
 import ResourceSearchField, { ResourceSelection } from './ResourceSearchField';
+import LinkInput from './LinkInput';
 
 
 interface AddPersonFormProps {
@@ -303,7 +304,7 @@ export default function AddPersonForm({ showRoasterSelector = false, showResourc
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.people.websiteUrl', 'Website')}
             </label>
-            <input type="url" placeholder={t('admin.people.websiteUrl', 'Website')} value={form.websiteUrl} onChange={e => handleChange('websiteUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+            <LinkInput type="url" placeholder={t('admin.people.websiteUrl', 'Website')} value={form.websiteUrl} onChange={e => handleChange('websiteUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
           </div>
         </div>
 
@@ -313,7 +314,7 @@ export default function AddPersonForm({ showRoasterSelector = false, showResourc
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.people.email', 'Email')}
             </label>
-            <input type="email" placeholder={t('admin.people.email', 'Email')} value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
+            <LinkInput type="email" placeholder={t('admin.people.email', 'Email')} value={form.email} onChange={e => handleChange('email', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -351,7 +352,7 @@ export default function AddPersonForm({ showRoasterSelector = false, showResourc
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.people.instagramUrl', 'Instagram URL')}
             </label>
-            <input type="url" placeholder={t('admin.people.instagramUrlPlaceholder', 'https://www.instagram.com/username')} value={form.instagramUrl} onChange={e => handleChange('instagramUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" onPaste={(event) => {
+            <LinkInput type="url" placeholder={t('admin.people.instagramUrlPlaceholder', 'https://www.instagram.com/username')} value={form.instagramUrl} onChange={e => handleChange('instagramUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" onPaste={(event) => {
               event.preventDefault();
               handleChange('instagramUrl', stripToRootUrl(event.clipboardData.getData('text')));
             }} />
@@ -360,7 +361,7 @@ export default function AddPersonForm({ showRoasterSelector = false, showResourc
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.people.linkedinUrl', 'LinkedIn URL')}
             </label>
-            <input type="url" placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')} value={form.linkedinUrl} onChange={e => handleChange('linkedinUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" onPaste={(event) => {
+            <LinkInput type="url" placeholder={t('admin.people.linkedinUrlPlaceholder', 'https://www.linkedin.com/in/username')} value={form.linkedinUrl} onChange={e => handleChange('linkedinUrl', e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" onPaste={(event) => {
               event.preventDefault();
               handleChange('linkedinUrl', stripToRootUrl(event.clipboardData.getData('text')));
             }} />

@@ -86,6 +86,9 @@ The Admin Dashboard is accessible via the main navigation bar (visible only to a
 
 - Inline editing for user role and language
 - Delete with confirmation dialog
+- URL fields in admin forms include a 45-degree arrow that opens the current value in a new tab; email fields include an envelope that opens the mail application.
+- These actions also apply to social links, contact people, and image URLs. They use unsaved field values without submitting the form, preserve existing editing and paste behavior, and include English/French accessible labels.
+- Empty fields have no link action. Invalid values display a disabled icon with an explanatory tooltip. URLs without a scheme open using HTTPS; only HTTP/HTTPS destinations are allowed.
 
 ---
 

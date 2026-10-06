@@ -9,6 +9,7 @@ import SpecialtyPillSelector from "@/components/SpecialtyPillSelector";
 import SimpleImageUpload from "@/components/SimpleImageUpload";
 import LocationFields from "@/components/LocationFields";
 import SocialNetworksFields from "@/components/SocialNetworksFields";
+import LinkInput from "@/components/LinkInput";
 import { stripToRootUrl } from "@/lib/url";
 import { emptySocialNetworks, socialNetworksToForm, socialNetworksToPayload } from "@/lib/socials";
 import { apiClient } from "@/lib/api";
@@ -927,7 +928,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.website', 'Website')}
               </label>
-              <input
+              <LinkInput
                 type="url"
                 name="website"
                 value={basicInfo.website}
@@ -1041,7 +1042,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('adminForms.roasters.email', 'Email')}
               </label>
-              <input
+              <LinkInput
                 type="email"
                 name="email"
                 value={basicInfo.email}
@@ -1260,7 +1261,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.people.email', 'Email')}
                     </label>
-                    <input
+                    <LinkInput
                       type="email"
                       name="email"
                       value={contact.email}
@@ -1284,7 +1285,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.people.instagramUrl', 'Instagram URL')}
                     </label>
-                    <input
+                    <LinkInput
                       type="url"
                       name="instagramUrl"
                       value={contact.instagramUrl}
@@ -1308,7 +1309,7 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.people.linkedinUrl', 'LinkedIn URL')}
                     </label>
-                    <input
+                    <LinkInput
                       type="url"
                       name="linkedinUrl"
                       value={contact.linkedinUrl}
@@ -1478,15 +1479,16 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
                     />
                   </div>
                   <div className="mt-1 flex items-center justify-between">
-                    <input
+                    <LinkInput
                       type="text"
                       value={imageUrl}
+                      wrapperClassName="flex-1 mr-2"
                       onChange={(e) => {
                         const updated = [...urlImages];
                         updated[index] = e.target.value;
                         setUrlImages(updated);
                       }}
-                      className="text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded px-2 py-1 w-full mr-2"
+                      className="text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded px-2 py-1 w-full"
                       placeholder={t('adminForms.roasters.imageUrl', 'Image URL')}
                     />
                     <button
@@ -1504,9 +1506,10 @@ export default function AdminRoasterEditLayout({ roasterId, roasterName = "[Roas
           )}
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <input
+            <LinkInput
               type="text"
               value={newUrlImage}
+              wrapperClassName="flex-1"
               onChange={(e) => setNewUrlImage(e.target.value)}
               placeholder={t('adminForms.roasters.addImageUrl', 'Add image URL...')}
               className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"

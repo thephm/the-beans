@@ -3,6 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
 import { stripToRootUrl } from '@/lib/url';
+import LinkInput from '@/components/LinkInput';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -421,7 +422,7 @@ export default function AdminInstagramImportPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('admin.instagramImport.website', 'Web site')}
                 </label>
-                <input
+                <LinkInput
                   type="text"
                   value={website}
                   onChange={(event) => setWebsite(event.target.value)}

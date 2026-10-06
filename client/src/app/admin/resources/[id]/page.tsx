@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { apiClient } from '@/lib/api'
 import SocialNetworksFields from '@/components/SocialNetworksFields'
+import LinkInput from '@/components/LinkInput'
 import ResourcePeopleSection from '@/components/ResourcePeopleSection'
 import LocationFields from '@/components/LocationFields'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -152,7 +153,7 @@ export default function AdminResourceEditPage() {
               <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.name', 'Name')}</span><input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
               <p className="break-all text-sm text-gray-500 dark:text-gray-400">{form.slug}</p>
             </div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.url', 'URL')}</span><input required value={form.url} onChange={(event) => setForm({ ...form, url: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.url', 'URL')}</span><LinkInput required value={form.url} onChange={(event) => setForm({ ...form, url: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
           </div>
           <div className="sm:col-span-2 grid gap-4 sm:grid-cols-3">
             <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -165,7 +166,7 @@ export default function AdminResourceEditPage() {
                 {providerSearch.trim() && providerRoasters.length > 0 && <div className="mt-1 max-h-60 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">{providerRoasters.map((roaster) => <button key={roaster.id} type="button" onClick={() => { setForm({ ...form, publisherRoasterId: roaster.id }); setSelectedProviderRoaster(roaster); setProviderSearch(''); setProviderRoasters([]) }} className="block w-full border-b border-gray-200 px-4 py-2 text-left text-gray-800 last:border-b-0 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700">{roaster.name}{roaster.city ? ` - ${roaster.city}` : ''}</button>)}</div>}
               </>}
             </div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.email', 'Email')}</span><input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.email', 'Email')}</span><LinkInput type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
             <label className="text-sm font-medium text-gray-700 dark:text-gray-200"><span className="mb-1 block">{t('adminResources.phone', 'Phone')}</span><input type="tel" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" /></label>
           </div>
           <div className="sm:col-span-2">

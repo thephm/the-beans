@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import LinkInput from '@/components/LinkInput';
 import { User } from '../../../../../types';
 import { formatDateToYYYYMMDD, formatDateTimeToYYYYMMDD } from '../../../../../lib/dateUtils';
 
@@ -283,7 +284,7 @@ const EditUserPage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.users.email', 'Email')}
             </label>
-            <input
+            <LinkInput
               type="email"
               value={editData.email || ''}
               onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}

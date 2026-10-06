@@ -378,6 +378,9 @@
     }
   },
   "common": {
+    "openUrl": "Open {{value}} in a new tab",
+    "sendEmailTo": "Send email to {{value}}",
+    "invalidLink": "Enter a valid URL or email address to use this link",
     "loading": "Loading...",
     "error": "An error occurred",
     "retry": "Retry",

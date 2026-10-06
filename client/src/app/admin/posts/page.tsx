@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { SortArrow } from '@/components/SortArrow';
+import LinkInput from '@/components/LinkInput';
 import { formatDateToYYYYMMDD } from '@/lib/dateUtils';
 
 interface Post {
@@ -354,7 +355,7 @@ const AdminPostsPage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('admin.posts.url', 'URL')} *
               </label>
-              <input
+              <LinkInput
                 type="url"
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}

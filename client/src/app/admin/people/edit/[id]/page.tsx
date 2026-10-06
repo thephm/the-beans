@@ -6,6 +6,7 @@ import AddPersonForm from "@/components/AddPersonForm";
 import LocationFields from "@/components/LocationFields";
 import { RoasterSearchField } from "@/components/AddPersonForm";
 import PersonRoleButtons from "@/components/PersonRoleButtons";
+import LinkInput from "@/components/LinkInput";
 import { apiClient } from "@/lib/api";
 import { PersonRole, RESOURCE_PERSON_ROLES, RoasterPerson } from "@/types";
 
@@ -490,10 +491,10 @@ const EditPersonPage: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.jobTitle', 'Title')}<input value={resourcePersonForm.title || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, title: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.websiteUrl', 'Website')}<input type="url" value={resourcePersonForm.websiteUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, websiteUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.websiteUrl', 'Website')}<LinkInput type="url" value={resourcePersonForm.websiteUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, websiteUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
               </div>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.email', 'Email')}<input type="email" value={resourcePersonForm.email || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, email: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.email', 'Email')}<LinkInput type="email" value={resourcePersonForm.email || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, email: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.mobile', 'Mobile')}<input value={resourcePersonForm.mobile || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, mobile: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
               </div>
               <LocationFields
@@ -502,8 +503,8 @@ const EditPersonPage: React.FC = () => {
                 onChange={(city, country) => setResourcePersonForm((current: any) => ({ ...current, city, country }))}
               />
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.linkedinUrl', 'LinkedIn URL')}<input type="url" value={resourcePersonForm.linkedinUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, linkedinUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.instagramUrl', 'Instagram URL')}<input type="url" value={resourcePersonForm.instagramUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, instagramUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.linkedinUrl', 'LinkedIn URL')}<LinkInput type="url" value={resourcePersonForm.linkedinUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, linkedinUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.people.instagramUrl', 'Instagram URL')}<LinkInput type="url" value={resourcePersonForm.instagramUrl || ''} onChange={(event) => setResourcePersonForm({ ...resourcePersonForm, instagramUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" /></label>
               </div>
             </div>
             <section className="mb-4 space-y-3 sm:col-span-2" aria-labelledby="roaster-associations-heading">

@@ -375,6 +375,9 @@
     "communityDescription": "Connectez-vous avec d'autres passionnés de café"
   },
   "common": {
+    "openUrl": "Ouvrir {{value}} dans un nouvel onglet",
+    "sendEmailTo": "Envoyer un e-mail à {{value}}",
+    "invalidLink": "Saisissez une URL ou une adresse e-mail valide pour utiliser ce lien",
     "loading": "Chargement...",
     "error": "Une erreur s'est produite",
     "retry": "Réessayer",

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { stripToRootUrl } from '@/lib/url'
+import LinkInput from './LinkInput'
 import {
   PRIMARY_SOCIAL_NETWORKS,
   SECONDARY_SOCIAL_NETWORKS,
@@ -32,7 +33,7 @@ export default function SocialNetworksFields({ values, onChange, idPrefix = 'soc
         >
           {t(meta.translationKey, meta.label)}
         </label>
-        <input
+        <LinkInput
           id={`${idPrefix}-${key}`}
           type="url"
           name={key}
