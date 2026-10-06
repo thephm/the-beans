@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import CountryFlag from '@/components/CountryFlag'
+import PersonRolePill from '@/components/PersonRolePill'
 import { useParams, useRouter } from 'next/navigation'
 import type { ComponentType } from 'react'
 import { useEffect, useState } from 'react'
@@ -97,13 +98,6 @@ const groupResourcePeople = (entries: any[]) => {
   })
 
   return grouped
-}
-
-const formatPersonRole = (role: string, translate: (key: string, fallback: string) => string) => {
-  const words = role.split(/[_\s-]+/).filter(Boolean)
-  const fallback = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-  const roleKey = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('')
-  return translate(`admin.people.role${roleKey}`, fallback || role)
 }
 
 const typePillClass = (resourceType: string) => {
@@ -226,7 +220,7 @@ export default function ResourceDetailPage() {
                     </p>
                     <CountryFlag country={entry.person.country} className="mt-1" />
                   </div>
-                  {entry.roles.length > 0 && <p className="text-base text-primary-700 dark:text-primary-300">{entry.roles.map((role: string) => formatPersonRole(role, t)).join(', ')}</p>}
+                  {entry.roles.length > 0 && <div className="mt-2 flex flex-wrap gap-1.5">{entry.roles.map((role: string) => <PersonRolePill key={role} role={role} />)}</div>}
                   {entry.person.bio && <p title={entry.person.bio} className="mt-3 line-clamp-4 text-gray-600 dark:text-gray-300">{entry.person.bio}</p>}
                   {socialLinks.length > 0 && (
                     <div className="mt-auto flex justify-end gap-2 pt-4">

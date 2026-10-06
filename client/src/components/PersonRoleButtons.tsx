@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { COMMON_PERSON_ROLES, PersonRole } from '../types';
+import { COMMON_PERSON_ROLES, RESOURCE_PERSON_ROLES } from '../types';
+import { getPersonRoleLabel, getPersonRolePresentation } from '../lib/personRoles';
 
 interface PersonRoleButtonsProps {
   selectedRoles: string[];
@@ -14,22 +15,8 @@ interface PersonRoleButtonsProps {
 export default function PersonRoleButtons({ selectedRoles, onRoleToggle, roles, disabled = false, size = 'md', layout = 'grid' }: PersonRoleButtonsProps) {
   const { t } = useTranslation();
   
-  const roleDefinitions = [
-    { value: PersonRole.OWNER, label: t('admin.people.roleOwner', 'Owner') },
-    { value: PersonRole.ADMIN, label: t('admin.people.roleAdmin', 'Admin') },
-    { value: PersonRole.ROASTER, label: t('admin.people.roleRoaster', 'Roaster') },
-    { value: PersonRole.FOUNDER, label: t('admin.people.roleFounder', 'Founder') },
-    { value: PersonRole.MARKETING, label: t('admin.people.roleMarketing', 'Marketing') },
-    { value: PersonRole.SCOUT, label: t('admin.people.roleScout', 'Scout') },
-    { value: PersonRole.EMPLOYEE, label: t('admin.people.roleEmployee', 'Employee') },
-    { value: PersonRole.ALUMNI, label: t('admin.people.roleAlumni', 'Alumni') },
-    { value: PersonRole.OTHER, label: t('admin.people.roleOther', 'Other') },
-    { value: PersonRole.CREATOR, label: t('admin.people.roleCreator', 'Creator') },
-    { value: PersonRole.AUTHOR, label: t('admin.people.roleAuthor', 'Author') },
-    { value: PersonRole.CONTRIBUTOR, label: t('admin.people.roleContributor', 'Contributor') },
-  ];
   const allowedRoles = roles || COMMON_PERSON_ROLES;
-  const visibleRoles = roleDefinitions.filter((role) => allowedRoles.includes(role.value));
+  const visibleRoles = RESOURCE_PERSON_ROLES.filter((role) => allowedRoles.includes(role));
 
   const sizeClasses = size === 'sm'
     ? 'px-3 py-1.5 text-sm min-w-[104px]'
@@ -50,22 +37,22 @@ export default function PersonRoleButtons({ selectedRoles, onRoleToggle, roles, 
   return (
     <div className={containerClasses}>
       {visibleRoles.map(role => {
-        const isSelected = selectedRoles.includes(role.value);
+        const isSelected = selectedRoles.includes(role);
 
         return (
         <button
-          key={role.value}
+          key={role}
           type="button"
           aria-pressed={isSelected}
-          className={`${widthClasses} ${sizeClasses} rounded-full border font-medium transition-all duration-200 focus:outline-none inline-flex items-center justify-center gap-2 ${
+          className={`${widthClasses} ${sizeClasses} rounded-full border font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 inline-flex items-center justify-center gap-2 ${
             isSelected
-              ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
-              : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
+              ? getPersonRolePresentation(role).colorClasses
+              : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100 dark:bg-gray-950 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-800'
           } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
-          onClick={() => !disabled && onRoleToggle(role.value)}
+          onClick={() => !disabled && onRoleToggle(role)}
           disabled={disabled}
         >
-          <span>{role.label}</span>
+          <span>{getPersonRoleLabel(role, t)}</span>
           <span className={`${isSelected ? 'opacity-100' : 'opacity-0'} inline-flex items-center justify-center w-4 h-4`}>
             <svg
               aria-hidden="true"

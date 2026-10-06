@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Close from '@mui/icons-material/Close'
 import AddPersonForm from './AddPersonForm'
+import PersonRolePill from './PersonRolePill'
 import { apiClient } from '@/lib/api'
 import { PersonRole, RESOURCE_PERSON_ROLES } from '@/types'
 
@@ -191,11 +192,7 @@ export default function ResourcePeopleSection({ people, onChange, resourceId }: 
                   )}
                   {(entry.roles?.length || entry.role) && (
                     <div className="mt-1 flex flex-wrap gap-1.5">
-                      {(entry.roles?.length ? entry.roles : [entry.role]).map((role: string) => (
-                        <span key={role} className="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                          {role}
-                        </span>
-                      ))}
+                      {(entry.roles?.length ? entry.roles : [entry.role]).map((role: string) => <PersonRolePill key={role} role={role} />)}
                     </div>
                   )}
                 </div>

@@ -27,6 +27,7 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 - Failed saves display the API's validation messages, including the reason a biography was rejected
 - The People list normalizes legacy role casing and displays each role once per association, using translated labels and consistent badge colors on desktop and mobile
 - Creating or editing role selections stores unique, trimmed, lowercase role identifiers; existing database records are not rewritten by listing them
+- Public and admin person-role displays share pastel pills and translated labels; selected role buttons use the same palette. See [Person Role Palette](person-role-palette.md) for labels, exact color codes, and maintenance rules.
 
 ### Audit Logging
 - Comprehensive activity tracking and monitoring

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:request-diagnostics": "node scripts/testRequestDiagnostics.cjs"
+    "test:request-diagnostics": "node scripts/testRequestDiagnostics.cjs",
+    "test:person-roles": "node scripts/testPersonRoles.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

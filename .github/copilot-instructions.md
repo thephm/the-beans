@@ -89,6 +89,11 @@ Key entities in `server/prisma/schema.prisma`:
 
 ## Component Architecture
 
+### Person Role Presentation
+- Use `PersonRolePill` for person-role badges and `PersonRoleButtons` for role selection; never add page-specific role colors or display raw role identifiers.
+- Role labels and pastel colors are centralized in `client/src/lib/personRoles.ts` and documented in `docs/admin/person-role-palette.md`.
+- When adding or changing roles, update the registry, applicable role-option lists, English/French translations, and palette documentation together. Run `npm run test:person-roles` in `client/` to catch documentation or palette drift.
+
 ### Page Structure (App Router)
 - **Layout**: `client/src/app/layout.tsx` with providers
 - **Pages**: Each route in `app/` directory with `page.tsx`

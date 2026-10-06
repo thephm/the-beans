@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { SortArrow } from '@/components/SortArrow';
 import AddPersonForm from './AddPersonForm';
+import PersonRolePill from './PersonRolePill';
 import { apiClient } from '../lib/api';
 import { RoasterPerson, Roaster } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -11,18 +12,6 @@ type AdminPeopleRow = Omit<RoasterPerson, 'roles'> & {
   source?: 'roaster' | 'resource'
   personId?: string
   resource?: { id: string; name: string; slug: string }
-}
-
-const getRoleLabel = (role: string, translate: (key: string, options: { defaultValue: string }) => string) => {
-  const words = role
-    .trim()
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .split(/[_\s-]+/)
-    .filter(Boolean)
-  const key = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('')
-  const fallback = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
-
-  return translate(`admin.people.role${key}`, { defaultValue: fallback || role })
 }
 
 export default function PeopleTable() {
@@ -177,22 +166,7 @@ export default function PeopleTable() {
                   )}
                   {person.roles && person.roles.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {person.roles.map((role, index) => (
-                        <span
-                          key={index}
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                            role === 'owner' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' :
-                            role === 'admin' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
-                            role === 'founder' ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200' :
-                            role === 'employee' ? 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200' :
-                            role === 'scout' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
-                            role === 'marketing' ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200' :
-                            'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                          }`}
-                        >
-                          {getRoleLabel(role, t)}
-                        </span>
-                      ))}
+                      {person.roles.map((role) => <PersonRolePill key={role} role={role} />)}
                     </div>
                   )}
                 </div>
@@ -355,22 +329,7 @@ export default function PeopleTable() {
                     <td className="w-[12%] px-3 py-4">
                       {person.roles && person.roles.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
-                          {person.roles.map((role, index) => (
-                            <span
-                              key={index}
-                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                                role === 'owner' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200' :
-                                role === 'admin' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
-                                role === 'founder' ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200' :
-                                role === 'employee' ? 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200' :
-                                role === 'scout' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
-                                role === 'marketing' ? 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200' :
-                                'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                              }`}
-                            >
-                              {getRoleLabel(role, t)}
-                            </span>
-                          ))}
+                          {person.roles.map((role) => <PersonRolePill key={role} role={role} />)}
                         </div>
                       ) : (
                         <span className="text-gray-400 dark:text-gray-500">-</span>
