@@ -31,6 +31,11 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 - Creating or editing role selections stores unique, trimmed, lowercase role identifiers; existing database records are not rewritten by listing them
 - Public and admin person-role displays share pastel pills and translated labels; selected role buttons use the same palette. See [Person Role Palette](person-role-palette.md) for labels, exact color codes, and maintenance rules.
 
+### Link Checker
+- Re-check previously failed links with a spinner, completed/total progress, and the URL currently being checked.
+- Results refresh after re-checking, followed by a completion message. Request failures display an error instead.
+- Starting a new check or changing link-loading filters is disabled during re-checking.
+
 ### Audit Logging
 - Comprehensive activity tracking and monitoring
 - View detailed audit logs with filtering capabilities
