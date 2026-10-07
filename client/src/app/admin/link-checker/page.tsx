@@ -24,7 +24,7 @@ export default function LinkCheckerPage() {
   const [previousBroken, setPreviousBroken] = useState<Result[]>([]);
   const [running, setRunning] = useState(false);
   const [rechecking, setRechecking] = useState(false);
-  const [recheckProgress, setRecheckProgress] = useState<{ completed: number; total: number } | null>(null);
+  const [recheckProgress, setRecheckProgress] = useState<{ completed: number; total: number; fixed: number; removed: number; stillBroken: number } | null>(null);
   const [recheckUrl, setRecheckUrl] = useState('');
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
@@ -55,15 +55,20 @@ export default function LinkCheckerPage() {
   const recheckPrevious = async () => {
     const failedLinks = previousBroken.filter((failedLink) => failedLink.isBroken);
     setRechecking(true);
-    setRecheckProgress({ completed: 0, total: failedLinks.length });
+    setRecheckProgress({ completed: 0, total: failedLinks.length, fixed: 0, removed: 0, stillBroken: 0 });
     setRecheckUrl('');
     setError('');
     try {
       for (let index = 0; index < failedLinks.length; index += 1) {
         const item = failedLinks[index];
         setRecheckUrl(item.currentUrl || item.url);
-        await apiClient.recheckLink({ id: item.id });
-        setRecheckProgress({ completed: index + 1, total: failedLinks.length });
+        const result = await apiClient.recheckLink({ id: item.id }) as Pick<Result, 'isBroken' | 'disposition'>;
+        const outcome = result.isBroken ? 'stillBroken' : result.disposition === 'URL removed' ? 'removed' : 'fixed';
+        setRecheckProgress((current) => current && ({
+          ...current,
+          completed: index + 1,
+          [outcome]: current[outcome] + 1,
+        }));
       }
       setRecheckUrl('');
       await loadLinks();
@@ -123,7 +128,7 @@ export default function LinkCheckerPage() {
       <div className="mx-auto max-w-6xl">
         <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-gray-100">{t('admin.linkChecker.title', 'Link checker')}</h1>
         <p className="mb-6 text-gray-600 dark:text-gray-300">{t('admin.linkChecker.description', 'Check database links and find broken ones.')}</p>
-        <div className="mb-6 grid gap-4 rounded-lg border border-black/90 bg-white p-5 shadow dark:border-purple-400/70 dark:bg-gray-800 sm:grid-cols-2 lg:grid-cols-6">
+        <div className="mb-6 grid gap-4 rounded-lg border border-black/90 bg-white p-5 shadow dark:border-purple-400/70 dark:bg-gray-800 sm:grid-cols-2 lg:grid-cols-[repeat(5,minmax(0,1fr))_auto]">
           <label className="text-sm text-gray-700 dark:text-gray-200">{t('admin.linkChecker.type', 'Type')}
             <select value={category} disabled={rechecking} onChange={(e) => setCategory(e.target.value)} style={{ maxWidth: '11rem' }} className="mt-1 block w-full rounded border p-2 dark:bg-gray-700">
               <option value="all">{t('admin.linkChecker.all', 'All')}</option><option value="people">{t('admin.linkChecker.people', 'People')}</option><option value="roasters">{t('admin.linkChecker.roasters', 'Roasters')}</option><option value="resources">{t('admin.linkChecker.resources', 'Resources')}</option>
@@ -139,7 +144,11 @@ export default function LinkCheckerPage() {
           <label className="text-sm text-gray-700 dark:text-gray-200">{t('admin.linkChecker.delay', 'Delay (ms)')}
             <input type="number" min="0" max="5000" step="250" value={delay} onChange={(e) => setDelay(Number(e.target.value))} className="mt-1 block w-24 rounded border p-2 dark:bg-gray-700 dark:text-gray-100" />
           </label>
-          <div className="flex items-end gap-2"><button onClick={run} disabled={running || rechecking || !links.length} className="rounded bg-primary-600 px-4 py-2 font-semibold text-white disabled:opacity-50">{t('admin.linkChecker.start', 'Start')}</button>{running && <button onClick={togglePause} className="rounded bg-amber-500 px-4 py-2 font-semibold text-white">{paused ? t('admin.linkChecker.continue', 'Continue') : t('admin.linkChecker.pause', 'Pause')}</button>}</div>
+          <div className="flex flex-wrap items-end gap-2">
+            <button onClick={run} disabled={running || rechecking || !links.length} className="rounded bg-primary-600 px-4 py-2 font-semibold text-white disabled:opacity-50">{t('admin.linkChecker.start', 'Start')}</button>
+            {running && <button onClick={togglePause} className="rounded bg-amber-500 px-4 py-2 font-semibold text-white">{paused ? t('admin.linkChecker.continue', 'Continue') : t('admin.linkChecker.pause', 'Pause')}</button>}
+            {previousBroken.length > 0 && <button onClick={recheckPrevious} disabled={rechecking || running} aria-busy={rechecking} className="inline-flex items-center gap-2 whitespace-nowrap rounded bg-teal-700 px-4 py-2 font-semibold text-white hover:bg-teal-800 disabled:opacity-50">{rechecking && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />}{rechecking ? t('admin.linkChecker.rechecking', 'Re-checking...') : t('admin.linkChecker.recheck', 'Re-check')}</button>}
+          </div>
         </div>
         {error && <p className="mb-4 text-red-600 dark:text-red-400">{error}</p>}
         {recheckProgress && !error && (
@@ -149,13 +158,13 @@ export default function LinkCheckerPage() {
                 ? recheckProgress.completed === recheckProgress.total
                   ? t('admin.linkChecker.recheckRefreshing', 'Refreshing results...')
                   : t('admin.linkChecker.recheckProgress', { completed: recheckProgress.completed, total: recheckProgress.total, defaultValue: 'Re-checking failed links: {{completed}}/{{total}} completed' })
-                : t('admin.linkChecker.recheckComplete', { count: recheckProgress.completed, defaultValue: 'Re-check complete: {{count}} links checked.' })}
+                : t('admin.linkChecker.recheckComplete', { count: recheckProgress.completed, fixed: recheckProgress.fixed, removed: recheckProgress.removed, stillBroken: recheckProgress.stillBroken, defaultValue: 'Re-check complete: {{count}} links checked: {{fixed}} fixed, {{removed}} removed, {{stillBroken}} still broken.' })}
             </p>
             {recheckUrl && <p className="mt-1 break-all">{t('admin.linkChecker.recheckCurrent', { url: recheckUrl, defaultValue: 'Checking: {{url}}' })}</p>}
           </div>
         )}
         {(running || results.length > 0) && <p className="mb-4 text-gray-700 dark:text-gray-200">{t('admin.linkChecker.progress', 'Progress')}: {progress}/{links.length} · {t('admin.linkChecker.broken', 'Broken')}: {broken.length}</p>}
-        {previousBroken.length > 0 && <section className="mb-6"><div className="mb-3 flex items-center justify-between gap-4"><h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('admin.linkChecker.previousBroken', 'Previously failed links')} ({visiblePreviousBroken.length})</h2><button onClick={recheckPrevious} disabled={rechecking || running} aria-busy={rechecking} className="inline-flex items-center gap-2 rounded bg-primary-600 px-4 py-2 font-semibold text-white disabled:opacity-50">{rechecking && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />}{rechecking ? t('admin.linkChecker.rechecking', 'Re-checking...') : t('admin.linkChecker.recheck', 'Re-check')}</button></div>{visiblePreviousBroken.length > 0 && renderBrokenLinks(visiblePreviousBroken)}</section>}
+        {previousBroken.length > 0 && <section className="mb-6"><h2 className="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{t('admin.linkChecker.previousBroken', 'Previously failed links')} ({visiblePreviousBroken.length})</h2>{visiblePreviousBroken.length > 0 && renderBrokenLinks(visiblePreviousBroken)}</section>}
         {broken.length > 0 && <section><h2 className="mb-3 text-xl font-semibold text-gray-900 dark:text-gray-100">{t('admin.linkChecker.currentBroken', 'Failed links in this check')} ({broken.length})</h2>{renderBrokenLinks(broken)}</section>}
       </div>
     </main>

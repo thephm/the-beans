@@ -33,7 +33,9 @@ The Admin Dashboard allows privileged users to manage the application's users, c
 
 ### Link Checker
 - Re-check previously failed links with a spinner, completed/total progress, and the URL currently being checked.
+- The teal Re-check button sits beside Start in the top controls.
 - Results refresh after re-checking, followed by a completion message. Request failures display an error instead.
+- The completion message counts fixed links (valid or updated URLs), removed URLs, and links that are still broken for that re-check run.
 - Starting a new check or changing link-loading filters is disabled during re-checking.
 
 ### Audit Logging
