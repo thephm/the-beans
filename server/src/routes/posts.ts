@@ -92,6 +92,14 @@ function isUnitedStatesCountry(value?: string | null): boolean {
   return ['us', 'usa', 'united states', 'united states of america', 'america'].includes(normalized);
 }
 
+function isCanadaCountry(value?: string | null): boolean {
+  return ['ca', 'can', 'canada'].includes(normalizeLocationValue(value));
+}
+
+function getPostedRoasterCount(counts: Map<string, Set<string>>, location: string): number {
+  return counts.get(location)?.size || 0;
+}
+
 /**
  * @swagger
  * /api/posts:
@@ -257,16 +265,25 @@ router.get('/suggestion', requireAdmin, async (_req: any, res: Response) => {
     });
 
     const postedRoasterIds = new Set(existingPosts.map((post) => post.roasterId));
-    const postedCountries = new Set(
-      existingPosts
-        .map((post) => normalizeLocationValue(post.roaster.country))
-        .filter(Boolean)
-    );
-    const postedCities = new Set(
-      existingPosts
-        .map((post) => normalizeLocationValue(post.roaster.city))
-        .filter(Boolean)
-    );
+    const postedCountries = new Map<string, Set<string>>();
+    const postedCities = new Map<string, Set<string>>();
+    existingPosts.forEach((post) => {
+      const country = normalizeLocationValue(post.roaster.country);
+      const city = normalizeLocationValue(post.roaster.city);
+
+      if (country) {
+        const roasters = postedCountries.get(country) || new Set<string>();
+        roasters.add(post.roasterId);
+        postedCountries.set(country, roasters);
+      }
+
+      if (country && city) {
+        const location = `${country}\u0000${city}`;
+        const roasters = postedCities.get(location) || new Set<string>();
+        roasters.add(post.roasterId);
+        postedCities.set(location, roasters);
+      }
+    });
 
     const candidates = await prisma.roaster.findMany({
       where: {
@@ -287,17 +304,33 @@ router.get('/suggestion', requireAdmin, async (_req: any, res: Response) => {
       ]
     });
 
-    const suggestion = candidates.find((roaster) => {
+    const eligibleCandidates = candidates.filter((roaster) => {
       const country = normalizeLocationValue(roaster.country);
-      const city = normalizeLocationValue(roaster.city);
 
       return !postedRoasterIds.has(roaster.id)
         && !isUnitedStatesCountry(roaster.country)
         && !!country
-        && !!city
-        && !postedCountries.has(country)
-        && !postedCities.has(city);
+        && !!normalizeLocationValue(roaster.city);
     });
+    const countryCount = (roaster: typeof candidates[number]) =>
+      getPostedRoasterCount(postedCountries, normalizeLocationValue(roaster.country));
+    const cityCount = (roaster: typeof candidates[number]) =>
+      getPostedRoasterCount(
+        postedCities,
+        `${normalizeLocationValue(roaster.country)}\u0000${normalizeLocationValue(roaster.city)}`
+      );
+    const suggestion = [
+      (roaster: typeof candidates[number]) => countryCount(roaster) === 0,
+      (roaster: typeof candidates[number]) => countryCount(roaster) === 1,
+      (roaster: typeof candidates[number]) => isCanadaCountry(roaster.country) && cityCount(roaster) === 0,
+      (roaster: typeof candidates[number]) => isCanadaCountry(roaster.country) && cityCount(roaster) === 1,
+      (roaster: typeof candidates[number]) => cityCount(roaster) === 0,
+      (roaster: typeof candidates[number]) => countryCount(roaster) === 2,
+      (roaster: typeof candidates[number]) => isCanadaCountry(roaster.country) && cityCount(roaster) === 2,
+      (roaster: typeof candidates[number]) => cityCount(roaster) === 1
+    ]
+      .map((isEligible) => eligibleCandidates.find(isEligible))
+      .find(Boolean);
 
     res.json({ suggestion: suggestion || null });
   } catch (error: any) {
