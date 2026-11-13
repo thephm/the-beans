@@ -61,6 +61,15 @@ async function run() {
       roaster('unposted', 'Lisbon', 'Portugal'),
     ]), 'unposted', 'US roasters must be excluded');
 
+    assert.equal(await suggest([], [
+      roaster('us-with-code', 'New York', 'United States of America (USA)', -1),
+      roaster('unposted', 'Lisbon', 'Portugal'),
+    ]), 'unposted', 'US roasters with a country-code qualifier must be excluded');
+
+    assert.equal(await suggest([], [
+      roaster('us-only', 'New York', 'USA (US)'),
+    ]), null, 'No suggestion should be returned when only US roasters are available');
+
     assert.equal(await suggest([
       post('canada-toronto', 'Toronto', 'Canada'),
       post('canada-vancouver', 'Vancouver', 'Canada'),

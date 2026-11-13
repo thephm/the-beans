@@ -88,7 +88,9 @@ function normalizeLocationValue(value?: string | null): string {
 }
 
 function isUnitedStatesCountry(value?: string | null): boolean {
-  const normalized = normalizeLocationValue(value).replace(/\./g, '');
+  const normalized = normalizeLocationValue(value)
+    .replace(/\./g, '')
+    .replace(/\s*\([^)]*\)\s*$/, '');
   return ['us', 'usa', 'united states', 'united states of america', 'america'].includes(normalized);
 }
 
